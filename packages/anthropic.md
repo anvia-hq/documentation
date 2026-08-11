@@ -83,6 +83,12 @@ The Vertex client follows Google authentication through the official Anthropic V
 
 ## Continue
 
+- [Get started](/packages/anthropic/get-started)
+- [Capabilities](/packages/anthropic/capabilities)
+- [Configuration](/packages/anthropic/configuration)
+- [Compatible endpoints](/packages/anthropic/compatible-endpoints)
+- [Vertex AI](/packages/anthropic/vertex-ai)
 - [API reference](/packages/anthropic/api-reference)
+- [Releases](/packages/anthropic/releases)
 - [Anthropic SDK guide](/sdk/providers/anthropic)
 - [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-anthropic/CHANGELOG.md)

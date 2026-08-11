@@ -614,7 +614,14 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/core' },
-                { text: 'API reference', link: '/packages/core/api-reference' }
+                { text: 'Get started', link: '/packages/core/get-started' },
+                { text: 'Capabilities', link: '/packages/core/capabilities' },
+                { text: 'Architecture', link: '/packages/core/architecture' },
+                { text: 'Configuration', link: '/packages/core/configuration' },
+                { text: 'Lifecycle', link: '/packages/core/runtime-lifecycle' },
+                { text: 'Patterns', link: '/packages/core/patterns' },
+                { text: 'API', link: '/packages/core/api-reference' },
+                { text: 'Releases', link: '/packages/core/releases' }
               ]
             },
             {
@@ -622,7 +629,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/server' },
-                { text: 'API reference', link: '/packages/server/api-reference' }
+                { text: 'Get started', link: '/packages/server/get-started' },
+                { text: 'Capabilities', link: '/packages/server/capabilities' },
+                { text: 'Transports', link: '/packages/server/transports' },
+                { text: 'Streaming', link: '/packages/server/streaming' },
+                { text: 'Deployment', link: '/packages/server/deployment' },
+                { text: 'API', link: '/packages/server/api-reference' },
+                { text: 'Releases', link: '/packages/server/releases' }
               ]
             },
             {
@@ -630,7 +643,11 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/react' },
-                { text: 'API reference', link: '/packages/react/api-reference' }
+                { text: 'Get started', link: '/packages/react/get-started' },
+                { text: 'Capabilities', link: '/packages/react/capabilities' },
+                { text: 'State and streaming', link: '/packages/react/state-and-streaming' },
+                { text: 'API', link: '/packages/react/api-reference' },
+                { text: 'Releases', link: '/packages/react/releases' }
               ]
             },
             {
@@ -638,7 +655,11 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/react-ui' },
-                { text: 'API reference', link: '/packages/react-ui/api-reference' }
+                { text: 'Get started', link: '/packages/react-ui/get-started' },
+                { text: 'Capabilities', link: '/packages/react-ui/capabilities' },
+                { text: 'Components and theming', link: '/packages/react-ui/components-and-theming' },
+                { text: 'API', link: '/packages/react-ui/api-reference' },
+                { text: 'Releases', link: '/packages/react-ui/releases' }
               ]
             }
           ]
@@ -651,7 +672,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/openai' },
-                { text: 'API reference', link: '/packages/openai/api-reference' }
+                { text: 'Get started', link: '/packages/openai/get-started' },
+                { text: 'Capabilities', link: '/packages/openai/capabilities' },
+                { text: 'Configuration', link: '/packages/openai/configuration' },
+                { text: 'Compatible endpoints', link: '/packages/openai/compatible-endpoints' },
+                { text: 'Models and media', link: '/packages/openai/models-and-media' },
+                { text: 'API', link: '/packages/openai/api-reference' },
+                { text: 'Releases', link: '/packages/openai/releases' }
               ]
             },
             {
@@ -659,7 +686,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/anthropic' },
-                { text: 'API reference', link: '/packages/anthropic/api-reference' }
+                { text: 'Get started', link: '/packages/anthropic/get-started' },
+                { text: 'Capabilities', link: '/packages/anthropic/capabilities' },
+                { text: 'Configuration', link: '/packages/anthropic/configuration' },
+                { text: 'Compatible endpoints', link: '/packages/anthropic/compatible-endpoints' },
+                { text: 'Vertex AI', link: '/packages/anthropic/vertex-ai' },
+                { text: 'API', link: '/packages/anthropic/api-reference' },
+                { text: 'Releases', link: '/packages/anthropic/releases' }
               ]
             },
             {
@@ -667,7 +700,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/gemini' },
-                { text: 'API reference', link: '/packages/gemini/api-reference' }
+                { text: 'Get started', link: '/packages/gemini/get-started' },
+                { text: 'Capabilities', link: '/packages/gemini/capabilities' },
+                { text: 'Configuration', link: '/packages/gemini/configuration' },
+                { text: 'Vertex AI', link: '/packages/gemini/vertex-ai' },
+                { text: 'Models and media', link: '/packages/gemini/models-and-media' },
+                { text: 'API', link: '/packages/gemini/api-reference' },
+                { text: 'Releases', link: '/packages/gemini/releases' }
               ]
             },
             {
@@ -675,7 +714,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/mistral' },
-                { text: 'API reference', link: '/packages/mistral/api-reference' }
+                { text: 'Get started', link: '/packages/mistral/get-started' },
+                { text: 'Capabilities', link: '/packages/mistral/capabilities' },
+                { text: 'Configuration', link: '/packages/mistral/configuration' },
+                { text: 'OCR', link: '/packages/mistral/ocr' },
+                { text: 'Mapping helpers', link: '/packages/mistral/mapping-helpers' },
+                { text: 'API', link: '/packages/mistral/api-reference' },
+                { text: 'Releases', link: '/packages/mistral/releases' }
               ]
             },
             {
@@ -683,7 +728,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/grok' },
-                { text: 'API reference', link: '/packages/grok/api-reference' }
+                { text: 'Get started', link: '/packages/grok/get-started' },
+                { text: 'Capabilities', link: '/packages/grok/capabilities' },
+                { text: 'Configuration', link: '/packages/grok/configuration' },
+                { text: 'Server tools', link: '/packages/grok/server-tools' },
+                { text: 'Models and media', link: '/packages/grok/models-and-media' },
+                { text: 'API', link: '/packages/grok/api-reference' },
+                { text: 'Releases', link: '/packages/grok/releases' }
               ]
             }
           ]
@@ -696,7 +747,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/fastembed' },
-                { text: 'API reference', link: '/packages/fastembed/api-reference' }
+                { text: 'Get started', link: '/packages/fastembed/get-started' },
+                { text: 'Capabilities', link: '/packages/fastembed/capabilities' },
+                { text: 'Configuration', link: '/packages/fastembed/configuration' },
+                { text: 'Local runtime', link: '/packages/fastembed/local-runtime' },
+                { text: 'Sparse embeddings', link: '/packages/fastembed/sparse-embeddings' },
+                { text: 'API', link: '/packages/fastembed/api-reference' },
+                { text: 'Releases', link: '/packages/fastembed/releases' }
               ]
             },
             {
@@ -704,7 +761,12 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/transformers' },
-                { text: 'API reference', link: '/packages/transformers/api-reference' }
+                { text: 'Get started', link: '/packages/transformers/get-started' },
+                { text: 'Capabilities', link: '/packages/transformers/capabilities' },
+                { text: 'Configuration', link: '/packages/transformers/configuration' },
+                { text: 'Model loading', link: '/packages/transformers/model-loading' },
+                { text: 'API', link: '/packages/transformers/api-reference' },
+                { text: 'Releases', link: '/packages/transformers/releases' }
               ]
             }
           ]
@@ -717,7 +779,14 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/memory-sqlite' },
-                { text: 'API reference', link: '/packages/memory-sqlite/api-reference' }
+                { text: 'Get started', link: '/packages/memory-sqlite/get-started' },
+                { text: 'Capabilities', link: '/packages/memory-sqlite/capabilities' },
+                { text: 'Configuration', link: '/packages/memory-sqlite/configuration' },
+                { text: 'Schema and migrations', link: '/packages/memory-sqlite/schema-and-migrations' },
+                { text: 'Scope and concurrency', link: '/packages/memory-sqlite/scoping-and-concurrency' },
+                { text: 'Production', link: '/packages/memory-sqlite/production' },
+                { text: 'API', link: '/packages/memory-sqlite/api-reference' },
+                { text: 'Releases', link: '/packages/memory-sqlite/releases' }
               ]
             },
             {
@@ -725,7 +794,14 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/memory-postgres' },
-                { text: 'API reference', link: '/packages/memory-postgres/api-reference' }
+                { text: 'Get started', link: '/packages/memory-postgres/get-started' },
+                { text: 'Capabilities', link: '/packages/memory-postgres/capabilities' },
+                { text: 'Configuration', link: '/packages/memory-postgres/configuration' },
+                { text: 'Schema and migrations', link: '/packages/memory-postgres/schema-and-migrations' },
+                { text: 'Scope and concurrency', link: '/packages/memory-postgres/scoping-and-concurrency' },
+                { text: 'Production', link: '/packages/memory-postgres/production' },
+                { text: 'API', link: '/packages/memory-postgres/api-reference' },
+                { text: 'Releases', link: '/packages/memory-postgres/releases' }
               ]
             },
             {
@@ -733,7 +809,14 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/memory-drizzle' },
-                { text: 'API reference', link: '/packages/memory-drizzle/api-reference' }
+                { text: 'Get started', link: '/packages/memory-drizzle/get-started' },
+                { text: 'Capabilities', link: '/packages/memory-drizzle/capabilities' },
+                { text: 'Configuration', link: '/packages/memory-drizzle/configuration' },
+                { text: 'Schema and migrations', link: '/packages/memory-drizzle/schema-and-migrations' },
+                { text: 'Scope and concurrency', link: '/packages/memory-drizzle/scoping-and-concurrency' },
+                { text: 'Production', link: '/packages/memory-drizzle/production' },
+                { text: 'API', link: '/packages/memory-drizzle/api-reference' },
+                { text: 'Releases', link: '/packages/memory-drizzle/releases' }
               ]
             },
             {
@@ -741,7 +824,14 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/memory-prisma' },
-                { text: 'API reference', link: '/packages/memory-prisma/api-reference' }
+                { text: 'Get started', link: '/packages/memory-prisma/get-started' },
+                { text: 'Capabilities', link: '/packages/memory-prisma/capabilities' },
+                { text: 'Configuration', link: '/packages/memory-prisma/configuration' },
+                { text: 'Schema and migrations', link: '/packages/memory-prisma/schema-and-migrations' },
+                { text: 'Scope and concurrency', link: '/packages/memory-prisma/scoping-and-concurrency' },
+                { text: 'Production', link: '/packages/memory-prisma/production' },
+                { text: 'API', link: '/packages/memory-prisma/api-reference' },
+                { text: 'Releases', link: '/packages/memory-prisma/releases' }
               ]
             }
           ]
@@ -754,7 +844,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/chroma' },
-                { text: 'API reference', link: '/packages/chroma/api-reference' }
+                { text: 'Get started', link: '/packages/chroma/get-started' },
+                { text: 'Capabilities', link: '/packages/chroma/capabilities' },
+                { text: 'Collections', link: '/packages/chroma/collections-and-indexing' },
+                { text: 'Search and filters', link: '/packages/chroma/search-and-filters' },
+                { text: 'Production', link: '/packages/chroma/production' },
+                { text: 'API', link: '/packages/chroma/api-reference' },
+                { text: 'Releases', link: '/packages/chroma/releases' }
               ]
             },
             {
@@ -762,7 +858,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/lancedb' },
-                { text: 'API reference', link: '/packages/lancedb/api-reference' }
+                { text: 'Get started', link: '/packages/lancedb/get-started' },
+                { text: 'Capabilities', link: '/packages/lancedb/capabilities' },
+                { text: 'Tables and indexes', link: '/packages/lancedb/collections-and-indexing' },
+                { text: 'Search and filters', link: '/packages/lancedb/search-and-filters' },
+                { text: 'Production', link: '/packages/lancedb/production' },
+                { text: 'API', link: '/packages/lancedb/api-reference' },
+                { text: 'Releases', link: '/packages/lancedb/releases' }
               ]
             },
             {
@@ -770,7 +872,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/milvus' },
-                { text: 'API reference', link: '/packages/milvus/api-reference' }
+                { text: 'Get started', link: '/packages/milvus/get-started' },
+                { text: 'Capabilities', link: '/packages/milvus/capabilities' },
+                { text: 'Collections', link: '/packages/milvus/collections-and-indexing' },
+                { text: 'Search and filters', link: '/packages/milvus/search-and-filters' },
+                { text: 'Production', link: '/packages/milvus/production' },
+                { text: 'API', link: '/packages/milvus/api-reference' },
+                { text: 'Releases', link: '/packages/milvus/releases' }
               ]
             },
             {
@@ -778,7 +886,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/pgvector' },
-                { text: 'API reference', link: '/packages/pgvector/api-reference' }
+                { text: 'Get started', link: '/packages/pgvector/get-started' },
+                { text: 'Capabilities', link: '/packages/pgvector/capabilities' },
+                { text: 'Tables and indexes', link: '/packages/pgvector/collections-and-indexing' },
+                { text: 'Search and filters', link: '/packages/pgvector/search-and-filters' },
+                { text: 'Production', link: '/packages/pgvector/production' },
+                { text: 'API', link: '/packages/pgvector/api-reference' },
+                { text: 'Releases', link: '/packages/pgvector/releases' }
               ]
             },
             {
@@ -786,7 +900,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/pinecone' },
-                { text: 'API reference', link: '/packages/pinecone/api-reference' }
+                { text: 'Get started', link: '/packages/pinecone/get-started' },
+                { text: 'Capabilities', link: '/packages/pinecone/capabilities' },
+                { text: 'Indexes and namespaces', link: '/packages/pinecone/collections-and-indexing' },
+                { text: 'Search and filters', link: '/packages/pinecone/search-and-filters' },
+                { text: 'Production', link: '/packages/pinecone/production' },
+                { text: 'API', link: '/packages/pinecone/api-reference' },
+                { text: 'Releases', link: '/packages/pinecone/releases' }
               ]
             },
             {
@@ -794,7 +914,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/qdrant' },
-                { text: 'API reference', link: '/packages/qdrant/api-reference' }
+                { text: 'Get started', link: '/packages/qdrant/get-started' },
+                { text: 'Capabilities', link: '/packages/qdrant/capabilities' },
+                { text: 'Collections', link: '/packages/qdrant/collections-and-indexing' },
+                { text: 'Search and filters', link: '/packages/qdrant/search-and-filters' },
+                { text: 'Production', link: '/packages/qdrant/production' },
+                { text: 'API', link: '/packages/qdrant/api-reference' },
+                { text: 'Releases', link: '/packages/qdrant/releases' }
               ]
             },
             {
@@ -802,7 +928,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/redis' },
-                { text: 'API reference', link: '/packages/redis/api-reference' }
+                { text: 'Get started', link: '/packages/redis/get-started' },
+                { text: 'Capabilities', link: '/packages/redis/capabilities' },
+                { text: 'Keys and indexes', link: '/packages/redis/collections-and-indexing' },
+                { text: 'Search and filters', link: '/packages/redis/search-and-filters' },
+                { text: 'Production', link: '/packages/redis/production' },
+                { text: 'API', link: '/packages/redis/api-reference' },
+                { text: 'Releases', link: '/packages/redis/releases' }
               ]
             },
             {
@@ -810,7 +942,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/weaviate' },
-                { text: 'API reference', link: '/packages/weaviate/api-reference' }
+                { text: 'Get started', link: '/packages/weaviate/get-started' },
+                { text: 'Capabilities', link: '/packages/weaviate/capabilities' },
+                { text: 'Collections', link: '/packages/weaviate/collections-and-indexing' },
+                { text: 'Search and filters', link: '/packages/weaviate/search-and-filters' },
+                { text: 'Production', link: '/packages/weaviate/production' },
+                { text: 'API', link: '/packages/weaviate/api-reference' },
+                { text: 'Releases', link: '/packages/weaviate/releases' }
               ]
             }
           ]
@@ -823,7 +961,12 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/logger' },
-                { text: 'API reference', link: '/packages/logger/api-reference' }
+                { text: 'Get started', link: '/packages/logger/get-started' },
+                { text: 'Capabilities', link: '/packages/logger/capabilities' },
+                { text: 'Data and privacy', link: '/packages/logger/data-and-privacy' },
+                { text: 'Production', link: '/packages/logger/production' },
+                { text: 'API', link: '/packages/logger/api-reference' },
+                { text: 'Releases', link: '/packages/logger/releases' }
               ]
             },
             {
@@ -831,7 +974,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/otel' },
-                { text: 'API reference', link: '/packages/otel/api-reference' }
+                { text: 'Get started', link: '/packages/otel/get-started' },
+                { text: 'Tracing', link: '/packages/otel/tracing' },
+                { text: 'Eval reporting', link: '/packages/otel/eval-reporting' },
+                { text: 'Data and privacy', link: '/packages/otel/data-and-privacy' },
+                { text: 'Lifecycle', link: '/packages/otel/lifecycle' },
+                { text: 'API', link: '/packages/otel/api-reference' },
+                { text: 'Releases', link: '/packages/otel/releases' }
               ]
             },
             {
@@ -839,7 +988,13 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/lens' },
-                { text: 'API reference', link: '/packages/lens/api-reference' }
+                { text: 'Get started', link: '/packages/lens/get-started' },
+                { text: 'Tracing', link: '/packages/lens/tracing' },
+                { text: 'Evals and datasets', link: '/packages/lens/evals-and-datasets' },
+                { text: 'Data and privacy', link: '/packages/lens/data-and-privacy' },
+                { text: 'Lifecycle', link: '/packages/lens/lifecycle' },
+                { text: 'API', link: '/packages/lens/api-reference' },
+                { text: 'Releases', link: '/packages/lens/releases' }
               ]
             },
             {
@@ -847,7 +1002,14 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/langfuse' },
-                { text: 'API reference', link: '/packages/langfuse/api-reference' }
+                { text: 'Get started', link: '/packages/langfuse/get-started' },
+                { text: 'Tracing', link: '/packages/langfuse/tracing' },
+                { text: 'Prompts and data', link: '/packages/langfuse/prompts-and-data' },
+                { text: 'Evals and scores', link: '/packages/langfuse/evals-and-scores' },
+                { text: 'Data and privacy', link: '/packages/langfuse/data-and-privacy' },
+                { text: 'Lifecycle', link: '/packages/langfuse/lifecycle' },
+                { text: 'API', link: '/packages/langfuse/api-reference' },
+                { text: 'Releases', link: '/packages/langfuse/releases' }
               ]
             }
           ]
@@ -860,7 +1022,12 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/studio' },
-                { text: 'API reference', link: '/packages/studio/api-reference' }
+                { text: 'Get started', link: '/packages/studio/get-started' },
+                { text: 'Capabilities', link: '/packages/studio/capabilities' },
+                { text: 'Configuration', link: '/packages/studio/configuration' },
+                { text: 'Runtime boundary', link: '/packages/studio/runtime-boundary' },
+                { text: 'API', link: '/packages/studio/api-reference' },
+                { text: 'Releases', link: '/packages/studio/releases' }
               ]
             },
             {
@@ -868,7 +1035,12 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/packages/sandbox' },
-                { text: 'API reference', link: '/packages/sandbox/api-reference' }
+                { text: 'Get started', link: '/packages/sandbox/get-started' },
+                { text: 'Capabilities', link: '/packages/sandbox/capabilities' },
+                { text: 'Lifecycle', link: '/packages/sandbox/lifecycle' },
+                { text: 'Security', link: '/packages/sandbox/security' },
+                { text: 'API', link: '/packages/sandbox/api-reference' },
+                { text: 'Releases', link: '/packages/sandbox/releases' }
               ]
             }
           ]

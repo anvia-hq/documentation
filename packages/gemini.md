@@ -81,6 +81,12 @@ Use matching dimensions and a compatible task configuration when indexing and qu
 
 ## Continue
 
+- [Get started](/packages/gemini/get-started)
+- [Capabilities](/packages/gemini/capabilities)
+- [Configuration](/packages/gemini/configuration)
+- [Vertex AI](/packages/gemini/vertex-ai)
+- [Models and media](/packages/gemini/models-and-media)
 - [API reference](/packages/gemini/api-reference)
+- [Releases](/packages/gemini/releases)
 - [Gemini SDK guide](/sdk/providers/gemini)
 - [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-gemini/CHANGELOG.md)

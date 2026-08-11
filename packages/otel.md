@@ -52,6 +52,11 @@ The package peers with `@anvia/core` and uses the OpenTelemetry API packages. SD
 
 ## Next steps
 
+- [Get started](/packages/otel/get-started)
+- [Tracing](/packages/otel/tracing)
+- [Eval reporting](/packages/otel/eval-reporting)
+- [Data and privacy](/packages/otel/data-and-privacy)
+- [Lifecycle](/packages/otel/lifecycle)
 - [Public API](/packages/otel/api-reference)
+- [Releases](/packages/otel/releases)
 - [Lens observability](/lens/observability)
-- [Package changelog](https://github.com/anvia-hq/anvia/blob/main/packages/observability-otel/CHANGELOG.md)

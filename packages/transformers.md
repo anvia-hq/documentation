@@ -77,7 +77,11 @@ Use the same model, pooling, normalization, and preprocessing for ingestion and 
 
 ## Continue
 
+- [Get started](/packages/transformers/get-started)
+- [Capabilities](/packages/transformers/capabilities)
+- [Configuration](/packages/transformers/configuration)
+- [Model loading](/packages/transformers/model-loading)
 - [API reference](/packages/transformers/api-reference)
+- [Releases](/packages/transformers/releases)
 - [Embeddings guide](/sdk/knowledges/embeddings)
 - [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/embedding-transformers/CHANGELOG.md)
-

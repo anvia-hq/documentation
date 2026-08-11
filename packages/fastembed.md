@@ -75,7 +75,12 @@ Use the same dense model, sparse model, and preprocessing rules for ingestion an
 
 ## Continue
 
+- [Get started](/packages/fastembed/get-started)
+- [Capabilities](/packages/fastembed/capabilities)
+- [Configuration](/packages/fastembed/configuration)
+- [Local runtime](/packages/fastembed/local-runtime)
+- [Sparse embeddings](/packages/fastembed/sparse-embeddings)
 - [API reference](/packages/fastembed/api-reference)
+- [Releases](/packages/fastembed/releases)
 - [Embeddings guide](/sdk/knowledges/embeddings)
 - [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/embedding-fastembed/CHANGELOG.md)
-

@@ -44,6 +44,10 @@ The package is a server-side logging adapter and declares `@anvia/core` as a pee
 
 ## Next steps
 
+- [Get started](/packages/logger/get-started)
+- [Capabilities](/packages/logger/capabilities)
+- [Data and privacy](/packages/logger/data-and-privacy)
+- [Production](/packages/logger/production)
 - [Public API](/packages/logger/api-reference)
+- [Releases](/packages/logger/releases)
 - [Hooks and run control](/sdk/advanced/hooks)
-- [Package changelog](https://github.com/anvia-hq/anvia/blob/main/packages/logger/CHANGELOG.md)

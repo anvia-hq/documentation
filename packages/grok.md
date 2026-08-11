@@ -82,7 +82,12 @@ The package does not expose embeddings, video generation, realtime voice, stream
 
 ## Continue
 
+- [Get started](/packages/grok/get-started)
+- [Capabilities](/packages/grok/capabilities)
+- [Configuration](/packages/grok/configuration)
+- [Server tools](/packages/grok/server-tools)
+- [Models and media](/packages/grok/models-and-media)
 - [API reference](/packages/grok/api-reference)
+- [Releases](/packages/grok/releases)
 - [Provider capability matrix](/sdk/providers/capability-matrix)
 - [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-grok/CHANGELOG.md)
-

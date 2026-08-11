@@ -83,6 +83,12 @@ const vectors = await embeddings.embedTexts(['first document', 'second document'
 
 ## Continue
 
+- [Get started](/packages/mistral/get-started)
+- [Capabilities](/packages/mistral/capabilities)
+- [Configuration](/packages/mistral/configuration)
+- [OCR](/packages/mistral/ocr)
+- [Mapping helpers](/packages/mistral/mapping-helpers)
 - [API reference](/packages/mistral/api-reference)
+- [Releases](/packages/mistral/releases)
 - [Mistral SDK guide](/sdk/providers/mistral)
 - [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-mistral/CHANGELOG.md)

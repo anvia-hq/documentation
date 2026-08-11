@@ -84,6 +84,12 @@ Create the provider client once at the server boundary. Keep credentials there, 
 
 ## Continue
 
+- [Get started](/packages/openai/get-started)
+- [Capabilities](/packages/openai/capabilities)
+- [Configuration](/packages/openai/configuration)
+- [Compatible endpoints](/packages/openai/compatible-endpoints)
+- [Models and media](/packages/openai/models-and-media)
 - [API reference](/packages/openai/api-reference)
+- [Releases](/packages/openai/releases)
 - [OpenAI SDK guide](/sdk/providers/openai)
 - [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-openai/CHANGELOG.md)

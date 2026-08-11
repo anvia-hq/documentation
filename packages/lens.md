@@ -61,8 +61,12 @@ try {
 
 ## Next steps
 
+- [Get started](/packages/lens/get-started)
+- [Tracing](/packages/lens/tracing)
+- [Evals and datasets](/packages/lens/evals-and-datasets)
+- [Data and privacy](/packages/lens/data-and-privacy)
+- [Lifecycle](/packages/lens/lifecycle)
 - [Public API](/packages/lens/api-reference)
+- [Releases](/packages/lens/releases)
 - [Connect Anvia to Lens](/lens/connect/anvia)
 - [Lens evaluations](/lens/evaluations)
-- [Package changelog](https://github.com/anvia-hq/anvia/blob/main/packages/observability-lens/CHANGELOG.md)
-

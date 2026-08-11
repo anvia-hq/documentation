@@ -46,7 +46,12 @@ The package peers with `@anvia/core` and includes the Langfuse OpenTelemetry and
 
 ## Next steps
 
+- [Get started](/packages/langfuse/get-started)
+- [Tracing](/packages/langfuse/tracing)
+- [Prompts and data](/packages/langfuse/prompts-and-data)
+- [Evals and scores](/packages/langfuse/evals-and-scores)
+- [Data and privacy](/packages/langfuse/data-and-privacy)
+- [Lifecycle](/packages/langfuse/lifecycle)
 - [Public API](/packages/langfuse/api-reference)
+- [Releases](/packages/langfuse/releases)
 - [Connect existing Langfuse instrumentation](/lens/connect/langfuse)
-- [Package changelog](https://github.com/anvia-hq/anvia/blob/main/packages/observability-langfuse/CHANGELOG.md)
-
