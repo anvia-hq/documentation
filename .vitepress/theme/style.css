@@ -1,0 +1,208 @@
+:root {
+  --vp-font-family-base: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --vp-font-family-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
+  --vp-sidebar-width: 304px;
+  --vp-c-bg: #fff;
+  --vp-c-bg-alt: #fff;
+  --vp-c-bg-elv: #fff;
+  --vp-c-gutter: #fff;
+  --vp-code-block-bg: #f6f6f7;
+  --vp-c-brand-1: #35b95d;
+  --vp-c-brand-2: #49cf71;
+  --vp-c-brand-3: #62e989;
+  --vp-c-brand-soft: rgb(53 185 93 / 12%);
+  --vp-home-hero-name-color: #35b95d;
+  --vp-home-hero-image-background-image: radial-gradient(circle, rgb(98 233 137 / 18%), transparent 65%);
+  --vp-home-hero-image-filter: blur(44px);
+}
+
+:root:not(.dark) {
+  --vp-code-bg: #f8f8f8;
+}
+
+.dark {
+  --vp-c-bg: #131313;
+  --vp-c-bg-alt: #131313;
+  --vp-c-bg-elv: #191919;
+  --vp-c-bg-soft: #1c1c1c;
+  --vp-c-text-1: #f5f5f5;
+  --vp-c-text-2: #a3a3a3;
+  --vp-c-text-3: #737373;
+  --vp-c-divider: #242424;
+  --vp-c-border: #2e2e2e;
+  --vp-c-gutter: #131313;
+  --vp-c-brand-1: #62e989;
+  --vp-c-brand-2: #49cf71;
+  --vp-c-brand-3: #35b95d;
+  --vp-c-brand-soft: rgb(98 233 137 / 12%);
+  --vp-code-block-bg: #0a0a0a;
+  --vp-home-hero-name-color: #62e989;
+}
+
+body {
+  font-size: 18px;
+  line-height: 28px;
+}
+
+.VPNavBar,
+.VPNavBar.has-sidebar .content,
+.VPNavBar.has-sidebar .curtain {
+  background-color: color-mix(in srgb, var(--vp-c-bg) 82%, transparent) !important;
+  backdrop-filter: blur(12px);
+}
+
+.VPNavBarTitle .title span {
+  width: 76px;
+  height: 16px;
+  overflow: hidden;
+  background: url('/anvia-wordmark.png') center / contain no-repeat;
+  color: transparent;
+  white-space: nowrap;
+}
+
+.VPNavBarTitle.has-sidebar .title {
+  border-bottom: 0 !important;
+}
+
+:root:not(.dark) .VPNavBarTitle .title span {
+  filter: invert(1);
+}
+
+.VPHomeHero .image-src {
+  width: 220px;
+  height: 220px;
+}
+
+.VPButton.brand {
+  color: #050505 !important;
+}
+
+.VPSidebar .group + .group {
+  border-top: 0;
+}
+
+.VPSidebarItem .text {
+  font-size: 16px;
+}
+
+.VPSidebarItem.is-active > .item > .link {
+  margin-left: -10px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: var(--vp-c-brand-soft);
+}
+
+.VPDocAsideOutline .content {
+  border-left: 0;
+}
+
+.VPDocAsideOutline .outline-title,
+.VPDocAsideOutline .outline-link {
+  font-size: 15px;
+}
+
+.VPDocFooter .pager-link:hover {
+  border-color: var(--vp-c-divider);
+}
+
+.vp-doc table {
+  display: table;
+  width: 100%;
+  border: 1px solid var(--vp-c-divider);
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.vp-doc img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 24px auto;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+  background: var(--vp-c-bg);
+  cursor: zoom-in;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.vp-doc img:hover {
+  border-color: var(--vp-c-border);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 6%);
+}
+
+.vp-doc img:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 3px;
+}
+
+.dark .vp-doc img:hover {
+  box-shadow: 0 8px 28px rgb(0 0 0 / 24%);
+}
+
+.vp-doc [class*='language-'] code {
+  font-size: 0.8125em;
+}
+
+.vp-doc tr {
+  border-top: 0;
+}
+
+.vp-doc th,
+.vp-doc td {
+  border: 0;
+  border-right: 1px solid var(--vp-c-divider);
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc th:last-child,
+.vp-doc td:last-child {
+  border-right: 0;
+}
+
+.vp-doc tr:last-child td {
+  border-bottom: 0;
+}
+
+:root:not(.dark) .vp-doc tr:nth-child(2n),
+:root:not(.dark) .vp-doc th {
+  background-color: #fdfdfd;
+}
+
+.dark .vp-doc tr:nth-child(2n),
+.dark .vp-doc th {
+  background-color: #171717;
+}
+
+.VPSwitchAppearance {
+  width: 32px !important;
+  height: 32px !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.VPSwitchAppearance .check {
+  top: 7px;
+  left: 7px;
+  background: transparent;
+  box-shadow: none;
+  transform: none !important;
+}
+
+.VPNavBar .appearance::before,
+.VPNavBar .social-links::before {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  :root:not(.dark) .DocSearch-Button,
+  :root:not(.dark) .DocSearch-Button:hover {
+    background-color: #f8f8f8;
+  }
+
+  .dark .DocSearch-Button,
+  .dark .DocSearch-Button:hover {
+    background-color: #242424;
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "anvia-documentation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "lucide-static": "^1.31.0",
+    "vitepress": "^1.6.4"
+  }
+}
