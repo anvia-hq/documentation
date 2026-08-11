@@ -1114,6 +1114,7 @@ export default defineConfig({
             { text: 'Auth and permissions', link: '/faqs/production/authentication-and-authorization' },
             { text: 'API keys', link: '/faqs/production/api-keys' },
             { text: 'Deployment', link: '/faqs/production/deploying-anvia' },
+            { text: 'Bun support', link: '/faqs/production/bun-support' },
             { text: 'Durable workflows', link: '/faqs/production/durable-workflows' },
             { text: 'Persistence', link: '/faqs/production/persistence' },
             { text: 'Retries and cancellation', link: '/faqs/production/retries-and-cancellation' },

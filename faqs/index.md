@@ -11,6 +11,7 @@ Understand what Anvia provides, where it fits in a TypeScript application, and h
 | How does it compare with other TypeScript tools? | The best choice depends on whether the product needs a model/UI toolkit, an integrated agent framework, an autonomous harness, or an application-owned runtime. [Compare the stacks](/faqs/comparisons/). |
 | Do I need Studio or Lens? | No. Both are optional products around the SDK: Studio is a local development console, while Lens is an observability and evaluation workspace. [Understand the products](/faqs/studio-and-lens/do-i-need-studio-or-lens). |
 | Is it production-ready? | The runtime provides production-oriented controls, but the application still owns deployment, authentication, authorization, data policy, and operational reliability. [Read the production answer](/faqs/production/is-anvia-production-ready). |
+| Does it work with Bun? | Node.js is the currently tested and supported runtime. Bun may work for some packages, but official support will follow dedicated compatibility testing. [Read the Bun answer](/faqs/production/bun-support). |
 
 ## Explore by topic
 
@@ -32,7 +33,7 @@ Learn what [Studio](/faqs/studio-and-lens/what-is-studio) and [Lens](/faqs/studi
 
 ### Production architecture
 
-Review [security ownership](/faqs/production/authentication-and-authorization), [deployment](/faqs/production/deploying-anvia), [persistence](/faqs/production/persistence), [retries and cancellation](/faqs/production/retries-and-cancellation), and [testing agent behavior](/faqs/production/testing-agent-behavior).
+Review [security ownership](/faqs/production/authentication-and-authorization), [deployment](/faqs/production/deploying-anvia), [Bun support](/faqs/production/bun-support), [persistence](/faqs/production/persistence), [retries and cancellation](/faqs/production/retries-and-cancellation), and [testing agent behavior](/faqs/production/testing-agent-behavior).
 
 ## Quick answers
 
