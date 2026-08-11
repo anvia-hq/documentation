@@ -44,6 +44,11 @@ body {
   line-height: 28px;
 }
 
+.vp-doc {
+  font-size: 16px;
+  line-height: 26px;
+}
+
 .VPNavBar,
 .VPNavBar.has-sidebar .content,
 .VPNavBar.has-sidebar .curtain {
@@ -99,6 +104,23 @@ body {
 .VPDocAsideOutline .outline-title,
 .VPDocAsideOutline .outline-link {
   font-size: 15px;
+}
+
+@media (min-width: 1280px) {
+  .VPDoc.has-aside .content-container {
+    max-width: 800px;
+  }
+
+  .VPDoc.has-aside .vp-doc > :where(h1, h2, h3, h4, h5, h6, p, ul, ol, dl, blockquote, details) {
+    width: 100%;
+    max-width: 688px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .VPDoc.has-aside .vp-doc > p:has(> img:only-child) {
+    max-width: none;
+  }
 }
 
 .VPDocFooter .pager-link:hover {
@@ -210,13 +232,48 @@ body {
 }
 
 @media (min-width: 768px) {
+  .VPNavBarSearch {
+    flex: 1 1 420px;
+    width: auto;
+    max-width: 560px;
+    margin-right: auto;
+  }
+
   :root:not(.dark) .DocSearch-Button,
   :root:not(.dark) .DocSearch-Button:hover {
+    border-color: transparent;
     background-color: #f8f8f8;
   }
 
   .dark .DocSearch-Button,
   .dark .DocSearch-Button:hover {
+    border-color: transparent;
     background-color: #242424;
   }
+
+  .DocSearch-Button:focus-visible {
+    border-color: transparent;
+    outline: 1px solid var(--vp-c-border);
+    outline-offset: 2px;
+  }
+}
+
+@media (min-width: 960px) {
+  .VPNavBar.has-sidebar .content {
+    padding-left: 124px;
+  }
+
+  .VPNavBarSearch {
+    padding-left: 16px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .VPNavBar.has-sidebar .content {
+    padding-left: calc((100vw - var(--vp-layout-max-width)) / 2 + 124px);
+  }
+}
+
+.DocSearch-Form {
+  border-color: var(--vp-c-divider);
 }
