@@ -15,6 +15,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Anvia SDK', link: '/sdk/' },
+      { text: 'Studio', link: '/studio/' },
       { text: 'Lens', link: '/lens/' },
       { text: 'References', link: '/references/' },
       { text: 'FAQs', link: '/faqs/' }
@@ -381,6 +382,94 @@ export default defineConfig({
           ]
         }
       ],
+      '/studio/': [
+        {
+          text: 'Get Started',
+          items: [
+            { text: 'Introduction', link: '/studio/' },
+            { text: 'Install and setup', link: '/studio/install-and-setup' },
+            { text: 'Run your first agent', link: '/studio/run-your-first-agent' },
+            { text: 'How Studio works', link: '/studio/how-studio-works' }
+          ]
+        },
+        {
+          text: 'Workspace',
+          items: [
+            {
+              text: 'Playground',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/studio/playground' },
+                { text: 'Run an agent', link: '/studio/playground/run-an-agent' },
+                { text: 'Models and attachments', link: '/studio/playground/models-and-attachments' },
+                { text: 'Approvals and questions', link: '/studio/playground/approvals-and-questions' }
+              ]
+            },
+            {
+              text: 'Pipelines',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/studio/pipelines' },
+                { text: 'Graph and inputs', link: '/studio/pipelines/graph-and-inputs' },
+                { text: 'Runs, logs, and replay', link: '/studio/pipelines/runs-logs-and-replay' }
+              ]
+            },
+            { text: 'Sessions', link: '/studio/sessions' },
+            {
+              text: 'Traces',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/studio/traces' },
+                { text: 'Inspect a trace', link: '/studio/traces/inspect-a-trace' },
+                { text: 'Session traces and logs', link: '/studio/traces/session-traces-and-logs' }
+              ]
+            }
+          ]
+        },
+        {
+          text: 'Inspect',
+          items: [
+            { text: 'Agents', link: '/studio/agents' },
+            {
+              text: 'Tools',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/studio/tools' },
+                { text: 'Inspect schemas', link: '/studio/tools/inspect-schemas' },
+                { text: 'Run tools directly', link: '/studio/tools/run-tools-directly' },
+                { text: 'Approval behavior', link: '/studio/tools/approval-behavior' }
+              ]
+            },
+            { text: 'MCP', link: '/studio/mcp' },
+            {
+              text: 'Knowledge',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/studio/knowledge' },
+                { text: 'Static context', link: '/studio/knowledge/static-context' },
+                { text: 'Dynamic context', link: '/studio/knowledge/dynamic-context' },
+                { text: 'Dynamic tools', link: '/studio/knowledge/dynamic-tools' },
+                { text: 'Retrieval evidence', link: '/studio/knowledge/retrieval-evidence' }
+              ]
+            },
+            { text: 'Memory', link: '/studio/memory' },
+            { text: 'Sandboxes', link: '/studio/sandboxes' },
+            { text: 'Runtime status', link: '/studio/runtime-status' }
+          ]
+        },
+        {
+          text: 'Configure',
+          items: [
+            { text: 'Register agents and pipelines', link: '/studio/configure/register-agents-and-pipelines' },
+            { text: 'Quick prompts', link: '/studio/configure/quick-prompts' },
+            { text: 'Model catalog', link: '/studio/configure/model-catalog' },
+            { text: 'Storage and persistence', link: '/studio/configure/storage-and-persistence' },
+            { text: 'UI and server options', link: '/studio/configure/ui-and-server-options' },
+            { text: 'Lifecycle and cleanup', link: '/studio/configure/lifecycle-and-cleanup' },
+            { text: 'Security boundaries', link: '/studio/configure/security-boundaries' }
+          ]
+        }
+      ],
       '/lens/': [
         {
           text: 'Get Started',
@@ -526,6 +615,7 @@ export default defineConfig({
           text: 'Products',
           items: [
             { text: 'Anvia SDK', link: '/sdk/' },
+            { text: 'Anvia Studio', link: '/studio/' },
             { text: 'Lens Observability', link: '/lens/' }
           ]
         },
