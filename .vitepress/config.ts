@@ -17,7 +17,7 @@ export default defineConfig({
       { text: 'Anvia SDK', link: '/sdk/' },
       { text: 'Studio', link: '/studio/' },
       { text: 'Lens', link: '/lens/' },
-      { text: 'References', link: '/references/' },
+      { text: 'Packages', link: '/packages/' },
       { text: 'FAQs', link: '/faqs/' }
     ],
     sidebar: {
@@ -595,7 +595,285 @@ export default defineConfig({
           ]
         }
       ],
-      '/references/': [{ text: 'References', items: [{ text: 'Overview', link: '/references/' }] }],
+      '/packages/': [
+        {
+          text: 'Packages',
+          items: [
+            { text: 'Overview', link: '/packages/' },
+            { text: 'Package catalog', link: '/packages/catalog' },
+            { text: 'Feature matrix', link: '/packages/feature-matrix' },
+            { text: 'Compatibility and versioning', link: '/packages/compatibility-and-versioning' },
+            { text: 'Changelog', link: '/packages/changelog' }
+          ]
+        },
+        {
+          text: 'Core runtime',
+          items: [
+            {
+              text: '@anvia/core',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/core' },
+                { text: 'API reference', link: '/packages/core/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/server',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/server' },
+                { text: 'API reference', link: '/packages/server/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/react',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/react' },
+                { text: 'API reference', link: '/packages/react/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/react-ui',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/react-ui' },
+                { text: 'API reference', link: '/packages/react-ui/api-reference' }
+              ]
+            }
+          ]
+        },
+        {
+          text: 'Model providers',
+          items: [
+            {
+              text: '@anvia/openai',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/openai' },
+                { text: 'API reference', link: '/packages/openai/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/anthropic',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/anthropic' },
+                { text: 'API reference', link: '/packages/anthropic/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/gemini',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/gemini' },
+                { text: 'API reference', link: '/packages/gemini/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/mistral',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/mistral' },
+                { text: 'API reference', link: '/packages/mistral/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/grok',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/grok' },
+                { text: 'API reference', link: '/packages/grok/api-reference' }
+              ]
+            }
+          ]
+        },
+        {
+          text: 'Embeddings',
+          items: [
+            {
+              text: '@anvia/fastembed',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/fastembed' },
+                { text: 'API reference', link: '/packages/fastembed/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/transformers',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/transformers' },
+                { text: 'API reference', link: '/packages/transformers/api-reference' }
+              ]
+            }
+          ]
+        },
+        {
+          text: 'Memory',
+          items: [
+            {
+              text: '@anvia/memory-sqlite',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/memory-sqlite' },
+                { text: 'API reference', link: '/packages/memory-sqlite/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/memory-postgres',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/memory-postgres' },
+                { text: 'API reference', link: '/packages/memory-postgres/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/memory-drizzle',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/memory-drizzle' },
+                { text: 'API reference', link: '/packages/memory-drizzle/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/memory-prisma',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/memory-prisma' },
+                { text: 'API reference', link: '/packages/memory-prisma/api-reference' }
+              ]
+            }
+          ]
+        },
+        {
+          text: 'Vector stores',
+          items: [
+            {
+              text: '@anvia/chroma',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/chroma' },
+                { text: 'API reference', link: '/packages/chroma/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/lancedb',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/lancedb' },
+                { text: 'API reference', link: '/packages/lancedb/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/milvus',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/milvus' },
+                { text: 'API reference', link: '/packages/milvus/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/pgvector',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/pgvector' },
+                { text: 'API reference', link: '/packages/pgvector/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/pinecone',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/pinecone' },
+                { text: 'API reference', link: '/packages/pinecone/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/qdrant',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/qdrant' },
+                { text: 'API reference', link: '/packages/qdrant/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/redis',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/redis' },
+                { text: 'API reference', link: '/packages/redis/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/weaviate',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/weaviate' },
+                { text: 'API reference', link: '/packages/weaviate/api-reference' }
+              ]
+            }
+          ]
+        },
+        {
+          text: 'Observability',
+          items: [
+            {
+              text: '@anvia/logger',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/logger' },
+                { text: 'API reference', link: '/packages/logger/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/otel',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/otel' },
+                { text: 'API reference', link: '/packages/otel/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/lens',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/lens' },
+                { text: 'API reference', link: '/packages/lens/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/langfuse',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/langfuse' },
+                { text: 'API reference', link: '/packages/langfuse/api-reference' }
+              ]
+            }
+          ]
+        },
+        {
+          text: 'Development tools',
+          items: [
+            {
+              text: '@anvia/studio',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/studio' },
+                { text: 'API reference', link: '/packages/studio/api-reference' }
+              ]
+            },
+            {
+              text: '@anvia/sandbox',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/sandbox' },
+                { text: 'API reference', link: '/packages/sandbox/api-reference' }
+              ]
+            }
+          ]
+        }
+      ],
       '/faqs/': [{ text: 'FAQs', items: [{ text: 'Overview', link: '/faqs/' }] }],
       '/': [
         {
