@@ -5,10 +5,13 @@
   "scripts": {
     "docs:dev": "vitepress dev",
     "docs:build": "vitepress build",
-    "docs:preview": "vitepress preview"
+    "docs:preview": "vitepress preview",
+    "docs:deploy": "pnpm docs:build && wrangler deploy",
+    "docs:deploy:dry-run": "pnpm docs:build && wrangler deploy --dry-run"
   },
   "devDependencies": {
     "lucide-static": "^1.31.0",
-    "vitepress": "^1.6.4"
+    "vitepress": "^1.6.4",
+    "wrangler": "^4.120.0"
   }
 }
