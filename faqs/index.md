@@ -1,47 +1,61 @@
 # Frequently asked questions
 
-Quick answers about choosing and operating Anvia runtime primitives.
+Understand what Anvia provides, where it fits in a TypeScript application, and how it differs from other AI development tools.
 
-## Do I need an agent for every model call?
+## Start with your question
 
-No. Use `createCompletion` when your application already owns a simple one-call flow. Use an agent when behavior is reused or needs tools, memory, streaming across turns, or runtime policies.
+| Question | Answer |
+| --- | --- |
+| What is Anvia? | A composable TypeScript runtime for provider-neutral AI behavior inside application code. [Learn the boundary](/faqs/understanding/what-is-anvia). |
+| Why use it? | To share explicit contracts across models, agents, tools, memory, retrieval, pipelines, streaming, and observability without giving a framework ownership of the surrounding application. [Why Anvia](/faqs/choosing/why-anvia). |
+| How does it compare with other TypeScript tools? | The best choice depends on whether the product needs a model/UI toolkit, an integrated agent framework, an autonomous harness, or an application-owned runtime. [Compare the stacks](/faqs/comparisons/). |
+| Do I need Studio or Lens? | No. Both are optional products around the SDK: Studio is a local development console, while Lens is an observability and evaluation workspace. [Understand the products](/faqs/studio-and-lens/do-i-need-studio-or-lens). |
+| Is it production-ready? | The runtime provides production-oriented controls, but the application still owns deployment, authentication, authorization, data policy, and operational reliability. [Read the production answer](/faqs/production/is-anvia-production-ready). |
 
-## Is Anvia tied to OpenAI?
+## Explore by topic
 
-No. Core depends on provider-neutral model interfaces. Provider packages create models for OpenAI, Anthropic, Gemini, Mistral, and other supported vendors.
+### Understanding Anvia
 
-## Where should provider API keys live?
+Start with [what Anvia is](/faqs/understanding/what-is-anvia), [how it is structured](/faqs/understanding/how-anvia-is-structured), and [what the application still owns](/faqs/understanding/application-ownership). The boundary is as important as the feature list.
 
-On the server. Browser clients should call an application route that runs the agent and streams normalized events.
+### Choosing a stack
 
-## What is the difference between completion and agent streaming?
+Read the [capability overview](/faqs/choosing/capability-overview), then compare Anvia with [Vercel AI SDK](/faqs/comparisons/vercel-ai-sdk), [Mastra](/faqs/comparisons/mastra), [VoltAgent](/faqs/comparisons/voltagent), [Flue](/faqs/comparisons/flue), or [direct provider SDKs](/faqs/comparisons/direct-provider-sdks).
 
-`createCompletionStream` streams one model call. `agent.prompt(...).stream()` streams the whole runtime run, including turns, tools, final metadata, and errors.
+### Runtime capabilities
 
-## Why does a tool-enabled agent need multiple turns?
+Decide between [completions and agents](/faqs/capabilities/completions-or-agents), [memory and knowledge](/faqs/capabilities/memory-or-knowledge), or [pipelines and agents](/faqs/capabilities/pipelines-or-agents). Separate pages cover tools, multi-agent systems, structured output, streaming, and sandbox execution.
 
-The model first requests the tool, the application returns its result, and the model then produces an answer. Set a turn limit that allows that sequence while still bounding work.
+### Studio and Lens
 
-## Does a tool schema handle authorization?
+Learn what [Studio](/faqs/studio-and-lens/what-is-studio) and [Lens](/faqs/studio-and-lens/what-is-lens) are designed to do—and why Studio is not a production operations console.
 
-No. Schemas validate input and output shapes. Application code must still check the current user's permission before reading data or performing an action.
+### Production architecture
 
-## When should I use static context instead of retrieval?
+Review [security ownership](/faqs/production/authentication-and-authorization), [deployment](/faqs/production/deploying-anvia), [persistence](/faqs/production/persistence), [retries and cancellation](/faqs/production/retries-and-cancellation), and [testing agent behavior](/faqs/production/testing-agent-behavior).
 
-Use static context for small facts that rarely change and can be sent with every request. Use retrieval for large or frequently changing knowledge bases.
+## Quick answers
 
-## Does memory scope authorize a session?
+### Is Anvia tied to OpenAI?
 
-No. Scope determines which stored thread is loaded. Authenticate the route and verify that the current user may access the requested session before calling the agent.
+No. Core depends on provider-neutral model contracts. Provider packages adapt OpenAI, Anthropic, Gemini, Mistral, Grok, and supported compatible endpoints. Model capabilities still vary by provider, account, region, endpoint, and model ID.
 
-## Which server stream format should I use?
+### Do I need an agent for every model call?
 
-Use JSONL for Anvia React transports. Use SSE when an existing client requires `text/event-stream` compatibility.
+No. Use a direct completion for one model request. Use an agent when reusable behavior needs tools, context, memory, hooks, or multiple bounded turns.
 
-## What does runtime logging include by default?
+### Does a tool schema provide authorization?
 
-Lifecycle metadata without final outputs, full model requests and responses, or tool results. Opt into sensitive payloads only when your data policy permits them.
+No. A schema validates the arguments a model produced. Application code must authenticate the caller and authorize the requested operation.
 
-## How do I inspect an agent locally?
+### Does a memory scope authorize a session?
 
-Run the agent with `@anvia/studio`, then open its playground in a browser. Studio can expose sessions, traces, tools, memory, and other configured runtime capabilities.
+No. Scope determines which conversation is loaded. The application must still verify that the caller can access that user, tenant, and session.
+
+### Where should provider keys live?
+
+On the server or trusted worker. Browser clients should call an authenticated application route that runs the model or agent and returns an appropriate stream.
+
+### How do I inspect an agent locally?
+
+Register it with [`@anvia/studio`](/studio/), start the local runtime, and inspect its tools, context, sessions, traces, and configured capabilities in the browser.

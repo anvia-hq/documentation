@@ -183,11 +183,25 @@ body {
 }
 
 .VPSwitchAppearance .check {
-  top: 7px;
-  left: 7px;
+  top: 6px;
+  left: 6px;
+  width: 20px;
+  height: 20px;
   background: transparent;
   box-shadow: none;
   transform: none !important;
+}
+
+.VPSwitchAppearance .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.VPSwitchAppearance .icon [class^='vpi-'] {
+  top: 1px;
+  left: 1px;
+  width: 18px;
+  height: 18px;
 }
 
 .VPNavBar .appearance::before,

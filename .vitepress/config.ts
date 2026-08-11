@@ -874,7 +874,82 @@ export default defineConfig({
           ]
         }
       ],
-      '/faqs/': [{ text: 'FAQs', items: [{ text: 'Overview', link: '/faqs/' }] }],
+      '/faqs/': [
+        {
+          text: 'FAQs',
+          items: [{ text: 'Overview', link: '/faqs/' }]
+        },
+        {
+          text: 'Understanding Anvia',
+          items: [
+            { text: 'What is Anvia?', link: '/faqs/understanding/what-is-anvia' },
+            { text: 'What you can build', link: '/faqs/understanding/what-can-i-build' },
+            { text: 'Architecture', link: '/faqs/understanding/how-anvia-is-structured' },
+            { text: 'Application ownership', link: '/faqs/understanding/application-ownership' },
+            { text: 'What is Anvia not?', link: '/faqs/understanding/what-anvia-is-not' },
+            { text: 'When not to use it', link: '/faqs/understanding/when-not-to-use-anvia' }
+          ]
+        },
+        {
+          text: 'Choosing Anvia',
+          items: [
+            { text: 'Why Anvia?', link: '/faqs/choosing/why-anvia' },
+            { text: 'Capabilities', link: '/faqs/choosing/capability-overview' },
+            { text: 'Other SDKs', link: '/faqs/choosing/using-with-other-sdks' },
+            { text: 'Portability', link: '/faqs/choosing/provider-and-platform-independence' }
+          ]
+        },
+        {
+          text: 'Comparisons',
+          items: [
+            { text: 'Stack guide', link: '/faqs/comparisons/' },
+            { text: 'Vercel AI SDK', link: '/faqs/comparisons/vercel-ai-sdk' },
+            { text: 'Mastra', link: '/faqs/comparisons/mastra' },
+            { text: 'VoltAgent', link: '/faqs/comparisons/voltagent' },
+            { text: 'Flue', link: '/faqs/comparisons/flue' },
+            { text: 'Provider SDKs', link: '/faqs/comparisons/direct-provider-sdks' }
+          ]
+        },
+        {
+          text: 'Capabilities',
+          items: [
+            { text: 'Models', link: '/faqs/capabilities/models-and-providers' },
+            { text: 'Completions or agents', link: '/faqs/capabilities/completions-or-agents' },
+            { text: 'Tools and MCP', link: '/faqs/capabilities/tools-mcp-and-approvals' },
+            { text: 'Memory or knowledge', link: '/faqs/capabilities/memory-or-knowledge' },
+            { text: 'Pipelines or agents', link: '/faqs/capabilities/pipelines-or-agents' },
+            { text: 'Multi-agent', link: '/faqs/capabilities/multi-agent-systems' },
+            { text: 'Structured output', link: '/faqs/capabilities/structured-output' },
+            { text: 'Streaming and UI', link: '/faqs/capabilities/streaming-and-ui' },
+            { text: 'Sandboxes', link: '/faqs/capabilities/sandbox-execution' }
+          ]
+        },
+        {
+          text: 'Studio and Lens',
+          items: [
+            { text: 'Studio', link: '/faqs/studio-and-lens/what-is-studio' },
+            { text: 'Studio in production?', link: '/faqs/studio-and-lens/is-studio-for-production' },
+            { text: 'Lens', link: '/faqs/studio-and-lens/what-is-lens' },
+            { text: 'Lens or Langfuse?', link: '/faqs/studio-and-lens/lens-or-langfuse' },
+            { text: 'Other applications', link: '/faqs/studio-and-lens/can-lens-observe-non-anvia-apps' },
+            { text: 'Are they required?', link: '/faqs/studio-and-lens/do-i-need-studio-or-lens' }
+          ]
+        },
+        {
+          text: 'Production',
+          items: [
+            { text: 'Production readiness', link: '/faqs/production/is-anvia-production-ready' },
+            { text: 'Auth and permissions', link: '/faqs/production/authentication-and-authorization' },
+            { text: 'API keys', link: '/faqs/production/api-keys' },
+            { text: 'Deployment', link: '/faqs/production/deploying-anvia' },
+            { text: 'Durable workflows', link: '/faqs/production/durable-workflows' },
+            { text: 'Persistence', link: '/faqs/production/persistence' },
+            { text: 'Retries and cancellation', link: '/faqs/production/retries-and-cancellation' },
+            { text: 'Vendor lock-in', link: '/faqs/production/vendor-lock-in' },
+            { text: 'Testing', link: '/faqs/production/testing-agent-behavior' }
+          ]
+        }
+      ],
       '/': [
         {
           text: 'Welcome',
