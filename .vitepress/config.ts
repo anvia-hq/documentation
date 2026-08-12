@@ -15,6 +15,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Anvia SDK', link: '/sdk/' },
+      { text: 'Examples', link: '/examples/' },
       { text: 'Studio', link: '/studio/' },
       { text: 'Lens', link: '/lens/' },
       { text: 'Packages', link: '/packages/' },
@@ -379,6 +380,100 @@ export default defineConfig({
                 { text: 'Production checklist', link: '/sdk/providers/compatible/production' }
               ]
             }
+          ]
+        }
+      ],
+      '/examples/': [
+        {
+          text: 'Examples',
+          items: [{ text: 'Overview', link: '/examples/' }]
+        },
+        {
+          text: 'Start here',
+          items: [
+            { text: 'Text completion', link: '/examples/essentials/basic-completion' },
+            { text: 'Streaming completion', link: '/examples/essentials/streaming-completion' },
+            { text: 'First agent', link: '/examples/essentials/first-agent' },
+            { text: 'Agent with tools', link: '/examples/essentials/agent-with-tools' },
+            { text: 'Structured output', link: '/examples/essentials/structured-output' },
+            { text: 'Conversation memory', link: '/examples/essentials/conversation-memory' }
+          ]
+        },
+        {
+          text: 'Agents and tools',
+          items: [
+            { text: 'Tool calling', link: '/examples/agents-and-tools/tool-calling' },
+            { text: 'Tool permissions', link: '/examples/agents-and-tools/tool-permissions' },
+            { text: 'Tool approval', link: '/examples/agents-and-tools/tool-approval' },
+            { text: 'Dynamic tools', link: '/examples/agents-and-tools/dynamic-tools' },
+            { text: 'Tool middleware', link: '/examples/agents-and-tools/tool-middleware' },
+            { text: 'Cancellation', link: '/examples/agents-and-tools/cancellation' },
+            { text: 'Agent as a tool', link: '/examples/agents-and-tools/agent-as-tool' },
+            { text: 'Parallel agents', link: '/examples/agents-and-tools/parallel-agents' }
+          ]
+        },
+        {
+          text: 'Applications',
+          items: [
+            { text: 'Streaming React chat', link: '/examples/applications/streaming-react-chat' },
+            { text: 'Support RAG', link: '/examples/applications/customer-support-rag' },
+            { text: 'Research assistant', link: '/examples/applications/research-assistant' },
+            { text: 'Document analyst', link: '/examples/applications/document-analyst' },
+            { text: 'CLI agent', link: '/examples/applications/cli-agent' },
+            { text: 'Operations assistant', link: '/examples/applications/operations-assistant' }
+          ]
+        },
+        {
+          text: 'Knowledge and data',
+          items: [
+            { text: 'Basic RAG', link: '/examples/knowledge-and-data/basic-rag' },
+            { text: 'Permission-aware RAG', link: '/examples/knowledge-and-data/permission-aware-rag' },
+            { text: 'Document ingestion', link: '/examples/knowledge-and-data/document-ingestion' },
+            { text: 'Metadata filters', link: '/examples/knowledge-and-data/metadata-filters' },
+            { text: 'Postgres memory', link: '/examples/knowledge-and-data/persistent-memory' },
+            { text: 'Multi-tenant memory', link: '/examples/knowledge-and-data/multi-tenant-memory' },
+            { text: 'Vector stores', link: '/examples/knowledge-and-data/vector-store-adapters' }
+          ]
+        },
+        {
+          text: 'Workflows',
+          items: [
+            { text: 'SQLite memory', link: '/examples/data-and-workflows/persistent-memory' },
+            { text: 'Document extraction', link: '/examples/data-and-workflows/document-extraction-pipeline' },
+            { text: 'Research pipeline', link: '/examples/data-and-workflows/research-pipeline' },
+            { text: 'Parallel pipeline', link: '/examples/data-and-workflows/parallel-pipeline' },
+            { text: 'Batch processing', link: '/examples/data-and-workflows/batch-processing' },
+            { text: 'Background workers', link: '/examples/data-and-workflows/background-workers' },
+            { text: 'Human review', link: '/examples/data-and-workflows/human-review' },
+            { text: 'Failure recovery', link: '/examples/data-and-workflows/failure-recovery' }
+          ]
+        },
+        {
+          text: 'Providers and media',
+          items: [
+            { text: 'Provider switch', link: '/examples/providers-and-media/provider-switching' },
+            { text: 'Compatible APIs', link: '/examples/providers-and-media/compatible-apis' },
+            { text: 'Image input', link: '/examples/providers-and-media/image-understanding' },
+            { text: 'PDF analysis', link: '/examples/providers-and-media/pdf-analysis' },
+            { text: 'Image generation', link: '/examples/providers-and-media/image-generation' },
+            { text: 'Speech and text', link: '/examples/providers-and-media/speech-and-transcription' },
+            { text: 'Mistral OCR', link: '/examples/providers-and-media/mistral-ocr' },
+            { text: 'Grok search', link: '/examples/providers-and-media/grok-live-search' }
+          ]
+        },
+        {
+          text: 'Production',
+          items: [
+            { text: 'Authentication', link: '/examples/production/authentication' },
+            { text: 'Rate limits', link: '/examples/production/rate-limits' },
+            { text: 'Retries and timeouts', link: '/examples/production/retries-and-timeouts' },
+            { text: 'Durable jobs', link: '/examples/production/durable-jobs' },
+            { text: 'Lens tracing', link: '/examples/production/tracing-with-lens' },
+            { text: 'OpenTelemetry', link: '/examples/production/open-telemetry' },
+            { text: 'Langfuse', link: '/examples/production/langfuse' },
+            { text: 'Evaluations', link: '/examples/production/evaluations' },
+            { text: 'Quality gates', link: '/examples/production/quality-gates' },
+            { text: 'Testing agents', link: '/examples/production/testing-agents' }
           ]
         }
       ],
