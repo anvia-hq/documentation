@@ -9,6 +9,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 ## Topic Guides
 
 - [Agents, tools, and MCP](https://docs.anvia.dev/llms-agents.txt): Models, agents, tools, MCP, skills, multi-agent coordination, pipelines, sandboxing, and streaming.
+- [Full-stack applications](https://docs.anvia.dev/llms-apps.txt): Hono routes, `@anvia/server` streaming, `@anvia/react` client state, `@anvia/react-ui` components, authentication, cancellation, and resumption.
 - [Evaluations and observability](https://docs.anvia.dev/llms-evals.txt): Tracing, Lens, evaluation suites, datasets, release comparison, quality gates, alerts, cost, and testing.
 - [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt): Ingestion, embeddings, vector stores, metadata filters, dynamic context, permission-aware retrieval, and memory boundaries.
 
@@ -29,6 +30,7 @@ approved web and X search
 ```
 
 - Use [Agents, tools, and MCP](https://docs.anvia.dev/llms-agents.txt) for a hybrid research agent that combines a local vector-search tool with Grok provider-executed web and X search.
+- Use [Full-stack applications](https://docs.anvia.dev/llms-apps.txt) to expose the resulting agent through an authenticated Hono route and `@anvia/server`, then consume and render it with `@anvia/react` and `@anvia/react-ui`.
 - Use [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt) for an advanced research-to-index ingestion pipeline with source discovery, secure fetching, structured enrichment, embedding, upsert, and activation boundaries.
 - Use [Evaluations and observability](https://docs.anvia.dev/llms-evals.txt) for an advanced suite that evaluates answer relevancy, grounding, hallucination, allowed-source policy, and evidence freshness.
 

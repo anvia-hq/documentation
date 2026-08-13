@@ -668,6 +668,8 @@ For permission-aware RAG, make every forbidden retrieval a hard failure. Add cro
 
 See [Evaluations and observability](https://docs.anvia.dev/llms-evals.txt) for suite APIs, tracing, datasets, release comparison, and gates.
 
+See [Full-stack applications](https://docs.anvia.dev/llms-apps.txt) to expose a permission-filtered RAG agent through Hono and render its streamed response with Anvia React packages.
+
 ## Production Checklist
 
 - Run ingestion outside the request path.

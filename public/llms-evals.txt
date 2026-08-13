@@ -538,6 +538,7 @@ Evaluation suites measure variable behavior; they do not replace unit tests for 
 
 ## Canonical Documentation
 
+- [Full-stack applications](https://docs.anvia.dev/llms-apps.txt): Instrument and test the Hono, server-stream, React-controller, and React UI delivery path.
 - [Lens overview](https://docs.anvia.dev/lens/): Tracing, evaluations, datasets, comparisons, and gates.
 - [Lens core concepts](https://docs.anvia.dev/lens/core-concepts): Object model and lifecycle boundaries.
 - [Your first trace](https://docs.anvia.dev/lens/your-first-trace): Native agent instrumentation.

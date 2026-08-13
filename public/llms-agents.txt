@@ -424,6 +424,7 @@ Prefer narrow commands and file roots, explicit session lifecycle, bounded CPU a
 
 ## Canonical Documentation
 
+- [Full-stack applications](https://docs.anvia.dev/llms-apps.txt): Deliver an agent through Hono, `@anvia/server`, `@anvia/react`, and `@anvia/react-ui`.
 - [Agents](https://docs.anvia.dev/sdk/agents): Agent construction, instructions, context, lifecycle, and limits.
 - [Tools](https://docs.anvia.dev/sdk/tools): Tool contracts, validation, results, middleware, and security.
 - [MCP](https://docs.anvia.dev/sdk/advanced/mcp): Connections, transports, result mapping, security, and lifecycle.

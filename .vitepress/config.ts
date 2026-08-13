@@ -1253,6 +1253,7 @@ export default defineConfig({
           items: [
             { text: 'LLMs.txt', link: '/llms.txt' },
             { text: 'Agents, tools, and MCP', link: '/llms-agents.txt' },
+            { text: 'Full-stack applications', link: '/llms-apps.txt' },
             { text: 'Evaluations and observability', link: '/llms-evals.txt' },
             { text: 'RAG and retrieval', link: '/llms-rag.txt' }
           ]
