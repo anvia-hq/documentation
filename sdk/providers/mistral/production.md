@@ -42,6 +42,8 @@ Model listing is inventory, not a substitute for these tests.
 
 ## Observability
 
-Record the selected provider, model, endpoint class, latency, normalized usage, error class, and application request ID. Attach [Lens](https://anvia.dev/docs/packages/lens/overview), [Langfuse](https://anvia.dev/docs/packages/langfuse/overview), or another Anvia observer when model and tool traces are needed.
+Record the selected provider, model, endpoint class, latency, normalized usage, error class, and
+application request ID. Attach [Lens](/packages/lens), [Langfuse](/packages/langfuse), or another
+Anvia observer when model and tool traces are needed.
 
 Choose payload capture deliberately. Prompts, tool arguments, tool results, and OCR content may contain credentials, personal data, or private documents. Prefer normalized application errors over returning raw Mistral responses to users.

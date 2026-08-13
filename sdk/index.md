@@ -55,5 +55,5 @@ The runtime remains dependency-injection oriented throughout: your application c
 
 - [Install the runtime and a provider](/sdk/install-and-setup).
 - [Build your first agent](/sdk/your-first-agent).
-- [Learn the runtime lifecycle](https://anvia.dev/docs/advanced/runtime-lifecycle).
-- [Prepare for production](https://anvia.dev/docs/advanced/readiness-checklist).
+- [Learn the runtime lifecycle](/sdk/agents/runtime-lifecycle).
+- [Review tool security before shipping](/sdk/tools/security#before-shipping).

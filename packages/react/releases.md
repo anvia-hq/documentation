@@ -1,9 +1,10 @@
 # Releases
 
-The current source manifest is `@anvia/react` **0.11.4**. Recent releases mainly track Core protocol changes while preserving the hook/transport boundary.
+The current source manifest is `@anvia/react` **0.11.5**. Recent releases mainly track Core protocol changes while preserving the hook/transport boundary.
 
 | Version | Summary |
 | --- | --- |
+| `0.11.5` | Updated the Core dependency to `0.26.0`. |
 | `0.11.4` | Updated the Core dependency to `0.25.1`. |
 | `0.11.0` | Added model-aware context limits and active context usage to hook results. |
 | `0.10.3` | Added first-class resume cursor support for shared request/response APIs. |

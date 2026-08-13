@@ -1,9 +1,10 @@
 # Releases
 
-The current source manifest is `@anvia/server` **0.7.4**. Most patch releases track compatible Core updates; the entries below highlight Server behavior changes.
+The current source manifest is `@anvia/server` **0.7.5**. Most patch releases track compatible Core updates; the entries below highlight Server behavior changes.
 
 | Version | Summary |
 | --- | --- |
+| `0.7.5` | Updated the Core dependency to `0.26.0`. |
 | `0.7.4` | Updated the Core dependency to `0.25.1`. |
 | `0.7.0` | Carried model-aware context limits and active context usage through UI stream events. |
 | `0.6.0` | Added `createEventStream({ resume })` and `createUIStreamResponse({ resume })` overloads for first-class stream continuation. |

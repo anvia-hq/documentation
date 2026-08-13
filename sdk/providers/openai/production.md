@@ -37,5 +37,7 @@ Treat the provider client as infrastructure and the selected model as a tested a
 
 ## Observability
 
-Record the selected provider, model, adapter, latency, usage, error class, and application request ID. Attach [Lens](https://anvia.dev/docs/packages/lens/overview), [Langfuse](https://anvia.dev/docs/packages/langfuse/overview), or another Anvia observer when model and tool traces are needed. Choose payload capture deliberately; prompts, documents, images, transcripts, and tool results can contain sensitive data.
-
+Record the selected provider, model, adapter, latency, usage, error class, and application request
+ID. Attach [Lens](/packages/lens), [Langfuse](/packages/langfuse), or another Anvia observer when
+model and tool traces are needed. Choose payload capture deliberately; prompts, documents, images,
+transcripts, and tool results can contain sensitive data.

@@ -84,6 +84,8 @@ There is no singular `upsertDocument(...)` API. Pass one or several embedded doc
 
 ## Choose a production adapter
 
-Anvia provides adapters for [pgvector](https://anvia.dev/docs/packages/pgvector/overview), [Qdrant](https://anvia.dev/docs/packages/qdrant/overview), [Pinecone](https://anvia.dev/docs/packages/pinecone/overview), [Chroma](https://anvia.dev/docs/packages/chroma/overview), [LanceDB](https://anvia.dev/docs/packages/lancedb/overview), [Milvus](https://anvia.dev/docs/packages/milvus/overview), [Redis](https://anvia.dev/docs/packages/redis/overview), and [Weaviate](https://anvia.dev/docs/packages/weaviate/overview).
+Anvia provides adapters for [pgvector](/packages/pgvector), [Qdrant](/packages/qdrant),
+[Pinecone](/packages/pinecone), [Chroma](/packages/chroma), [LanceDB](/packages/lancedb),
+[Milvus](/packages/milvus), [Redis](/packages/redis), and [Weaviate](/packages/weaviate).
 
 Keep credentials, collection names, and ingestion jobs outside the agent. Pass a prepared `VectorSearchIndex` into the agent factory.

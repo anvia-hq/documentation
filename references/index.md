@@ -56,4 +56,4 @@ JSONL is the default. React clients normally send `{ messages, stream: true, met
 
 ## External reference
 
-For the complete published Basics sequence, see the [Anvia Basics documentation](https://anvia.dev/docs/basics/overview).
+For the complete walkthrough, start with [Your first agent](/sdk/your-first-agent).

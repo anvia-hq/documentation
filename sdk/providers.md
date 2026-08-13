@@ -28,7 +28,7 @@ Then open the guide for the provider you selected:
 | [Anthropic](/sdk/providers/anthropic) | `@anvia/anthropic` | Claude completions through Anthropic or Vertex AI. |
 | [Gemini](/sdk/providers/gemini) | `@anvia/gemini` | Gemini API or Vertex AI, including embeddings and media capabilities. |
 | [Mistral](/sdk/providers/mistral) | `@anvia/mistral` | Completions, embeddings, and OCR. |
-| [Grok](https://anvia.dev/docs/providers/grok) | `@anvia/grok` | xAI completions, live search, media generation, and transcription. |
+| [Grok](/packages/grok) | `@anvia/grok` | xAI completions, live search, media generation, and transcription. |
 | [Compatible APIs](/sdk/providers/compatible) | OpenAI or Anthropic adapter | Endpoints that intentionally implement one of those API shapes. |
 
 ## The common setup
@@ -81,4 +81,3 @@ Choose the capability first, then evaluate providers and exact model IDs. It is 
 The [capability matrix](/sdk/providers/capability-matrix) describes what each Anvia adapter can represent. It does not guarantee that every model ID, account, region, or custom endpoint supports the same request.
 
 Before shipping, exercise the actual configuration your workflow depends on: streaming, tool choice, structured output, media input, and any provider-specific parameters. Model listing is useful for inventory, but it is not proof of those capabilities.
-

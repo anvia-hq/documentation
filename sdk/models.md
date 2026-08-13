@@ -42,4 +42,5 @@ Keep provider clients and credentials in server-side configuration or factories.
 
 Model support varies by provider, model ID, account, region, and endpoint. Test the precise feature your workflow uses—such as streaming, tool calls, schemas, input media, dimensions, voices, or output formats—before enabling a model in production.
 
-Use the [provider capability matrix](https://anvia.dev/docs/providers/capability-matrix) to narrow the choices, then run a small workflow-specific smoke test.
+Use the [provider capability matrix](/sdk/providers/capability-matrix) to narrow the choices, then
+run a small workflow-specific smoke test.

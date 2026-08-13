@@ -60,4 +60,5 @@ Map raw remote messages to safe user-facing errors while retaining a correlation
 
 ## Inspect tools before runs
 
-Use internal tooling or [Studio MCP inspection](https://anvia.dev/docs/studio/tools-and-human-review) to verify server identity, listed tools, schemas, and direct tool behavior before debugging agent routing.
+Use internal tooling or [Studio MCP inspection](/studio/mcp) to verify server identity, listed tools,
+schemas, and direct tool behavior before debugging agent routing.

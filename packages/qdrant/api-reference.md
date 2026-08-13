@@ -12,6 +12,7 @@ import {
   type QdrantFusion,
   type QdrantHybridIndexOptions,
   type QdrantIndexOptions,
+  type QdrantMutationOptions,
   type QdrantVectorStoreConnectOptions,
 } from '@anvia/qdrant'
 ```
@@ -39,7 +40,17 @@ class QdrantVectorStore<
 
   upsertDocuments(
     documents: Array<EmbeddedDocument<T, Metadata>>,
+    mutationOptions?: QdrantMutationOptions,
   ): Promise<void>
+
+  deleteDocuments(
+    documentIds: string[],
+    mutationOptions?: QdrantMutationOptions,
+  ): Promise<void>
+
+  getDocuments(
+    documentIds: string[],
+  ): Promise<Array<VectorInspectItem<T, Metadata>>>
 
   index(options: QdrantIndexOptions): QdrantVectorIndex<T, Metadata>
 }
@@ -67,6 +78,7 @@ class QdrantVectorIndex<
 
   search(request: VectorSearchRequest): Promise<Array<VectorSearchResult<T, Metadata>>>
   searchIds(request: VectorSearchRequest): Promise<Array<{ score: number; id: string }>>
+  inspect(request: VectorInspectRequest): Promise<VectorInspectPage<T, Metadata>>
   asTool(options: VectorSearchToolOptions): Tool<{ query: string; topK?: number }, unknown>
 }
 ```
@@ -76,7 +88,7 @@ The constructor's hybrid object is part of the emitted class signature but is no
 ## Types
 
 ```ts
-type QdrantDistance = 'Cosine' | 'Dot' | 'Euclid'
+type QdrantDistance = 'Cosine' | 'Dot' | 'Euclid' | 'Manhattan'
 type QdrantFusion = 'rrf' | 'dbsf'
 
 type QdrantClientLike = {
@@ -86,6 +98,19 @@ type QdrantClientLike = {
     options: Record<string, unknown>,
   ): Promise<unknown>
   upsert(
+    collectionName: string,
+    options: Record<string, unknown>,
+  ): Promise<unknown>
+  batchUpdate?(
+    collectionName: string,
+    options: Record<string, unknown>,
+  ): Promise<unknown>
+  collectionExists?(collectionName: string): Promise<unknown>
+  delete?(
+    collectionName: string,
+    options: Record<string, unknown>,
+  ): Promise<unknown>
+  scroll?(
     collectionName: string,
     options: Record<string, unknown>,
   ): Promise<unknown>
@@ -99,8 +124,7 @@ type QdrantClientLike = {
   ): Promise<unknown>
 }
 
-type QdrantVectorStoreConnectOptions = {
-  client?: QdrantClientLike
+type QdrantVectorStoreBaseConnectOptions = {
   collectionName: string
   vectorSize: number
   createIfMissing?: boolean
@@ -108,6 +132,18 @@ type QdrantVectorStoreConnectOptions = {
   hybrid?: boolean
   denseVectorName?: string
   sparseVectorName?: string
+}
+
+type QdrantVectorStoreConnectOptions = QdrantVectorStoreBaseConnectOptions &
+  (
+    | { client: QdrantClientLike; clientOptions?: never }
+    | { client?: undefined; clientOptions?: QdrantClientParams }
+  )
+
+type QdrantMutationOptions = {
+  wait?: boolean
+  ordering?: 'weak' | 'medium' | 'strong'
+  timeout?: number
 }
 
 type QdrantHybridIndexOptions = {
@@ -121,5 +157,14 @@ type QdrantHybridIndexOptions = {
 
 type QdrantIndexOptions = EmbeddingModel | QdrantHybridIndexOptions
 ```
+
+`upsertDocuments(...)` replaces every point for each logical document ID, so reducing the number of
+embeddings does not leave stale points. Mutations wait for Qdrant by default. The official client
+uses an ordered batch for replacement; a custom client without `batchUpdate(...)` falls back to a
+non-atomic delete followed by upsert.
+
+`deleteDocuments(...)` removes every point belonging to the supplied logical IDs.
+`getDocuments(...)` and `index.inspect(...)` require a client with `scroll(...)` support and return
+logical documents rather than individual embedding points.
 
 Return to the [package guide](/packages/qdrant).

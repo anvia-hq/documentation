@@ -1,9 +1,10 @@
 # Releases
 
-The current source manifest is `@anvia/core` **0.25.1**. The source changelog is authoritative; this page highlights recent compatibility milestones rather than reproducing every patch.
+The current source manifest is `@anvia/core` **0.26.0**. The source changelog is authoritative; this page highlights recent compatibility milestones rather than reproducing every patch.
 
 | Version | Summary |
 | --- | --- |
+| `0.26.0` | Hardened MCP HTTP and SSE connections against SSRF, including DNS rebinding, redirects, and OAuth metadata requests; custom transport fetch implementations are rejected. |
 | `0.25.1` | Published updated upstream runtime dependencies. |
 | `0.25.0` | Expanded evaluation CLI handling, deterministic and abstention metrics, totals, score direction, usage/cost aggregation, negative controls, and richer typed suite/reporting contracts. |
 | `0.24.0` | Added evaluation run identity and lifecycle reporting for grouped Lens runs, comparisons, and quality gates. |

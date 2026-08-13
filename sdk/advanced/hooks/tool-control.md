@@ -76,7 +76,9 @@ const hook = createHook({
 })
 ```
 
-The prompt request must have an approval handler. Without one, Anvia raises `ToolApprovalRequiredError`. See [Human approval](https://anvia.dev/docs/advanced/tool-approvals) for the full approval lifecycle.
+The prompt request must have an approval handler. Without one, Anvia raises
+`ToolApprovalRequiredError`. See [Human approval](/studio/playground/approvals-and-questions) for the
+interactive Studio workflow.
 
 ## Keep enforcement in the tool
 

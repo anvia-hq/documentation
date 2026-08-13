@@ -40,7 +40,8 @@ const ticketPipeline = new PipelineBuilder(z.string(), {
 new Studio([ticketPipeline]).start({ port: 4021 })
 ```
 
-Open `http://localhost:4021/ui/pipelines`. The Pipelines item appears when Studio has at least one registered pipeline.
+Open `http://localhost:4021/ui/pipelines`. The Pipelines item remains available even when no
+pipeline is registered; in that case Studio shows an empty state explaining what to configure.
 
 You can register several pipelines, or mix pipelines and agents in the same target list:
 

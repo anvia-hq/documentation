@@ -38,7 +38,8 @@ const requestRefund = createTool({
 
 Keep each action narrow. Make retried operations idempotent where possible, validate business rules immediately before execution, and record sensitive changes in an audit log.
 
-Use [human approval](https://anvia.dev/docs/advanced/tool-approvals) for high-risk side effects, but never use approval as the only permission or policy check.
+Use [human approval](/studio/playground/approvals-and-questions) for high-risk side effects, but
+never use approval as the only permission or policy check.
 
 ## Before shipping
 

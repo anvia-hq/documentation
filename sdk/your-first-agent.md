@@ -56,4 +56,5 @@ The exact response can vary, but it should follow the support instructions and a
 | The task is a single model call. | Behavior should be reusable across requests. |
 | Your application owns all orchestration. | The task needs instructions, tools, memory, or multiple turns. |
 
-Your agent is now ready for capabilities such as [tools](https://anvia.dev/docs/advanced/tool-contracts), [memory](https://anvia.dev/docs/advanced/sessions-and-memory), and [streaming](https://anvia.dev/docs/advanced/streaming-events).
+Your agent is now ready for capabilities such as [tools](/sdk/tools), [memory](/sdk/memory), and
+[streaming](/sdk/streaming).

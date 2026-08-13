@@ -38,7 +38,21 @@ const events = await connectMcp(
 )
 ```
 
-Both factories accept a `transport` option for the corresponding MCP SDK client transport. Use it for transport-level configuration supported by that SDK.
+Both factories accept a `transport` option for supported configuration from the corresponding MCP
+SDK client transport. A custom `transport.fetch` implementation is rejected because it could bypass
+Anvia's outbound request protections.
+
+## Remote URL safety
+
+HTTP and SSE connections accept only `http:` and `https:` URLs. At connection time Anvia rejects
+localhost, loopback, link-local, private, reserved, multicast, and cloud-metadata addresses. It
+resolves and validates every hostname before connecting and pins the validated resolution through
+the request dispatcher. The same checks apply to redirects and OAuth metadata requests.
+
+This means `mcp.http(...)` and `mcp.sse(...)` are intended for remotely reachable servers. Use
+`mcp.stdio(...)` for a local MCP process. If an internal remote server must be reachable, expose it
+through an application-controlled gateway with an allowed public address rather than weakening the
+transport boundary.
 
 ## Keep credentials server-side
 

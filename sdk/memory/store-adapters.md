@@ -4,10 +4,10 @@ Choose the adapter that matches the database layer your application already oper
 
 | Package | Use when |
 | --- | --- |
-| [`@anvia/memory-prisma`](https://anvia.dev/docs/packages/memory-prisma/getting-started) | The application already uses Prisma and owns Prisma migrations. |
-| [`@anvia/memory-drizzle`](https://anvia.dev/docs/packages/memory-drizzle/getting-started) | The application uses Drizzle with Postgres. |
-| [`@anvia/memory-postgres`](https://anvia.dev/docs/packages/memory-postgres/getting-started) | The application owns a Postgres pool without an ORM. |
-| [`@anvia/memory-sqlite`](https://anvia.dev/docs/packages/memory-sqlite/getting-started) | Local or small deployments need durable SQLite storage. |
+| [`@anvia/memory-prisma`](/packages/memory-prisma/get-started) | The application already uses Prisma and owns Prisma migrations. |
+| [`@anvia/memory-drizzle`](/packages/memory-drizzle/get-started) | The application uses Drizzle with Postgres. |
+| [`@anvia/memory-postgres`](/packages/memory-postgres/get-started) | The application owns a Postgres pool without an ORM. |
+| [`@anvia/memory-sqlite`](/packages/memory-sqlite/get-started) | Local or small deployments need durable SQLite storage. |
 
 All official adapters implement `MemoryStore`, maintain ordered message rows, support scoped conversations, and expose compaction and read-only inspection capabilities.
 

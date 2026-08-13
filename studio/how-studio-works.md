@@ -47,7 +47,10 @@ Studio reads the registered configuration and enables relevant surfaces automati
 | Agent memory or Studio sessions | Memory and session inspection. |
 | Active sandbox-backed tools | Read-only sandbox inspection. |
 
-This is why two Studio processes can show different navigation: the console reflects the capabilities of the targets in that process.
+Studio keeps every navigation item accessible so developers can discover the available inspection
+surfaces. A page whose capability is not configured shows an empty or unavailable state instead of
+disappearing from navigation. The registered targets still determine which pages contain data and
+which actions can run.
 
 ## 3. Serve the console and API
 

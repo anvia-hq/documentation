@@ -1,6 +1,6 @@
 # Production
 
-- Inject an authenticated client with explicit endpoint and timeout settings.
+- Inject an authenticated client, or pass `clientOptions`, with explicit endpoint and timeout settings.
 - Pre-create dense or hybrid collections and use `createIfMissing: false`.
 - Keep dense/sparse vector names stable across every workflow.
 - Add payload indexes for common filters.
@@ -9,4 +9,6 @@
 
 The adapter supports clients with Qdrant's universal `query` API and retains dense compatibility with custom clients exposing legacy `search`. Test the actual client shape during upgrades.
 
-Use stable document IDs, and remove superseded physical IDs when chunking changes.
+Use stable logical document IDs. `upsertDocuments(...)` removes superseded physical points when
+chunking changes. Prefer the official client or another `batchUpdate(...)`-capable client when
+replacement must not have a delete-then-insert failure window.

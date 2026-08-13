@@ -2,6 +2,7 @@
 
 Notable releases include:
 
+- `0.4.0` added logical document deletion, retrieval, and inspection; mutation consistency controls; hosted client options; existing collection validation; stale-point cleanup on document replacement; Manhattan distance; and server-side score thresholds.
 - `0.3.1` adopted Qdrant's universal query API for dense search while retaining legacy custom-client compatibility.
 - `0.3.0` added sparse embedding contracts and hybrid RRF search; the current adapter also supports DBSF fusion.
 - `0.2.11` simplified optional query and result construction.

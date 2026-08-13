@@ -1,9 +1,10 @@
 # Releases
 
-The current source manifest is `@anvia/studio` **0.7.53**. Studio releases often track compatible Core, Server, React, and React UI updates.
+The current source manifest is `@anvia/studio` **0.7.54**. Studio releases often track compatible Core, Server, React, and React UI updates.
 
 | Version | Summary |
 | --- | --- |
+| `0.7.54` | Updated React, Server, and React UI dependencies for Core `0.26.0` compatibility. |
 | `0.7.53` | Published updated upstream runtime dependencies. |
 | `0.7.52` | Adopted richer evaluation result, totals, usage/cost, negative-control, and optional Lens environment handling. |
 | `0.7.49` | Adopted model-aware context usage across the Studio client stack. |

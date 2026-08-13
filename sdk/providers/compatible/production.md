@@ -42,9 +42,10 @@ Ship a compatible endpoint as a tested infrastructure dependency, not as an inte
 
 Record the provider, endpoint identity, model ID, adapter, latency, normalized usage, status code, error class, and application request ID. Do not log credentials, full authorization headers, or unredacted payloads.
 
-Attach [Lens](https://anvia.dev/docs/packages/lens/overview), [Langfuse](https://anvia.dev/docs/packages/langfuse/overview), or another Anvia observer when runs need model and tool traces. Choose safe or full payload capture deliberately; a compatible gateway can receive the same sensitive content as a first-party provider.
+Attach [Lens](/packages/lens), [Langfuse](/packages/langfuse), or another Anvia observer when runs
+need model and tool traces. Choose safe or full payload capture deliberately; a compatible gateway
+can receive the same sensitive content as a first-party provider.
 
 ## Rollout
 
 Introduce a new compatible deployment behind controlled routing. Compare quality, latency, tool accuracy, schema validity, and cost with the current model before increasing traffic. Keep rollback explicit: switch to a separately configured and separately tested model boundary rather than mutating a failed request mid-run.
-
