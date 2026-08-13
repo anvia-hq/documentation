@@ -1247,6 +1247,15 @@ export default defineConfig({
             { text: 'Observe systems', link: '/use-cases/observe-systems' },
             { text: 'Production operations', link: '/use-cases/production' }
           ]
+        },
+        {
+          text: 'For agents',
+          items: [
+            { text: 'LLMs.txt', link: '/llms.txt' },
+            { text: 'Agents, tools, and MCP', link: '/llms-agents.txt' },
+            { text: 'Evaluations and observability', link: '/llms-evals.txt' },
+            { text: 'RAG and retrieval', link: '/llms-rag.txt' }
+          ]
         }
       ]
     },

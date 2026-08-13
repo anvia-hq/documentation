@@ -1,0 +1,552 @@
+# Anvia Evaluations and Observability
+
+> Curated implementation context for tracing Anvia applications, investigating production behavior, designing evaluation suites, managing datasets, comparing releases, and enforcing quality gates.
+
+Anvia separates runtime behavior, telemetry, and release policy. Agents emit observable activity. Evaluation suites produce evidence. Lens organizes traces, cases, results, datasets, comparisons, and gates. The application and deployment system still own product records, authorization, release approval, and deployment decisions.
+
+This guide is optimized for coding agents. Prefer the linked documentation for complete APIs and deployment instructions. Updated 2026-08-13.
+
+## Core Mental Model
+
+The recommended feedback loop is:
+
+```text
+instrument agent → inspect real traces → curate failures into cases
+→ run repeatable evaluations → compare releases → enforce a quality gate
+```
+
+Important distinctions:
+
+- A trace explains one end-to-end operation.
+- An observation is one unit of work inside a trace, such as an agent, generation, tool, child agent, or ordinary span.
+- A session groups related traces from a conversation or workflow.
+- A user connects activity across sessions using an application-supplied stable ID.
+- An evaluation run executes one named suite over defined cases.
+- A metric result says whether one requirement passed, failed, or was invalid.
+- A completed run can contain failed metrics; infrastructure completion does not imply product quality.
+- A quality gate turns evidence into `pass`, `fail`, or `insufficient_data`; it does not deploy or merge code.
+
+Lens telemetry is not application state. Keep conversation memory, business records, user-visible jobs, authorization, and audit records in their owning systems.
+
+## Instrument with Lens
+
+Install native Lens integration when an application should send isolated Anvia telemetry directly to a Lens project:
+
+```sh
+pnpm add @anvia/core @anvia/lens
+```
+
+Configure server-only project credentials and stable deployment context:
+
+```dotenv
+ANVIA_LENS_BASE_URL=https://lens.example.com
+ANVIA_LENS_PUBLIC_KEY=pk-lens-...
+ANVIA_LENS_SECRET_KEY=sk-lens-...
+ANVIA_LENS_SERVICE_NAME=support-api
+ANVIA_LENS_ENVIRONMENT=production
+ANVIA_LENS_RELEASE=2026.08.1
+```
+
+The public and secret keys must belong to the same active project key pair. Never expose the secret key in browser code.
+
+Create one tracing instance during application startup, reuse it, and attach it before building agents:
+
+```ts
+import { AgentBuilder } from '@anvia/core'
+import { lens } from '@anvia/lens'
+
+export const tracing = lens.createFromEnv({
+  captureMode: 'safe',
+})
+
+export const supportAgent = new AgentBuilder('support-agent', model)
+  .name('Support agent')
+  .instructions('Answer support questions clearly and concisely.')
+  .observe(tracing)
+  .build()
+```
+
+`lens.create()` can also be configured explicitly with `baseUrl`, keys, `serviceName`, `environment`, `release`, capture policy, and timeouts. `@anvia/lens` owns isolated OpenTelemetry trace and log providers; it does not register global providers or collect unrelated application telemetry.
+
+Add request-level investigation context:
+
+```ts
+const response = await supportAgent
+  .prompt('Why does observability matter for an AI agent?')
+  .withTrace({
+    name: 'explain-observability',
+    userId: 'user_42',
+    sessionId: 'getting-started',
+    tags: ['docs', 'first-trace'],
+    metadata: { source: 'lens-getting-started' },
+  })
+  .send()
+
+console.log(response.trace?.traceId)
+```
+
+Use stable application identifiers, not email addresses or personal values. Do not put secrets or payload bodies in searchable tags and metadata.
+
+Lens batches delivery:
+
+- `flush()` delivers buffered telemetry while keeping the instance usable.
+- `shutdown()` performs final delivery and releases resources; do not reuse the instance afterward.
+- Long-running servers should shut down from their graceful termination path.
+- Short-lived jobs should flush after the final run and shut down in `finally`.
+
+## Capture and Privacy
+
+Native tracing defaults to safe capture. It retains useful structure, status, timing, model identity, and available token information while omitting prompt and response bodies.
+
+Full capture can include prompts, responses, tool arguments, and tool results:
+
+```ts
+const tracing = lens.create({
+  captureMode: 'full',
+  captureMaxBytes: 64 * 1024,
+  redactInputs: true,
+  redactOutputs: true,
+})
+```
+
+Do not enable full capture automatically in production. Review redaction, project access, data classification, and retention first. A byte limit is a storage control, not a privacy boundary; sensitive text may appear before truncation.
+
+Trace capture and evaluation payload reporting are separate decisions. `captureMode: 'full'` does not enable evaluation case payloads. Evaluation reporters separately control `includePayloads` and `includeMetadata`.
+
+## Investigate Production Behavior
+
+Start with the Lens overview to find what changed, then move to traces for request-level evidence:
+
+1. Select a time range containing the suspected change.
+2. Check trace error rate, generation duration, tokens, cost, services, and models.
+3. Keep the same time range while moving between views.
+4. Filter by immutable release, environment, service, model, tag, session, or user.
+5. Open a representative trace.
+6. Inspect the observation tree to locate the model, tool, child agent, or application span responsible.
+7. Compare neighboring traces before concluding that one example explains a population-wide regression.
+
+Environment and release are different. An environment changes over time; a release should identify the exact deployed build, such as a Git SHA or immutable version.
+
+Cost belongs to model activity inside traces and can be aggregated across traces, sessions, users, or time. Provider-reported cost is preferred when available. Lens can apply configured pricing for exact model names when needed.
+
+Alerts should represent actionable operational conditions. Configure ownership and response expectations before enabling a rule. Treat alert incidents as investigation entry points, not automatic diagnoses.
+
+## Design Evaluation Suites
+
+Begin with a user, policy, or operational failure—not a generic score. For every check, answer:
+
+1. What observable failure must be prevented?
+2. Which cases reproduce that risk?
+3. What is the least subjective evaluator that can detect it?
+
+Use representative cases:
+
+- A normal request that should succeed.
+- A boundary or ambiguous request.
+- A production or review failure that must not regress.
+- An adversarial request when safety, authorization, or privacy is involved.
+
+Keep each case focused and give it a stable behavior-oriented ID such as `refund-window`, not `case-01`.
+
+Use deterministic metrics when acceptable output has a stable form. They are fast, inexpensive, and easy to debug. Use model-graded metrics only when correctness depends on meaning or a narrow rubric.
+
+Available `@anvia/core/evals` metric factories include:
+
+- Deterministic and structural: `exactMatch`, `contains`, `containsAll`, `containsAny`, `doesNotMatch`, `matches`, `maxLength`, `notContains`, `requiredFields`, and `jsonCorrectness`.
+- Semantic and rubric-based: `semanticSimilarity`, `llmJudge`, `llmScore`, and `gEval`.
+- Retrieval and factuality: `answerRelevancy`, `faithfulness`, and `hallucination`.
+- Conversation behavior: `abstention`, `knowledgeRetention`, `promptAlignment`, `summarization`, and `turnRelevancy`.
+
+For RAG, measure retrieval quality, answer faithfulness, and answer usefulness separately. A relevant answer can still invent unsupported facts.
+
+## Run an Evaluation
+
+The smallest agent evaluation uses `agentEvalTarget(...)`, cases, metrics, and `runEvalSuite(...)`:
+
+```ts
+import {
+  agentEvalTarget,
+  contains,
+  exactMatch,
+  runEvalSuite,
+} from '@anvia/core/evals'
+import type { PromptResponse } from '@anvia/core/request'
+
+const result = await runEvalSuite({
+  name: 'support-policy-v3',
+  cases: [
+    {
+      id: 'refund-window',
+      input: 'When can I request a refund?',
+      expected: '30 days',
+    },
+    {
+      id: 'billing-owner',
+      input: 'Who changes billing settings?',
+      expected: 'Workspace owners',
+    },
+  ],
+  target: agentEvalTarget<string>(supportAgent),
+  metrics: [
+    contains<string, PromptResponse, string>({
+      name: 'expected-fact-present',
+      actual: ({ output }) => output.output,
+    }),
+    exactMatch<string, PromptResponse, string>({
+      name: 'not-blank',
+      actual: ({ output }) => output.output.trim().length > 0,
+      expected: true,
+    }),
+  ],
+  concurrency: 2,
+})
+
+console.log(result.metrics)
+```
+
+Each case can produce pass, fail, or invalid outcomes. Invalid means the evaluator could not make a valid judgment; never silently count it as a pass. Make network failures, judge schema failures, missing expected values, and rate limits visible.
+
+Concurrency reduces runtime but increases provider rate-limit pressure and simultaneous tool load. Model-graded metrics make additional model calls, so track evaluation cost separately from target cost.
+
+## Report Evaluations to Lens
+
+`lens.evals()` provides a tracing observer and matching evaluation reporter from one configuration:
+
+```ts
+import { AgentBuilder } from '@anvia/core'
+import {
+  agentEvalTarget,
+  contains,
+  runEvalSuite,
+} from '@anvia/core/evals'
+import { lens } from '@anvia/lens'
+
+const evaluation = lens.evals({
+  includePayloads: false,
+  includeMetadata: true,
+  onMissingTrace: 'throw',
+})
+
+const agent = new AgentBuilder('support-policy-agent', model)
+  .instructions('Answer with only the relevant verified policy fact.')
+  .observe(evaluation.observer)
+  .build()
+
+try {
+  const suite = await runEvalSuite({
+    name: 'support-policy-regression',
+    run: {
+      datasetName: 'support-policy-cases',
+      datasetVersion: 'v1',
+      metadata: { source: 'ci' },
+    },
+    cases,
+    target: agentEvalTarget(agent),
+    metrics: [contains({
+      name: 'policy-fact-present',
+      actual: ({ output }) => output.output,
+    })],
+    reporters: [evaluation.reporter],
+    failOnReporterError: true,
+  })
+
+  console.log('Lens run ID:', suite.run.id)
+} finally {
+  await evaluation.shutdown()
+}
+```
+
+Use the same observer for the evaluated target and reporter when results must link to traces. `onMissingTrace` controls whether uncorrelated results are emitted, ignored, warned about, or rejected. In controlled CI, use `throw` with `failOnReporterError: true` when trace linkage is required evidence.
+
+Metric failures normally do not throw. The suite completes and returns quality evidence; CI or a later gate decides whether the candidate proceeds.
+
+## Model-Graded Evaluators
+
+Give each judge one narrow responsibility and preserve an inspectable explanation:
+
+```ts
+import { llmJudge } from '@anvia/core/evals'
+import { z } from 'zod'
+
+const policyJudge = llmJudge({
+  name: 'policy-quality',
+  model: judgeModel,
+  schema: z.object({
+    passed: z.boolean(),
+    reason: z.string(),
+  }),
+  passes: (judgment) => judgment.passed,
+  instructions:
+    'Pass only when the answer follows the expected policy and invents no policy details.',
+  prompt: ({ case: testCase, output }) => [
+    `Question: ${testCase.input}`,
+    `Expected behavior: ${testCase.expected ?? ''}`,
+    `Agent answer: ${output.output}`,
+  ].join('\n'),
+})
+```
+
+Review explanations before relying on a judge for release decisions. Add positive and negative controls. When reviewers disagree, tighten the rubric, add examples, or split unrelated requirements into separate metrics. Pin judge model and prompt versions for meaningful comparisons.
+
+## Advanced Example: Evaluate Live-Enriched RAG
+
+A research-to-index system needs more than answer correctness. Evaluate source policy and freshness deterministically, then evaluate relevance and grounding with model-graded metrics.
+
+Assume the RAG target returns the answer, exact retrieved passages, and source records used for the response:
+
+```ts
+import {
+  answerRelevancy,
+  defineEvalSuite,
+  EvalOutcome,
+  faithfulness,
+  hallucination,
+  runEvalSuite,
+} from '@anvia/core/evals'
+import { OpenAIClient } from '@anvia/openai'
+
+type ResearchInput = {
+  question: string
+  notBefore: string
+}
+
+type ResearchOutput = {
+  answer: string
+  retrieved: string[]
+  sources: Array<{
+    url: string
+    retrievedAt: string
+  }>
+}
+
+declare function answerWithEvidence(
+  question: string,
+): Promise<ResearchOutput>
+
+const judgeClient = new OpenAIClient({
+  apiKey: process.env.OPENAI_API_KEY,
+})
+
+const judgeModel = judgeClient.completionModel('gpt-5')
+
+const ALLOWED_HOSTS = new Set([
+  'docs.example.com',
+  'research.example.org',
+])
+
+const researchEvals = defineEvalSuite<
+  ResearchInput,
+  ResearchOutput,
+  string
+>()
+
+const sourcePolicy = researchEvals.defineMetric({
+  name: 'source_policy',
+  dataType: 'BOOLEAN',
+  evaluate: ({ output }) => {
+    const valid = output.sources.length > 0 && output.sources.every((source) => {
+      try {
+        const url = new URL(source.url)
+        return url.protocol === 'https:' && ALLOWED_HOSTS.has(url.hostname)
+      } catch {
+        return false
+      }
+    })
+
+    return valid
+      ? EvalOutcome.pass(true)
+      : EvalOutcome.fail(false, {
+          comment: 'Missing, malformed, non-HTTPS, or unapproved source.',
+        })
+  },
+})
+
+const evidenceFreshness = researchEvals.defineMetric({
+  name: 'evidence_freshness',
+  dataType: 'BOOLEAN',
+  evaluate: ({ case: testCase, output }) => {
+    const cutoff = Date.parse(testCase.input.notBefore)
+    const fresh =
+      Number.isFinite(cutoff) &&
+      output.sources.length > 0 &&
+      output.sources.every((source) => {
+        const retrievedAt = Date.parse(source.retrievedAt)
+        return Number.isFinite(retrievedAt) && retrievedAt >= cutoff
+      })
+
+    return fresh
+      ? EvalOutcome.pass(true)
+      : EvalOutcome.fail(false, {
+          comment: 'One or more evidence records are older than the case cutoff.',
+        })
+  },
+})
+
+const result = await runEvalSuite({
+  name: 'live-enriched-rag-v1',
+  cases: [
+    {
+      id: 'current-api-change',
+      input: {
+        question: 'What changed in the approved API this week?',
+        notBefore: '2026-08-06T00:00:00.000Z',
+      },
+      expected: 'Describe only changes supported by approved current sources.',
+    },
+  ],
+  target: ({ question }) => answerWithEvidence(question),
+  metrics: [
+    sourcePolicy,
+    evidenceFreshness,
+    answerRelevancy<ResearchInput, ResearchOutput, string>({
+      model: judgeModel,
+      threshold: 0.8,
+      input: ({ case: testCase }) => testCase.input.question,
+      actual: ({ output }) => output.answer,
+    }),
+    faithfulness<ResearchInput, ResearchOutput, string>({
+      model: judgeModel,
+      threshold: 0.85,
+      actual: ({ output }) => output.answer,
+      retrievalContext: ({ output }) => output.retrieved,
+    }),
+    hallucination<ResearchInput, ResearchOutput, string>({
+      model: judgeModel,
+      threshold: 0.1,
+      actual: ({ output }) => output.answer,
+      context: ({ output }) => output.retrieved,
+    }),
+  ],
+  concurrency: 2,
+})
+
+console.log(result.metrics)
+```
+
+Add deterministic retrieval tests before the answer layer:
+
+- An unauthorized tenant or domain canary must never appear.
+- Required primary evidence must be present in the retrieved set.
+- Duplicate or superseded source versions must not dominate `topK`.
+- Empty evidence must produce an abstention rather than an unsupported answer.
+- Citation URLs in the answer must be a subset of the target's source records.
+- Retrieval and enrichment failures must be distinguishable from model-quality failures.
+
+Live search changes over time, so split evaluation into two lanes:
+
+- A reproducible regression suite uses a frozen evidence packet or pinned corpus version. It compares prompts, models, retrieval configuration, and code against identical evidence.
+- A scheduled live-search suite uses timestamped cases and tests source policy, freshness, availability, and end-to-end behavior. Do not interpret output drift caused by changed search results as a model regression.
+
+Attach the same Lens observer and reporter to the target when trace correlation is required. Record the corpus version, discovery policy, allowed-domain and handle policy version, source timestamps, enrichment model, embedding model, retrieval parameters, answer model, and judge model in run metadata. Gate source-policy and cross-tenant failures as critical regardless of aggregate score.
+
+## Datasets
+
+Lens supports two dataset lifecycles:
+
+- Observed datasets reconstruct cases reported by evaluation telemetry.
+- Managed datasets curate reusable cases in Lens and publish immutable versions.
+
+Managed drafts are editable; published versions are immutable. Pin a published version in CI so repeated runs use the same cases:
+
+```ts
+import { createLensDatasetClient } from '@anvia/lens'
+
+const datasets = createLensDatasetClient(evaluation.observer)
+const dataset = await datasets.getDataset('support-cases', {
+  version: 'v2',
+})
+```
+
+Use synthetic or approved data. Protect datasets and result artifacts like production data. Do not expose hidden expected answers to the target agent. Review changes to cases, expected values, judge prompts, and critical-case membership.
+
+## Quality Gates
+
+A useful gate protects explicit product risks rather than optimizing one aggregate score. A balanced first gate can require:
+
+- A minimum evaluated case count.
+- An absolute pass-rate floor for a named metric.
+- A maximum regression from a compatible baseline.
+- A latency or token-use budget.
+- No invalid outcomes or missing required trace evidence.
+
+Treat `insufficient_data` as non-passing. Missing metrics, incomplete runs, incompatible suite or environment scope, absent trace coverage, and zero or invalid baselines must not look like improvements.
+
+For an application-owned gate:
+
+```ts
+const result = await runEvalSuite(supportSuite)
+
+const criticalIds = new Set(['refund-window', 'account-deletion'])
+const criticalFailure = result.results.some((caseResult) =>
+  criticalIds.has(caseResult.case.id) &&
+  caseResult.metrics.some((metric) => metric.outcome.outcome !== 'pass'),
+)
+
+const evaluated = result.metrics.passed + result.metrics.failed
+const passRate = evaluated === 0 ? 0 : result.metrics.passed / evaluated
+const gatePassed =
+  !criticalFailure &&
+  result.metrics.invalid === 0 &&
+  passRate >= 0.95
+
+if (!gatePassed) process.exitCode = 1
+```
+
+Store a machine-readable artifact even when the gate fails. Distinguish evaluator outages from candidate regressions. Use immutable candidate and baseline run IDs in CI rather than selecting the latest run implicitly.
+
+Lens quality gates can apply the same saved policy in release comparison and CI. The public endpoint returns HTTP `200` for valid `pass`, `fail`, and `insufficient_data` verdicts; CI must inspect the returned verdict and fail unless it is exactly `pass`.
+
+## Alternative Observability Integrations
+
+Choose one integration boundary intentionally:
+
+- `@anvia/lens`: isolated native Lens tracing, evaluation reporting, and managed datasets.
+- `@anvia/otel`: Anvia observations through an OpenTelemetry SDK and exporters the application already owns. The application initializes and shuts down its OTel providers. Evaluation reporting additionally requires an OTel logs provider and exporter.
+- `@anvia/langfuse`: traces, evaluation scores, datasets, experiments, and managed prompts in Langfuse.
+- `@anvia/logger`: structured runtime logging when trace storage is not required.
+
+Do not attach duplicate exporters accidentally. Define which integration owns provider lifecycle, flushing, shutdown, redaction, and error policy.
+
+## Testing Strategy
+
+Use a testing pyramid:
+
+```text
+many deterministic unit tests
+→ some database, queue, and HTTP integration tests
+→ few live-provider smoke tests and behavioral evaluation suites
+```
+
+Test schemas, tool handlers, pipeline steps, hooks, memory adapters, and fake-model runs deterministically. Use scripted models to test tool calls and failures. Run live provider tests only with explicit credentials, small budgets, model allow-lists, and synthetic data.
+
+Evaluation suites measure variable behavior; they do not replace unit tests for deterministic code or security boundaries. Add negative controls that must fail so a broken metric cannot make every candidate look good.
+
+## Production Checklist
+
+- Use immutable release identifiers and stable environment, service, suite, case, and metric names.
+- Default production tracing to safe capture.
+- Keep credentials server-side and rotate ingestion keys.
+- Review capture, redaction, access, retention, and deletion together.
+- Flush short-lived jobs and gracefully shut down long-running exporters.
+- Start with deterministic metrics and add judges only for defined semantic requirements.
+- Version cases, expected outputs, prompts, models, retrieval configuration, and evaluators.
+- Treat invalid outcomes and missing evidence as failures to decide.
+- Compare compatible candidate and baseline populations.
+- Keep quality, latency, token, and cost constraints separate and explainable.
+- Preserve run results and gate decisions as reviewable artifacts.
+- Continue live monitoring after deployment; offline suites cannot represent all traffic.
+
+## Canonical Documentation
+
+- [Lens overview](https://docs.anvia.dev/lens/): Tracing, evaluations, datasets, comparisons, and gates.
+- [Lens core concepts](https://docs.anvia.dev/lens/core-concepts): Object model and lifecycle boundaries.
+- [Your first trace](https://docs.anvia.dev/lens/your-first-trace): Native agent instrumentation.
+- [Observability](https://docs.anvia.dev/lens/observability): Investigation workflow, traces, sessions, users, costs, and alerts.
+- [Evaluations](https://docs.anvia.dev/lens/evaluations): Suite design, execution, results, datasets, and release comparisons.
+- [Run evaluations](https://docs.anvia.dev/lens/evaluations/run-evaluations): `@anvia/core/evals` with Lens reporting.
+- [Quality gates](https://docs.anvia.dev/lens/evaluations/quality-gates): Saved policies, verdicts, and CI enforcement.
+- [`@anvia/lens`](https://docs.anvia.dev/packages/lens/): Native Lens integration API.
+- [`@anvia/otel`](https://docs.anvia.dev/packages/otel/): Vendor-neutral OpenTelemetry integration.
+- [`@anvia/langfuse`](https://docs.anvia.dev/packages/langfuse/): Langfuse tracing and evaluation integration.
+- [Production evaluation example](https://docs.anvia.dev/examples/production/evaluations): Runnable evaluation pattern.
+- [Testing agents](https://docs.anvia.dev/examples/production/testing-agents): Deterministic, integration, smoke, and evaluation layers.
