@@ -22,7 +22,7 @@ If an agent has its own memory store, that source takes precedence on the Memory
 Anvia's SQLite, Postgres, Drizzle, and Prisma memory adapters expose the optional read-only `MemoryInspector` interface. Register one with the agent as usual:
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { createSqliteMemoryStore } from '@anvia/memory-sqlite'
 import { Studio } from '@anvia/studio'
 
@@ -30,9 +30,11 @@ const memory = createSqliteMemoryStore({
   path: 'data/anvia-memory.sqlite',
 })
 
-const agent = new AgentBuilder('support', model)
-  .memory(memory, { savePolicy: 'turn' })
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  memory: { store: memory, savePolicy: 'turn' },
+})
 
 new Studio([agent]).start({ port: 4021 })
 ```

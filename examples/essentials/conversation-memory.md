@@ -42,20 +42,19 @@ export class LocalMemoryStore implements MemoryStore {
 Use the store from `memory-demo.ts`:
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { OpenAIClient } from '@anvia/openai'
 import { LocalMemoryStore } from './local-memory-store.js'
 
 const apiKey = process.env.OPENAI_API_KEY
 if (!apiKey) throw new Error('Set OPENAI_API_KEY.')
 
-const agent = new AgentBuilder(
-  'assistant',
-  new OpenAIClient({ apiKey }).completionModel('gpt-5'),
-)
-  .instructions('Use remembered context, but do not invent missing facts.')
-  .memory(new LocalMemoryStore())
-  .build()
+const agent = new Agent({
+  id: 'assistant',
+  model: new OpenAIClient({ apiKey }).completionModel('gpt-5'),
+  instructions: 'Use remembered context, but do not invent missing facts.',
+  memory: { store: new LocalMemoryStore() },
+})
 
 const session = agent.session('chat_7d8f', { userId: 'user_42' })
 await session.prompt('Remember that my project is named Anvia.').send()

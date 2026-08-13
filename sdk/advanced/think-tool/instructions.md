@@ -5,15 +5,17 @@ Instructions should define the moment that deserves a checkpoint and the small d
 ## Write a bounded instruction
 
 ```ts
-const agent = new AgentBuilder('incident-review', model)
-  .instructions([
+const agent = new Agent({
+  id: 'incident-review',
+  model: model,
+  instructions: [
     'Gather evidence with the available read-only tools.',
     'Use think once you have evidence from more than one source.',
     'In the checkpoint, state the leading explanation, conflicting evidence, and the next required action.',
     'Do not place credentials, tokens, or raw customer data in the checkpoint.',
-  ].join('\n'))
-  .tools([createThinkTool(), ...incidentTools])
-  .build()
+  ].join('\n'),
+  tools: [createThinkTool(), ...incidentTools],
+})
 ```
 
 This tells the model:

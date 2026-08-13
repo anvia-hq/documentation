@@ -4,7 +4,7 @@ Core is split into focused package entry points. The root export contains common
 
 | Capability | Entry point | Package responsibility |
 | --- | --- | --- |
-| Agents | `@anvia/core/agent` | Bounded model/tool loops, sessions, event stores, dynamic context, agent-as-tool |
+| Agents | `@anvia/core/agent` | Bounded model/tool loops, sessions, observability, dynamic context, agent-as-tool |
 | Completions | `@anvia/core/completion` | Provider-neutral requests, streams, messages, usage, documents, structured parsing |
 | Tools | `@anvia/core/tool` | Zod validation, approvals, middleware, tool sets, dynamic discovery, result normalization |
 | Hooks | `@anvia/core/hooks` | Typed run, turn, completion, and tool interception and control |

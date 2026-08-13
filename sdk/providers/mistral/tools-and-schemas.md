@@ -5,7 +5,7 @@ Mistral completion models support Anvia tools, tool choice, and output schemas. 
 ## Add a tool to an agent
 
 ```ts
-import { AgentBuilder, createTool } from '@anvia/core'
+import { Agent, createTool } from '@anvia/core'
 import { z } from 'zod'
 
 const getOrder = createTool({
@@ -24,13 +24,13 @@ const getOrder = createTool({
   },
 })
 
-const agent = new AgentBuilder('order-support', model)
-  .instructions(
-    'Use get_order for account-specific status. Never guess order data.',
-  )
-  .tools([getOrder])
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'order-support',
+  model: model,
+  instructions: 'Use get_order for account-specific status. Never guess order data.',
+  maxTurns: 4,
+  tools: [getOrder],
+})
 ```
 
 The runtime validates model-supplied arguments, executes the application handler, returns the result to the model, and continues until a final answer or the turn limit. Authorization belongs inside the tool boundary; model arguments are never proof of access.
@@ -40,12 +40,14 @@ The runtime validates model-supplied arguments, executes the application handler
 Keep automatic selection for ordinary agents. Use a required choice only when every valid run must call a tool:
 
 ```ts
-const agent = new AgentBuilder('order-status', model)
-  .instructions('Look up the order before answering.')
-  .tools([getOrder])
-  .toolChoice('required')
-  .defaultMaxTurns(3)
-  .build()
+const agent = new Agent({
+  id: 'order-status',
+  model: model,
+  instructions: 'Look up the order before answering.',
+  toolChoice: 'required',
+  maxTurns: 3,
+  tools: [getOrder],
+})
 ```
 
 Test the selected Mistral model with required tool choice and streaming tool arguments before depending on it in production.
@@ -72,7 +74,7 @@ const result = await createParsedCompletion(model, {
 console.log(result.data.severity)
 ```
 
-Use agent `.outputSchema(...)` when tools or runtime context must run before the final structured answer. A schema validates shape, not truth: validate identifiers, permissions, and business rules before any product write.
+Use the agent `outputSchema` option when tools or runtime context must run before the final structured answer. A schema validates shape, not truth: validate identifiers, permissions, and business rules before any product write.
 
 ## Know the boundary
 

@@ -34,13 +34,11 @@ Tool-definition or embedding failures reject the call. Build required catalogs b
 ```ts
 import { vectorFilter } from '@anvia/core/vector-store'
 
-const agent = new AgentBuilder('billing-support', model)
-  .dynamicTools(toolIndex, {
-    topK: 6,
-    threshold: 0.72,
-    filter: vectorFilter.eq('productArea', 'billing'),
-  })
-  .build()
+const agent = new Agent({
+  id: 'billing-support',
+  model: model,
+  dynamicTools: [{ index: toolIndex, topK: 6, threshold: 0.72, filter: vectorFilter.eq('productArea', 'billing') }],
+})
 ```
 
 | Option | Purpose |

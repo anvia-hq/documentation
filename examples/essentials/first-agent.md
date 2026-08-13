@@ -19,7 +19,7 @@ isolated model call with no agent lifecycle.
 Save as `first-agent.ts`:
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { OpenAIClient } from '@anvia/openai'
 
 const apiKey = process.env.OPENAI_API_KEY
@@ -27,15 +27,17 @@ if (!apiKey) throw new Error('Set OPENAI_API_KEY.')
 
 const model = new OpenAIClient({ apiKey }).completionModel('gpt-5')
 
-const reviewer = new AgentBuilder('release-reviewer', model)
-  .name('Release reviewer')
-  .description('Reviews release notes for clarity and missing operational detail.')
-  .instructions([
+const reviewer = new Agent({
+  id: 'release-reviewer',
+  model: model,
+  name: 'Release reviewer',
+  description: 'Reviews release notes for clarity and missing operational detail.',
+  instructions: [
     'Review only the text supplied by the user.',
     'Identify unclear claims and missing upgrade steps.',
     'Return no more than five bullets.',
-  ].join('\n'))
-  .build()
+  ].join('\n'),
+})
 
 const response = await reviewer
   .prompt('Added streaming support and changed the retry defaults.')
@@ -50,7 +52,7 @@ console.log(response.output)
 pnpm tsx first-agent.ts
 ```
 
-The agent returns a short review. `AgentBuilder` stores stable configuration; `prompt(...)` creates a
+The agent returns a short review. `Agent` stores stable configuration; `prompt(...)` creates a
 single-use request where per-run controls such as maximum turns, retries, hooks, middleware, and
 tracing can be added before `send()` or `stream()`.
 

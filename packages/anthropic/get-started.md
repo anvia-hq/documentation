@@ -9,19 +9,18 @@ pnpm add @anvia/core @anvia/anthropic
 Create the client on the server and pass its completion model into an agent:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { AnthropicClient } from '@anvia/anthropic'
 
 const anthropic = new AnthropicClient({
   apiKey: process.env.ANTHROPIC_API_KEY,
 })
 
-const agent = new AgentBuilder(
-  'analyst',
-  anthropic.completionModel('claude-sonnet-4-20250514'),
-)
-  .instructions('Analyze the evidence before answering.')
-  .build()
+const agent = new Agent({
+  id: 'analyst',
+  model: anthropic.completionModel('claude-sonnet-4-20250514'),
+  instructions: 'Analyze the evidence before answering.',
+})
 
 const result = await agent.prompt('Summarize the incident report.').send()
 console.log(result.output)

@@ -19,14 +19,16 @@ Keep provider credentials on the server. To change vendors, create a model from 
 ## Agent defaults
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 
-const agent = new AgentBuilder('support', model)
-  .name('Support')
-  .description('Answers support questions.')
-  .instructions('Answer clearly and ask for missing details.')
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  name: 'Support',
+  description: 'Answers support questions.',
+  instructions: 'Answer clearly and ask for missing details.',
+  maxTurns: 4,
+})
 ```
 
 Turn limits bound model/tool loops. A tool-assisted answer usually needs one turn to request the tool and another to use its result.
@@ -61,9 +63,11 @@ const memory = createPrismaMemoryStore(prisma, {
   scope: { metadataKeys: ['tenantId'] },
 })
 
-const agent = new AgentBuilder('assistant', model)
-  .memory(memory, { savePolicy: 'turn' })
-  .build()
+const agent = new Agent({
+  id: 'assistant',
+  model: model,
+  memory: { store: memory, savePolicy: 'turn' },
+})
 ```
 
 `savePolicy: 'turn'` stores complete model and tool turns together. Use stable product identifiers in storage scope and enforce authorization before calling the agent.

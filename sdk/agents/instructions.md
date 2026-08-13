@@ -5,27 +5,30 @@ Instructions define how an agent should behave. Use them for durable policy, rol
 ## Add stable instructions
 
 ```ts
-const agent = new AgentBuilder('support', model)
-  .instructions([
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  instructions: [
     'Answer from verified support information.',
     'Use tools before making account-specific claims.',
     'Escalate billing, legal, or security uncertainty.',
-  ].join('\n'))
-  .build()
+  ].join('\n'),
+})
 ```
 
 Good instructions describe repeatable behavior. They should not contain the current user's permissions, tenant ID, database IDs, or other request-specific facts.
 
 ## Compose instruction blocks
 
-Multiple `.instructions(...)` calls append blocks in order; they do not replace earlier instructions.
+Combine instruction blocks explicitly in the order they should be applied.
 
 ```ts
-const agent = new AgentBuilder('research', model)
-  .instructions(baseAgentRules)
-  .instructions(researchWorkflowRules)
-  .skills(researchSkills)
-  .build()
+const agent = new Agent({
+  id: 'research',
+  model: model,
+  instructions: [baseAgentRules, researchWorkflowRules].join('\n\n'),
+  skills: researchSkills,
+})
 ```
 
 Anvia combines normal instruction blocks first, followed by skill instructions. Keep the order intentional and remove contradictory rules.

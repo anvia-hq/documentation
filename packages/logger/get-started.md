@@ -11,7 +11,7 @@ pnpm add @anvia/core @anvia/logger
 ## Attach an observer
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { createLoggerObserver, createPinoLogger } from '@anvia/logger'
 
 const logger = createPinoLogger({
@@ -20,9 +20,11 @@ const logger = createPinoLogger({
   bindings: { environment: process.env.NODE_ENV },
 })
 
-const agent = new AgentBuilder('support', model)
-  .observe(createLoggerObserver(logger))
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  observers: [createLoggerObserver(logger)],
+})
 
 await agent.prompt('Where is order A123?').send()
 ```

@@ -52,15 +52,17 @@ Use `scripts/collect-changes.sh` when change data is not supplied.
 Load the directory and attach the resulting `SkillSet`:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { loadSkills, skill } from '@anvia/core/skills'
 
 const productSkills = await loadSkills(skill.local('skills'))
 
-const agent = new AgentBuilder('release-assistant', model)
-  .skills(productSkills)
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'release-assistant',
+  model: model,
+  skills: productSkills,
+  maxTurns: 4,
+})
 ```
 
 ## Choose skills for procedures

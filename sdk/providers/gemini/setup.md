@@ -33,18 +33,15 @@ Construction fails when the API key is missing or empty. Validate environment co
 ## Use the model with an agent
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { completionModel } from './gemini'
 
-export const supportAgent = new AgentBuilder(
-  'support',
-  completionModel,
-)
-  .instructions(
-    'Answer support questions clearly. Use tools for account data.',
-  )
-  .defaultMaxTurns(4)
-  .build()
+export const supportAgent = new Agent({
+  id: 'support',
+  model: completionModel,
+  instructions: 'Answer support questions clearly. Use tools for account data.',
+  maxTurns: 4,
+})
 ```
 
 The agent remains provider-neutral. Provider selection stays in the model module, making it easier to test the workflow with a fake model or replace the deployment later.

@@ -31,14 +31,14 @@ The coordinator decides whether to delegate, supplies a focused task, receives e
 ## Create one specialist
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 
-const policyAgent = new AgentBuilder('policy-review', model)
-  .instructions(
-    'Review the supplied draft for policy risk. Return concise findings, not a user-facing answer.',
-  )
-  .defaultMaxTurns(2)
-  .build()
+const policyAgent = new Agent({
+  id: 'policy-review',
+  model: model,
+  instructions: 'Review the supplied draft for policy risk. Return concise findings, not a user-facing answer.',
+  maxTurns: 2,
+})
 
 const policyReview = policyAgent.asTool({
   name: 'policy_review',
@@ -50,13 +50,13 @@ const policyReview = policyAgent.asTool({
 Add the specialist tool to the coordinator:
 
 ```ts
-const supportAgent = new AgentBuilder('support', model)
-  .instructions(
-    'Answer support questions. Use policy_review for high-risk answers, then write the final response yourself.',
-  )
-  .tools([policyReview, ...supportTools])
-  .defaultMaxTurns(6)
-  .build()
+const supportAgent = new Agent({
+  id: 'support',
+  model: model,
+  instructions: 'Answer support questions. Use policy_review for high-risk answers, then write the final response yourself.',
+  maxTurns: 6,
+  tools: [policyReview, ...supportTools],
+})
 ```
 
 ## Use meaningful boundaries

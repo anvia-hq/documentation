@@ -54,7 +54,7 @@ telemetry.start();
 ## Agent boundary
 
 ```ts
-import { AgentBuilder } from "@anvia/core/agent";
+import { Agent } from "@anvia/core/agent";
 import { OpenAIClient } from "@anvia/openai";
 import { otel } from "@anvia/otel";
 
@@ -64,10 +64,12 @@ const tracing = otel.create({
 });
 
 const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY });
-export const agent = new AgentBuilder("support", openai.completionModel("gpt-5"))
-  .observe(tracing)
-  .instructions("Answer support questions concisely.")
-  .build();
+export const agent = new Agent({
+  id: "support",
+  model: openai.completionModel("gpt-5"),
+  instructions: "Answer support questions concisely.",
+  observers: [tracing],
+});
 ```
 
 At graceful shutdown, stop accepting requests, wait for active work, then `await telemetry.shutdown()`.

@@ -3,7 +3,7 @@
 Use `completionModel(...)` for direct completions, agents, extractors, structured output, and model-driven pipeline stages.
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { GeminiClient } from '@anvia/gemini'
 
 const gemini = new GeminiClient({
@@ -12,9 +12,11 @@ const gemini = new GeminiClient({
 
 const model = gemini.completionModel('gemini-2.5-flash')
 
-export const supportAgent = new AgentBuilder('support', model)
-  .instructions('Answer support questions clearly and concisely.')
-  .build()
+export const supportAgent = new Agent({
+  id: 'support',
+  model: model,
+  instructions: 'Answer support questions clearly and concisely.',
+})
 ```
 
 The returned `GeminiCompletionModel` implements Anvia's streaming completion contract, so the same model works for `.send()` and `.stream()` workflows.
@@ -44,13 +46,13 @@ Use an [agent](/sdk/agents) when the run needs tools, memory, dynamic context, h
 Gemini function calls map to Anvia tool calls. The agent runtime validates the arguments, invokes the local handler, and returns its result to the model.
 
 ```ts
-const agent = new AgentBuilder('orders', model)
-  .instructions(
-    'Use get_order for order-specific questions. Never guess status.',
-  )
-  .tools([getOrder])
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'orders',
+  model: model,
+  instructions: 'Use get_order for order-specific questions. Never guess status.',
+  maxTurns: 4,
+  tools: [getOrder],
+})
 ```
 
 The adapter supports automatic, required, disabled, and named tool choice through Anvia's normalized contract. Test required and named calls against the exact model because adapter support does not guarantee identical behavior across all Gemini model IDs.
@@ -86,15 +88,17 @@ The adapter sends a JSON response MIME type and the JSON schema to Google. Anvia
 Provider-specific thinking configuration belongs at the Gemini model boundary:
 
 ```ts
-const reasoningAgent = new AgentBuilder('analyst', model)
-  .additionalParams({
+const reasoningAgent = new Agent({
+  id: 'analyst',
+  model: model,
+  additionalParams: {
     config: {
       thinkingConfig: {
         includeThoughts: true,
       },
     },
-  })
-  .build()
+  },
+})
 ```
 
 When Google returns thought content, the adapter exposes it as normalized reasoning summaries and stream deltas and preserves thought signatures needed in later history.

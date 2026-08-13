@@ -32,13 +32,11 @@ const allowedToolFilter = vectorFilter.and(
   vectorFilter.eq('role', operator.role),
 )
 
-const agent = new AgentBuilder('support-admin', model)
-  .dynamicTools(toolIndex, {
-    topK: 6,
-    threshold: 0.7,
-    filter: allowedToolFilter,
-  })
-  .build()
+const agent = new Agent({
+  id: 'support-admin',
+  model: model,
+  dynamicTools: [{ index: toolIndex, topK: 6, threshold: 0.7, filter: allowedToolFilter }],
+})
 ```
 
 This prevents ineligible definitions from reaching the model. Do not build filters from model output or unverified request fields.

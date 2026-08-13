@@ -9,20 +9,19 @@ pnpm add @anvia/core @anvia/openai
 Create one client at the server boundary. Construction requires `apiKey` unless an initialized OpenAI client is supplied.
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 
 const openai = new OpenAIClient({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-const agent = new AgentBuilder(
-  'support',
-  openai.completionModel('gpt-5'),
-)
-  .instructions('Answer support questions clearly.')
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: openai.completionModel('gpt-5'),
+  instructions: 'Answer support questions clearly.',
+  maxTurns: 4,
+})
 
 const result = await agent.prompt('Draft a concise reply to this ticket.').send()
 console.log(result.output)

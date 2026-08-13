@@ -56,7 +56,7 @@ const response = await agent.prompt([
 ].join("\n\n")).send();
 ```
 
-`agent` is an ordinary server-side `AgentBuilder` result. Manual retrieval makes the boundary
+`agent` is an ordinary server-side `Agent` result. Manual retrieval makes the boundary
 visible; use `dynamicContext` when automatic prompt-time retrieval better fits your application.
 
 ## Run and expected behavior

@@ -13,16 +13,18 @@ The package is ESM-only and peers with `@anvia/core >=0.13.0 <1.0.0`. It uses `n
 ## Create a persistent store
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { createSqliteMemoryStore } from '@anvia/memory-sqlite'
 
 const memory = createSqliteMemoryStore({
   path: 'data/anvia-memory.sqlite',
 })
 
-const agent = new AgentBuilder('support', model)
-  .memory(memory, { savePolicy: 'turn' })
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  memory: { store: memory, savePolicy: 'turn' },
+})
 ```
 
 Omitting `path` creates an in-memory SQLite database. Use an explicit path when state must survive a restart.

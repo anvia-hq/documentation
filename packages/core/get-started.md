@@ -7,7 +7,7 @@ pnpm add @anvia/core @anvia/openai zod
 ```
 
 ```ts
-import { AgentBuilder, createTool } from '@anvia/core'
+import { Agent, createTool } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 import { z } from 'zod'
 
@@ -23,11 +23,13 @@ const currentTime = createTool({
   execute: async () => ({ iso: new Date().toISOString() }),
 })
 
-const agent = new AgentBuilder('assistant', model)
-  .instructions('Answer briefly and use tools when they provide fresher data.')
-  .tools([currentTime])
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'assistant',
+  model: model,
+  instructions: 'Answer briefly and use tools when they provide fresher data.',
+  maxTurns: 4,
+  tools: [currentTime],
+})
 
 const response = await agent.prompt('What time is it?').send()
 console.log(response.output)
@@ -41,7 +43,7 @@ Keep the API key and agent execution on the server. A browser should call an aut
 | --- | --- |
 | One model request | `createCompletion` |
 | Schema-validated data | `createParsedCompletion` |
-| Reusable instructions or automatic tools | `AgentBuilder` |
+| Reusable instructions or automatic tools | `Agent` |
 | Explicit typed stages | `PipelineBuilder` |
 | Persistent conversation | `agent.session(...)` with a `MemoryStore` |
 

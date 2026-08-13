@@ -47,15 +47,17 @@ ANVIA_LENS_ENVIRONMENT=production
 Create the observer once, then reuse it across agents in the process:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { lens } from '@anvia/lens'
 
 const tracing = lens.create()
 
-const supportAgent = new AgentBuilder('support', model)
-  .name('Support agent')
-  .observe(tracing)
-  .build()
+const supportAgent = new Agent({
+  id: 'support',
+  model: model,
+  name: 'Support agent',
+  observers: [tracing],
+})
 
 const response = await supportAgent
   .prompt('Summarize the latest support request.')

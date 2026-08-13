@@ -56,7 +56,7 @@ function filterFor(principal: Principal) {
 const results = await index.search({ query, topK: 5, filter: filterFor(principal) });
 ```
 
-The same filter can be passed to `AgentBuilder.dynamicContext(index, { filter, topK: 5 })`.
+The same filter can be included in an agent's `dynamicContexts` option.
 
 ## Expected behavior
 

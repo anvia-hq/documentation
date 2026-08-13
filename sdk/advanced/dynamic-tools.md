@@ -36,7 +36,7 @@ The model sees only selected definitions. The application still owns every concr
 ## Build a dynamic catalog
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { createToolIndex } from '@anvia/core/tool'
 import { vectorFilter } from '@anvia/core/vector-store'
 
@@ -54,13 +54,11 @@ const toolIndex = await createToolIndex(
   },
 )
 
-const agent = new AgentBuilder('billing-support', model)
-  .dynamicTools(toolIndex, {
-    topK: 6,
-    threshold: 0.72,
-    filter: vectorFilter.eq('productArea', 'billing'),
-  })
-  .build()
+const agent = new Agent({
+  id: 'billing-support',
+  model: model,
+  dynamicTools: [{ index: toolIndex, topK: 6, threshold: 0.72, filter: vectorFilter.eq('productArea', 'billing') }],
+})
 ```
 
 Anvia searches again before every turn. Tool results can change the current runtime prompt, so a later turn may receive a different set of definitions.

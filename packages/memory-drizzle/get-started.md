@@ -16,14 +16,16 @@ npx drizzle-kit migrate
 ```
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { createDrizzleMemoryStore } from '@anvia/memory-drizzle'
 
 const memory = createDrizzleMemoryStore(db)
 
-const agent = new AgentBuilder('support', model)
-  .memory(memory, { savePolicy: 'turn' })
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  memory: { store: memory, savePolicy: 'turn' },
+})
 ```
 
 The package's tables use Drizzle's PostgreSQL core. It does not create database objects at runtime.

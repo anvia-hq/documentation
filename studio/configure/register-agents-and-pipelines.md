@@ -19,7 +19,7 @@ Studio accepts built `Agent` and `Pipeline` instances. It runs those same object
 Give the agent a stable ID and useful display metadata when you build it:
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { OpenAIClient } from '@anvia/openai'
 import { Studio } from '@anvia/studio'
 
@@ -27,15 +27,14 @@ const openai = new OpenAIClient({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-const supportAgent = new AgentBuilder(
-  'support-operations',
-  openai.completionModel('gpt-5.6-luna'),
-)
-  .name('Support operations')
-  .description('Investigates tickets and recommends the next action.')
-  .instructions('Use available evidence and keep recommendations concise.')
-  .defaultMaxTurns(4)
-  .build()
+const supportAgent = new Agent({
+  id: 'support-operations',
+  model: openai.completionModel('gpt-5.6-luna'),
+  name: 'Support operations',
+  description: 'Investigates tickets and recommends the next action.',
+  instructions: 'Use available evidence and keep recommendations concise.',
+  maxTurns: 4,
+})
 
 new Studio([supportAgent]).start()
 ```

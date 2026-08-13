@@ -61,8 +61,8 @@ expiry—not merely the tool name.
 ## Compose specialists
 
 Create support, engineering, and communications agents, expose each with
-`specialist.asTool({ name: "ask_engineering_agent" })`, and attach them to a coordinator with
-`.tools([...]).defaultMaxTurns(4)`. Stream with `.withToolConcurrency(3)` when the tasks are
+`specialist.asTool({ name: "ask_engineering_agent" })`, and attach them to a coordinator with the
+`tools` and `maxTurns: 4` options. Stream with `.withToolConcurrency(3)` when the tasks are
 independent. Keep remediation tools out of specialist agents.
 
 ## Run and expected behavior

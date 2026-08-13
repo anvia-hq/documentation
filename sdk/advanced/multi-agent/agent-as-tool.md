@@ -1,20 +1,22 @@
 # Agent as a tool
 
-`agent.asTool(...)` turns a built agent into a tool that another agent can call with a focused prompt.
+`agent.asTool(...)` turns an agent into a tool that another agent can call with a focused prompt.
 
 ## Build the specialist first
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 
-const policyAgent = new AgentBuilder('policy-review', policyModel)
-  .instructions([
+const policyAgent = new Agent({
+  id: 'policy-review',
+  model: policyModel,
+  instructions: [
     'Review the supplied draft for policy risk.',
     'Return findings and recommended changes.',
     'Do not write the final customer response.',
-  ].join('\n'))
-  .defaultMaxTurns(2)
-  .build()
+  ].join('\n'),
+  maxTurns: 2,
+})
 ```
 
 A specialist should have a stable ID, narrow instructions, and only the tools or context required for its role. It may use a different completion model from the coordinator.
@@ -41,15 +43,17 @@ The generated tool accepts a prompt for the child. When called, Anvia runs the c
 ## Add it to a coordinator
 
 ```ts
-const supportAgent = new AgentBuilder('support', coordinatorModel)
-  .instructions([
+const supportAgent = new Agent({
+  id: 'support',
+  model: coordinatorModel,
+  instructions: [
     'Answer support questions.',
     'Use policy_review before sending a high-risk answer.',
     'Use the findings as evidence, then write the final answer yourself.',
-  ].join('\n'))
-  .tools([policyReview, ...supportTools])
-  .defaultMaxTurns(6)
-  .build()
+  ].join('\n'),
+  maxTurns: 6,
+  tools: [policyReview, ...supportTools],
+})
 ```
 
 The tool description and coordinator instructions should agree. A vague description makes delegation unpredictable; overlapping specialist descriptions make tool selection ambiguous.

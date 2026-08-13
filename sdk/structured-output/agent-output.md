@@ -1,11 +1,11 @@
 # Agent output
 
-Use `.outputSchema(...)` when an agent may use tools or runtime context before returning a structured final answer.
+Use the `outputSchema` option when an agent may use tools or runtime context before returning a structured final answer.
 
 ## Configure the final shape
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { z } from 'zod'
 
 const supportResultSchema = z.object({
@@ -14,14 +14,14 @@ const supportResultSchema = z.object({
   needsHuman: z.boolean(),
 })
 
-const agent = new AgentBuilder('support', model)
-  .instructions(
-    'Use tools when account state is needed. Return the requested object.',
-  )
-  .tools(createSupportTools(scope))
-  .outputSchema(supportResultSchema)
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  instructions: 'Use tools when account state is needed. Return the requested object.',
+  outputSchema: supportResultSchema,
+  maxTurns: 4,
+  tools: [...createSupportTools(scope)],
+})
 ```
 
 The schema is sent with the agent's model requests so the final response follows that shape.

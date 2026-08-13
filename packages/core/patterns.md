@@ -19,11 +19,13 @@ Create provider clients and stores once, then build agents from injected depende
 
 ```ts
 export function createSupportAgent(deps: SupportDependencies) {
-  return new AgentBuilder('support', deps.model)
-    .tools([createAccountTool(deps.accounts)])
-    .memory(deps.memory)
-    .observe(deps.observer)
-    .build()
+  return new Agent({
+    id: 'support',
+    model: deps.model,
+    memory: { store: deps.memory },
+    tools: [createAccountTool(deps.accounts)],
+    observers: [deps.observer],
+  })
 }
 ```
 
@@ -41,6 +43,6 @@ Keep models, memory, vector search, and observers behind their interfaces. This 
 
 ## Separate development and operations
 
-Register the same built agents in [Studio](/packages/studio) for local inspection. Attach [Lens](/packages/lens) or another observer for retained production telemetry. Neither product should own application authorization or business state.
+Register the same agents in [Studio](/packages/studio) for local inspection. Attach [Lens](/packages/lens) or another observer for retained production telemetry. Neither product should own application authorization or business state.
 
 Continue with [architecture](/packages/core/architecture) and the SDK's [agent stability guidance](/sdk/agents/stable-behavior).

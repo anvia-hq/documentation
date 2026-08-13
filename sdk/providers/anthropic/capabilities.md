@@ -45,13 +45,13 @@ Direct completion streams expose tool-call events but do not execute tools. Use 
 Anthropic tool use maps to Anvia assistant `tool_call` content. Tool results return as Anthropic `tool_result` blocks, and streamed JSON arguments are assembled before an agent executes the handler.
 
 ```ts
-const agent = new AgentBuilder('orders', model)
-  .instructions(
-    'Use get_order for order-specific questions. Never guess status.',
-  )
-  .tools([getOrder])
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'orders',
+  model: model,
+  instructions: 'Use get_order for order-specific questions. Never guess status.',
+  maxTurns: 4,
+  tools: [getOrder],
+})
 ```
 
 Add a provider smoke test for workflows that require a tool call. Verify that the handler receives complete, schema-valid arguments after streaming.

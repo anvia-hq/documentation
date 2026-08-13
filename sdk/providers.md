@@ -5,7 +5,7 @@ Provider packages connect Anvia's runtime contracts to model vendors. Your appli
 ```text
 Provider client          Model object                 Runtime
 credentials              one capability              product behavior
-endpoint          ──→     completionModel(...)   ──→     AgentBuilder
+endpoint          ──→     completionModel(...)   ──→     Agent
 SDK configuration        embeddingModel(...)         createCompletion
                          transcriptionModel(...)     pipelines
 ```
@@ -54,13 +54,15 @@ export const supportModel = openai.completionModel('gpt-5')
 The result is an Anvia `CompletionModel`. The rest of the workflow does not need the provider SDK:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { supportModel } from './models'
 
-export const supportAgent = new AgentBuilder('support', supportModel)
-  .instructions('Answer support questions clearly and concisely.')
-  .defaultMaxTurns(4)
-  .build()
+export const supportAgent = new Agent({
+  id: 'support',
+  model: supportModel,
+  instructions: 'Answer support questions clearly and concisely.',
+  maxTurns: 4,
+})
 ```
 
 Keep API keys, endpoints, headers, and provider SDK clients on the server or in workers. A browser should call an application-owned route or stream endpoint.

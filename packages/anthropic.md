@@ -18,19 +18,18 @@ pnpm add @anvia/anthropic @anvia/core
 ## Create a Claude agent
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { AnthropicClient } from '@anvia/anthropic'
 
 const anthropic = new AnthropicClient({
   apiKey: process.env.ANTHROPIC_API_KEY,
 })
 
-const agent = new AgentBuilder(
-  'assistant',
-  anthropic.completionModel('claude-sonnet-4-20250514'),
-)
-  .instructions('Give direct, well-supported answers.')
-  .build()
+const agent = new Agent({
+  id: 'assistant',
+  model: anthropic.completionModel('claude-sonnet-4-20250514'),
+  instructions: 'Give direct, well-supported answers.',
+})
 
 const result = await agent.prompt('Summarize the release notes.').send()
 console.log(result.output)

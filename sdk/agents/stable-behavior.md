@@ -1,23 +1,23 @@
 # Stable behavior
 
-Put behavior that is safe and useful across every run on `AgentBuilder`. Keep user, tenant, and request state outside global agents.
+Put behavior that is safe and useful across every run in `Agent` options. Keep user, tenant, and request state outside global agents.
 
-## Builder defaults
+## Agent defaults
 
-| Method | Adds |
+| Option | Adds |
 | --- | --- |
-| `.instructions(...)` | Durable policy, role, tone, and workflow rules. |
-| `.context(text, id)` | Small static documents safe for every run. |
-| `.tools(...)` | Stable product actions. |
-| `.memory(...)` | Session-backed conversation history. |
-| `.dynamicContext(...)` | Retrieval-selected knowledge. |
-| `.eventStore(...)` | Runtime event persistence. |
-| `.observe(...)` | Telemetry adapters. |
-| `.hook(...)` | Default runtime control. |
-| `.outputSchema(...)` | A typed final output contract. |
-| `.defaultMaxTurns(...)` | The default loop limit. |
+| `instructions` | Durable policy, role, tone, and workflow rules. |
+| `context` | Small static documents safe for every run. |
+| `tools` | Stable product actions. |
+| `memory` | Session-backed conversation history. |
+| `dynamicContexts` | Retrieval-selected knowledge. |
+| `observers` | Logger, Lens, and other telemetry adapters. |
+| `hook` | Default runtime control. |
+| `outputSchema` | A typed final output contract. |
+| `maxTurns` | The default loop limit. |
 
-Multiple `.instructions(...)` calls append blocks; they do not replace earlier instructions. Keep their order intentional and avoid contradictory rules.
+Combine multiple instruction blocks explicitly, for example with `blocks.join('\n\n')`. Keep their
+order intentional and avoid contradictory rules.
 
 ## Use a scoped factory
 
@@ -30,11 +30,13 @@ export function createBillingAgent(scope: BillingScope) {
     createPlanChangeTool(scope.services.billing, scope.user),
   ]
 
-  return new AgentBuilder('billing', scope.model)
-    .instructions('Use tools for account-specific information.')
-    .tools(tools)
-    .memory(scope.memory)
-    .build()
+  return new Agent({
+    id: 'billing',
+    model: scope.model,
+    instructions: 'Use tools for account-specific information.',
+    memory: { store: scope.memory },
+    tools: [...tools],
+  })
 }
 ```
 

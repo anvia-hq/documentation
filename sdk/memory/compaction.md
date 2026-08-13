@@ -6,22 +6,21 @@ Compaction replaces an older transcript prefix with a durable summary while pres
 
 ```ts
 import {
-  AgentBuilder,
+  Agent,
   createSummaryMemoryCompactor,
 } from '@anvia/core'
 
-const agent = new AgentBuilder('support', model)
-  .memory(memoryStore, {
-    savePolicy: 'turn',
-    compaction: {
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  memory: { store: memoryStore, savePolicy: 'turn', compaction: {
       maxMessages: 40,
       keepRecentUserTurns: 4,
       compactor: createSummaryMemoryCompactor(summaryModel, {
         maxTokens: 1024,
       }),
-    },
-  })
-  .build()
+    } },
+})
 ```
 
 When stored history plus the incoming prompt exceeds `maxMessages`, Anvia summarizes older messages and retains the configured number of complete user-led turns.

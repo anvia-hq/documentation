@@ -15,7 +15,7 @@ LANGFUSE_SERVICE_NAME=support-api
 ```
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { langfuse } from '@anvia/langfuse'
 
 const tracing = langfuse.create({
@@ -23,9 +23,11 @@ const tracing = langfuse.create({
   release: process.env.APP_RELEASE,
 })
 
-const agent = new AgentBuilder('support', model)
-  .observe(tracing)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  observers: [tracing],
+})
 ```
 
 Explicit options override environment variables. The base URL defaults to Langfuse Cloud and request timeout defaults to 30 seconds.

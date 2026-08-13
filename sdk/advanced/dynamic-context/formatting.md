@@ -16,7 +16,7 @@ The default is enough when the index stores plain text. Use custom formatting wh
 ## Format structured documents
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 
 type PolicyDocument = {
   title: string
@@ -41,12 +41,14 @@ const policyContext = {
       ].join('\n'),
     }
   },
-} satisfies Parameters<AgentBuilder['dynamicContext']>[1]
+}
 
-const agent = new AgentBuilder('policy-support', model)
-  .instructions('Prefer the newest applicable policy and name its source.')
-  .dynamicContext(policyIndex, policyContext)
-  .build()
+const agent = new Agent({
+  id: 'policy-support',
+  model: model,
+  instructions: 'Prefer the newest applicable policy and name its source.',
+  dynamicContexts: [{ index: policyIndex, ...policyContext }],
+})
 ```
 
 The formatter runs after search and before the model request. It changes what the model sees; it does not change the stored vector or similarity score.
@@ -69,4 +71,3 @@ Formatting can remove private fields as a final safeguard, but it should not dec
 ## Check the final shape
 
 Test the formatter with missing metadata, non-string documents, long bodies, and stale records. If the model ignores retrieved evidence, inspect the exact formatted text before changing the agent instruction.
-

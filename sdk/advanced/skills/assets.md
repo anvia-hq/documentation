@@ -55,4 +55,4 @@ The application owns process permissions, environment variables, network access,
 
 ## Keep outputs small and safe
 
-Script output can enter tool messages, traces, event stores, or memory. Return only the data the agent needs, redact secrets, and store large artifacts outside the transcript with a safe reference.
+Script output can enter tool messages, traces, or memory. Return only the data the agent needs, redact secrets, and store large artifacts outside the transcript with a safe reference.

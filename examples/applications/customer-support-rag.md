@@ -12,7 +12,7 @@ You will have a JSON API that:
 - validates and embeds application-owned handbook records at startup;
 - authenticates support principals before parsing or retrieving;
 - constructs metadata filters from trusted principal state;
-- uses `AgentBuilder.dynamicContext` for prompt-time retrieval; and
+- uses the agent `dynamicContexts` option for prompt-time retrieval; and
 - names the source or reports that the handbook is insufficient.
 
 The in-memory store keeps the example self-contained. It rebuilds embeddings on restart and is not
@@ -243,7 +243,7 @@ export const knowledgeIndex = InMemoryVectorStore
 ```
 
 ```ts [agent.ts]
-import { AgentBuilder } from "@anvia/core/agent";
+import { Agent } from "@anvia/core/agent";
 import { vectorFilter } from "@anvia/core/vector-store";
 import { completionModel, knowledgeIndex } from "./knowledge.js";
 import type { Principal } from "./types.js";
@@ -256,22 +256,20 @@ export function createSupportAgent(principal: Principal) {
       )
     : vectorFilter.eq("visibility", "agent");
 
-  return new AgentBuilder("customer-support-rag", completionModel)
-    .instructions([
+  return new Agent({
+    id: "customer-support-rag",
+    model: completionModel,
+    instructions: [
       "Answer only from the retrieved handbook documents.",
       "If they are insufficient, say so; never invent policy or approval.",
       "End handbook claims with the supplied Source value in parentheses.",
-    ].join("\n"))
-    .dynamicContext(knowledgeIndex, {
-      topK: 4,
-      filter,
-      format: (result) => ({
+    ].join("\n"),
+    dynamicContexts: [{ index: knowledgeIndex, topK: 4, filter, format: (result) => ({
         id: result.id,
         text: `Title: ${result.document.title}\nSource: ${result.document.source}`
           + `\n\n${result.document.text}`,
-      }),
-    })
-    .build();
+      }) }],
+  });
 }
 ```
 

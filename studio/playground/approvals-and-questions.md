@@ -67,7 +67,7 @@ const approvalHook = createHook({
 })
 ```
 
-Attach the hook with `.hook(approvalHook)` when building the agent. Calls that do not require review must return `tool.run()` so they continue normally.
+Attach the hook with `hook: approvalHook` when constructing the agent. Calls that do not require review must return `tool.run()` so they continue normally.
 
 ## Ask the operator a question
 
@@ -128,15 +128,17 @@ The operator may select a declared choice or enter a custom answer. For multiple
 Register `ask_question` alongside the tool that consumes the confirmed values:
 
 ```ts
-const agent = new AgentBuilder('support-escalation', model)
-  .instructions([
+const agent = new Agent({
+  id: 'support-escalation',
+  model: model,
+  instructions: [
     'Ask for priority, channel, and an operator note when they are missing.',
     'Ask all missing questions in one ask_question call.',
     'After the operator answers, call prepare_escalation with the confirmed values.',
-  ].join('\n'))
-  .tools([askQuestion, prepareEscalation])
-  .defaultMaxTurns(5)
-  .build()
+  ].join('\n'),
+  maxTurns: 5,
+  tools: [askQuestion, prepareEscalation],
+})
 
 new Studio([agent], {
   quickPrompts: {
@@ -160,4 +162,3 @@ If the operator stops the run while it is waiting:
 Approval and question requests live in the Studio process. Restarting an in-memory Studio runtime does not preserve an unresolved interaction, so do not use the development Playground as a production approval queue.
 
 Return to the [Playground overview](/studio/playground) or review [Run an agent](/studio/playground/run-an-agent) for the complete streaming lifecycle.
-

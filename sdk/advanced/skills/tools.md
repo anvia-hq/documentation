@@ -11,7 +11,7 @@ When at least one skill is loaded, Anvia creates four tools that let the model p
 | `get_skill_script` | Read one listed file under `scripts/`. |
 | `run_skill_script` | Execute one listed skill script. |
 
-These tools are included in the `SkillSet` and attached by `.skills(skillSet)`.
+These tools are included in the `SkillSet` and attached through the `skills` option.
 
 ## What the agent sees first
 
@@ -32,11 +32,13 @@ This keeps unrelated skill content out of the model context.
 ```ts
 const productSkills = await loadSkills(skill.local('skills'))
 
-const agent = new AgentBuilder('release-assistant', model)
-  .instructions('Use skills when they are relevant to the task.')
-  .skills(productSkills)
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'release-assistant',
+  model: model,
+  instructions: 'Use skills when they are relevant to the task.',
+  skills: productSkills,
+  maxTurns: 4,
+})
 
 const response = await agent
   .prompt(

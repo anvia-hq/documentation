@@ -16,20 +16,18 @@ The think tool gives an agent an explicit checkpoint between gathering informati
 ## Add a checkpoint
 
 ```ts
-import { AgentBuilder, createThinkTool } from '@anvia/core'
+import { Agent, createThinkTool } from '@anvia/core'
 
-const agent = new AgentBuilder('incident-review', model)
-  .instructions([
+const agent = new Agent({
+  id: 'incident-review',
+  model: model,
+  instructions: [
     'Investigate the incident using the available evidence.',
     'Use think after gathering evidence and before proposing remediation.',
     'Keep the checkpoint concise and do not include secrets.',
-  ].join('\n'))
-  .tools([
-    createThinkTool(),
-    searchLogsTool,
-    getDeploymentTool,
-  ])
-  .build()
+  ].join('\n'),
+  tools: [createThinkTool(), searchLogsTool, getDeploymentTool],
+})
 ```
 
 When the model calls `think`, Anvia accepts `{ thought: string }` and returns the same text as the tool result. Nothing is retrieved and no external side effect occurs.

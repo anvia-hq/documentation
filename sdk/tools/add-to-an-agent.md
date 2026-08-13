@@ -1,19 +1,19 @@
 # Add tools to an agent
 
-Pass the tools an agent may use to `AgentBuilder`. Keep the set small enough that each tool has a distinct purpose.
+Pass the tools an agent may use to `Agent`. Keep the set small enough that each tool has a distinct purpose.
 
 ## Register tools
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 
-const agent = new AgentBuilder('billing', model)
-  .instructions(
-    'Use tools for account-specific information. Never guess invoice data.',
-  )
-  .tools([getInvoice, searchInvoices])
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'billing',
+  model: model,
+  instructions: 'Use tools for account-specific information. Never guess invoice data.',
+  maxTurns: 4,
+  tools: [getInvoice, searchInvoices],
+})
 
 const response = await agent
   .prompt('Has invoice inv_123 been paid?')
@@ -30,14 +30,13 @@ Create the tool set from the current application scope when handlers depend on u
 
 ```ts
 export function createBillingAgent(scope: BillingScope) {
-  return new AgentBuilder('billing', model)
-    .instructions('Use tools for account-specific information.')
-    .tools([
-      createGetInvoiceTool(scope),
-      createSearchInvoicesTool(scope),
-    ])
-    .defaultMaxTurns(4)
-    .build()
+  return new Agent({
+    id: 'billing',
+    model: model,
+    instructions: 'Use tools for account-specific information.',
+    maxTurns: 4,
+    tools: [createGetInvoiceTool(scope), createSearchInvoicesTool(scope)],
+  })
 }
 ```
 
@@ -45,4 +44,4 @@ Do not place mutable request state in a shared global tool. The handler should c
 
 ## Keep the loop bounded
 
-Start with a small `defaultMaxTurns(...)`. If the agent repeatedly reaches it, improve instructions, tool descriptions, or result content before increasing the limit.
+Start with a small `maxTurns` option. If the agent repeatedly reaches it, improve instructions, tool descriptions, or result content before increasing the limit.

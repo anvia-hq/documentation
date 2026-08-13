@@ -16,7 +16,7 @@ Hooks let application code observe and control an agent while it runs. They can 
 ## A minimal hook
 
 ```ts
-import { AgentBuilder, createHook } from '@anvia/core'
+import { Agent, createHook } from '@anvia/core'
 
 const policyHook = createHook({
   onRunStart({ maxTurns, run }) {
@@ -33,9 +33,11 @@ const policyHook = createHook({
   },
 })
 
-const agent = new AgentBuilder('support', model)
-  .hook(policyHook)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  hook: policyHook,
+})
 ```
 
 Returning nothing continues normally. Control methods return explicit actions that the runtime applies after the callback.

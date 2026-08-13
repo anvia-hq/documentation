@@ -96,7 +96,7 @@ export const tracing = lens.createFromEnv({
 ```
 
 ```ts [src/agent.ts]
-import { AgentBuilder } from "@anvia/core/agent";
+import { Agent } from "@anvia/core/agent";
 import { OpenAIClient } from "@anvia/openai";
 import { tracing } from "./observability.js";
 
@@ -105,15 +105,14 @@ if (!apiKey) throw new Error("Missing OPENAI_API_KEY.");
 
 const openai = new OpenAIClient({ apiKey });
 
-export const supportAgent = new AgentBuilder(
-  "support-summary",
-  openai.completionModel("gpt-5"),
-)
-  .name("Support summary agent")
-  .instructions("Answer clearly and concisely. Do not include secrets in the response.")
-  .defaultMaxTurns(4)
-  .observe(tracing)
-  .build();
+export const supportAgent = new Agent({
+  id: "support-summary",
+  model: openai.completionModel("gpt-5"),
+  name: "Support summary agent",
+  instructions: "Answer clearly and concisely. Do not include secrets in the response.",
+  maxTurns: 4,
+  observers: [tracing],
+});
 ```
 
 ```ts [src/smoke.ts]
@@ -200,7 +199,7 @@ process reaches `await tracing.flush()` without an exporter timeout.
   authentication errors surface when telemetry is exported or flushed. Unlike
   `createFromEnv({ optional: true })`, this production-oriented setup fails fast when Lens
   configuration is absent or partial.
-- `.observe(tracing)` registers the Lens observer before the agent is built, allowing it to record
+- `observers: [tracing]` registers the Lens observer when the agent is constructed, allowing it to record
   the run, each generation, tool calls when present, usage, and failures.
 - `.withTrace()` supplies searchable operational context for this request. The service,
   environment, and release describe the process; the name, user, session, tags, version, and

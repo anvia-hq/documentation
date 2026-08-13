@@ -26,7 +26,7 @@ Generate and apply the resulting migration with your normal Drizzle tooling. The
 ## Create the store
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { createDrizzleMemoryStore } from '@anvia/memory-drizzle'
 
 const memory = createDrizzleMemoryStore(db, {
@@ -35,9 +35,11 @@ const memory = createDrizzleMemoryStore(db, {
   },
 })
 
-const agent = new AgentBuilder('support', model)
-  .memory(memory, { savePolicy: 'turn' })
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  memory: { store: memory, savePolicy: 'turn' },
+})
 ```
 
 The default schema uses `agent_memory_sessions`, `agent_memory_messages`, and `agent_memory_errors`, with unique indexes for scope keys and ordered message positions.

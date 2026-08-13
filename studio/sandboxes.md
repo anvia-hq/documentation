@@ -11,7 +11,7 @@ Open `http://localhost:4021/sandboxes`. The compatibility path `http://localhost
 Studio does not create a sandbox from configuration alone. Create the session, turn it into tools with `createSandboxTools(session)`, and register those tools on an agent:
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { createSandboxTools, DockerSandbox } from '@anvia/sandbox'
 import { Studio } from '@anvia/studio'
 
@@ -54,9 +54,11 @@ const tools = createSandboxTools(session, {
   process: { maxLogBytes: 64_000 },
 })
 
-const agent = new AgentBuilder('sandbox-builder', model)
-  .tools(tools)
-  .build()
+const agent = new Agent({
+  id: 'sandbox-builder',
+  model: model,
+  tools: [...tools],
+})
 ```
 
 `createSandboxTools()` attaches non-enumerable session metadata to each generated tool. Studio uses that metadata to discover the live session; it does not search Docker or another provider for unrelated workspaces. When several tools or agents reference the same session object, Studio shows one workspace with all associated tool and agent names.

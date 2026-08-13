@@ -19,7 +19,7 @@ uses that result in a final answer.
 
 ## Packages used
 
-- `@anvia/core` for `AgentBuilder` and `createTool(...)`
+- `@anvia/core` for `Agent` and `createTool(...)`
 - `@anvia/openai` for the OpenAI completion model
 - `zod` for validating tool input and output
 - `tsx`, TypeScript, and Node.js types for running the TypeScript file
@@ -88,7 +88,7 @@ export const lookupOrder = createTool({
 ```
 
 ```ts [agent.ts]
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 import { lookupOrder } from './tools.js'
 
@@ -101,13 +101,13 @@ if (!apiKey) {
 const openai = new OpenAIClient({ apiKey })
 const model = openai.completionModel('gpt-5')
 
-const agent = new AgentBuilder('order-status', model)
-  .instructions(
-    'Use lookup_order before answering order-status questions. Never invent order data.',
-  )
-  .tools([lookupOrder])
-  .defaultMaxTurns(3)
-  .build()
+const agent = new Agent({
+  id: 'order-status',
+  model: model,
+  instructions: 'Use lookup_order before answering order-status questions. Never invent order data.',
+  maxTurns: 3,
+  tools: [lookupOrder],
+})
 
 const response = await agent
   .prompt('Look up order ord_123 and tell me its status and estimated ship date.')
@@ -139,7 +139,7 @@ the fixture's `processing` status and `2026-08-15` ship date, but its exact word
 `createTool(...)` turns the Zod schemas and handler into a model-callable tool. Anvia parses the
 model's arguments before `execute(...)` runs and validates the declared output afterward.
 
-`AgentBuilder` registers the tool and stable instructions. When the model requests `lookup_order`,
+`Agent` registers the tool and stable instructions. When the model requests `lookup_order`,
 the runtime executes the handler, returns its result to the model, and continues the loop until the
 model produces a final answer or the three-turn limit is reached. `response.output` contains the
 final visible answer.

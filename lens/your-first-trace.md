@@ -27,18 +27,20 @@ export const tracing = lens.create()
 
 ## Observe an agent
 
-Attach the tracing instance before building the agent:
+Attach the tracing instance when constructing the agent:
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { tracing } from './tracing'
 import { model } from './model'
 
-const supportAgent = new AgentBuilder('support-agent', model)
-  .name('Support agent')
-  .instructions('Answer support questions clearly and concisely.')
-  .observe(tracing)
-  .build()
+const supportAgent = new Agent({
+  id: 'support-agent',
+  model: model,
+  name: 'Support agent',
+  instructions: 'Answer support questions clearly and concisely.',
+  observers: [tracing],
+})
 ```
 
 The observer records runtime activity without changing the agent result.

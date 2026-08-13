@@ -31,7 +31,7 @@ release, and service-name variables in server secrets.
 ## Process and request boundaries
 
 ```ts
-import { AgentBuilder } from "@anvia/core/agent";
+import { Agent } from "@anvia/core/agent";
 import { langfuse } from "@anvia/langfuse";
 import { OpenAIClient } from "@anvia/openai";
 
@@ -41,10 +41,12 @@ const tracing = langfuse.create({
 });
 
 const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY });
-const agent = new AgentBuilder("support", openai.completionModel("gpt-5"))
-  .observe(tracing)
-  .instructions("Answer with verified support policy only.")
-  .build();
+const agent = new Agent({
+  id: "support",
+  model: openai.completionModel("gpt-5"),
+  instructions: "Answer with verified support policy only.",
+  observers: [tracing],
+});
 
 try {
   const response = await agent

@@ -1,6 +1,6 @@
 # Add context
 
-Attach a prepared vector index to an agent with `.dynamicContext(...)`.
+Attach a prepared vector index to an agent with the `dynamicContexts` option.
 
 ## Prepare the index first
 
@@ -31,17 +31,14 @@ Do not rebuild the index for every message. Run ingestion during startup, in an 
 ## Attach it to an agent
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 
-const agent = new AgentBuilder('docs-support', model)
-  .instructions(
-    'Answer from retrieved documentation. Say when the documentation does not contain the answer.',
-  )
-  .dynamicContext(docsIndex, {
-    topK: 4,
-    threshold: 0.74,
-  })
-  .build()
+const agent = new Agent({
+  id: 'docs-support',
+  model: model,
+  instructions: 'Answer from retrieved documentation. Say when the documentation does not contain the answer.',
+  dynamicContexts: [{ index: docsIndex, topK: 4, threshold: 0.74 }],
+})
 ```
 
 `topK` limits how many results may be included. `threshold` rejects matches below the configured similarity score.
@@ -71,4 +68,3 @@ If the model calls a tool and continues, the next turn performs a new search usi
 ## Start with conservative limits
 
 Begin with three to five short chunks. Increase `topK` only when answers consistently require evidence from more passages. Raise `threshold` when unrelated documents appear; revisit chunking when the right facts are split across poor boundaries.
-

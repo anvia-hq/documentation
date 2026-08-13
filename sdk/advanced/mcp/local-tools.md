@@ -5,14 +5,13 @@ Combine reviewed MCP capabilities with local tools when the application must ret
 ## Register both sources
 
 ```ts
-const agent = new AgentBuilder('operations', model)
-  .tools([
-    createIncidentTool(scope),
-    createApprovalStatusTool(scope),
-  ])
-  .mcp([runbookServer, monitoringServer])
-  .defaultMaxTurns(6)
-  .build()
+const agent = new Agent({
+  id: 'operations',
+  model: model,
+  mcpServers: [runbookServer, monitoringServer],
+  maxTurns: 6,
+  tools: [createIncidentTool(scope), createApprovalStatusTool(scope)],
+})
 ```
 
 Local and MCP tools appear in the same model-facing tool set and run through the normal agent tool loop.
@@ -40,22 +39,20 @@ const docsTools = await allowMcpTools(
   new Set(['search_docs', 'read_doc']),
 )
 
-const agent = new AgentBuilder('support', model)
-  .tools([
-    ...docsTools,
-    createCustomerLookupTool(scope),
-    createTicketTool(scope),
-  ])
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  tools: [...docsTools, createCustomerLookupTool(scope), createTicketTool(scope)],
+})
 ```
 
-This avoids registering the full server through `.mcp(...)`.
+This avoids registering the full server through `mcpServers`.
 
 ## Keep names and descriptions distinct
 
 The model should be able to tell external lookup from product action. Prefer names such as `search_runbooks` and `create_incident` over two tools both described as “handle incidents.”
 
-Check tool names across every local and MCP source before building the agent.
+Check tool names across every local and MCP source before constructing the agent.
 
 ## Close every connected server
 

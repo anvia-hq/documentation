@@ -8,26 +8,28 @@ Quick reference for the core runtime surfaces used throughout these guides.
 - `createCompletionStream(model, request)` yields normalized provider completion events such as `text_delta`.
 - `createParsedCompletion(model, { schema, input })` returns schema-validated `data` or throws.
 
-## Agent builder
+## Agent construction
 
 ```ts
-new AgentBuilder(id, model)
-  .name(name)
-  .description(description)
-  .instructions(instructions)
-  .tools(tools)
-  .context(document, id)
-  .memory(store, options)
-  .observe(observer)
-  .defaultMaxTurns(turns)
-  .build()
+new Agent({
+  id: id,
+  model: model,
+  name: name,
+  description: description,
+  instructions: instructions,
+  memory: { store: store, ...options },
+  maxTurns: turns,
+  context: [{ id: id, text: document }],
+  tools: [...tools],
+  observers: [observer],
+})
 ```
 
-Use only the methods required by the agent.
+Pass only the options required by the agent. Construction returns a ready-to-use runtime.
 
 ## Prompt execution
 
-- `agent.prompt(input).send()` returns final `output`, `usage`, `messages`, and optional `trace`.
+- `agent.prompt(input).send()` returns `runId`, final `output`, `usage`, `messages`, and optional `trace`.
 - `agent.prompt(input).maxTurns(n).send()` overrides the turn limit for one request.
 - `agent.prompt(input).stream()` yields runtime events.
 - `agent.session(sessionId, scope)` creates a durable session surface.

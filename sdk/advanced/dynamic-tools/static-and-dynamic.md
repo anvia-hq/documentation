@@ -5,17 +5,12 @@ Keep essential tools static and retrieve the larger, less frequently used catalo
 ## Combine both sources
 
 ```ts
-const agent = new AgentBuilder('support', model)
-  .tools([
-    createEscalationTool(scope),
-    createHumanHelpTool(scope),
-  ])
-  .dynamicTools(toolIndex, {
-    topK: 5,
-    threshold: 0.7,
-    filter: allowedToolFilter,
-  })
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  dynamicTools: [{ index: toolIndex, topK: 5, threshold: 0.7, filter: allowedToolFilter }],
+  tools: [createEscalationTool(scope), createHumanHelpTool(scope)],
+})
 ```
 
 Static definitions appear in every model turn. Dynamic definitions are selected from the current prompt for each turn.

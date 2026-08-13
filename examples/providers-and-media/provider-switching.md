@@ -18,7 +18,7 @@ experiments—not unbounded fallback after a side effect.
 
 ```ts
 import { AnthropicClient } from '@anvia/anthropic'
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import type { StreamingCompletionModel } from '@anvia/core/completion'
 import { GeminiClient } from '@anvia/gemini'
 import { MistralClient } from '@anvia/mistral'
@@ -45,9 +45,11 @@ function completionModel(provider: string): StreamingCompletionModel {
 }
 
 const model = completionModel(process.env.ANVIA_PROVIDER ?? 'openai')
-const agent = new AgentBuilder('assistant', model)
-  .instructions('Answer in two sentences or less.')
-  .build()
+const agent = new Agent({
+  id: 'assistant',
+  model: model,
+  instructions: 'Answer in two sentences or less.',
+})
 
 console.log((await agent.prompt('What is a model boundary?').send()).output)
 ```

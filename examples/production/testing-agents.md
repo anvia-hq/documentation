@@ -32,7 +32,7 @@ Implement the public completion contract for unit tests:
 
 ```ts
 import {
-  AgentBuilder,
+  Agent,
   AssistantContent,
   type CompletionModel,
   type CompletionRequest,
@@ -62,7 +62,10 @@ class StaticModel implements CompletionModel {
   }
 }
 
-const agent = new AgentBuilder("support-test", new StaticModel()).build();
+const agent = new Agent({
+  id: "support-test",
+  model: new StaticModel(),
+});
 const response = await agent.prompt("What is the refund window?").send();
 expect(response.output).toContain("30 days");
 ```

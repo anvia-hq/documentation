@@ -5,7 +5,7 @@
 ## Create a tool set
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { ToolSet } from '@anvia/core/tool'
 
 const supportToolSet = ToolSet.fromTools([
@@ -14,12 +14,15 @@ const supportToolSet = ToolSet.fromTools([
   createEscalationTool(scope),
 ])
 
-const agent = new AgentBuilder('support', model)
-  .useToolSet(supportToolSet)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model,
+  tools: supportToolSet.values(),
+})
 ```
 
-`.useToolSet(...)` makes every tool in the set static, so its definition is available on every model turn.
+`values()` snapshots the current set into the agent, so each tool definition is available on every
+model turn. Later mutations to the set do not change the constructed agent.
 
 ## Inspect the set
 

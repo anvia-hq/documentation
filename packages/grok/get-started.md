@@ -9,20 +9,19 @@ pnpm add @anvia/core @anvia/grok
 Create a client for xAI’s API:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { GrokClient, tools as grokTools } from '@anvia/grok'
 
 const grok = new GrokClient({
   apiKey: process.env.XAI_API_KEY,
 })
 
-const agent = new AgentBuilder('researcher', grok.completionModel())
-  .tools([
-    grokTools.webSearch({ allowedDomains: ['x.ai'] }),
-    grokTools.codeInterpreter(),
-  ])
-  .defaultMaxTurns(5)
-  .build()
+const agent = new Agent({
+  id: 'researcher',
+  model: grok.completionModel(),
+  maxTurns: 5,
+  tools: [grokTools.webSearch({ allowedDomains: ['x.ai'] }), grokTools.codeInterpreter()],
+})
 
 const result = await agent.prompt('Summarize recent xAI product updates.').send()
 console.log(result.output)

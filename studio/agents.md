@@ -6,10 +6,10 @@ Open `http://localhost:4021/ui/agents` when Studio is running on port `4021`.
 
 ## Register agents with Studio
 
-Pass one or more built agents to `Studio`:
+Pass one or more agents to `Studio`:
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { OpenAIClient } from '@anvia/openai'
 import { Studio } from '@anvia/studio'
 
@@ -17,14 +17,13 @@ const client = new OpenAIClient({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-const supportAgent = new AgentBuilder(
-  'support-operations',
-  client.completionModel('gpt-5.6-luna'),
-)
-  .name('Support operations')
-  .description('Looks up tickets and prepares support actions.')
-  .defaultMaxTurns(4)
-  .build()
+const supportAgent = new Agent({
+  id: 'support-operations',
+  model: client.completionModel('gpt-5.6-luna'),
+  name: 'Support operations',
+  description: 'Looks up tickets and prepares support actions.',
+  maxTurns: 4,
+})
 
 new Studio([supportAgent]).start({ port: 4021 })
 ```

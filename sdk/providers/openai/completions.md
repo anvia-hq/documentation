@@ -3,7 +3,7 @@
 Use `completionModel(...)` for direct completions, agents, extractors, structured output, and model-driven pipeline stages.
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 
 const openai = new OpenAIClient({
@@ -12,9 +12,11 @@ const openai = new OpenAIClient({
 
 const model = openai.completionModel('gpt-5')
 
-export const supportAgent = new AgentBuilder('support', model)
-  .instructions('Answer support questions clearly and concisely.')
-  .build()
+export const supportAgent = new Agent({
+  id: 'support',
+  model: model,
+  instructions: 'Answer support questions clearly and concisely.',
+})
 ```
 
 The returned model implements Anvia's streaming completion contract, so the same model can be used for `.send()` and `.stream()` workflows.

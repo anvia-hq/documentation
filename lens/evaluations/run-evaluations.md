@@ -51,7 +51,7 @@ It flushes at the end of each run by default. Use `shutdown()` before the proces
 The target must use the same observer as the reporter if you want each result linked to its agent trace:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { agentEvalTarget, contains, runEvalSuite } from '@anvia/core/evals'
 import type { PromptResponse } from '@anvia/core/request'
 import { lens } from '@anvia/lens'
@@ -62,15 +62,17 @@ const evaluation = lens.evals<string, PromptResponse, string>({
   onMissingTrace: 'throw',
 })
 
-const agent = new AgentBuilder('support-policy-agent', model)
-  .name('Support policy agent')
-  .instructions([
+const agent = new Agent({
+  id: 'support-policy-agent',
+  model: model,
+  name: 'Support policy agent',
+  instructions: [
     'Answer with only the relevant policy fact.',
     'Refunds are available for 30 days.',
     'Workspace owners can change billing settings.',
-  ].join('\n'))
-  .observe(evaluation.observer)
-  .build()
+  ].join('\n'),
+  observers: [evaluation.observer],
+})
 
 try {
   const suite = await runEvalSuite({

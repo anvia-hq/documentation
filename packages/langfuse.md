@@ -9,7 +9,7 @@ pnpm add @anvia/core @anvia/langfuse
 ```
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { langfuse } from '@anvia/langfuse'
 
 const tracing = langfuse.create({
@@ -20,9 +20,11 @@ const tracing = langfuse.create({
   captureMode: 'safe',
 })
 
-const agent = new AgentBuilder('support', model)
-  .observe(tracing)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  observers: [tracing],
+})
 ```
 
 Call `flush()` before a short-lived worker exits and `shutdown()` during service termination so queued traces and scores have time to reach Langfuse.

@@ -12,7 +12,7 @@ An agent's stable ID, display name, and description make it easier to identify i
 
 ```ts
 import 'dotenv/config'
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { OpenAIClient } from '@anvia/openai'
 import { Studio } from '@anvia/studio'
 
@@ -20,17 +20,14 @@ const client = new OpenAIClient({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-const supportAgent = new AgentBuilder(
-  'support',
-  client.completionModel('gpt-5'),
-)
-  .name('Support')
-  .description('Turns support questions into concrete next steps.')
-  .instructions(
-    'Answer support questions clearly. Ask for any missing facts before diagnosing the issue.',
-  )
-  .defaultMaxTurns(4)
-  .build()
+const supportAgent = new Agent({
+  id: 'support',
+  model: client.completionModel('gpt-5'),
+  name: 'Support',
+  description: 'Turns support questions into concrete next steps.',
+  instructions: 'Answer support questions clearly. Ask for any missing facts before diagnosing the issue.',
+  maxTurns: 4,
+})
 
 new Studio([supportAgent], {
   quickPrompts: {

@@ -15,12 +15,11 @@ const toolIndex = await createToolIndex(embeddingModel, [
   searchRunbooks,
 ])
 
-const agent = new AgentBuilder('support-agent', model)
-  .dynamicTools(toolIndex, {
-    topK: 2,
-    threshold: 0.75,
-  })
-  .build()
+const agent = new Agent({
+  id: 'support-agent',
+  model: model,
+  dynamicTools: [{ index: toolIndex, topK: 2, threshold: 0.75 }],
+})
 ```
 
 At runtime, Anvia searches the tool index from the current prompt, applies the threshold and filter, and adds up to `topK` matching definitions to the model request. If the model selects one, Anvia resolves and executes the concrete tool from the index's backing tool set.

@@ -6,12 +6,12 @@ Turn a provider model into a reusable agent with a clear identity, instructions,
 
 Complete [Install and setup](/sdk/install-and-setup) first. You should already have `@anvia/core`, a provider package, and a working API key.
 
-## Build the agent
+## Construct the agent
 
-Create the provider model, then pass it to `AgentBuilder`.
+Create the provider model, then pass it in the `Agent` options.
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 
 const client = new OpenAIClient({
@@ -20,20 +20,22 @@ const client = new OpenAIClient({
 
 const model = client.completionModel('gpt-5')
 
-const agent = new AgentBuilder('support', model)
-  .instructions('Answer support questions clearly and ask for missing details.')
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  instructions: 'Answer support questions clearly and ask for missing details.',
+  maxTurns: 4,
+})
 ```
 
 The agent setup has four parts:
 
 | Part | Purpose |
 | --- | --- |
-| `support` | Gives the agent a stable identity. |
+| `id: 'support'` | Gives the agent a stable identity. |
 | `model` | Supplies the provider-backed completion model. |
-| `instructions(...)` | Defines the agent's reusable behavior. |
-| `defaultMaxTurns(4)` | Bounds the model and tool loop for each run. |
+| `instructions` | Defines the agent's reusable behavior. |
+| `maxTurns: 4` | Bounds the model and tool loop for each run. |
 
 ## Send a prompt
 

@@ -18,17 +18,17 @@ pnpm add @anvia/gemini @anvia/core
 ## Create a Gemini agent
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { GeminiClient } from '@anvia/gemini'
 
 const gemini = new GeminiClient({
   apiKey: process.env.GEMINI_API_KEY,
 })
 
-const agent = new AgentBuilder(
-  'assistant',
-  gemini.completionModel('gemini-2.5-flash'),
-).build()
+const agent = new Agent({
+  id: 'assistant',
+  model: gemini.completionModel('gemini-2.5-flash'),
+})
 
 const result = await agent.prompt('Describe this system in three bullets.').send()
 console.log(result.output)

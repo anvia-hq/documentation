@@ -13,10 +13,12 @@ const research = researchAgent.asTool({
   maxTurns: 3,
 })
 
-const coordinator = new AgentBuilder('research-coordinator', model)
-  .tools([research])
-  .defaultMaxTurns(6)
-  .build()
+const coordinator = new Agent({
+  id: 'research-coordinator',
+  model: model,
+  maxTurns: 6,
+  tools: [research],
+})
 ```
 
 A child that can call tools or other agents can otherwise consume a large amount of latency and model usage inside one parent tool call.

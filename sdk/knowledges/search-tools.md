@@ -19,13 +19,13 @@ Every `VectorSearchIndex` supports `asTool(...)`. The tool accepts a query and r
 ## Add it to an agent
 
 ```ts
-const agent = new AgentBuilder('incident-assistant', model)
-  .instructions(
-    'Search runbooks before answering incident response questions.',
-  )
-  .tools([searchRunbooks])
-  .defaultMaxTurns(3)
-  .build()
+const agent = new Agent({
+  id: 'incident-assistant',
+  model: model,
+  instructions: 'Search runbooks before answering incident response questions.',
+  maxTurns: 3,
+  tools: [searchRunbooks],
+})
 ```
 
 The model can search, inspect the result, refine its query, and then produce a final answer. Keep the turn limit bounded.

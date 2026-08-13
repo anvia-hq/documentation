@@ -20,14 +20,16 @@ ANVIA_LENS_RELEASE=2026.08.1
 ```
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { lens } from '@anvia/lens'
 
 const tracing = lens.createFromEnv({ captureMode: 'safe' })
 
-const agent = new AgentBuilder('support', model)
-  .observe(tracing)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  observers: [tracing],
+})
 ```
 
 `createFromEnv()` requires a complete connection. For code that may run without Lens, pass `optional: true`; no credentials produces a disabled no-op observer, while partial credentials still fail fast.

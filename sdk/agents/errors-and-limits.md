@@ -16,10 +16,12 @@ Bound every production agent and translate runtime failures at the application r
 ## Set turn limits
 
 ```ts
-const agent = new AgentBuilder('support', model)
-  .instructions('Use tools only when needed.')
-  .defaultMaxTurns(3)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  instructions: 'Use tools only when needed.',
+  maxTurns: 3,
+})
 
 const response = await agent
   .prompt(input)

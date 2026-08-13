@@ -43,9 +43,11 @@ Connection and tool-listing failures reject from `connectMcp(...)`. Do not build
 ## Register the server
 
 ```ts
-const agent = new AgentBuilder('docs-operator', model)
-  .mcp([filesystem])
-  .build()
+const agent = new Agent({
+  id: 'docs-operator',
+  model: model,
+  mcpServers: [filesystem],
+})
 ```
 
 This registers every tool exposed by the server. Use an allow-listed subset through `.tools(...)` when the server exposes capabilities the agent should not receive.

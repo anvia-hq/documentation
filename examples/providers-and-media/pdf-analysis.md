@@ -17,7 +17,7 @@ large document workflows.
 ## Implementation
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { Message, UserContent } from '@anvia/core/completion'
 import { OpenAIClient } from '@anvia/openai'
 
@@ -25,9 +25,11 @@ const model = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY })
   .completionModel('gpt-5')
 if (!model.capabilities.documentInput) throw new Error('Selected model has no document input.')
 
-const analyst = new AgentBuilder('document-analyst', model)
-  .instructions('Use only the attached document. Say when evidence is missing.')
-  .build()
+const analyst = new Agent({
+  id: 'document-analyst',
+  model: model,
+  instructions: 'Use only the attached document. Say when evidence is missing.',
+})
 
 const response = await analyst.prompt(Message.user([
   UserContent.text('Summarize the document and list its stated action items.'),

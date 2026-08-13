@@ -16,7 +16,7 @@ model needs live application data or a capability that should remain in trusted 
 ## Implementation
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { createTool } from '@anvia/core/tool'
 import { OpenAIClient } from '@anvia/openai'
 import { z } from 'zod'
@@ -29,14 +29,13 @@ const add = createTool({
   execute: ({ x, y }) => x + y,
 })
 
-const agent = new AgentBuilder(
-  'calculator',
-  new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY }).completionModel('gpt-5'),
-)
-  .instructions('Use the add tool for arithmetic, then explain the result briefly.')
-  .tools([add])
-  .defaultMaxTurns(2)
-  .build()
+const agent = new Agent({
+  id: 'calculator',
+  model: new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY }).completionModel('gpt-5'),
+  instructions: 'Use the add tool for arithmetic, then explain the result briefly.',
+  maxTurns: 2,
+  tools: [add],
+})
 
 console.log((await agent.prompt('What is 12 + 30?').send()).output)
 ```

@@ -17,7 +17,7 @@ Anvia keeps runtime primitives separate so applications can adopt only the behav
 
 Use `createCompletion` for one request where your application owns every step. Use `createCompletionStream` when that same call should emit text incrementally.
 
-Use an agent when behavior is reused or needs multiple model/tool turns. `AgentBuilder` defines stable defaults; each `agent.prompt(...)` creates an independent request that may override them.
+Use an agent when behavior is reused or needs multiple model/tool turns. `Agent` defines stable defaults; each `agent.prompt(...)` creates an independent request that may override them.
 
 ## Tools
 

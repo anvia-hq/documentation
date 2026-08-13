@@ -8,7 +8,7 @@ Each provider tells Studio how to construct a completion model. Static model def
 
 ```ts
 import { AnthropicClient } from '@anvia/anthropic'
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { OpenAIClient } from '@anvia/openai'
 import { Studio } from '@anvia/studio'
 
@@ -22,13 +22,12 @@ const anthropic = new AnthropicClient({
   apiKey: process.env.ANTHROPIC_API_KEY,
 })
 
-const agent = new AgentBuilder(
-  'model-router',
-  openai.completionModel('gpt-5.6-luna'),
-)
-  .name('Model Router')
-  .instructions('Answer clearly and concisely.')
-  .build()
+const agent = new Agent({
+  id: 'model-router',
+  model: openai.completionModel('gpt-5.6-luna'),
+  name: 'Model Router',
+  instructions: 'Answer clearly and concisely.',
+})
 
 new Studio([agent], {
   models: {

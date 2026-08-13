@@ -83,21 +83,20 @@ export const evidencePipeline = new PipelineBuilder(z.string())
 
 ```ts
 // src/agents/synthesizer.ts
-import { AgentBuilder } from "@anvia/core/agent";
+import { Agent } from "@anvia/core/agent";
 import { OpenAIClient } from "@anvia/openai";
 
 const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY });
 
-export const synthesizer = new AgentBuilder(
-  "research-synthesizer",
-  client.completionModel("gpt-5.5"),
-)
-  .instructions([
+export const synthesizer = new Agent({
+  id: "research-synthesizer",
+  model: client.completionModel("gpt-5.5"),
+  instructions: [
     "Use only the supplied evidence packet.",
     "Separate findings, uncertainty, and next steps.",
     "Cite the supplied source URLs; never create a URL.",
-  ].join("\n"))
-  .build();
+  ].join("\n"),
+});
 ```
 
 The request handler runs `await evidencePipeline.run(topic)`, serializes the bounded packet, then

@@ -9,17 +9,17 @@ pnpm add @anvia/core @anvia/mistral
 Create the provider client on the server:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { MistralClient } from '@anvia/mistral'
 
 const mistral = new MistralClient({
   apiKey: process.env.MISTRAL_API_KEY,
 })
 
-const agent = new AgentBuilder(
-  'assistant',
-  mistral.completionModel('mistral-large-latest'),
-).build()
+const agent = new Agent({
+  id: 'assistant',
+  model: mistral.completionModel('mistral-large-latest'),
+})
 
 const result = await agent.prompt('Extract the launch risks.').send()
 console.log(result.output)

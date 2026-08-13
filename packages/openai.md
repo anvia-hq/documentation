@@ -18,19 +18,18 @@ pnpm add @anvia/openai @anvia/core
 ## Create a completion model
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 
 const openai = new OpenAIClient({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-const agent = new AgentBuilder(
-  'assistant',
-  openai.completionModel('gpt-5'),
-)
-  .instructions('Answer clearly and concisely.')
-  .build()
+const agent = new Agent({
+  id: 'assistant',
+  model: openai.completionModel('gpt-5'),
+  instructions: 'Answer clearly and concisely.',
+})
 
 const result = await agent.prompt('Explain semantic search in one paragraph.').send()
 console.log(result.output)

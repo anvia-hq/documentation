@@ -3,7 +3,7 @@
 Use `completionModel(...)` for agents, direct model calls, extractors, and model-driven pipeline stages.
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { MistralClient } from '@anvia/mistral'
 
 const mistral = new MistralClient({
@@ -12,9 +12,11 @@ const mistral = new MistralClient({
 
 const model = mistral.completionModel('mistral-large-latest')
 
-export const supportAgent = new AgentBuilder('support', model)
-  .instructions('Answer support questions clearly and concisely.')
-  .build()
+export const supportAgent = new Agent({
+  id: 'support',
+  model: model,
+  instructions: 'Answer support questions clearly and concisely.',
+})
 ```
 
 The returned model implements Anvia's streaming completion contract, so it can power both `.send()` and `.stream()` agent runs.

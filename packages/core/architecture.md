@@ -6,7 +6,7 @@ Core is a dependency-injected runtime rather than a container that owns the surr
 Application composition
 ├── provider model
 ├── tools and permissions
-├── memory / vector / event stores
+├── memory / vector stores / observability
 ├── observers and policies
 └── agent, completion, or pipeline
           ↓
@@ -23,7 +23,7 @@ This keeps credentials, storage clients, and vendor configuration in application
 
 ## Agent construction and execution
 
-`AgentBuilder` records reusable configuration and produces an `Agent`. Calling `agent.prompt(...)` creates a one-shot `PromptRequest`; it does not execute until `send()`, `stream()`, or `readableStream()` is consumed.
+`Agent` records reusable configuration and produces an `Agent`. Calling `agent.prompt(...)` creates a one-shot `PromptRequest`; it does not execute until `send()`, `stream()`, or `readableStream()` is consumed.
 
 The prompt request owns one run. It applies request-level overrides, retrieves dynamic context and tools, performs model turns, executes application tools, records memory and events, calls observers, and enforces the turn limit. An `AgentSession` adds a stable memory context around repeated prompt requests.
 

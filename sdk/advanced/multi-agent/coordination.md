@@ -24,25 +24,21 @@ const coordinatorInstructions = [
   'Write one final answer yourself after the tools return.',
 ].join('\n')
 
-const coordinator = new AgentBuilder(
-  'incident-coordinator',
-  coordinatorModel,
-)
-  .instructions(coordinatorInstructions)
-  .tools([
-    logAgent.asTool({
+const coordinator = new Agent({
+  id: 'incident-coordinator',
+  model: coordinatorModel,
+  instructions: coordinatorInstructions,
+  maxTurns: 6,
+  tools: [logAgent.asTool({
       name: 'log_analysis',
       description: 'Analyze supplied logs and return likely causes.',
       maxTurns: 3,
-    }),
-    policyAgent.asTool({
+    }), policyAgent.asTool({
       name: 'policy_review',
       description: 'Review a proposed response for policy risk.',
       maxTurns: 2,
-    }),
-  ])
-  .defaultMaxTurns(6)
-  .build()
+    })],
+})
 ```
 
 Tool names and descriptions define the routing surface. Keep them distinct enough that the coordinator can choose the correct specialist.

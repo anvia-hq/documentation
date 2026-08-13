@@ -43,12 +43,14 @@ console.log(result.text)
 Once the provider works, wrap the model in reusable runtime behavior:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 
-const agent = new AgentBuilder('support', model)
-  .instructions('Answer support questions clearly and ask for missing details.')
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  instructions: 'Answer support questions clearly and ask for missing details.',
+  maxTurns: 4,
+})
 ```
 
 The agent depends on the provider-neutral model interface. Changing providers does not require moving provider-specific code into the agent.

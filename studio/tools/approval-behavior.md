@@ -61,10 +61,12 @@ const approvalHook = createHook({
   },
 })
 
-const agent = new AgentBuilder('support-operations', model)
-  .tools([getOrder, cancelOrder])
-  .hook(approvalHook)
-  .build()
+const agent = new Agent({
+  id: 'support-operations',
+  model: model,
+  hook: approvalHook,
+  tools: [getOrder, cancelOrder],
+})
 ```
 
 Because the policy lives in the hook, the Tools registry may show **none** for `cancel_order`. During a Playground run, the hook still pauses the call and Studio renders the request. Test hook policy through the Playground, not by reading the registry badge.

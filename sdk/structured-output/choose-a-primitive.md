@@ -5,7 +5,7 @@ Choose by what the model and application need to do—not only by the desired sc
 | Need | Primitive |
 | --- | --- |
 | One model call should return one validated object. | `createParsedCompletion(...)` |
-| An agent should use tools or context before a structured final answer. | Agent `.outputSchema(...)` |
+| An agent should use tools or context before a structured final answer. | Agent `outputSchema` option |
 | Existing content must be converted into fields or records. | `ExtractorBuilder` |
 | A tool should return typed data to the model. | Tool `output` schema |
 | Multi-step work needs validated input and typed stages. | [Pipeline](/sdk/pipelines) |

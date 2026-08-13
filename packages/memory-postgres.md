@@ -13,16 +13,18 @@ The package includes `pg` and peers with `@anvia/core >=0.13.0 <1.0.0`.
 ## Connect a store
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { createPostgresMemoryStore } from '@anvia/memory-postgres'
 
 const memory = await createPostgresMemoryStore({
   connectionString: process.env.DATABASE_URL,
 })
 
-const agent = new AgentBuilder('support', model)
-  .memory(memory, { savePolicy: 'turn' })
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  memory: { store: memory, savePolicy: 'turn' },
+})
 ```
 
 You may pass a compatible client or pool instead of `connectionString`. Pool-like clients let the adapter acquire and release a connection for each transaction.

@@ -96,15 +96,17 @@ const tools = createSandboxTools(session, {
   },
 })
 
-const agent = new AgentBuilder('website-builder', model)
-  .instructions([
+const agent = new Agent({
+  id: 'website-builder',
+  model: model,
+  instructions: [
     'Use only the pre-authorized published port.',
     'Bind the development server to 0.0.0.0.',
     'Wait for the port before reporting that the preview is ready.',
     'Inspect process logs when readiness fails.',
-  ].join('\n'))
-  .tools(tools)
-  .build()
+  ].join('\n'),
+  tools: [...tools],
+})
 ```
 
 The executable allow/block policy also applies to managed processes. The process policy bounds retained logs, readiness waits, and graceful shutdown.

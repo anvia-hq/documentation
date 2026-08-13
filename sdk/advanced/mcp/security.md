@@ -17,7 +17,7 @@ Prompt instructions may describe policy, but they must not be its only enforceme
 
 ## Allow-list remote tools
 
-`.mcp([server])` registers every adapted tool. For privileged servers, inspect and select tools before building the agent:
+`mcpServers: [server]` registers every adapted tool. For privileged servers, inspect and select tools before constructing the agent:
 
 ```ts
 import type { AnyTool } from '@anvia/core'
@@ -44,9 +44,11 @@ const docsTools = await allowMcpTools(
   new Set(['search_docs', 'read_doc']),
 )
 
-const agent = new AgentBuilder('docs-assistant', model)
-  .tools(docsTools)
-  .build()
+const agent = new Agent({
+  id: 'docs-assistant',
+  model: model,
+  tools: [...docsTools],
+})
 ```
 
 Review tool descriptions and schemas as well as names. A stable name can still acquire broader input or output behavior after a server update.

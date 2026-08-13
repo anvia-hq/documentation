@@ -7,7 +7,7 @@ Register an existing Anvia agent with Studio, open the Playground, and send a pr
 This example gives the agent one local tool so the transcript has useful activity to inspect:
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { createTool } from '@anvia/core/tool'
 import { OpenAIClient } from '@anvia/openai'
 import { Studio } from '@anvia/studio'
@@ -38,16 +38,15 @@ const getOrder = createTool({
   }),
 })
 
-const agent = new AgentBuilder(
-  'support-operations',
-  client.completionModel('gpt-5.6-luna'),
-)
-  .name('Support Operations')
-  .description('Answers operational questions with concise summaries.')
-  .instructions('Use tools when useful. Keep answers action-oriented.')
-  .tools([getOrder])
-  .defaultMaxTurns(5)
-  .build()
+const agent = new Agent({
+  id: 'support-operations',
+  model: client.completionModel('gpt-5.6-luna'),
+  name: 'Support Operations',
+  description: 'Answers operational questions with concise summaries.',
+  instructions: 'Use tools when useful. Keep answers action-oriented.',
+  maxTurns: 5,
+  tools: [getOrder],
+})
 
 new Studio([agent], {
   quickPrompts: {

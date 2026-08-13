@@ -17,7 +17,7 @@ Sandbox execution gives an agent a disposable workspace for commands and files w
 ## Create a bounded workspace
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { createSandboxTools, DockerSandbox } from '@anvia/sandbox'
 
 const sandbox = DockerSandbox.node({
@@ -52,15 +52,17 @@ try {
     writeFile: { maxBytes: 64_000 },
   })
 
-  const agent = new AgentBuilder('ticket-analyzer', model)
-    .instructions([
+  const agent = new Agent({
+    id: 'ticket-analyzer',
+    model: model,
+    instructions: [
       'Work only inside the sandbox workspace.',
       'Read input/ticket.txt and write the final report to output/report.md.',
       'Do not claim a command succeeded unless its result confirms success.',
-    ].join('\n'))
-    .tools(tools)
-    .defaultMaxTurns(8)
-    .build()
+    ].join('\n'),
+    maxTurns: 8,
+    tools: [...tools],
+  })
 
   await agent.prompt('Analyze the ticket and create the report.').send()
   const report = await session.readTextFile('output/report.md')

@@ -64,13 +64,11 @@ Only expose `write_file`, process tools, or published ports when the workflow ne
 Some workflows need a human or application decision before a sandbox tool runs:
 
 ```ts
-const agent = new AgentBuilder('workspace-reviewer', model)
-  .instructions('Inspect the workspace and propose changes before writing.')
-  .tools(createSandboxTools(session, {
-    include: ['list_files', 'read_file', 'write_file', 'exec_command'],
-    exec: { allowedCommands: ['node'] },
-  }))
-  .approvals({
+const agent = new Agent({
+  id: 'workspace-reviewer',
+  model: model,
+  instructions: 'Inspect the workspace and propose changes before writing.',
+  approvals: {
     handler: async (approval) => ({
       approved: await reviewSandboxAction({
         userId: request.user.id,
@@ -79,8 +77,12 @@ const agent = new AgentBuilder('workspace-reviewer', model)
       }),
       reason: 'Reviewed against the workspace policy.',
     }),
-  })
-  .build()
+  },
+  tools: [...createSandboxTools(session, {
+    include: ['list_files', 'read_file', 'write_file', 'exec_command'],
+    exec: { allowedCommands: ['node'] },
+  })],
+})
 ```
 
 Approval should evaluate authenticated product identity and the proposed operation. It does not replace command, network, or resource limits, and a prompt cannot grant its own approval.

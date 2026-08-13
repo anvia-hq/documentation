@@ -5,19 +5,15 @@ Use dynamic context when most prompts should receive a small set of relevant doc
 ## Add an index
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { vectorFilter } from '@anvia/core/vector-store'
 
-const agent = new AgentBuilder('docs-support', model)
-  .instructions(
-    'Answer with retrieved documentation when it is relevant.',
-  )
-  .dynamicContext(docsIndex, {
-    topK: 4,
-    threshold: 0.74,
-    filter: vectorFilter.eq('published', true),
-  })
-  .build()
+const agent = new Agent({
+  id: 'docs-support',
+  model: model,
+  instructions: 'Answer with retrieved documentation when it is relevant.',
+  dynamicContexts: [{ index: docsIndex, topK: 4, threshold: 0.74, filter: vectorFilter.eq('published', true) }],
+})
 ```
 
 For every turn, Anvia extracts retrieval text from the current prompt, searches the index, applies its threshold and filter, and sends matching results as documents with the model request.
@@ -43,7 +39,7 @@ const policyContext = {
       ].join('\n'),
     }
   },
-} satisfies Parameters<AgentBuilder['dynamicContext']>[1]
+}
 ```
 
 Keep the formatted context focused. Retrieval should not become an unbounded corpus dump.

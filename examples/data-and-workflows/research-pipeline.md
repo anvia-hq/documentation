@@ -37,7 +37,7 @@ pnpm add @anvia/core @anvia/openai zod
 First define the external contract and the evidence shape:
 
 ```ts
-import { AgentBuilder } from "@anvia/core/agent";
+import { Agent } from "@anvia/core/agent";
 import { PipelineBuilder } from "@anvia/core/pipeline";
 import { OpenAIClient } from "@anvia/openai";
 import { z } from "zod";
@@ -92,13 +92,15 @@ const metricsSearch = new PipelineBuilder(ResearchInput)
   .build();
 
 const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY });
-const synthesizer = new AgentBuilder("research-synthesizer", openai.completionModel("gpt-5"))
-  .instructions([
+const synthesizer = new Agent({
+  id: "research-synthesizer",
+  model: openai.completionModel("gpt-5"),
+  instructions: [
     "Use only the supplied evidence.",
     "Separate findings, uncertainty, and follow-up checks.",
     "Cite source IDs in square brackets. Never invent a source ID.",
-  ].join("\n"))
-  .build();
+  ].join("\n"),
+});
 
 export const researchPipeline = new PipelineBuilder(ResearchInput)
   .parallel({ internal: internalSearch, metrics: metricsSearch }, { name: "Collect evidence" })

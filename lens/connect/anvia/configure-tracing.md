@@ -59,13 +59,17 @@ Good values are `support-api`, `checkout-worker`, or `agent-evals`. Set `environ
 One tracing instance can observe multiple agents in the same process:
 
 ```ts
-const supportAgent = new AgentBuilder('support', supportModel)
-  .observe(tracing)
-  .build()
+const supportAgent = new Agent({
+  id: 'support',
+  model: supportModel,
+  observers: [tracing],
+})
 
-const triageAgent = new AgentBuilder('triage', triageModel)
-  .observe(tracing)
-  .build()
+const triageAgent = new Agent({
+  id: 'triage',
+  model: triageModel,
+  observers: [tracing],
+})
 ```
 
 The agent id and name distinguish their traces. Sharing the observer also gives the process one place to flush and shut down its exporters.
@@ -85,7 +89,7 @@ console.log(tracing.enabled)
 
 When all three connection variables—base URL, public key, and secret key—are absent, `optional: true` returns a disabled no-op observer. Partial connection configuration still throws, which prevents a mistyped deployment from silently losing telemetry.
 
-Use `tracing.enabled` only for diagnostics or optional UI behavior. The disabled observer is safe to pass to `.observe(tracing)` directly.
+Use `tracing.enabled` only for diagnostics or optional UI behavior. The disabled observer is safe to include in `observers` directly.
 
 ## Verify the connection
 
@@ -101,4 +105,3 @@ console.log(response.trace?.traceId)
 The printed trace id should match the trace detail in Lens. If nothing appears, check that the key pair is active and belongs to the intended project, the base URL has no extra path, and the application can reach Lens over the network.
 
 Next, add request-level identity with [Trace context](/lens/connect/anvia/trace-context).
-

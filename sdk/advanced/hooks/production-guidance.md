@@ -29,7 +29,7 @@ Long hook calls add latency to the runtime and make the decision harder to repro
 
 Give cancellation, skip, and approval actions stable internal reasons. They help tests, audit records, and debugging even when the product returns a more generic message to the user.
 
-Do not place secrets, raw credentials, or private service responses in a reason that may reach a model, event store, trace, or UI.
+Do not place secrets, raw credentials, or private service responses in a reason that may reach a model, trace, log, or UI.
 
 ## Preserve the real error
 

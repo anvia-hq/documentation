@@ -22,7 +22,7 @@ Validate required environment values at startup. Keep model selection in reviewe
 
 ## Bound every request
 
-Set maximum output tokens for direct completions and a small `defaultMaxTurns(...)` for agents. Validate upload ownership, size, duration, dimensions, and MIME type before loading media. Cancel streamed work when the caller disconnects.
+Set maximum output tokens for direct completions and a small agent `maxTurns` value. Validate upload ownership, size, duration, dimensions, and MIME type before loading media. Cancel streamed work when the caller disconnects.
 
 Translate provider and SDK errors into safe application errors. Log an internal request or trace ID, but do not expose raw Google errors, credentials, project details, or media payloads to the browser.
 

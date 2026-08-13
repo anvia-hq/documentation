@@ -45,13 +45,15 @@ The agent factory can now stay provider-neutral:
 
 ```ts
 import type { CompletionModel } from '@anvia/core'
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 
 export function createSupportAgent(model: CompletionModel) {
-  return new AgentBuilder('support', model)
-    .instructions('Resolve support questions using the available tools.')
-    .defaultMaxTurns(4)
-    .build()
+  return new Agent({
+    id: 'support',
+    model: model,
+    instructions: 'Resolve support questions using the available tools.',
+    maxTurns: 4,
+  })
 }
 ```
 

@@ -25,7 +25,7 @@ The application owns the connection, credentials, allowed tool set, user and ten
 ## Connect and run
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { connectMcp, mcp } from '@anvia/core/mcp'
 
 const filesystem = await connectMcp(
@@ -40,10 +40,12 @@ const filesystem = await connectMcp(
 )
 
 try {
-  const agent = new AgentBuilder('docs-operator', model)
-    .instructions('Use filesystem tools only for documentation files.')
-    .mcp([filesystem])
-    .build()
+  const agent = new Agent({
+    id: 'docs-operator',
+    model: model,
+    instructions: 'Use filesystem tools only for documentation files.',
+    mcpServers: [filesystem],
+  })
 
   const response = await agent
     .prompt('List the documentation files.')
@@ -55,7 +57,7 @@ try {
 }
 ```
 
-`.mcp([filesystem])` exposes all adapted tools from that connected server. For privileged or changing servers, review and allow-list `filesystem.tools` before adding them with `.tools(...)`.
+`mcpServers: [filesystem]` exposes all adapted tools from that connected server. For privileged or changing servers, review and allow-list `filesystem.tools` before adding them with the `tools` option.
 
 ## Treat MCP as external capability
 

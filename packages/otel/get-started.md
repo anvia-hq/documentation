@@ -7,7 +7,7 @@ pnpm add @anvia/core @anvia/otel @opentelemetry/api @opentelemetry/api-logs
 ```
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { otel } from '@anvia/otel'
 
 const tracing = otel.create({
@@ -15,9 +15,11 @@ const tracing = otel.create({
   captureMode: 'safe',
 })
 
-const agent = new AgentBuilder('support', model)
-  .observe(tracing)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  observers: [tracing],
+})
 ```
 
 `otel.create()` uses an explicitly supplied `Tracer` or the active global tracer provider. It does not initialize exporters, register global providers, flush processors, or shut them down.

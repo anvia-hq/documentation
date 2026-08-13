@@ -16,7 +16,7 @@ question answering, or a first-pass review when the chosen model supports image 
 ## Implementation
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { Message, UserContent } from '@anvia/core/completion'
 import { OpenAIClient } from '@anvia/openai'
 
@@ -24,9 +24,11 @@ const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY })
 const model = client.completionModel('gpt-5')
 if (!model.capabilities.imageInput) throw new Error('Selected model has no image input.')
 
-const agent = new AgentBuilder('visual-reviewer', model)
-  .instructions('Describe only visible evidence. State uncertainty clearly.')
-  .build()
+const agent = new Agent({
+  id: 'visual-reviewer',
+  model: model,
+  instructions: 'Describe only visible evidence. State uncertainty clearly.',
+})
 
 const response = await agent.prompt(Message.user([
   UserContent.text('Describe the scene in three bullets.'),

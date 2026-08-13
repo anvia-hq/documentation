@@ -43,7 +43,7 @@ The command is a dry run unless `--write` is present. Review generated changes b
 ## Create the store
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { createPrismaMemoryStore } from '@anvia/memory-prisma'
 import { prisma } from './db.js'
 
@@ -53,9 +53,11 @@ const memory = createPrismaMemoryStore(prisma, {
   },
 })
 
-const agent = new AgentBuilder('support', model)
-  .memory(memory, { savePolicy: 'turn' })
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  memory: { store: memory, savePolicy: 'turn' },
+})
 ```
 
 The conventional client path expects delegates named `agentMemorySession`, `agentMemoryMessage`, and `agentMemoryError`.

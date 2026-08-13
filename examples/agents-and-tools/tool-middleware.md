@@ -37,11 +37,13 @@ const outputGate = createMiddleware({
   },
 })
 
-const agent = new AgentBuilder('analyst', model)
-  .tools([longReportTool])
-  .middleware(outputGate)
-  .defaultMaxTurns(2)
-  .build()
+const agent = new Agent({
+  id: 'analyst',
+  model: model,
+  middlewares: [outputGate],
+  maxTurns: 2,
+  tools: [longReportTool],
+})
 ```
 
 `model` and `longReportTool` are configured separately. Returning `undefined` preserves the original

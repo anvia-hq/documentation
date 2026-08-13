@@ -12,9 +12,11 @@ const logger = createConsoleLogger({
   level: 'debug',
 })
 
-const agent = new AgentBuilder('support', model)
-  .observe(createLoggerObserver(logger))
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  observers: [createLoggerObserver(logger)],
+})
 ```
 
 Use local console logging while developing, then switch to the adapter for the logger your production application already operates.

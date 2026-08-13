@@ -17,28 +17,31 @@ to invoke them.
 ## Specialist and coordinator
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 
-const support = new AgentBuilder('support', model)
-  .name('Support specialist')
-  .description('Analyze customer impact and the next support action.')
-  .instructions('Use only supplied facts. Return concise bullets.')
-  .build()
+const support = new Agent({
+  id: 'support',
+  model: model,
+  name: 'Support specialist',
+  description: 'Analyze customer impact and the next support action.',
+  instructions: 'Use only supplied facts. Return concise bullets.',
+})
 
-const engineering = new AgentBuilder('engineering', model)
-  .name('Engineering specialist')
-  .description('Propose diagnostics and the safest technical next step.')
-  .instructions('Separate facts from hypotheses. Return concise bullets.')
-  .build()
+const engineering = new Agent({
+  id: 'engineering',
+  model: model,
+  name: 'Engineering specialist',
+  description: 'Propose diagnostics and the safest technical next step.',
+  instructions: 'Separate facts from hypotheses. Return concise bullets.',
+})
 
-const coordinator = new AgentBuilder('coordinator', model)
-  .instructions('Delegate when specialist analysis is needed, then synthesize one incident brief.')
-  .tools([
-    support.asTool({ name: 'ask_support' }),
-    engineering.asTool({ name: 'ask_engineering' }),
-  ])
-  .defaultMaxTurns(4)
-  .build()
+const coordinator = new Agent({
+  id: 'coordinator',
+  model: model,
+  instructions: 'Delegate when specialist analysis is needed, then synthesize one incident brief.',
+  maxTurns: 4,
+  tools: [support.asTool({ name: 'ask_support' }), engineering.asTool({ name: 'ask_engineering' })],
+})
 
 const response = await coordinator
   .prompt('Webhook retries failed for large payloads. Prepare an incident brief.')

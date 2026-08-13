@@ -29,17 +29,19 @@ pnpm add @anvia/core @anvia/openai
 ```
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 
 const client = new OpenAIClient({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-const agent = new AgentBuilder('support', client.completionModel('gpt-5'))
-  .instructions('Answer support questions clearly.')
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: client.completionModel('gpt-5'),
+  instructions: 'Answer support questions clearly.',
+  maxTurns: 4,
+})
 
 const response = await agent.prompt('Draft a reply to this ticket.').send()
 console.log(response.output)

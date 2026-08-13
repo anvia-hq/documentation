@@ -22,7 +22,7 @@ versioned cases -> agentEvalTarget(agent) -> outputs/traces
 ## Setup and agent target
 
 ```ts
-import { AgentBuilder } from "@anvia/core/agent";
+import { Agent } from "@anvia/core/agent";
 import {
   agentEvalTarget,
   contains,

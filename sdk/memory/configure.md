@@ -5,7 +5,7 @@ Create a durable store, attach it to the agent, and choose when completed messag
 ## Attach a store
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { createPrismaMemoryStore } from '@anvia/memory-prisma'
 import { prisma } from './db'
 
@@ -15,10 +15,12 @@ const memory = createPrismaMemoryStore(prisma, {
   },
 })
 
-export const agent = new AgentBuilder('support', model)
-  .instructions('Use the conversation history when it is relevant.')
-  .memory(memory, { savePolicy: 'turn' })
-  .build()
+export const agent = new Agent({
+  id: 'support',
+  model: model,
+  instructions: 'Use the conversation history when it is relevant.',
+  memory: { store: memory, savePolicy: 'turn' },
+})
 ```
 
 The store persists full Anvia `Message` values. `savePolicy: 'turn'` saves complete model-and-tool turns together and is a practical default for product chat.

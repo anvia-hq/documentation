@@ -7,22 +7,19 @@ Open `http://localhost:4021/ui/knowledge/dynamic-context`.
 ## Register an index
 
 ```ts
-const agent = new AgentBuilder('docs-support', model)
-  .instructions('Answer from relevant documentation.')
-  .dynamicContext(docsIndex, {
-    topK: 4,
-    threshold: 0.72,
-    filter: vectorFilter.eq('product', 'platform'),
-    format: (result) => ({
+const agent = new Agent({
+  id: 'docs-support',
+  model: model,
+  instructions: 'Answer from relevant documentation.',
+  dynamicContexts: [{ index: docsIndex, topK: 4, threshold: 0.72, filter: vectorFilter.eq('product', 'platform'), format: (result) => ({
       id: result.id,
       text: result.document.text,
       additionalProps: {
         product: result.document.product,
         score: result.score,
       },
-    }),
-  })
-  .build()
+    }) }],
+})
 ```
 
 These options control runtime retrieval:

@@ -19,7 +19,7 @@ ANVIA_LENS_SECRET_KEY=sk_...
 Then attach the observer:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { lens } from '@anvia/lens'
 
 const tracing = lens.createFromEnv({
@@ -28,9 +28,11 @@ const tracing = lens.createFromEnv({
   captureMode: 'safe',
 })
 
-const agent = new AgentBuilder('support', model)
-  .observe(tracing)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  observers: [tracing],
+})
 ```
 
 ## Evaluations and datasets

@@ -6,8 +6,7 @@ An agent run is where stable agent configuration meets one product request. The 
 
 | Object | Owns |
 | --- | --- |
-| `AgentBuilder` | Stable model, instructions, tools, context, memory, observers, hooks, and defaults. |
-| `Agent` | Reusable built behavior. |
+| `Agent` | Stable model, instructions, tools, context, memory, observers, hooks, and defaults. |
 | Session | Durable conversation identity and memory scope. |
 | Prompt request | One input plus request-specific controls. |
 
@@ -43,10 +42,14 @@ Dynamic context and dynamic tools are selected again for each turn. A tool resul
 
 ## Send or stream
 
-`.send()` and `.stream()` run the same lifecycle. `send()` returns the final response; `stream()` exposes runtime events while work is active.
+`.send()` and `.stream()` run the same lifecycle. `send()` returns the final response with its
+`runId`; observers receive that same ID when the run starts. `stream()` exposes runtime events while
+work is active.
 
 Filter streamed events before they reach browsers because tool arguments, results, reasoning, and provider metadata may contain private data.
 
-## Memory and events
+## Memory and observability
 
-Memory stores conversation messages for future prompts. An event store records runtime events for replay, debugging, and audit. They are separate concerns and should not replace each other.
+Memory stores conversation messages for future prompts. Observers send lifecycle information to
+Logger, Lens, Langfuse, OpenTelemetry, or a custom integration for debugging and tracing. They do
+not provide deterministic execution replay.

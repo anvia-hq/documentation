@@ -1,22 +1,24 @@
 # Load skills
 
-Use `loadSkills(...)` to merge trusted skill sources into one `SkillSet`, then attach it with `.skills(...)`.
+Use `loadSkills(...)` to merge trusted skill sources into one `SkillSet`, then attach it with the `skills` option.
 
 ## Load local skills
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { loadSkills, skill } from '@anvia/core/skills'
 
 const productSkills = await loadSkills(
   skill.local('skills'),
 )
 
-const agent = new AgentBuilder('release-assistant', model)
-  .instructions('Use a skill when it matches the task.')
-  .skills(productSkills)
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'release-assistant',
+  model: model,
+  instructions: 'Use a skill when it matches the task.',
+  skills: productSkills,
+  maxTurns: 4,
+})
 ```
 
 If the path points to one skill directory, the loader returns that skill. If it points to a directory containing skills, it loads each child with a `SKILL.md`.
@@ -31,7 +33,7 @@ If the path points to one skill directory, the loader returns that skill. If it 
 | `tools` | Generated tools for loading and running skill content. |
 | `instructions` | Compact catalog instructions added to the agent. |
 
-`.skills(skillSet)` attaches the generated instruction block and tools together.
+`skills: skillSet` attaches the generated instruction block and tools together.
 
 ## Load multiple sources
 

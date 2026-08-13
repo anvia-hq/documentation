@@ -4,14 +4,15 @@ Context supplies facts an agent may use. Choose the context path based on how la
 
 ## Static context
 
-Use `.context(text, id)` for small documents that are safe and useful for every run of the agent.
+Use the `context` option for small documents that are safe and useful for every run of the agent.
 
 ```ts
-const agent = new AgentBuilder('release-notes', model)
-  .instructions('Answer questions about the current release.')
-  .context(currentReleaseNotes, 'release-notes')
-  .context(supportPolicySummary, 'support-policy')
-  .build()
+const agent = new Agent({
+  id: 'release-notes',
+  model: model,
+  instructions: 'Answer questions about the current release.',
+  context: [{ id: 'release-notes', text: currentReleaseNotes }, { id: 'support-policy', text: supportPolicySummary }],
+})
 ```
 
 Static context is sent with every model request. Keep it short and stable.
@@ -23,14 +24,12 @@ Use retrieval when relevant documents should be selected for each turn:
 ```ts
 import { vectorFilter } from '@anvia/core/vector-store'
 
-const agent = new AgentBuilder('docs-support', model)
-  .instructions('Use retrieved documentation before answering.')
-  .dynamicContext(docsIndex, {
-    topK: 5,
-    threshold: 0.72,
-    filter: vectorFilter.eq('product', 'platform'),
-  })
-  .build()
+const agent = new Agent({
+  id: 'docs-support',
+  model: model,
+  instructions: 'Use retrieved documentation before answering.',
+  dynamicContexts: [{ index: docsIndex, topK: 5, threshold: 0.72, filter: vectorFilter.eq('product', 'platform') }],
+})
 ```
 
 Enforce tenant, product, language, and access filters in the index or retrieval adapter. Prompt instructions must not be the authorization boundary.
@@ -55,8 +54,8 @@ const response = await agent
 
 | Context | Best location |
 | --- | --- |
-| Small facts safe for all callers | `.context(...)` |
-| Large or changing knowledge | `.dynamicContext(...)` |
+| Small facts safe for all callers | `context` option |
+| Large or changing knowledge | `dynamicContexts` option |
 | Conversation identity | `.session(...)` |
 | Observability metadata | `.withTrace(...)` |
 | Permissioned product state | Scoped tools and services |

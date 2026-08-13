@@ -21,9 +21,11 @@ const hideInternalErrors = createMiddleware({
 ## Attach it to an agent
 
 ```ts
-const agent = new AgentBuilder('support', model)
-  .middleware(hideInternalErrors)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  middlewares: [hideInternalErrors],
+})
 ```
 
 Agent middleware applies to every run. Request middleware applies only to one prompt.

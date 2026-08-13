@@ -19,9 +19,11 @@ Flush after the last successful request when the script needs the trace immediat
 
 ```ts
 const tracing = lens.create()
-const agent = new AgentBuilder('support-check', model)
-  .observe(tracing)
-  .build()
+const agent = new Agent({
+  id: 'support-check',
+  model: model,
+  observers: [tracing],
+})
 
 try {
   const response = await agent.prompt('Run the support smoke test.').send()

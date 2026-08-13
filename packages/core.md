@@ -15,7 +15,7 @@ pnpm add @anvia/core zod
 ## Build a useful agent
 
 ```ts
-import { AgentBuilder, createTool } from '@anvia/core'
+import { Agent, createTool } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 import { z } from 'zod'
 
@@ -33,11 +33,13 @@ const lookupOrder = createTool({
   }),
 })
 
-const supportAgent = new AgentBuilder('support', model)
-  .instructions('Help customers understand their order status.')
-  .tools([lookupOrder])
-  .defaultMaxTurns(4)
-  .build()
+const supportAgent = new Agent({
+  id: 'support',
+  model: model,
+  instructions: 'Help customers understand their order status.',
+  maxTurns: 4,
+  tools: [lookupOrder],
+})
 
 const response = await supportAgent
   .prompt('What is happening with order A123?')

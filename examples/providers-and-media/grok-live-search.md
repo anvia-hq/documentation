@@ -16,21 +16,20 @@ answer. Use this for current-information research where citation provenance is p
 ## Implementation
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { GrokClient, tools as grokTools } from '@anvia/grok'
 
 const apiKey = process.env.XAI_API_KEY
 if (!apiKey) throw new Error('Set XAI_API_KEY.')
 
 const grok = new GrokClient({ apiKey })
-const researcher = new AgentBuilder('researcher', grok.completionModel())
-  .instructions('Research current information and cite every factual update.')
-  .tools([
-    grokTools.webSearch({ allowedDomains: ['x.ai'] }),
-    grokTools.xSearch({ allowedHandles: ['xai'] }),
-  ])
-  .additionalParams({ max_turns: 5 })
-  .build()
+const researcher = new Agent({
+  id: 'researcher',
+  model: grok.completionModel(),
+  instructions: 'Research current information and cite every factual update.',
+  additionalParams: { max_turns: 5 },
+  tools: [grokTools.webSearch({ allowedDomains: ['x.ai'] }), grokTools.xSearch({ allowedHandles: ['xai'] })],
+})
 
 const response = await researcher.prompt('What are the latest xAI product updates?').send()
 

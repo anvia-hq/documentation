@@ -53,10 +53,12 @@ The middleware returns replacement data. It does not cancel the run.
 Stable behavior belongs on the agent:
 
 ```ts
-const agent = new AgentBuilder('support', model)
-  .hook(policyHook)
-  .middleware(hideInternalErrors)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  hook: policyHook,
+  middlewares: [hideInternalErrors],
+})
 ```
 
 Request-local behavior belongs on the prompt request:

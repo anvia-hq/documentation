@@ -6,9 +6,9 @@ Skills provide procedural guidance. Retrieval supplies relevant facts from a lar
 
 | Need | Use |
 | --- | --- |
-| Stable behavior for every run | Agent `.instructions(...)` |
+| Stable behavior for every run | Agent `instructions` option |
 | A reusable procedure selected by task | Skills |
-| Relevant facts selected by the current prompt | `.dynamicContext(...)` |
+| Relevant facts selected by the current prompt | `dynamicContexts` option |
 | Optional model-directed factual search | `index.asTool(...)` |
 | Live state or an application action | A scoped tool |
 
@@ -44,16 +44,14 @@ const supportSkills = await loadSkills(
   skill.local('skills/support-writing'),
 )
 
-const agent = new AgentBuilder('support', model)
-  .instructions('Answer accurately and disclose missing evidence.')
-  .skills(supportSkills)
-  .dynamicContext(policyIndex, {
-    topK: 4,
-    threshold: 0.74,
-    filter: tenantFilter,
-  })
-  .tools([createCustomerLookupTool(scope)])
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  instructions: 'Answer accurately and disclose missing evidence.',
+  skills: supportSkills,
+  dynamicContexts: [{ index: policyIndex, topK: 4, threshold: 0.74, filter: tenantFilter }],
+  tools: [createCustomerLookupTool(scope)],
+})
 ```
 
 Here, the skill guides response structure, dynamic context supplies policy facts, and the local tool reads current customer state with product authorization.

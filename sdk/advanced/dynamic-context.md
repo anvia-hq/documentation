@@ -24,17 +24,15 @@ Retrieval runs again after a tool call. A later turn can therefore receive diffe
 ## Add automatic retrieval
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { vectorFilter } from '@anvia/core/vector-store'
 
-const agent = new AgentBuilder('docs-support', model)
-  .instructions('Use retrieved documentation when it is relevant.')
-  .dynamicContext(docsIndex, {
-    topK: 5,
-    threshold: 0.72,
-    filter: vectorFilter.eq('published', true),
-  })
-  .build()
+const agent = new Agent({
+  id: 'docs-support',
+  model: model,
+  instructions: 'Use retrieved documentation when it is relevant.',
+  dynamicContexts: [{ index: docsIndex, topK: 5, threshold: 0.72, filter: vectorFilter.eq('published', true) }],
+})
 ```
 
 `docsIndex` must implement `VectorSearchIndex`. Prepare and populate the index outside the request path; see [Knowledges](/sdk/knowledges) for ingestion, embeddings, and vector stores.
@@ -43,11 +41,10 @@ const agent = new AgentBuilder('docs-support', model)
 
 | Requirement | Use |
 | --- | --- |
-| Small facts safe for every run | Static `.context(...)` |
-| Relevant documents selected every turn | `.dynamicContext(...)` |
+| Small facts safe for every run | Static `context` option |
+| Relevant documents selected every turn | `dynamicContexts` option |
 | Optional, model-directed search | `index.asTool(...)` |
 | Live or permissioned product data | A scoped tool |
-| A large searchable tool catalog | `.dynamicTools(...)` |
+| A large searchable tool catalog | `dynamicTools` option |
 
 Dynamic context is read-only evidence. It should not replace service calls for current account state or actions that need validation, authorization, and audit.
-

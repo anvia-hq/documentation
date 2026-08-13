@@ -90,7 +90,7 @@ verify lease recovery before treating the design as durable.
 Re-authorize access when reading job status. Use opaque IDs, encrypt sensitive source data, limit
 worker egress, and separate queues by trust level. Add idempotency keys for every external write,
 lease expiry, retry ceilings, a dead-letter queue, progress throttling, and graceful shutdown. Do not
-assume a `PipelineRunObserver` is a durable event store.
+assume a `PipelineRunObserver` is a durable audit log.
 
 ## Tests
 

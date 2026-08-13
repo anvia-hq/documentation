@@ -12,7 +12,7 @@ Production Anvia deployments keep the runtime boundary explicit: the server auth
 
 ## Bound agent work
 
-Set `defaultMaxTurns` on agents and lower it per request when a flow needs tighter limits. Tool-assisted runs need enough turns for the model to request a tool, receive its result, and produce a final answer.
+Set `maxTurns` in the agent options and lower it per request when a flow needs tighter limits. Tool-assisted runs need enough turns for the model to request a tool, receive its result, and produce a final answer.
 
 ## Durable memory
 

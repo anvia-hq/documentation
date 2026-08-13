@@ -24,21 +24,14 @@ The first three views inspect configuration or browseable source contents. They 
 ## A complete inspectable agent
 
 ```ts
-const agent = new AgentBuilder('knowledge-ops', model)
-  .instructions('Use the available operational knowledge and tools.')
-  .context(
-    'Escalate blocked enterprise orders to the support lead.',
-    'enterprise-escalation',
-  )
-  .dynamicContext(knowledgeIndex, {
-    topK: 3,
-    threshold: 0.7,
-  })
-  .dynamicTools(toolIndex, {
-    topK: 2,
-    threshold: 0.75,
-  })
-  .build()
+const agent = new Agent({
+  id: 'knowledge-ops',
+  model: model,
+  instructions: 'Use the available operational knowledge and tools.',
+  dynamicContexts: [{ index: knowledgeIndex, topK: 3, threshold: 0.7 }],
+  dynamicTools: [{ index: toolIndex, topK: 2, threshold: 0.75 }],
+  context: [{ id: 'enterprise-escalation', text: 'Escalate blocked enterprise orders to the support lead.' }],
+})
 
 new Studio([agent]).start({ port: 4021 })
 ```

@@ -74,7 +74,7 @@ export type ConversationRepository = {
 ```
 
 ```ts [src/agent.ts]
-import { AgentBuilder } from "@anvia/core/agent";
+import { Agent } from "@anvia/core/agent";
 import { OpenAIClient } from "@anvia/openai";
 
 const apiKey = process.env.OPENAI_API_KEY;
@@ -82,12 +82,11 @@ if (!apiKey) throw new Error("Missing OPENAI_API_KEY.");
 
 const openai = new OpenAIClient({ apiKey });
 
-export const supportAgent = new AgentBuilder(
-  "support",
-  openai.completionModel("gpt-5"),
-)
-  .instructions("Answer support questions clearly and concisely.")
-  .build();
+export const supportAgent = new Agent({
+  id: "support",
+  model: openai.completionModel("gpt-5"),
+  instructions: "Answer support questions clearly and concisely.",
+});
 ```
 
 ```ts [src/server.ts]

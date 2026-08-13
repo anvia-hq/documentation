@@ -2,7 +2,8 @@
 
 `@anvia/core` has a convenience root entry point and capability-specific subpaths. This page catalogs the public symbols from every package export and gives full declarations for the primary construction and execution APIs.
 
-No public export is currently annotated as deprecated or experimental. The `@anvia/core/internal/agent` path is exported by the package, but its name identifies it as a lower-level implementation surface; prefer `@anvia/core/agent` for application code.
+The `@anvia/core/internal/agent` path is exported for Anvia integration packages. Application code
+should use `@anvia/core` or `@anvia/core/agent`.
 
 ## `@anvia/core`
 
@@ -10,7 +11,7 @@ The root exports the most common runtime APIs. Symbols with fuller capability-sp
 
 | Group | Symbols |
 | --- | --- |
-| Agent | `AgentBuilder` |
+| Agent | `Agent`, `AgentOptions`, compatibility `AgentBuilder` |
 | Completion functions | `createCompletion`, `createCompletionStream`, `createParsedCompletion`, `calculateContextUsage`, `getAssistantGenerationMetadata`, `resolveCompletionModelInfo`, `withContextUsage`, `isJsonValue`, `isProviderTool` |
 | Completion values | `AssistantContent`, `Message`, `ToolContent`, `Usage`, `UserContent` |
 | Completion types | `AssistantGenerationMetadata`, `AssistantMessage`, `AssistantMessageOptions`, `CompletionModel`, `CompletionModelInfo`, `CompletionModelMetadataOptions`, `CompletionRequest`, `CompletionResponse`, `CompletionSource`, `CompletionTool`, `ContextUsage`, `CreateCompletionBaseOptions`, `CreateCompletionInput`, `CreateCompletionOptions`, `CreateCompletionResult`, `CreateCompletionStreamOptions`, `CreateParsedCompletionOptions`, `CreateParsedCompletionResult`, `Document`, `ImageContent`, `JsonObject`, `JsonPrimitive`, `JsonValue`, `MessageOptions`, `ModelContextLimits`, `ProviderTool`, `ProviderToolCall`, `SystemMessage`, `Text`, `ToolCall`, `ToolDefinition`, `ToolMessage`, `ToolResult`, `ToolResultContent`, `ToolResultMessageOptions`, `ToolResultOptions`, `UserMessage` |
@@ -27,66 +28,52 @@ The root exports the most common runtime APIs. Symbols with fuller capability-sp
 ## `@anvia/core/agent`
 
 ```ts
-import { AgentBuilder, type Agent } from '@anvia/core/agent'
+import { Agent, type AgentOptions } from '@anvia/core/agent'
 ```
 
-### `AgentBuilder`
+### `Agent`
 
 ```ts
-class AgentBuilder<M extends CompletionModel = CompletionModel> {
-  constructor(agentId: string, completionModel: M)
+class Agent<M extends CompletionModel = CompletionModel> {
+  constructor(options: AgentOptions<M>)
+  prompt(input: string | Message | Message[]): PromptRequest<M>
+  session(sessionId: string, options?: SessionOptions): AgentSession<M>
+  asTool(options: AgentToolOptions): Tool<{ prompt: string }, string>
+}
 
-  name(name: string): this
-  description(description: string): this
-  instructions(instructions: string): this
-  context(text: string, id?: string): this
-  dynamicContext<T>(
-    index: VectorSearchIndex<T>,
-    options: DynamicContextOptions<T>,
-  ): this
-  dynamicTools(
-    index: VectorSearchIndex<ToolSearchDocument>,
-    options: DynamicToolOptions,
-  ): this
-  tool(tool: AnyTool | ProviderTool): this
-  tools(tools: Array<AnyTool | ProviderTool>): this
-  mcp(servers: McpServer[]): this
-  skills(skillSet: SkillSet): this
-  useToolSet(toolSet: ToolSet): this
-  temperature(temperature: number): this
-  maxTokens(maxTokens: number): this
-  additionalParams(params: JsonValue): this
-  toolChoice(toolChoice: ToolChoice): this
-  defaultMaxTurns(defaultMaxTurns: number): this
-  hook(hook: PromptHook): this
-  middleware(middleware: AgentMiddleware): this
-  middlewares(middlewares: AgentMiddleware[]): this
-  observe(observer: AgentObserver, options?: ObserveOptions): this
-  approvals(options: ToolApprovalsOptions): this
-  guardrails(policies: GuardrailPolicyInput): this
-  memory(store: MemoryStore, options?: MemoryOptions): this
-  eventStore(
-    store: AgentEventStore,
-    options?: AgentEventStoreOptions,
-  ): this
-  outputSchema(schema: ZodSchema): this
-  build(): Agent<M>
+type AgentOptions<M extends CompletionModel = CompletionModel> = {
+  id: string
+  model: M
+  name?: string
+  description?: string
+  instructions?: string
+  context?: Document[]
+  tools?: Array<AnyTool | ProviderTool>
+  mcpServers?: McpServer[]
+  skills?: SkillSet
+  dynamicContexts?: AgentDynamicContext[]
+  dynamicTools?: AgentDynamicTool[]
+  middlewares?: AgentMiddleware[]
+  observers?: AgentObserverInput[]
+  memory?: AgentMemoryOptions
+  approvals?: ToolApprovalsOptions
+  guardrails?: GuardrailPolicyInput
+  hook?: PromptHook
+  temperature?: number
+  maxTokens?: number
+  maxTurns?: number
+  toolChoice?: ToolChoice
+  additionalParams?: JsonValue
+  outputSchema?: ZodSchema
 }
 ```
 
-The constructor fixes the stable agent ID and completion model. Builder methods accumulate configuration and return `this`; `build` returns an immutable runtime-facing `Agent`.
+Construction returns a ready-to-use agent; there is no `build()` step. `AgentBuilder` remains a
+supported compatibility API until its planned removal at 1.0. Its singular `tool()` and
+`middleware()` methods and its `eventStore()` integration are deprecated.
 
-An `Agent` creates prompt requests and sessions. A session carries its memory context so repeated prompts use the same stored conversation.
-
-### Export catalog
-
-`Agent`, `AgentBuilder`, `AgentSession`, `AgentEventAppendInput`, `AgentEventRecord`, `AgentEventStore`, `AgentEventStoreInclude`, `AgentEventStoreOptions`, `AgentToolOptions`, `DynamicContextOptions`, and `DynamicToolOptions`.
-
-## `@anvia/core/internal/agent`
-
-This exported lower-level entry point contains `Agent`, `AgentEventAppendInput`, `AgentEventRecord`, `AgentEventStore`, `AgentEventStoreInclude`, `AgentEventStoreOptions`, `AgentEventStoreRegistration`, `AgentOptions`, `AgentSession`, `AgentToolOptions`, `DEFAULT_MAX_TURNS`, `DynamicContextOptions`, `DynamicContextRegistration`, `DynamicToolOptions`, and `DynamicToolRegistration`.
-
-Application code normally imports the builder and public contracts from `@anvia/core/agent` instead.
+The event-store contracts remain exported for compatibility but are deprecated. Use observers and
+integrations such as Logger or Lens for run inspection and correlation.
 
 ## `@anvia/core/completion`
 
@@ -206,9 +193,17 @@ class PromptRequest<M extends CompletionModel = CompletionModel> {
   stream(options?: AgentStreamOptions): AsyncIterable<AgentStreamEvent>
   readableStream(options?: AgentStreamOptions): ReadableStream<Uint8Array>
 }
+
+type PromptResponse = {
+  runId: string
+  output: string
+  usage: Usage
+  messages: Message[]
+  trace?: AgentTraceInfo
+}
 ```
 
-`send` resolves the final response. `stream` yields semantic agent events; set `includeToolCallDeltas: false` for the narrower event union. `readableStream` encodes those events as JSONL bytes. `steer` returns whether the message was accepted by the active run.
+`send` resolves the final response, including the same `runId` supplied to run observers. `stream` yields semantic agent events; set `includeToolCallDeltas: false` for the narrower event union. `readableStream` encodes those events as JSONL bytes. `steer` returns whether the message was accepted by the active run.
 
 The entry point exports `PromptRequest`, `MaxTurnsError`, `PromptCancelledError`, `ToolApprovalRequiredError`, `CompletionRetryContext`, `CompletionRetryOptions`, `PromptResponse`, `AgentDeltaEvent`, `AgentErrorStreamEvent`, `AgentToolCallDeltaEvent`, `AgentChildStreamEvent`, `AgentChildStreamEventWithToolCallDeltas`, `AgentChildStreamEventWithoutToolCallDeltas`, `AgentStreamEvent`, `AgentStreamEventWithToolCallDeltas`, `AgentStreamEventWithoutToolCallDeltas`, and `AgentStreamOptions`.
 
@@ -572,6 +567,18 @@ Exports: `loadSkills`, `skill`, `Skill`, `SkillLoader`, `SkillSet`, `SkillValida
 
 ```ts
 function createObserver(options: AgentObserver): AgentObserver
+
+type AgentRunStartArgs = {
+  runId: string
+  agentName?: string
+  agentDescription?: string
+  instructions?: string
+  trace?: AgentTraceOptions
+  prompt: Message
+  promptRef?: AgentRunPromptRef
+  history: Message[]
+  maxTurns: number
+}
 ```
 
 `createObserver` preserves the composite observer type. Exported contracts are `AgentObserver`, `AgentObserverRegistration`, `ObserveOptions`, `AgentTraceInfo`, `AgentTraceOptions`, `AgentRunObserver`, `AgentRunPromptRef`, `AgentRunEventArgs`, `AgentRunStartArgs`, `AgentRunEndArgs`, `AgentRunErrorArgs`, `AgentGenerationObserver`, `AgentGenerationModelInfo`, `AgentGenerationStartArgs`, `AgentGenerationUpdateArgs`, `AgentGenerationEndArgs`, `AgentGenerationErrorArgs`, `AgentToolObserver`, `AgentToolStartArgs`, `AgentToolStreamEventArgs`, `AgentToolEndArgs`, and `AgentToolErrorArgs`.

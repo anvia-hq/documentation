@@ -35,9 +35,11 @@ const supportPolicy = createHook({
 Use `.hook(...)` for behavior that should apply to every run of the agent:
 
 ```ts
-const agent = new AgentBuilder('support', model)
-  .hook(supportPolicy)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  hook: supportPolicy,
+})
 ```
 
 Stable environment policy and rules shared by every caller belong here.

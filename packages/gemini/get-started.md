@@ -9,17 +9,17 @@ pnpm add @anvia/core @anvia/gemini
 Use an API key for the Gemini Developer API:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { GeminiClient } from '@anvia/gemini'
 
 const gemini = new GeminiClient({
   apiKey: process.env.GEMINI_API_KEY,
 })
 
-const agent = new AgentBuilder(
-  'assistant',
-  gemini.completionModel('gemini-2.5-flash'),
-).build()
+const agent = new Agent({
+  id: 'assistant',
+  model: gemini.completionModel('gemini-2.5-flash'),
+})
 
 const result = await agent.prompt('Summarize this document.').send()
 console.log(result.output)

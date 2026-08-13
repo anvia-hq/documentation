@@ -4,12 +4,12 @@ The MCP view shows the remote tools available to a Studio agent, grouped by the 
 
 Open `http://localhost:4021/ui/mcps` when Studio is running on port `4021`.
 
-Studio does not establish MCP connections from the browser. Your application connects to each server, registers it on an agent, and then passes the built agent to Studio.
+Studio does not establish MCP connections from the browser. Your application connects to each server, registers it on an agent, and then passes the agent to Studio.
 
 ## Register an MCP-backed agent
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { connectMcp, mcp } from '@anvia/core/mcp'
 import { Studio } from '@anvia/studio'
 
@@ -21,10 +21,12 @@ const counterServer = await connectMcp(
   }),
 )
 
-const agent = new AgentBuilder('counter-agent', model)
-  .instructions('Use the counter tools for arithmetic and updates.')
-  .mcp([counterServer])
-  .build()
+const agent = new Agent({
+  id: 'counter-agent',
+  model: model,
+  instructions: 'Use the counter tools for arithmetic and updates.',
+  mcpServers: [counterServer],
+})
 
 new Studio([agent]).start({ port: 4021 })
 ```
@@ -41,9 +43,9 @@ Select an agent at the top of the page when Studio has more than one. The summar
 - the number of input fields and complete JSON parameter schema;
 - any discoverable approval policy.
 
-Studio groups tools by their MCP provenance, so a tool registered through `.mcp(...)` can have a `static` source while still appearing under its server name. Definitions are de-duplicated by server, source, and tool name.
+Studio groups tools by their MCP provenance, so a tool registered through `mcpServers` can have a `static` source while still appearing under its server name. Definitions are de-duplicated by server, source, and tool name.
 
-If a server is missing, confirm that it connected successfully and that at least one of its adapted tools was registered on the selected agent. The Studio page cannot list a server that never reached the built agent.
+If a server is missing, confirm that it connected successfully and that at least one of its adapted tools was registered on the selected agent. The Studio page cannot list a server that never reached the agent.
 
 ## Run an MCP tool directly
 

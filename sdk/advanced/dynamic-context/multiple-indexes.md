@@ -5,27 +5,31 @@ Register multiple indexes when an agent needs independent knowledge sources with
 ## Add each source separately
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { vectorFilter } from '@anvia/core/vector-store'
 
-const agent = new AgentBuilder('support', model)
-  .instructions(
-    'Answer from public documentation and applicable support policy.',
-  )
-  .dynamicContext(publicDocsIndex, {
-    topK: 4,
-    threshold: 0.72,
-    filter: vectorFilter.eq('published', true),
-  })
-  .dynamicContext(policyIndex, {
-    topK: 2,
-    threshold: 0.78,
-    filter: vectorFilter.and(
-      vectorFilter.eq('audience', 'support'),
-      vectorFilter.eq('region', user.region),
-    ),
-  })
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  instructions: 'Answer from public documentation and applicable support policy.',
+  dynamicContexts: [
+    {
+      index: publicDocsIndex,
+      topK: 4,
+      threshold: 0.72,
+      filter: vectorFilter.eq('published', true),
+    },
+    {
+      index: policyIndex,
+      topK: 2,
+      threshold: 0.78,
+      filter: vectorFilter.and(
+        vectorFilter.eq('audience', 'support'),
+        vectorFilter.eq('region', user.region),
+      ),
+    },
+  ],
+})
 ```
 
 Anvia searches every registered index before the model turn and appends the formatted matches. Each index keeps its own `topK`, threshold, filter, and formatter.
@@ -62,7 +66,7 @@ const policyOptions = {
       text: `Source: Internal policy\n\n${String(result.document)}`,
     }
   },
-} satisfies Parameters<AgentBuilder['dynamicContext']>[1]
+}
 ```
 
 Clear source identity helps the model distinguish product documentation from internal policy and makes retrieval traces easier to inspect.
@@ -70,4 +74,3 @@ Clear source identity helps the model distinguish product documentation from int
 ## Tune sources independently
 
 Test which index supplied each answer. If one source dominates with weak matches, raise its threshold or reduce its `topK` instead of changing every index. Keep permission tests separate for each source because every registered index is an independent path into model context.
-

@@ -17,7 +17,7 @@ cost and model selection.
 ## Build and attach the index
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { createTool, createToolIndex } from '@anvia/core/tool'
 import { z } from 'zod'
 
@@ -39,9 +39,11 @@ const updateAddress = createTool({
 
 const toolIndex = await createToolIndex(embeddingModel, [issueRefund, updateAddress])
 
-const agent = new AgentBuilder('support', completionModel)
-  .dynamicTools(toolIndex, { topK: 1, threshold: 0.9 })
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: completionModel,
+  dynamicTools: [{ index: toolIndex, topK: 1, threshold: 0.9 }],
+})
 
 const response = await agent.prompt('Refund order A-100.').send()
 ```

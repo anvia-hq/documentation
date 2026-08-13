@@ -30,16 +30,18 @@ pnpm add @anvia/core @anvia/openai @anvia/memory-postgres
 ## Attach the store
 
 ```ts
-import { AgentBuilder } from "@anvia/core/agent";
+import { Agent } from "@anvia/core/agent";
 import { createPostgresMemoryStore } from "@anvia/memory-postgres";
 
 const memory = await createPostgresMemoryStore({
   connectionString: process.env.DATABASE_URL,
 });
-const agent = new AgentBuilder("assistant", model)
-  .instructions("Use prior conversation only when relevant.")
-  .memory(memory)
-  .build();
+const agent = new Agent({
+  id: "assistant",
+  model: model,
+  instructions: "Use prior conversation only when relevant.",
+  memory: { store: memory },
+});
 
 const session = agent.session(conversation.id, { userId: principal.id });
 const response = await session.prompt(question).send();

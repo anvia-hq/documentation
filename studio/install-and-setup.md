@@ -46,7 +46,7 @@ Create `studio.ts` next to your application code:
 
 ```ts
 import 'dotenv/config'
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { OpenAIClient } from '@anvia/openai'
 import { Studio } from '@anvia/studio'
 
@@ -54,15 +54,14 @@ const client = new OpenAIClient({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-const agent = new AgentBuilder(
-  'support',
-  client.completionModel('gpt-5'),
-)
-  .name('Support')
-  .description('Answers product support questions.')
-  .instructions('Answer clearly. Ask for missing details before making assumptions.')
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: client.completionModel('gpt-5'),
+  name: 'Support',
+  description: 'Answers product support questions.',
+  instructions: 'Answer clearly. Ask for missing details before making assumptions.',
+  maxTurns: 4,
+})
 
 new Studio([agent]).start({
   hostname: '127.0.0.1',

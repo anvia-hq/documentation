@@ -5,19 +5,15 @@ Create the built-in tool and register it with the other tools available to the a
 ## Basic setup
 
 ```ts
-import { AgentBuilder, createThinkTool } from '@anvia/core'
+import { Agent, createThinkTool } from '@anvia/core'
 
-const agent = new AgentBuilder('support-investigator', model)
-  .instructions(
-    'Use think when you need to compare multiple tool results before answering.',
-  )
-  .tools([
-    createThinkTool(),
-    searchTicketsTool,
-    getAccountTool,
-  ])
-  .defaultMaxTurns(6)
-  .build()
+const agent = new Agent({
+  id: 'support-investigator',
+  model: model,
+  instructions: 'Use think when you need to compare multiple tool results before answering.',
+  maxTurns: 6,
+  tools: [createThinkTool(), searchTicketsTool, getAccountTool],
+})
 ```
 
 The model decides whether to call the tool. Registering it does not make every request use it, so pair it with a specific instruction.
@@ -56,13 +52,12 @@ Do not add think globally merely because an agent can call tools. Attach it to a
 For a large dynamically retrieved catalog, keep think static so it is always available during the run:
 
 ```ts
-const agent = new AgentBuilder('operations', model)
-  .tools([createThinkTool()])
-  .dynamicTools(operationsToolIndex, {
-    topK: 5,
-    threshold: 0.72,
-  })
-  .build()
+const agent = new Agent({
+  id: 'operations',
+  model: model,
+  dynamicTools: [{ index: operationsToolIndex, topK: 5, threshold: 0.72 }],
+  tools: [createThinkTool()],
+})
 ```
 
 Static registration makes the checkpoint available on every turn while operational tools are selected from the index.

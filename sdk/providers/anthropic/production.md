@@ -22,7 +22,7 @@ Validate required environment variables at startup. Keep model selection in conf
 
 ## Bound every run
 
-Set `maxTokens` for direct completions and a small `defaultMaxTurns(...)` for agents. Validate upload sizes before sending image or PDF content, and cancel streams when the caller disconnects.
+Set `maxTokens` for direct completions and a small agent `maxTurns` value. Validate upload sizes before sending image or PDF content, and cancel streams when the caller disconnects.
 
 Provider errors should be logged with a request or trace ID, then translated into a safe application error. Do not expose raw SDK errors or provider credentials to the browser.
 
@@ -60,4 +60,3 @@ Do not treat `listModels()` as a capability check or automatically route product
 - Reasoning and multimodal payloads follow explicit retention rules.
 - Every required capability has a live smoke test.
 - Fallbacks and retries are visible, bounded, and tested.
-

@@ -43,12 +43,22 @@ Only manifest exports are supported package entry points. Avoid imports from `sr
 
 ```ts
 // Public
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import type { Message } from '@anvia/core/completion'
 
 // Internal and unsupported
 // import { something } from '@anvia/core/dist/internal-file.js'
 ```
+
+## Agent builder compatibility
+
+`AgentBuilder` remains supported for applications created before the declarative `new Agent({...})`
+API. New code should use `Agent`; the compatibility builder is planned for removal when Anvia
+prepares the 1.0 release.
+
+The builder's singular `tool()` and `middleware()` methods are deprecated in favor of their plural
+forms. `eventStore()` is also deprecated; use observers with Logger, Lens, Langfuse, or
+OpenTelemetry for run inspection.
 
 ## Upgrade checklist
 
@@ -57,4 +67,3 @@ import type { Message } from '@anvia/core/completion'
 - Run TypeScript, unit, integration, and evaluation suites.
 - Test migrations against a copy of production data.
 - Confirm traces, usage, tool calls, and streaming events still arrive as expected.
-

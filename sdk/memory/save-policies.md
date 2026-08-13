@@ -13,9 +13,11 @@ A save policy controls when messages created during a run are appended to the me
 `'message'` is the default. Choose the policy explicitly so the intended failure behavior is visible in agent configuration.
 
 ```ts
-const agent = new AgentBuilder('support', model)
-  .memory(memoryStore, { savePolicy: 'turn' })
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  memory: { store: memoryStore, savePolicy: 'turn' },
+})
 ```
 
 ## Failed runs

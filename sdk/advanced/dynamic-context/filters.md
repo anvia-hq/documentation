@@ -24,7 +24,7 @@ const embedded = await embedDocuments(embeddingModel, articles, {
 Create the filter from the authenticated request, not from prompt text or model output.
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import type { CompletionModel } from '@anvia/core/completion'
 import {
   type VectorSearchIndex,
@@ -47,14 +47,12 @@ export function createSupportAgent(input: {
     vectorFilter.eq('published', true),
   )
 
-  return new AgentBuilder('tenant-support', input.model)
-    .instructions('Answer from retrieved support documentation.')
-    .dynamicContext(input.docsIndex, {
-      topK: 5,
-      threshold: 0.72,
-      filter,
-    })
-    .build()
+  return new Agent({
+    id: 'tenant-support',
+    model: input.model,
+    instructions: 'Answer from retrieved support documentation.',
+    dynamicContexts: [{ index: input.docsIndex, topK: 5, threshold: 0.72, filter }],
+  })
 }
 ```
 

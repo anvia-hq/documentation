@@ -21,7 +21,7 @@ fact.
 
 ## Packages
 
-- `@anvia/core` provides `AgentBuilder` and session handling.
+- `@anvia/core` provides `Agent` and session handling.
 - `@anvia/openai` provides the OpenAI completion model adapter.
 - `@anvia/memory-sqlite` provides the supported durable `MemoryStore` used here.
 - `tsx`, `typescript`, and `@types/node` run and type-check the example locally.
@@ -78,7 +78,7 @@ export function createMemory() {
 ```
 
 ```ts [src/agent.ts]
-import { AgentBuilder } from "@anvia/core/agent";
+import { Agent } from "@anvia/core/agent";
 import { OpenAIClient } from "@anvia/openai";
 import { createMemory } from "./memory.js";
 
@@ -87,10 +87,12 @@ export function createProjectAgent() {
   if (!apiKey) throw new Error("Set OPENAI_API_KEY before running this example.");
 
   const openai = new OpenAIClient({ apiKey });
-  return new AgentBuilder("project-assistant", openai.completionModel("gpt-5"))
-    .instructions("Answer concisely. Use stored conversation facts when relevant.")
-    .memory(createMemory(), { savePolicy: "turn" })
-    .build();
+  return new Agent({
+    id: "project-assistant",
+    model: openai.completionModel("gpt-5"),
+    instructions: "Answer concisely. Use stored conversation facts when relevant.",
+    memory: { store: createMemory(), savePolicy: "turn" },
+  });
 }
 ```
 
@@ -169,7 +171,7 @@ write command with the same scope appends another turn rather than replacing the
 the store survive process restarts; omitting `path` would create an in-memory database instead.
 The adapter creates its tables on first access.
 
-`.memory(memory, { savePolicy: "turn" })` attaches the store and saves complete model-and-tool
+`memory: { store: memory, savePolicy: "turn" }` attaches the store and saves complete model-and-tool
 turns together. `agent.session(...)` carries the memory context for every prompt made through
 that session. Before a prompt runs, Anvia calls the store's public `load(...)` contract; after a
 completed turn, it appends the new messages according to the save policy.

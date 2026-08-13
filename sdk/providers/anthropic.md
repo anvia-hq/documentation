@@ -34,7 +34,7 @@ Pass `model` to an agent, direct completion, extractor, or pipeline. Keep the cl
 
 The completion adapter supports streaming, tools, tool choice, image input, PDF input, and Anthropic reasoning content. It does not declare support for Anvia final output schemas.
 
-That distinction matters: use tool-backed extraction when you need structured data, and do not assume `createParsedCompletion(...)` or agent `.outputSchema(...)` is portable to this provider.
+That distinction matters: use tool-backed extraction when you need structured data, and do not assume `createParsedCompletion(...)` or the agent `outputSchema` option is portable to this provider.
 
 ## In this section
 
@@ -43,4 +43,3 @@ That distinction matters: use tool-backed extraction when you need structured da
 - [Model options](/sdk/providers/anthropic/model-options) explains model IDs and request settings.
 - [Vertex AI](/sdk/providers/anthropic/vertex-ai) configures Google authentication.
 - [Production](/sdk/providers/anthropic/production) covers boundaries, testing, and operational checks.
-
