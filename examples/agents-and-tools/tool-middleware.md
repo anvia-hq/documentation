@@ -38,7 +38,7 @@ const outputGate = createMiddleware({
 })
 
 const agent = new AgentBuilder('analyst', model)
-  .tool(longReportTool)
+  .tools([longReportTool])
   .middleware(outputGate)
   .defaultMaxTurns(2)
   .build()

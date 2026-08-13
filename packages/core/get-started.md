@@ -25,7 +25,7 @@ const currentTime = createTool({
 
 const agent = new AgentBuilder('assistant', model)
   .instructions('Answer briefly and use tools when they provide fresher data.')
-  .tool(currentTime)
+  .tools([currentTime])
   .defaultMaxTurns(4)
   .build()
 

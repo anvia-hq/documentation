@@ -20,7 +20,7 @@ Create provider clients and stores once, then build agents from injected depende
 ```ts
 export function createSupportAgent(deps: SupportDependencies) {
   return new AgentBuilder('support', deps.model)
-    .tool(createAccountTool(deps.accounts))
+    .tools([createAccountTool(deps.accounts)])
     .memory(deps.memory)
     .observe(deps.observer)
     .build()

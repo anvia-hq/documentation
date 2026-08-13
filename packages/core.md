@@ -35,7 +35,7 @@ const lookupOrder = createTool({
 
 const supportAgent = new AgentBuilder('support', model)
   .instructions('Help customers understand their order status.')
-  .tool(lookupOrder)
+  .tools([lookupOrder])
   .defaultMaxTurns(4)
   .build()
 

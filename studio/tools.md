@@ -12,7 +12,7 @@ Studio reads tool definitions from the registered agent. For each tool it shows 
 
 | Origin | How the tool reached the agent | Label in Studio |
 | --- | --- | --- |
-| Static | Added directly with `.tool(...)`, `.tools(...)`, or a static `ToolSet`. | `static` |
+| Static | Added directly with `.tools(...)` or a static `ToolSet`. | `static` |
 | Dynamic | Stored in a tool index registered with `.dynamicTools(...)`. | `dynamic` |
 | MCP | Imported from a connected MCP server and carrying that server's provenance. | `MCP / <server>` |
 
@@ -48,7 +48,7 @@ Register it on an agent and start Studio:
 ```ts
 const agent = new AgentBuilder('support-inspector', model)
   .name('Support inspector')
-  .tool(getTicket)
+  .tools([getTicket])
   .build()
 
 new Studio([agent]).start({ port: 4021 })

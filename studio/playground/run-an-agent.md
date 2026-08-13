@@ -45,7 +45,7 @@ const agent = new AgentBuilder(
   .name('Support Operations')
   .description('Answers operational questions with concise summaries.')
   .instructions('Use tools when useful. Keep answers action-oriented.')
-  .tool(getOrder)
+  .tools([getOrder])
   .defaultMaxTurns(5)
   .build()
 
@@ -105,4 +105,3 @@ Stopping does three things:
 Pending approvals and human questions are cancelled as part of the same operation, so they cannot leave a tool waiting after the user stops the run. Model providers and external tools may have already performed work before cancellation reaches them; cancellation should not be treated as a rollback.
 
 Next, configure [models and attachments](/studio/playground/models-and-attachments), or add [approvals and questions](/studio/playground/approvals-and-questions) to runs that need operator input.
-

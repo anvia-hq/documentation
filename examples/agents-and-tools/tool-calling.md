@@ -34,7 +34,7 @@ const agent = new AgentBuilder(
   new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY }).completionModel('gpt-5'),
 )
   .instructions('Use the add tool for arithmetic, then explain the result briefly.')
-  .tool(add)
+  .tools([add])
   .defaultMaxTurns(2)
   .build()
 
