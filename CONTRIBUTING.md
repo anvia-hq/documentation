@@ -21,7 +21,8 @@ pnpm docs:dev
 Build the complete site before opening a pull request:
 
 ```sh
-pnpm docs:build
+pnpm docs:build:current
+pnpm docs:build:rc
 ```
 
 For deployment-related changes, also run:

@@ -1,42 +1,187 @@
 :root {
+  color-scheme: light;
   --vp-font-family-base: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --vp-font-family-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
   --vp-sidebar-width: 304px;
-  --vp-c-bg: #fff;
-  --vp-c-bg-alt: #fff;
-  --vp-c-bg-elv: #fff;
-  --vp-c-gutter: #fff;
-  --vp-code-block-bg: #f6f6f7;
-  --vp-c-brand-1: #35b95d;
-  --vp-c-brand-2: #49cf71;
-  --vp-c-brand-3: #62e989;
-  --vp-c-brand-soft: rgb(53 185 93 / 12%);
-  --vp-home-hero-name-color: #35b95d;
-  --vp-home-hero-image-background-image: radial-gradient(circle, rgb(98 233 137 / 18%), transparent 65%);
-  --vp-home-hero-image-filter: blur(44px);
-}
+  --vp-layout-max-width: 100%;
+  --docs-content-max-width: 52rem;
 
-:root:not(.dark) {
-  --vp-code-bg: #f8f8f8;
+  /* Brand — from anvia-web */
+  --accent: #62e989;
+  --accent-hover: #55da7c;
+  --accent-text: #197a37;
+  --accent-ink: #0a2c14;
+  --accent-pale: #e2fae9;
+  --accent-border: #b8eac7;
+
+  /* Type */
+  --ink: #141716;
+  --text-muted: #626864;
+  --text-subtle: #68706a;
+  --text-faint: #6f7671;
+
+  /* Surfaces */
+  --canvas: #f5f6f4;
+  --canvas-pattern: #eceeeb;
+  --paper: #fcfcfb;
+  --surface: #ffffff;
+  --surface-subtle: #f7f9f6;
+  --surface-hover: #f1f3f1;
+  --surface-tint: #f4faf5;
+  --surface-overlay: rgba(252, 252, 251, .94);
+  --surface-overlay-strong: rgba(252, 252, 251, .96);
+  --surface-ring: rgba(250, 251, 249, .8);
+
+  /* Edges and elevation */
+  --line: #dedfdd;
+  --soft-line: #ebedea;
+  --strong-line: #d4d8d4;
+  --shadow: #d9ddda;
+  --shadow-soft: #e8ebe7;
+  --shadow-accent: #bedcc6;
+  --shadow-strong: #111111;
+
+  /* Code and media */
+  --code-surface: #fbfcfa;
+  --code-hover: #f2f8f5;
+  --code-text: #48504c;
+  --code-gutter: #a6ada7;
+  --code-string: #743177;
+  --inline-code: #f3f6f3;
+  --inverse-surface: #171b18;
+  --inverse-text: #d9e3db;
+  --syntax-comment: #788079;
+  --syntax-string: #257044;
+  --syntax-keyword: #9c2c62;
+  --syntax-literal: #7144a5;
+  --syntax-number: #955810;
+  --syntax-function: #255fa6;
+  --syntax-type: #087d78;
+  --syntax-operator: #59615c;
+  --image-matte: #111111;
+
+  --vp-c-bg: var(--canvas);
+  --vp-c-bg-alt: var(--canvas);
+  --vp-c-bg-elv: var(--surface);
+  --vp-c-bg-soft: var(--surface-subtle);
+  --vp-c-gutter: var(--line);
+  --vp-c-divider: var(--line);
+  --vp-c-border: var(--strong-line);
+  --vp-c-text-1: var(--ink);
+  --vp-c-text-2: var(--text-muted);
+  --vp-c-text-3: var(--text-faint);
+  --vp-c-gray-1: var(--strong-line);
+  --vp-c-gray-2: var(--line);
+  --vp-c-gray-3: var(--surface-hover);
+  --vp-c-gray-soft: color-mix(in srgb, var(--ink) 6%, transparent);
+  --vp-c-green-1: var(--accent-text);
+  --vp-c-green-2: var(--accent-hover);
+  --vp-c-green-3: var(--accent);
+  --vp-c-green-soft: color-mix(in srgb, var(--accent) 16%, transparent);
+  --vp-c-brand-1: var(--accent-text);
+  --vp-c-brand-2: var(--accent-hover);
+  --vp-c-brand-3: var(--accent);
+  --vp-c-brand-soft: color-mix(in srgb, var(--accent) 16%, transparent);
+  --vp-c-brand: var(--vp-c-brand-1);
+  --vp-code-bg: var(--inline-code);
+  --vp-code-color: var(--code-text);
+  --vp-code-block-bg: var(--code-surface);
+  --vp-code-block-color: var(--code-text);
+  --vp-nav-bg-color: var(--surface-overlay);
+  --vp-sidebar-bg-color: var(--canvas);
+  --vp-local-nav-bg-color: var(--surface-overlay);
+  --vp-button-brand-text: var(--accent-ink);
+  --vp-button-brand-bg: var(--accent);
+  --vp-button-brand-hover-text: var(--accent-ink);
+  --vp-button-brand-hover-bg: var(--accent-hover);
+  --vp-button-brand-active-text: var(--accent-ink);
+  --vp-button-brand-active-bg: var(--accent-hover);
+  --vp-home-hero-name-color: var(--accent-text);
+  --vp-home-hero-image-background-image: radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, transparent), transparent 65%);
+  --vp-home-hero-image-filter: blur(44px);
+  --vp-local-search-bg: var(--paper);
+  --vp-local-search-result-bg: var(--paper);
+  --vp-local-search-highlight-bg: var(--accent);
+  --vp-local-search-highlight-text: var(--accent-ink);
 }
 
 .dark {
-  --vp-c-bg: #131313;
-  --vp-c-bg-alt: #131313;
-  --vp-c-bg-elv: #191919;
-  --vp-c-bg-soft: #1c1c1c;
-  --vp-c-text-1: #f5f5f5;
-  --vp-c-text-2: #a3a3a3;
-  --vp-c-text-3: #737373;
-  --vp-c-divider: #242424;
-  --vp-c-border: #2e2e2e;
-  --vp-c-gutter: #131313;
-  --vp-c-brand-1: #62e989;
-  --vp-c-brand-2: #49cf71;
-  --vp-c-brand-3: #35b95d;
-  --vp-c-brand-soft: rgb(98 233 137 / 12%);
-  --vp-code-block-bg: #0a0a0a;
-  --vp-home-hero-name-color: #62e989;
+  color-scheme: dark;
+  --ops-bg: #000000;
+  --ops-sheet: #080808;
+  --ops-card: #101010;
+  --ops-ink: #c4c4c4;
+  --ops-muted: #7a7a7a;
+  --ops-dim: #4e4e4e;
+  --ops-line: #2a2a2a;
+  --ops-accent: #c4c4c4;
+  --ops-accent-deep: #e0e0e0;
+  --ops-accent-ink: #080808;
+  --ink: var(--ops-ink);
+  --text-muted: var(--ops-muted);
+  --text-subtle: var(--ops-muted);
+  --text-faint: var(--ops-dim);
+  --canvas: var(--ops-bg);
+  --paper: var(--ops-sheet);
+  --surface: var(--ops-card);
+  --surface-subtle: var(--ops-card);
+  --surface-hover: #141414;
+  --surface-tint: #141414;
+  --surface-overlay: rgba(8, 8, 8, .94);
+  --line: var(--ops-line);
+  --soft-line: var(--ops-line);
+  --strong-line: #3a3a3a;
+  --code-surface: var(--ops-card);
+  --code-text: var(--ops-ink);
+  --inline-code: var(--ops-card);
+  --vp-c-bg: var(--ops-bg);
+  --vp-c-bg-alt: var(--ops-bg);
+  --vp-c-bg-elv: var(--ops-card);
+  --vp-c-bg-soft: var(--ops-card);
+  --vp-c-gutter: var(--ops-line);
+  --vp-c-divider: var(--ops-line);
+  --vp-c-border: var(--ops-line);
+  --vp-c-text-1: var(--ops-ink);
+  --vp-c-text-2: var(--ops-muted);
+  --vp-c-text-3: var(--ops-dim);
+  --vp-c-gray-1: #3a3a3a;
+  --vp-c-gray-2: var(--ops-line);
+  --vp-c-gray-3: var(--ops-card);
+  --vp-c-gray-soft: rgba(196, 196, 196, 0.1);
+  --vp-c-brand-1: var(--ops-accent-deep);
+  --vp-c-brand-2: var(--ops-accent);
+  --vp-c-brand-3: #ffffff;
+  --vp-c-brand-soft: rgba(196, 196, 196, 0.12);
+  --vp-c-brand: var(--vp-c-brand-1);
+  --vp-code-bg: var(--ops-card);
+  --vp-code-color: var(--ops-ink);
+  --vp-code-block-bg: var(--ops-card);
+  --vp-code-block-color: var(--ops-ink);
+  --vp-nav-bg-color: var(--surface-overlay);
+  --vp-sidebar-bg-color: var(--ops-bg);
+  --vp-local-nav-bg-color: var(--surface-overlay);
+  --vp-button-brand-text: var(--ops-accent-ink);
+  --vp-button-brand-bg: #ffffff;
+  --vp-button-brand-hover-text: var(--ops-accent-ink);
+  --vp-button-brand-hover-bg: #e8e8e8;
+  --vp-button-brand-active-text: var(--ops-accent-ink);
+  --vp-button-brand-active-bg: #e8e8e8;
+  --vp-home-hero-name-color: var(--ops-ink);
+  --vp-local-search-bg: var(--ops-sheet);
+  --vp-local-search-result-bg: var(--ops-sheet);
+  --vp-local-search-highlight-bg: #ffffff;
+  --vp-local-search-highlight-text: var(--ops-accent-ink);
+}
+
+html,
+body {
+  color: var(--ink);
+  background-color: var(--vp-c-bg);
+}
+
+::selection {
+  color: var(--accent-ink);
+  background: color-mix(in srgb, var(--accent) 45%, var(--paper));
 }
 
 body {
@@ -49,11 +194,15 @@ body {
   line-height: 26px;
 }
 
+.VPNavBar {
+  border-bottom: 1px solid var(--vp-c-divider) !important;
+}
+
 .VPNavBar,
 .VPNavBar.has-sidebar .content,
 .VPNavBar.has-sidebar .curtain {
-  background-color: color-mix(in srgb, var(--vp-c-bg) 82%, transparent) !important;
-  backdrop-filter: blur(12px);
+  background-color: var(--surface-overlay) !important;
+  backdrop-filter: blur(15px);
 }
 
 .VPNavBarTitle .title span {
@@ -63,6 +212,10 @@ body {
   background: url('/anvia-wordmark.png') center / contain no-repeat;
   color: transparent;
   white-space: nowrap;
+}
+
+.VPNavBar .divider {
+  display: none;
 }
 
 .VPNavBarTitle.has-sidebar .title {
@@ -79,11 +232,25 @@ body {
 }
 
 .VPButton.brand {
-  color: #050505 !important;
+  color: var(--accent-ink) !important;
+}
+
+.dark .VPButton.brand {
+  color: #080808 !important;
+}
+
+.dark .VPNavBarTitle .title span {
+  filter: brightness(0) invert(77%);
 }
 
 .VPSidebar .group + .group {
   border-top: 0;
+}
+
+@media (min-width: 960px) {
+  .VPSidebar {
+    border-right: 1px solid var(--line);
+  }
 }
 
 .VPSidebarItem .text {
@@ -106,20 +273,68 @@ body {
   font-size: 15px;
 }
 
+.VPDoc.has-aside .content-container {
+  max-width: var(--docs-content-max-width) !important;
+}
+
+.VPDoc:not(.has-sidebar) .container,
+.VPDoc:not(.has-sidebar) .content {
+  max-width: var(--docs-content-max-width) !important;
+}
+
 @media (min-width: 1280px) {
+  .VPDoc .container {
+    justify-content: flex-start !important;
+  }
+
+  .VPDoc.has-aside .content {
+    flex: 1 1 auto;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
   .VPDoc.has-aside .content-container {
-    max-width: 800px;
-  }
-
-  .VPDoc.has-aside .vp-doc > :where(h1, h2, h3, h4, h5, h6, p, ul, ol, dl, blockquote, details) {
-    width: 100%;
-    max-width: 688px;
     margin-right: auto;
-    margin-left: auto;
+    margin-left: 0;
   }
 
-  .VPDoc.has-aside .vp-doc > p:has(> img:only-child) {
-    max-width: none;
+  .VPDoc .aside {
+    flex: 0 0 256px;
+    width: 256px;
+    max-width: 256px;
+  }
+
+  .VPDoc .aside-container,
+  .VPDoc .aside-curtain {
+    right: 0 !important;
+    left: auto !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  .VPSidebar {
+    padding-left: 32px !important;
+    width: var(--vp-sidebar-width) !important;
+  }
+
+  .VPContent.has-sidebar {
+    padding-right: 0 !important;
+    padding-left: var(--vp-sidebar-width) !important;
+  }
+
+  .VPNavBar.has-sidebar .title {
+    padding-left: 32px !important;
+    width: var(--vp-sidebar-width) !important;
+  }
+
+  .VPNavBar.has-sidebar .content {
+    padding-right: 32px !important;
+    padding-left: var(--vp-sidebar-width) !important;
+  }
+
+  .VPLocalNav {
+    padding-left: var(--vp-sidebar-width) !important;
   }
 }
 
@@ -144,14 +359,14 @@ body {
   margin: 24px auto;
   border: 1px solid var(--vp-c-divider);
   border-radius: 10px;
-  background: var(--vp-c-bg);
+  background: var(--paper);
   cursor: zoom-in;
   transition: border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .vp-doc img:hover {
   border-color: var(--vp-c-border);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 6%);
+  box-shadow: 4px 4px 0 var(--shadow-soft);
 }
 
 .vp-doc img:focus-visible {
@@ -159,12 +374,20 @@ body {
   outline-offset: 3px;
 }
 
-.dark .vp-doc img:hover {
-  box-shadow: 0 8px 28px rgb(0 0 0 / 24%);
+.vp-doc [class*='language-'] {
+  border: 1px solid var(--strong-line);
+  background: var(--code-surface);
 }
 
 .vp-doc [class*='language-'] code {
   font-size: 0.8125em;
+  color: var(--code-text);
+}
+
+.vp-doc :not(pre) > code {
+  border: 1px solid var(--line);
+  background: var(--inline-code);
+  color: var(--ink);
 }
 
 .vp-doc tr {
@@ -187,14 +410,9 @@ body {
   border-bottom: 0;
 }
 
-:root:not(.dark) .vp-doc tr:nth-child(2n),
-:root:not(.dark) .vp-doc th {
-  background-color: #fdfdfd;
-}
-
-.dark .vp-doc tr:nth-child(2n),
-.dark .vp-doc th {
-  background-color: #171717;
+.vp-doc tr:nth-child(2n),
+.vp-doc th {
+  background-color: var(--surface-subtle);
 }
 
 .VPSwitchAppearance {
@@ -239,16 +457,10 @@ body {
     margin-right: auto;
   }
 
-  :root:not(.dark) .DocSearch-Button,
-  :root:not(.dark) .DocSearch-Button:hover {
+  .DocSearch-Button,
+  .DocSearch-Button:hover {
     border-color: transparent;
-    background-color: #f8f8f8;
-  }
-
-  .dark .DocSearch-Button,
-  .dark .DocSearch-Button:hover {
-    border-color: transparent;
-    background-color: #242424;
+    background-color: var(--surface-hover);
   }
 
   .DocSearch-Button:focus-visible {
@@ -260,17 +472,16 @@ body {
 
 @media (min-width: 960px) {
   .VPNavBar.has-sidebar .content {
-    padding-left: 124px;
+    padding-left: var(--vp-sidebar-width) !important;
+  }
+
+  .VPNavBar.has-sidebar .title {
+    z-index: 3;
+    background-color: var(--vp-nav-bg-color);
   }
 
   .VPNavBarSearch {
     padding-left: 16px;
-  }
-}
-
-@media (min-width: 1440px) {
-  .VPNavBar.has-sidebar .content {
-    padding-left: calc((100vw - var(--vp-layout-max-width)) / 2 + 124px);
   }
 }
 

@@ -50,6 +50,34 @@ pnpm docs:preview
 
 The generated site is written to `.vitepress/dist`.
 
+## Documentation versions
+
+The site has two documentation channels during the v1 release-candidate period:
+
+- **Current (v0.x)** is the production documentation from `main` and is served from `/`.
+- **Release candidate (v1)** is prerelease documentation from `staging` and is served from `/v1-rc/`.
+
+The branch remains named `staging` because it is a moving preview. The public selector calls it
+**Release candidate (v1)** so readers understand that the documented API is not yet stable.
+
+Run a channel locally with its dedicated command:
+
+```sh
+pnpm docs:dev:current
+pnpm docs:dev:rc
+```
+
+Build both channels independently before publishing a documentation release:
+
+```sh
+pnpm docs:build:current
+pnpm docs:build:rc
+```
+
+The channel selector uses `/` and `/v1-rc/` by default. Set `DOCS_CURRENT_URL` or `DOCS_RC_URL`
+when previews or custom domains need different destinations, and use `DOCS_BASE` when a build is
+mounted at a different path.
+
 ## Deployment
 
 The site deploys to Cloudflare Workers as static assets through `wrangler.jsonc`.
