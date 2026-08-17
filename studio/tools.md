@@ -12,11 +12,11 @@ Studio reads tool definitions from the registered agent. For each tool it shows 
 
 | Origin | How the tool reached the agent | Label in Studio |
 | --- | --- | --- |
-| Static | Added directly with `.tools(...)` or a static `ToolSet`. | `static` |
-| Dynamic | Stored in a tool index registered with `.dynamicTools(...)`. | `dynamic` |
+| Static | Added directly with the `tools` option. | `static` |
+| Dynamic | Stored in a `ToolIndex` passed through the agent's `tools` option. | `dynamic` |
 | MCP | Imported from a connected MCP server and carrying that server's provenance. | `MCP / <server>` |
 
-MCP is provenance layered on top of registration. An MCP tool can be part of the agent's static tool set while Studio presents its more useful server origin instead of a generic `static` label.
+MCP is provenance layered on top of registration. An MCP tool can be part of the agent's static tools while Studio presents its more useful server origin instead of a generic `static` label.
 
 Dynamic tools shown here are the definitions available in the registered tool index. During an agent prompt, retrieval still decides which dynamic definitions to send to the model for that request.
 
@@ -31,10 +31,10 @@ import { z } from 'zod'
 const getTicket = createTool({
   name: 'get_ticket',
   description: 'Read a support ticket from local application state.',
-  input: z.object({
+  inputSchema: z.object({
     id: z.string().describe('Ticket ID, for example TICKET-1001.'),
   }),
-  output: z.object({
+  outputSchema: z.object({
     id: z.string(),
     status: z.enum(['waiting_on_engineering', 'monitoring']),
     priority: z.enum(['high', 'medium']),
@@ -46,10 +46,12 @@ const getTicket = createTool({
 Register it on an agent and start Studio:
 
 ```ts
-const agent = new AgentBuilder('support-inspector', model)
-  .name('Support inspector')
-  .tools([getTicket])
-  .build()
+const agent = new Agent({
+  id: 'support-inspector',
+  model: model,
+  name: 'Support inspector',
+  tools: [getTicket],
+})
 
 new Studio([agent]).start({ port: 4021 })
 ```

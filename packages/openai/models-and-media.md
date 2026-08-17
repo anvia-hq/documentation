@@ -14,11 +14,22 @@ import {
 
 const openai = new OpenAIClient({ apiKey })
 
-const completion = openai.completionModel('gpt-5')
-const embeddings = openai.embeddingModel('text-embedding-3-small')
-const images = openai.imageGenerationModel(GPT_IMAGE_1)
-const speech = openai.audioGenerationModel(TTS_1_HD)
-const transcription = openai.transcriptionModel(WHISPER_1)
+const completion = openai.completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
+})
+const embeddings = openai.embeddingModel({
+    modelId: 'text-embedding-3-small'
+})
+const images = openai.imageGenerationModel({
+    modelId: GPT_IMAGE_1
+})
+const speech = openai.speechGenerationModel({
+    modelId: TTS_1_HD
+})
+const transcription = openai.transcriptionModel({
+    modelId: WHISPER_1
+})
 ```
 
 Known model-name types provide autocomplete while `ModelId` still permits a custom string. A name being accepted by TypeScript does not prove that the configured endpoint serves it.
@@ -30,12 +41,12 @@ const result = await images.imageGeneration({
   prompt: 'A clean isometric diagram of a distributed queue',
   width: 1024,
   height: 1024,
-  additionalParams: {
+  providerOptions: {
     output_format: 'webp',
   },
 })
 
-console.log(result.mediaType, result.images.length)
+console.log(result.images[0].mediaType, result.images.length)
 ```
 
 The adapter requests `width x height` as the provider size and returns the first image plus the complete image array. DALL-E models are forced to base64 response format. URL-only responses are unsupported because the Anvia contract returns bytes.
@@ -43,11 +54,11 @@ The adapter requests `width x height` as the provider size and returns the first
 ## Generate speech
 
 ```ts
-const result = await speech.audioGeneration({
+const result = await speech.speechGeneration({
   text: 'Your deployment has completed.',
   voice: 'alloy',
   speed: 1,
-  additionalParams: { response_format: 'mp3' },
+  providerOptions: { response_format: 'mp3' },
 })
 ```
 

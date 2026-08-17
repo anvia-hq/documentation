@@ -1,99 +1,112 @@
-# Image and transcription
+# Gemini image and transcription models
 
-Gemini media capabilities use separate Anvia model contracts. Image understanding belongs to a completion model; image creation and audio transcription use their own factories.
+Image understanding belongs to a completion model. Image creation and audio transcription use separate model factories.
 
-## Choose an image factory
+## 1. Choose an image factory
 
-`GeminiClient` exposes two image-generation paths:
+`imageGenerationModel({ api: 'generateContent', modelId })` uses Gemini `generateContent`.
 
-| Factory | Google operation | Default model constant |
-| --- | --- | --- |
-| `imageGenerationModel(...)` | Gemini `models.generateContent` | `GEMINI_2_5_FLASH_IMAGE` |
-| `imagenGenerationModel(...)` | Imagen `models.generateImages` | `IMAGEN_4_GENERATE` |
+`imageGenerationModel({ api: 'generateImages', modelId })` uses Imagen `generateImages`.
 
-Use the factory that matches the selected model family. They return the same Anvia image-generation contract but send different Google request shapes.
+Both satisfy Anvia's `ImageGenerationModel`, but send different Google request shapes.
 
-## Generate with a native Gemini image model
+## 2. Generate with a Gemini-native image model
 
 ```ts
 import { writeFile } from 'node:fs/promises'
-import { imageGenerationRequest } from '@anvia/core/image-generation'
+import { generateImage } from '@anvia/core/image-generation'
 import {
   GEMINI_2_5_FLASH_IMAGE,
   GeminiClient,
 } from '@anvia/gemini'
 
 const gemini = new GeminiClient({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY!,
 })
 
-const imageModel = gemini.imageGenerationModel(
-  GEMINI_2_5_FLASH_IMAGE,
-)
+const imageModel = gemini.imageGenerationModel({
+    api: 'generateContent',
+    modelId: GEMINI_2_5_FLASH_IMAGE,
+})
 
-const result = await imageGenerationRequest(imageModel)
-  .prompt('A minimal diagram of an agent calling two tools')
-  .width(1024)
-  .height(1024)
-  .additionalParams({
-    config: {
-      imageConfig: { imageSize: '1K' },
-    },
-  })
-  .send()
+const result = await generateImage({
+    prompt: 'A minimal diagram of an agent calling two tools',
+    model: imageModel,
+    width: 1024,
+    height: 1024,
+    providerOptions: {
+        config: {
+            imageConfig: {
+                aspectRatio: '1:1',
+                imageSize: '1K',
+            },
+        },
+    }
+})
 
-await writeFile('agent-diagram.png', result.image)
+await writeFile('agent-diagram.png', result.images[0].data)
 ```
 
-The adapter requests text and image response modalities, extracts inline image bytes, and returns them as `Uint8Array`. Width and height are reduced to an aspect ratio, such as `1024 × 768` becoming `4:3`.
+The adapter requests text and image modalities, extracts inline image data, and returns `Uint8Array` bytes. Width and height are reduced to an aspect-ratio string.
 
-## Generate with Imagen
+Gemini `config` is shallow-merged. Supplying `config.imageConfig` replaces the generated object, so include `aspectRatio` whenever overriding it.
+
+## 3. Generate with Imagen
 
 ```ts
+import { generateImage } from '@anvia/core/image-generation'
 import { IMAGEN_4_GENERATE } from '@anvia/gemini'
 
-const imagen = gemini.imagenGenerationModel(IMAGEN_4_GENERATE)
+const imagen = gemini.imageGenerationModel({
+  api: 'generateImages',
+  modelId: IMAGEN_4_GENERATE,
+})
 
-const result = await imageGenerationRequest(imagen)
-  .prompt('A clean editorial illustration of a retrieval pipeline')
-  .width(1600)
-  .height(900)
-  .additionalParams({
-    config: {
-      numberOfImages: 2,
-    },
-  })
-  .send()
+const result = await generateImage({
+    prompt: 'A clean editorial illustration of a retrieval pipeline',
+    model: imagen,
+    width: 1600,
+    height: 900,
+    providerOptions: {
+        config: {
+            aspectRatio: '16:9',
+            numberOfImages: 2,
+        },
+    }
+})
 
 console.log(result.images.length)
 ```
 
-Provider-specific configuration is forwarded to Google's image operation. Confirm option names against the selected model and API mode. The adapter uses a shallow merge, so a supplied `config.imageConfig` replaces the generated `imageConfig` object; include `aspectRatio` there when overriding it.
+Verify option names and supported aspect ratios against the exact model and API mode.
 
-## Transcribe audio
+## 4. Transcribe audio
 
 ```ts
 import { readFile } from 'node:fs/promises'
-import { transcriptionRequest } from '@anvia/core/transcription'
+import { transcribe } from '@anvia/core/transcription'
 
-const transcriptionModel = gemini.transcriptionModel(
-  'gemini-2.5-flash',
-)
+const transcriptionModel = gemini.transcriptionModel({
+    modelId: 'gemini-2.5-flash'
+})
 
-const transcript = await transcriptionRequest(transcriptionModel)
-  .data(await readFile('uploads/support-call.wav'))
-  .filename('support-call.wav')
-  .prompt('Use the product names Anvia and Acme Cloud.')
-  .temperature(0)
-  .send()
+const transcript = await transcribe({
+    audio: {
+        data: await readFile('uploads/support-call.wav'),
+        filename: 'support-call.wav'
+    },
+    model: transcriptionModel,
+    prompt: 'Use the product names Anvia and Acme Cloud.',
+    temperature: 0
+})
 
 console.log(transcript.text)
 ```
 
-The adapter sends the audio bytes as inline data to Gemini `generateContent` with a transcription instruction. A prompt adds domain terminology; it does not replace the instruction to transcribe exactly.
+The adapter adds a fixed exact-transcription instruction and appends the supplied prompt as domain guidance.
 
-The filename determines the outgoing MIME type for `.wav`, `.aac`, `.ogg`, `.flac`, `.m4a`, and `.opus`. Other filenames fall back to `audio/mpeg`, so validate and normalize uploads before calling the model.
+Filename extensions map `.wav`, `.aac`, `.ogg`, `.flac`, `.m4a`, and `.opus` to media types. Other names use `audio/mpeg`, so validate uploads before the call.
 
-## Store outputs deliberately
+## 5. Store output deliberately
 
-Persist generated images in object storage instead of agent memory or traces. Apply authorization and retention rules to source audio and transcripts, and avoid logging raw provider responses when they may contain media or sensitive text.
+Persist generated images in object storage. Apply authorization and retention rules to source audio and transcripts, and avoid logging raw provider media responses.

@@ -4,167 +4,63 @@ All public symbols are exported from `@anvia/qdrant`.
 
 ```ts
 import {
-  filterToQdrantFilter,
-  QdrantVectorIndex,
+  QdrantHybridVectorStore,
+  QdrantVectorClient,
   QdrantVectorStore,
+  filterToQdrantFilter,
   type QdrantClientLike,
+  type QdrantDenseVectorStoreOptions,
   type QdrantDistance,
   type QdrantFusion,
-  type QdrantHybridIndexOptions,
-  type QdrantIndexOptions,
+  type QdrantHybridVectorStoreOptions,
   type QdrantMutationOptions,
-  type QdrantVectorStoreConnectOptions,
+  type QdrantVectorClientOptions,
+  type QdrantVectorStoreBaseOptions,
+  type QdrantVectorStoreOptions,
 } from '@anvia/qdrant'
 ```
 
-## filterToQdrantFilter
+## QdrantVectorClient
 
 ```ts
-function filterToQdrantFilter(
-  filter: VectorFilter | undefined,
-): unknown
-```
-
-Converts an Anvia vector filter into a Qdrant filter value.
-
-## QdrantVectorStore
-
-```ts
-class QdrantVectorStore<
-  T,
-  Metadata extends VectorMetadata = VectorMetadata,
-> {
-  static connect<T, Metadata extends VectorMetadata = VectorMetadata>(
-    options: QdrantVectorStoreConnectOptions,
-  ): Promise<QdrantVectorStore<T, Metadata>>
-
-  upsertDocuments(
-    documents: Array<EmbeddedDocument<T, Metadata>>,
-    mutationOptions?: QdrantMutationOptions,
-  ): Promise<void>
-
-  deleteDocuments(
-    documentIds: string[],
-    mutationOptions?: QdrantMutationOptions,
-  ): Promise<void>
-
-  getDocuments(
-    documentIds: string[],
-  ): Promise<Array<VectorInspectItem<T, Metadata>>>
-
-  index(options: QdrantIndexOptions): QdrantVectorIndex<T, Metadata>
+class QdrantVectorClient {
+  constructor(options?: QdrantVectorClientOptions)
+  vectorStore<T, Metadata extends VectorMetadata = VectorMetadata>(
+    options: QdrantVectorStoreOptions,
+  ): QdrantVectorStore<T, Metadata> | QdrantHybridVectorStore<T, Metadata>
+  close(): Promise<void>
 }
 ```
 
-## QdrantVectorIndex
+`QdrantVectorClientOptions` accepts an injected `client?: QdrantClientLike`, or the official Qdrant client parameters such as `url` and `apiKey` directly.
+
+Dense store options contain `collectionName`, `dimensions`, optional `metric` and `denseVectorName`, and optional `mode: 'dense'`. Hybrid options require `mode: 'hybrid'` and may add `sparseVectorName`.
+
+## Stores
 
 ```ts
-class QdrantVectorIndex<
-  T,
-  Metadata extends VectorMetadata = VectorMetadata,
-> implements VectorSearchIndex<T, Metadata> {
-  constructor(
-    model: EmbeddingModel,
-    client: QdrantClientLike,
-    collectionName: string,
-    hybrid?: {
-      sparse: SparseEmbeddingModel
-      fusion: QdrantFusion
-      denseVectorName: string
-      sparseVectorName: string
-      prefetchLimit?: number
-    },
-  )
-
-  search(request: VectorSearchRequest): Promise<Array<VectorSearchResult<T, Metadata>>>
-  searchIds(request: VectorSearchRequest): Promise<Array<{ score: number; id: string }>>
-  inspect(request: VectorInspectRequest): Promise<VectorInspectPage<T, Metadata>>
-  asTool(options: VectorSearchToolOptions): Tool<{ query: string; topK?: number }, unknown>
-}
+await store.ensure()
+await store.validate()
+await store.upsert({ documents, providerOptions })
+const dense = await store.search({ vector, topK, minScore, filter, providerOptions, abortSignal })
+const page = await store.inspect({ limit, cursor, filter, providerOptions, abortSignal })
+await store.delete({ documentIds, providerOptions })
+const items = await store.get({ documentIds })
 ```
 
-The constructor's hybrid object is part of the emitted class signature but is not a separately exported named type. Most applications should use `store.index(...)`.
-
-## Types
+`QdrantHybridVectorStore` also implements:
 
 ```ts
-type QdrantDistance = 'Cosine' | 'Dot' | 'Euclid' | 'Manhattan'
-type QdrantFusion = 'rrf' | 'dbsf'
-
-type QdrantClientLike = {
-  getCollection(collectionName: string): Promise<unknown>
-  createCollection(
-    collectionName: string,
-    options: Record<string, unknown>,
-  ): Promise<unknown>
-  upsert(
-    collectionName: string,
-    options: Record<string, unknown>,
-  ): Promise<unknown>
-  batchUpdate?(
-    collectionName: string,
-    options: Record<string, unknown>,
-  ): Promise<unknown>
-  collectionExists?(collectionName: string): Promise<unknown>
-  delete?(
-    collectionName: string,
-    options: Record<string, unknown>,
-  ): Promise<unknown>
-  scroll?(
-    collectionName: string,
-    options: Record<string, unknown>,
-  ): Promise<unknown>
-  search?(
-    collectionName: string,
-    options: Record<string, unknown>,
-  ): Promise<unknown>
-  query?(
-    collectionName: string,
-    options: Record<string, unknown>,
-  ): Promise<unknown>
-}
-
-type QdrantVectorStoreBaseConnectOptions = {
-  collectionName: string
-  vectorSize: number
-  createIfMissing?: boolean
-  distance?: QdrantDistance
-  hybrid?: boolean
-  denseVectorName?: string
-  sparseVectorName?: string
-}
-
-type QdrantVectorStoreConnectOptions = QdrantVectorStoreBaseConnectOptions &
-  (
-    | { client: QdrantClientLike; clientOptions?: never }
-    | { client?: undefined; clientOptions?: QdrantClientParams }
-  )
-
-type QdrantMutationOptions = {
-  wait?: boolean
-  ordering?: 'weak' | 'medium' | 'strong'
-  timeout?: number
-}
-
-type QdrantHybridIndexOptions = {
-  dense: EmbeddingModel
-  sparse: SparseEmbeddingModel
-  fusion?: QdrantFusion
-  denseVectorName?: string
-  sparseVectorName?: string
-  prefetchLimit?: number
-}
-
-type QdrantIndexOptions = EmbeddingModel | QdrantHybridIndexOptions
+const results = await store.searchHybrid({
+  vector,
+  sparseVector,
+  fusion: 'rrf',
+  topK,
+  minScore,
+  filter,
+})
 ```
 
-`upsertDocuments(...)` replaces every point for each logical document ID, so reducing the number of
-embeddings does not leave stale points. Mutations wait for Qdrant by default. The official client
-uses an ordered batch for replacement; a custom client without `batchUpdate(...)` falls back to a
-non-atomic delete followed by upsert.
-
-`deleteDocuments(...)` removes every point belonging to the supplied logical IDs.
-`getDocuments(...)` and `index.inspect(...)` require a client with `scroll(...)` support and return
-logical documents rather than individual embedding points.
+`QdrantMutationOptions` supports `wait`, `ordering`, and `timeout`. Native distances are `'Cosine' | 'Dot' | 'Euclid'`; `QdrantFusion` follows the core `'rrf' | 'dbsf'` values. `filterToQdrantFilter(filter)` converts an Anvia filter for direct client calls.
 
 Return to the [package guide](/packages/qdrant).

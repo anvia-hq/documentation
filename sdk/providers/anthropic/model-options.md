@@ -5,9 +5,9 @@ Choose the model when creating the completion adapter, then keep common generati
 ## Select a model explicitly
 
 ```ts
-const model = anthropic.completionModel(
-  'claude-sonnet-4-20250514',
-)
+const model = anthropic.completionModel({
+    modelId: 'claude-sonnet-4-20250514'
+})
 ```
 
 Known Anthropic model IDs are included for editor autocomplete, while custom strings remain valid. This allows newly released models and compatible endpoints without waiting for a package release.
@@ -33,13 +33,14 @@ Use model listing for an admin inventory or selection UI. A listed ID does not p
 Use Anvia's normalized request fields whenever they cover the behavior:
 
 ```ts
-import { createCompletion } from '@anvia/core'
+import { generateCompletion } from '@anvia/core'
 
-const result = await createCompletion(model, {
-  instructions: 'Answer precisely and state uncertainty.',
-  input: 'Summarize the deployment risk.',
-  temperature: 0.2,
-  maxTokens: 600,
+const result = await generateCompletion({
+    prompt: 'Summarize the deployment risk.',
+    model,
+    instructions: 'Answer precisely and state uncertainty.',
+    temperature: 0.2,
+    maxTokens: 600
 })
 ```
 
@@ -47,16 +48,17 @@ const result = await createCompletion(model, {
 
 ## Pass Anthropic-specific parameters
 
-Use `params` only for an Anthropic Messages API option that has no Anvia field:
+Use `providerOptions` only for an Anthropic Messages API option that has no Anvia field:
 
 ```ts
-const result = await createCompletion(model, {
-  input: 'Draft a release note.',
-  maxTokens: 400,
-  params: {
-    top_p: 0.9,
-    stop_sequences: ['</release-note>'],
-  },
+const result = await generateCompletion({
+    prompt: 'Draft a release note.',
+    model,
+    maxTokens: 400,
+    providerOptions: {
+        top_p: 0.9,
+        stop_sequences: ['</release-note>'],
+    }
 })
 ```
 

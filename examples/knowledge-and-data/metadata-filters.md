@@ -14,23 +14,27 @@ Do not encode every concept as metadata: semantic subject matter belongs in the 
 ## Flow and setup
 
 Write flat metadata during `embedDocuments`, derive a trusted filter for the request, then pass it
-to `index.search`. Supported operators are expressed through `vectorFilter` rather than a
+to `retrieveDocuments()`. Supported operators are expressed through `vectorFilter` rather than a
 backend-specific query string.
 
 ```ts
-import { vectorFilter } from "@anvia/core/vector-store";
+import { retrieveDocuments, vectorFilter } from "@anvia/core/vector-store";
 
 const filter = vectorFilter.and(
   vectorFilter.eq("tenantId", principal.tenantId),
-  vectorFilter.eq("status", "published"),
-  vectorFilter.or(
-    vectorFilter.eq("locale", requestedLocale),
-    vectorFilter.eq("locale", "en"),
+  vectorFilter.and(
+    vectorFilter.eq("status", "published"),
+    vectorFilter.and(
+      vectorFilter.or(
+        vectorFilter.eq("locale", requestedLocale),
+        vectorFilter.eq("locale", "en"),
+      ),
+      vectorFilter.gt("priority", 2),
+    ),
   ),
-  vectorFilter.gt("priority", 2),
 );
 
-const results = await index.search({ query, topK: 10, filter });
+const results = await retrieveDocuments({ store, model: embeddingModel, query, topK: 10, filter });
 ```
 
 Use only validated application values. A model-generated filter can help propose a search facet,
@@ -62,7 +66,7 @@ facets, forbidden nearest-neighbor canaries, and empty result sets.
 
 ## Runnable reference
 
-- [Filters and LSH](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/02-filters-and-lsh.ts)
+- [Filters and LSH](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/02-filters-and-lsh.ts)
 
 ## Extensions
 

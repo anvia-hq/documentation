@@ -1,51 +1,68 @@
 # Transcription
 
-Transcription turns audio bytes into normalized text through a `TranscriptionModel`. It is usually an ingestion step: validate an upload, transcribe it, then send only the resulting text into an extractor, agent, or retrieval workflow.
+`transcribe()` turns audio bytes into normalized text through a `TranscriptionModel`.
 
-Create the model as described in [Transcription models](/sdk/models/transcription). Keep file access and provider credentials in a server route or worker.
-
-## Transcribe an upload
+## 1. Transcribe an upload
 
 ```ts
-import { transcriptionRequest } from '@anvia/core/transcription'
+import { transcribe } from '@anvia/core/transcription'
 
-const transcript = await transcriptionRequest(transcriptionModel)
-  .data(upload.bytes)
-  .filename(upload.filename)
-  .language('en')
-  .prompt('Transcribe the customer support call exactly.')
-  .temperature(0)
-  .send()
+const transcript = await transcribe({
+    audio: {
+        data: upload.bytes,
+        filename: upload.filename
+    },
+    model: transcriptionModel,
+    language: 'en',
+    prompt: 'Transcribe the customer support call exactly.',
+    temperature: 0,
+    retries: {
+        maxAttempts: 3,
+    }
+})
 
 console.log(transcript.text)
 ```
 
-`.data(...)` accepts a `Uint8Array` or `ArrayBuffer`. Use a meaningful filename with an extension because a provider may use it to infer the media type. Building or sending a request with empty audio data throws.
+The first argument accepts `Uint8Array` or `ArrayBuffer`. Anvia copies the supplied bytes before the provider call and rejects empty audio or an empty filename.
 
-The prompt should contain transcription guidance such as domain vocabulary, expected language, or formatting—not instructions for analyzing the conversation. Keep transcription and analysis as separate stages so their inputs, failures, and tests remain clear.
+Use a meaningful filename with an extension because the provider may use it to infer the format. Language, prompt, temperature, and `providerOptions` pass through to the configured model adapter.
 
-## Extract structured information afterward
+## 2. Keep transcription and analysis separate
+
+The transcription prompt should contain vocabulary, language, or formatting guidance. Analyze the conversation in a later extractor or agent stage:
 
 ```ts
-const transcript = await transcriptionRequest(transcriptionModel)
-  .data(upload.bytes)
-  .filename(upload.filename)
-  .temperature(0)
-  .send()
+const transcript = await transcribe({
+    audio: {
+        data: upload.bytes,
+        filename: upload.filename
+    },
+    model: transcriptionModel,
+    temperature: 0
+})
 
-const review = await callReviewExtractor.extract(transcript.text)
+const review = await extract({
+  model: reviewModel,
+  text: transcript.text,
+  outputSchema: callReviewSchema,
+})
 
 await callReviews.save({
   assetId: upload.assetId,
   transcript: transcript.text,
-  review,
+  review: review.output,
 })
 ```
 
-`callReviewExtractor` and `callReviews` are application-owned dependencies. This separation lets the application retry transcription without repeating the product write, or re-run extraction against an existing transcript.
+This boundary lets the application reuse an existing transcript without paying to process the audio again.
 
-## Protect the input and transcript
+## 3. Protect source and output
 
-Validate ownership, file size, and media type before loading audio into memory. Store the original audio according to product retention policy, and keep raw bytes out of agent memory and observability payloads.
+Validate ownership, file size, and detected media type before loading audio. Keep raw bytes out of agent memory and observability payloads.
 
-Transcripts can contain personal or regulated information even when the source audio appears harmless. Apply access controls and redaction before a transcript enters an agent, vector index, trace, or customer-visible summary. For large files, run the stages in a worker and persist intermediate status instead of holding an HTTP connection open.
+Transcripts may contain personal or regulated information. Apply authorization and redaction before indexing, tracing, or displaying them.
+
+Use a durable worker for long files, progress reporting, or restart-safe processing.
+
+Next, recover text from scans with [OCR](/sdk/advanced/multimodal/ocr).

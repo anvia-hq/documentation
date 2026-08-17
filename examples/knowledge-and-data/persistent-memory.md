@@ -16,7 +16,7 @@ reference material. Memory is not a substitute for identity or application state
 
 ## Flow
 
-authenticate → resolve application conversation → `agent.session(sessionId, { userId })` → load
+authenticate → resolve application conversation → `agent.generate({ prompt, session })` → load
 history → prompt → append completed messages. The memory adapter owns durable storage mechanics.
 
 ## Setup
@@ -30,23 +30,31 @@ pnpm add @anvia/core @anvia/openai @anvia/memory-postgres
 ## Attach the store
 
 ```ts
-import { AgentBuilder } from "@anvia/core/agent";
-import { createPostgresMemoryStore } from "@anvia/memory-postgres";
-
-const memory = await createPostgresMemoryStore({
-  connectionString: process.env.DATABASE_URL,
+import { Agent } from "@anvia/core/agent";
+import { PostgresMemoryClient } from "@anvia/memory-postgres";
+const memoryClient = new PostgresMemoryClient({
+    connectionString: process.env.DATABASE_URL!,
 });
-const agent = new AgentBuilder("assistant", model)
-  .instructions("Use prior conversation only when relevant.")
-  .memory(memory)
-  .build();
-
-const session = agent.session(conversation.id, { userId: principal.id });
-const response = await session.prompt(question).send();
+const memory = memoryClient.memoryStore();
+await memory.validate();
+const agent = new Agent({
+    id: "assistant",
+    model: model,
+    instructions: "Use prior conversation only when relevant.",
+    memory: { store: memory },
+});
+const session = { sessionId: conversation.id, userId: principal.id };
+const response = await agent.generate({
+    prompt: question,
+    session,
+});
+if (response.status === "completed") {
+    console.log(response.output);
+}
 ```
 
-Set `createIfMissing: false` when migrations provision the schema. Never allow an arbitrary web
-request to create database objects. The in-repository cookbook uses a small `MemoryStore`
+Apply `createPostgresMemorySchemaSql()` through migrations and call `validate()` at startup. Never
+allow an arbitrary web request to create database objects. The in-repository cookbook uses a small `MemoryStore`
 implementation to make the underlying contract visible.
 
 ## Expected behavior
@@ -75,8 +83,8 @@ failed completion, deletion, compaction, adapter outage, and retry behavior.
 
 ## Runnable references
 
-- [Conversation memory contract](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/01_basics/02-conversation-memory.ts)
-- [Session memory](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/01_basics/06-session-memory.ts)
+- [Conversation memory contract](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/01_basics/02-conversation-memory.ts)
+- [Session memory](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/01_basics/06-session-memory.ts)
 
 ## Extensions
 

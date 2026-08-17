@@ -7,23 +7,25 @@ Open `http://localhost:4021/ui/knowledge/dynamic-tools`.
 ## Register a dynamic tool index
 
 ```ts
-import { createToolIndex } from '@anvia/core/tool'
-
-const toolIndex = await createToolIndex(embeddingModel, [
-  getTicket,
-  lookupCustomer,
-  searchRunbooks,
-])
-
-const agent = new AgentBuilder('support-agent', model)
-  .dynamicTools(toolIndex, {
+import { createToolIndex } from '@anvia/core/tool';
+const toolIndex = await createToolIndex({
+    model: embeddingModel,
+    tools: [
+        getTicket,
+        lookupCustomer,
+        searchRunbooks,
+    ],
     topK: 2,
-    threshold: 0.75,
-  })
-  .build()
+    minScore: 0.75
+});
+const agent = new Agent({
+    id: 'support-agent',
+    model: model,
+    tools: [toolIndex],
+});
 ```
 
-At runtime, Anvia searches the tool index from the current prompt, applies the threshold and filter, and adds up to `topK` matching definitions to the model request. If the model selects one, Anvia resolves and executes the concrete tool from the index's backing tool set.
+At runtime, Anvia searches the tool index from the current prompt, applies the minScore and filter, and adds up to `topK` matching definitions to the model request. If the model selects one, Anvia resolves and executes the concrete tool from the index's backing catalog.
 
 ## Inspect the catalog
 
@@ -53,6 +55,6 @@ The general [Tools view](/studio/tools) also brings static, dynamic, and MCP-bac
 
 ## Improve weak selection
 
-Dynamic selection depends heavily on definition quality. Prefer specific action-oriented names, concrete descriptions, and parameter descriptions that include the language users actually use. If an unrelated tool appears, review its embedding text and threshold. If the correct tool never appears, check its index record, registration filter, and `topK` before increasing the entire catalog sent to the model.
+Dynamic selection depends heavily on definition quality. Prefer specific action-oriented names, concrete descriptions, and parameter descriptions that include the language users actually use. If an unrelated tool appears, review its embedding text and minScore. If the correct tool never appears, check its index record, registration filter, and `topK` before increasing the entire catalog sent to the model.
 
 For index construction, custom vector stores, filters, and safety policy, continue to [SDK dynamic tools](/sdk/advanced/dynamic-tools).

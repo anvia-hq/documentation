@@ -8,7 +8,10 @@ Gemini exposes separate model factories for completion, embeddings, two image AP
 import { GEMINI_2_5_FLASH_IMAGE, GeminiClient } from '@anvia/gemini'
 
 const model = new GeminiClient({ apiKey })
-  .imageGenerationModel(GEMINI_2_5_FLASH_IMAGE)
+    .imageGenerationModel({
+    api: 'generateContent',
+    modelId: GEMINI_2_5_FLASH_IMAGE,
+})
 
 const result = await model.imageGeneration({
   prompt: 'A minimal technical illustration of an agent pipeline',
@@ -24,17 +27,22 @@ This path calls `generateContent` with text and image response modalities. It sc
 ```ts
 import { IMAGEN_4_GENERATE } from '@anvia/gemini'
 
-const model = gemini.imagenGenerationModel(IMAGEN_4_GENERATE)
+const model = gemini.imageGenerationModel({
+  api: 'generateImages',
+  modelId: IMAGEN_4_GENERATE,
+})
 ```
 
 Imagen calls `generateImages` and reads `generatedImages[].image.imageBytes`. Keep it separate from the native Gemini factory; their request options are not interchangeable.
 
-Both image adapters reduce requested dimensions into an aspect-ratio string. Use `additionalParams.config` for supported provider controls.
+Both image adapters reduce requested dimensions into an aspect-ratio string. Use `providerOptions.config` for supported provider controls.
 
 ## Transcription
 
 ```ts
-const transcript = await gemini.transcriptionModel('gemini-2.5-flash')
+const transcript = await gemini.transcriptionModel({
+    modelId: 'gemini-2.5-flash'
+})
   .transcription({
     data: audioBytes,
     filename: 'interview.ogg',

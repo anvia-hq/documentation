@@ -1,73 +1,47 @@
 # Tool middleware
 
-**Type:** Pattern
-
-## Outcome
-
-Transform an oversized tool result before it returns to the model. Use middleware for cross-cutting
-controls such as size limits, redaction, normalization, or durable references that should apply to
-many tools.
-
-## Prerequisites
-
-- A working tool-enabled agent
-- `createMiddleware` from `@anvia/core/tool`
-- A protected storage boundary for any content moved out of the model context
-
-## Middleware and agent wiring
+Tool middleware applies cross-cutting controls after a handler returns but before its result goes back to the model. This example replaces oversized text with a compact reference.
 
 ```ts
 import { writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { createMiddleware } from '@anvia/core/tool'
+import { Agent, createMiddleware } from '@anvia/core'
 
 const outputGate = createMiddleware({
   async onToolOutput({ toolName, result, internalCallId }) {
-    if (typeof result !== 'string' || result.length <= 1_000) return undefined
+    if (result.length <= 1_000) {
+      return undefined
+    }
 
-    const path = join(tmpdir(), `${toolName}-${internalCallId}.txt`)
-    await writeFile(path, result, 'utf8')
+    const file = join(tmpdir(), `${toolName}-${internalCallId}.txt`)
+    await writeFile(file, result, 'utf8')
 
     return JSON.stringify({
       type: 'file_reference',
+      reason: 'tool_output_too_large',
       chars: result.length,
-      path,
+      path: file,
     })
   },
 })
 
-const agent = new AgentBuilder('analyst', model)
-  .tools([longReportTool])
-  .middleware(outputGate)
-  .defaultMaxTurns(2)
-  .build()
+const agent = new Agent({
+  id: 'analyst',
+  model,
+  instructions: 'Use tools when useful. Summarize results briefly.',
+  middlewares: [outputGate],
+  maxTurns: 2,
+  tools: [longReportTool],
+})
+
+const result = await agent.generate({
+    prompt: 'Create a short update from the onboarding report.'
+})
 ```
 
-`model` and `longReportTool` are configured separately. Returning `undefined` preserves the original
-output; returning a value replaces what the model receives.
+Returning `undefined` preserves the original serialized result. Returning a string replaces what the model receives. Middleware can also redact secrets, normalize output, enforce size limits, or create durable references consistently across tools.
 
-## Run and expected behavior
+The temporary-file example is only suitable for a local demonstration. In distributed production, write to tenant-scoped storage, return an opaque authorized ID, apply expiry and deletion, and never let the model choose storage paths or fetch arbitrary references.
 
-Prompt the agent to use `longReportTool`. A short string passes through. An output longer than 1,000
-characters is written to a file and replaced by compact JSON. The model sees the replacement, not
-the original report.
-
-## Boundaries
-
-The temporary-file example is a local demonstration, not a distributed storage design. File paths
-may leak infrastructure details and are useless to another host. Do not let a model choose storage
-paths or fetch arbitrary references. Redact sensitive data before logging or external storage and
-ensure later readers enforce authorization.
-
-In production, write to tenant-scoped object storage, return an opaque authorized ID, apply expiry
-and deletion, record hashes and size metadata, and fail closed if mandatory redaction cannot run.
-
-## Source and extensions
-
-Run the complete
-[tool-result middleware cookbook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/02_tools/10-tool-result-middleware.ts).
-Next, add MIME-aware storage, secret detection, or per-tool limits.
-
-- [Tool middleware](/sdk/tools/middleware)
-- [Hook middleware](/sdk/advanced/hooks/middleware)
+Continue with [tool middleware](/sdk/tools/middleware).

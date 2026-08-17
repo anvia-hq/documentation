@@ -1,7 +1,7 @@
 # Production
 
 - Inject an authenticated Chroma client configured for the intended server.
-- Pre-provision the collection and use `createIfMissing: false`.
+- Pre-provision the collection and call `validate()` at startup.
 - Keep embedding model, dimensions, and collection distance stable.
 - Monitor physical embeddings, not only logical source documents.
 - Use stable IDs and define deletion or corpus-replacement behavior.

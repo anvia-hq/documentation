@@ -30,7 +30,7 @@ new Studio(
 
 Open the Playground and select an agent. Its prompts appear above the composer when the current conversation has no messages. Selecting a card runs that prompt immediately.
 
-Quick prompts are Studio configuration. They do not change the agent's instructions, static context, memory, or tool set.
+Quick prompts are Studio configuration. They do not change the agent's instructions, static context, memory, or tools.
 
 ## Match the registered ID
 

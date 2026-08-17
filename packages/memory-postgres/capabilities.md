@@ -6,7 +6,7 @@ The Postgres adapter persists ordered messages and failed runs across processes.
 | --- | --- |
 | Shared persistence | Uses a `pg` client or pool |
 | Append serialization | Advisory transaction lock by default |
-| Schema bootstrap | Creates `pgcrypto`, tables, and index when enabled |
+| Schema bootstrap | `store.ensure()` creates `pgcrypto`, tables, and index |
 | Custom names | Prefix or explicit table names |
 | Inspection | Lists sessions and reads persisted transcripts |
 | Compaction | Atomically replaces history with conflict detection |

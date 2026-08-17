@@ -9,27 +9,35 @@ pnpm add @anvia/core @anvia/mistral
 Create the provider client on the server:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { MistralClient } from '@anvia/mistral'
 
 const mistral = new MistralClient({
-  apiKey: process.env.MISTRAL_API_KEY,
+  apiKey: process.env.MISTRAL_API_KEY!,
 })
 
-const agent = new AgentBuilder(
-  'assistant',
-  mistral.completionModel('mistral-large-latest'),
-).build()
+const agent = new Agent({
+  id: 'assistant',
+  model: mistral.completionModel({
+      modelId: 'mistral-large-latest'
+  }),
+})
 
-const result = await agent.prompt('Extract the launch risks.').send()
-console.log(result.output)
+const result = await agent.generate({
+    prompt: 'Extract the launch risks.'
+})
+
+if (result.status === 'completed') {
+  console.log(result.output)
+}
 ```
 
 ## Create embeddings
 
 ```ts
-const embeddings = mistral.embeddingModel('mistral-embed', {
-  maxBatchSize: 32,
+const embeddings = mistral.embeddingModel({
+    modelId: 'mistral-embed',
+    maxBatchSize: 32
 })
 
 const vectors = await embeddings.embedTexts([
@@ -40,7 +48,7 @@ const vectors = await embeddings.embedTexts([
 ## Process a document with OCR
 
 ```ts
-const ocr = mistral.ocrModel()
+const ocr = mistral.ocrModel({ modelId: 'mistral-ocr-latest' })
 const result = await ocr.ocr({
   source: {
     type: 'document_url',

@@ -1,30 +1,17 @@
 # Trust boundaries
 
-An MCP server is an external capability source. Connecting to it does not mean every listed tool is appropriate for every agent or user.
+An MCP server is an external capability source. Connecting does not make every listed tool appropriate for every agent or caller.
 
-## Keep responsibilities separate
+The application runtime owns transport credentials and connection scope. The agent factory owns which tools are exposed. Product services own user and tenant authorization. The MCP server owns remote validation. The public transport owns user-facing filtering.
 
-| Boundary | Owner |
-| --- | --- |
-| MCP transport credentials | Application runtime |
-| Which server tools are exposed | Agent factory and app policy |
-| User and tenant authorization | Runner and product services |
-| Remote tool validation | MCP server |
-| Product side effects | App-owned tool or reviewed remote service |
-| User-facing result filtering | Application transport or projection layer |
-
-Prompt instructions may describe policy, but they must not be its only enforcement.
-
-## Allow-list remote tools
-
-`.mcp([server])` registers every adapted tool. For privileged servers, inspect and select tools before building the agent:
+## 1. Allow-list remote tools
 
 ```ts
 import type { AnyTool } from '@anvia/core'
 
 async function allowMcpTools(
-  tools: AnyTool[],
-  allowedNames: Set<string>,
+  tools: readonly AnyTool[],
+  allowedNames: ReadonlySet<string>,
 ) {
   const reviewed: AnyTool[] = []
 
@@ -44,29 +31,35 @@ const docsTools = await allowMcpTools(
   new Set(['search_docs', 'read_doc']),
 )
 
-const agent = new AgentBuilder('docs-assistant', model)
-  .tools(docsTools)
-  .build()
+const agent = new Agent({
+  id: 'docs-assistant',
+  model,
+  tools: docsTools,
+})
 ```
 
-Review tool descriptions and schemas as well as names. A stable name can still acquire broader input or output behavior after a server update.
+Review descriptions, schemas, result shapes, and remote behavior as well as names. Re-review after server upgrades.
 
-## Constrain broad capabilities
+## 2. Constrain broad capability
 
-File, shell, database, browser, and network tools can cross major trust boundaries. Prefer a server configured with a narrow root, command allow-list, read-only credential, or restricted network identity.
+File, shell, database, browser, and network tools can cross major trust boundaries. Prefer narrow roots, command allow-lists, read-only credentials, restricted network identity, and sandboxing.
 
-If the remote server cannot enforce the product boundary you need, wrap its tools in app-owned policy or run the server in a constrained environment.
+If a remote server cannot enforce the product boundary, wrap its capability in application-owned policy or do not expose it.
 
-## Re-check product permissions
+## 3. Re-check product permission
 
-The MCP server may know whether its service credential can perform an action; it may not know whether the current product user should be allowed to request it.
+The server may know what its service credential can do but not what the current product user may request. Resolve caller scope in the runner, use scoped credentials where possible, and keep sensitive side effects behind product-owned authorization and approval.
 
-Resolve user and tenant scope in the runner, use scoped credentials where possible, and keep sensitive side effects behind product-owned checks and approval flows.
+Prompt instructions are not the only enforcement layer.
 
-## Filter remote output
+## 4. Prevent name collisions explicitly
 
-Remote results can contain sensitive fields, oversized payloads, misleading instructions, or unsafe media. Filter and redact them before user-facing transport. Do not expose raw MCP errors to the browser.
+Tool names form the model-facing routing contract. Audit names across local tools, MCP servers, and skills before agent construction.
 
-## Avoid name collisions
+Agent registration de-duplicates by name, and a later source can replace an earlier tool with the same name. Do not rely on construction to report collisions.
 
-Do not register an MCP tool with the same name as a local tool or a tool from another server. Names are part of the model-facing contract; collisions make routing and audit records ambiguous.
+## 5. Filter remote output
+
+Remote results can contain private fields, oversized payloads, misleading instructions, or unsafe media. Filter them before they enter a public response, and never return raw remote errors to the browser.
+
+Next, combine MCP with [local tools](/sdk/advanced/mcp/local-tools).

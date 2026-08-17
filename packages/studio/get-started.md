@@ -6,7 +6,7 @@ Install Studio beside Core in a local development entry point.
 pnpm add @anvia/studio @anvia/core
 ```
 
-Register built agents and pipelines, then bind the server to loopback:
+Register agents and built pipelines, then bind the server to loopback:
 
 ```ts
 import { Studio } from '@anvia/studio'

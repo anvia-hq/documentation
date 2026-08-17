@@ -1,53 +1,54 @@
 # Dynamic context
 
-Dynamic context automatically retrieves relevant documents before every agent turn. It gives the model focused knowledge without placing the full corpus in every request.
-
-## Explore dynamic context
-
-| Page | Learn how to |
-| --- | --- |
-| [Add context](/sdk/advanced/dynamic-context/add-context) | Attach a prepared vector index to an agent. |
-| [Formatting](/sdk/advanced/dynamic-context/formatting) | Turn search results into concise model-ready documents. |
-| [Filters and permissions](/sdk/advanced/dynamic-context/filters) | Scope retrieval with trusted application state. |
-| [Multiple indexes](/sdk/advanced/dynamic-context/multiple-indexes) | Combine independent knowledge sources without flooding the prompt. |
-
-## How it works
+Dynamic context retrieves relevant documents before each agent model turn. It gives the model focused evidence without sending an entire corpus with every request.
 
 ```text
-Current prompt → vector search → filter and rank → format documents → model turn
+Current prompt -> vector search -> filter -> format -> model documents
 ```
 
-For each turn, Anvia searches every registered dynamic-context index with the current runtime prompt. Matching results are converted into documents and sent with that turn's model request.
+In v1, dynamic context is represented by `createVectorContext({ store, model, ... })`. Static documents and retrieval-backed vector contexts both belong in the agent's `context` array.
 
-Retrieval runs again after a tool call. A later turn can therefore receive different documents as the conversation and tool results change.
-
-## Add automatic retrieval
+## 1. Add automatic retrieval
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
-import { vectorFilter } from '@anvia/core/vector-store'
-
-const agent = new AgentBuilder('docs-support', model)
-  .instructions('Use retrieved documentation when it is relevant.')
-  .dynamicContext(docsIndex, {
+import { Agent, createVectorContext } from '@anvia/core';
+import { vectorFilter } from '@anvia/core/vector-store';
+const docsContext = createVectorContext({
+    store: docsIndex,
+    model: embeddingModel,
     topK: 5,
-    threshold: 0.72,
-    filter: vectorFilter.eq('published', true),
-  })
-  .build()
+    minScore: 0.72,
+    filter: vectorFilter.eq('published', true)
+});
+const agent = new Agent({
+    id: 'docs-support',
+    model,
+    instructions: 'Use retrieved documentation when it is relevant.',
+    context: [docsContext],
+});
 ```
 
-`docsIndex` must implement `VectorSearchIndex`. Prepare and populate the index outside the request path; see [Knowledges](/sdk/knowledges) for ingestion, embeddings, and vector stores.
+`docsIndex` must implement `VectorStore`. Prepare and populate it outside the request path; see [Knowledges](/sdk/knowledges) for ingestion, embeddings, and vector stores.
 
-## Choose the right source
+## 2. Understand turn-by-turn retrieval
 
-| Requirement | Use |
-| --- | --- |
-| Small facts safe for every run | Static `.context(...)` |
-| Relevant documents selected every turn | `.dynamicContext(...)` |
-| Optional, model-directed search | `index.asTool(...)` |
-| Live or permissioned product data | A scoped tool |
-| A large searchable tool catalog | `.dynamicTools(...)` |
+Before a model turn, Anvia derives retrieval text from the current prompt and searches each context index. Matching results are formatted as documents and included in that turn's provider request.
 
-Dynamic context is read-only evidence. It should not replace service calls for current account state or actions that need validation, authorization, and audit.
+Retrieval runs again when a tool result or steering message creates another turn. The next search can therefore return different evidence.
 
+## 3. Choose the right source boundary
+
+Use static `context` documents for a small set of facts that is safe and useful on every turn.
+
+Use `createVectorContext()` for relevant documents selected automatically on each turn.
+
+Use `createVectorSearchTool()` when search is optional or the model should refine its query.
+
+Use a scoped application tool for live account state, permission checks, and actions. Retrieved vector data can be stale and must not authorize a side effect.
+
+## 4. Continue through the section
+
+- [Add a context index](/sdk/advanced/dynamic-context/add-context)
+- [Format retrieved results](/sdk/advanced/dynamic-context/formatting)
+- [Enforce filters and permissions](/sdk/advanced/dynamic-context/filters)
+- [Combine multiple indexes](/sdk/advanced/dynamic-context/multiple-indexes)

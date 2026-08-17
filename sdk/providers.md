@@ -1,83 +1,83 @@
 # Providers
 
-Provider packages connect Anvia's runtime contracts to model vendors. Your application creates a provider client, asks it for a capability-specific model, and passes that model into an agent, completion, extractor, or pipeline.
+Provider packages adapt vendor SDKs to Anvia's runtime contracts. The application creates a provider client, asks it for a capability-specific model, and injects that model into Core.
 
 ```text
-Provider client          Model object                 Runtime
-credentials              one capability              product behavior
-endpoint          ──→     completionModel(...)   ──→     AgentBuilder
-SDK configuration        embeddingModel(...)         createCompletion
-                         transcriptionModel(...)     pipelines
+Provider client        Capability model        Anvia runtime
+credentials            completionModel()       Agent
+endpoint        ->      embeddingModel()  ->   generateCompletion
+SDK options             transcriptionModel()   Pipeline stages
 ```
 
-This boundary keeps credentials and vendor configuration out of prompts, tools, and product code.
+This boundary keeps credentials and vendor configuration out of prompts, tools, and product logic.
 
-## Start here
-
-| Page | Use it to |
-| --- | --- |
-| [Model boundary](/sdk/providers/model-boundary) | Understand what the client, model, and runtime each own. |
-| [Choose a provider](/sdk/providers/choose-a-provider) | Turn workflow requirements into a provider shortlist. |
-| [Capability matrix](/sdk/providers/capability-matrix) | Compare the capabilities exposed by current Anvia adapters. |
-
-Then open the guide for the provider you selected:
-
-| Provider | Anvia package | Best starting point |
-| --- | --- | --- |
-| [OpenAI](/sdk/providers/openai) | `@anvia/openai` | Completions plus a broad set of embedding and media models. |
-| [Anthropic](/sdk/providers/anthropic) | `@anvia/anthropic` | Claude completions through Anthropic or Vertex AI. |
-| [Gemini](/sdk/providers/gemini) | `@anvia/gemini` | Gemini API or Vertex AI, including embeddings and media capabilities. |
-| [Mistral](/sdk/providers/mistral) | `@anvia/mistral` | Completions, embeddings, and OCR. |
-| [Grok](/packages/grok) | `@anvia/grok` | xAI completions, live search, media generation, and transcription. |
-| [Compatible APIs](/sdk/providers/compatible) | OpenAI or Anthropic adapter | Endpoints that intentionally implement one of those API shapes. |
-
-## The common setup
-
-Install Core and only the provider packages the application uses:
+## 1. Install only what the application uses
 
 ```sh
 pnpm add @anvia/core @anvia/openai
 ```
 
-Create the client in a server-only module:
+Available provider guides cover:
+
+- [OpenAI](/sdk/providers/openai) through `@anvia/openai`
+- [Anthropic](/sdk/providers/anthropic) through `@anvia/anthropic`
+- [Gemini](/sdk/providers/gemini) through `@anvia/gemini`
+- [Mistral](/sdk/providers/mistral) through `@anvia/mistral`
+- [Grok](/packages/grok) through `@anvia/grok`
+- [Compatible APIs](/sdk/providers/compatible) through an OpenAI- or Anthropic-shaped adapter
+
+## 2. Create models at a server boundary
 
 ```ts
 import { OpenAIClient } from '@anvia/openai'
 
 const openai = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 
-export const supportModel = openai.completionModel('gpt-5')
+export const supportModel =
+  openai.completionModel({
+      modelId: 'gpt-5.5',
+      api: "responses"
+  })
 ```
 
-The result is an Anvia `CompletionModel`. The rest of the workflow does not need the provider SDK:
+The returned object satisfies Anvia's `CompletionModel`. Inject it into the runtime:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { supportModel } from './models'
 
-export const supportAgent = new AgentBuilder('support', supportModel)
-  .instructions('Answer support questions clearly and concisely.')
-  .defaultMaxTurns(4)
-  .build()
+export const supportAgent = new Agent({
+  id: 'support',
+  model: supportModel,
+  instructions:
+    'Answer support questions clearly and concisely.',
+  maxTurns: 4,
+})
 ```
 
-Keep API keys, endpoints, headers, and provider SDK clients on the server or in workers. A browser should call an application-owned route or stream endpoint.
+Keep provider clients, API keys, endpoints, and custom headers in server or worker code. Browsers should call application-owned routes.
 
-## Capabilities are more important than brands
+## 3. Choose a capability before a brand
 
-A provider package may expose several model factories, and each factory represents a different contract. A completion model cannot be used as an embedding model merely because both come from the same provider.
+A provider client may expose several independent contracts:
 
 ```ts
-const chat = openai.completionModel('gpt-5')
-const embeddings = openai.embeddingModel('text-embedding-3-small')
+const chat = openai.completionModel({
+    modelId: 'gpt-5.5'
+})
+const embeddings = openai.embeddingModel({
+    modelId: 'text-embedding-3-small'
+})
 ```
 
-Choose the capability first, then evaluate providers and exact model IDs. It is normal for one application to use different providers for chat, embeddings, OCR, or evaluation.
+A completion model cannot be used for embeddings merely because both come from one provider. It is normal to use different providers for conversation, retrieval, OCR, transcription, and evaluation.
 
-## Adapter support is not model support
+## 4. Verify the actual configuration
 
-The [capability matrix](/sdk/providers/capability-matrix) describes what each Anvia adapter can represent. It does not guarantee that every model ID, account, region, or custom endpoint supports the same request.
+Adapter capabilities describe what Anvia can map. They do not prove that every model ID, account, region, or compatible endpoint enables the same feature.
 
-Before shipping, exercise the actual configuration your workflow depends on: streaming, tool choice, structured output, media input, and any provider-specific parameters. Model listing is useful for inventory, but it is not proof of those capabilities.
+Before shipping, exercise the exact production path for streaming, tool choice, structured output, media, and provider parameters. Model listing proves inventory, not behavior.
+
+Continue with the [model boundary](/sdk/providers/model-boundary), [provider selection](/sdk/providers/choose-a-provider), and [capability declarations](/sdk/providers/capability-matrix).

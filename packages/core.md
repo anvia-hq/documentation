@@ -15,35 +15,42 @@ pnpm add @anvia/core zod
 ## Build a useful agent
 
 ```ts
-import { AgentBuilder, createTool } from '@anvia/core'
+import { Agent, createTool } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 import { z } from 'zod'
 
 const model = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
-}).completionModel('gpt-5')
+    apiKey: process.env.OPENAI_API_KEY!,
+}).completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
+})
 
 const lookupOrder = createTool({
   name: 'lookup_order',
   description: 'Look up an order by id.',
-  input: z.object({ orderId: z.string() }),
+  inputSchema: z.object({ orderId: z.string() }),
   execute: async ({ orderId }) => ({
     orderId,
     status: 'processing',
   }),
 })
 
-const supportAgent = new AgentBuilder('support', model)
-  .instructions('Help customers understand their order status.')
-  .tools([lookupOrder])
-  .defaultMaxTurns(4)
-  .build()
+const supportAgent = new Agent({
+  id: 'support',
+  model: model,
+  instructions: 'Help customers understand their order status.',
+  maxTurns: 4,
+  tools: [lookupOrder],
+})
 
-const response = await supportAgent
-  .prompt('What is happening with order A123?')
-  .send()
+const response = await supportAgent.generate({
+    prompt: 'What is happening with order A123?'
+})
 
-console.log(response.output)
+if (response.status === 'completed') {
+  console.log(response.output)
+}
 ```
 
 The model, credentials, business data, permissions, storage, and deployment remain application-owned. Core coordinates the run around dependencies supplied by the application.
@@ -54,16 +61,16 @@ The model, credentials, business data, permissions, storage, and deployment rema
 | --- | --- | --- |
 | Agents | `@anvia/core/agent` | Stateful model-and-tool loops with instructions and runtime policy |
 | Completions | `@anvia/core/completion` | Direct model requests, streaming, messages, and parsed results |
-| Tools | `@anvia/core/tool` | Typed tools, middleware, approvals, tool sets, and dynamic discovery |
+| Tools | `@anvia/core/tool` | Typed tools, middleware, approvals, and dynamic discovery |
 | Memory | `@anvia/core/memory` | Conversation persistence and compaction contracts |
 | Retrieval | `@anvia/core/embeddings`, `@anvia/core/vector-store` | Embedding documents and searching vector indexes |
 | Pipelines | `@anvia/core/pipeline` | Typed multi-stage workflows, batches, graphs, and run events |
-| Media | `@anvia/core/image-generation`, `@anvia/core/audio-generation`, `@anvia/core/transcription` | Provider-neutral media requests |
-| Runtime control | `@anvia/core/hooks`, `@anvia/core/guardrails` | Intercepting runs and enforcing input/output policy |
+| Media | `@anvia/core/image-generation`, `@anvia/core/speech-generation`, `@anvia/core/transcription` | Provider-neutral media requests |
+| Runtime control | `@anvia/core/agent`, `@anvia/core/guardrails` | Lifecycle observation and enforced input/output policy |
 | Integration | `@anvia/core/mcp`, `@anvia/core/skills`, `@anvia/core/observability` | External tools, reusable instructions, and run telemetry |
 | Evaluation | `@anvia/core/evals` | Typed evaluation suites, metrics, reporters, and CLI output |
 
-The root `@anvia/core` entry point re-exports the most common agent, completion, tool, hook, memory, guardrail, and UI-stream APIs. Prefer a capability subpath when it makes ownership clearer or when the symbol is not available from the root.
+The root `@anvia/core` entry point re-exports the most common agent, completion, tool, memory, guardrail, lifecycle, and UI-stream APIs. Prefer a capability subpath when it makes ownership clearer or when the symbol is not available from the root.
 
 ## Common patterns
 
@@ -73,11 +80,11 @@ Create provider clients near the server boundary, then pass their completion, em
 
 ### Use direct completions for one model call
 
-Choose `createCompletion` or `createParsedCompletion` when a workflow does not need agent turns or tool execution. See [Completions](/sdk/completions) and [Structured output](/sdk/structured-output).
+Choose `generateCompletion` or `generateCompletion` when a workflow does not need agent turns or tool execution. See [Completions](/sdk/completions) and [Structured output](/sdk/structured-output).
 
 ### Keep persistence behind contracts
 
-Agents accept `MemoryStore`, `AgentEventStore`, and `VectorSearchIndex` implementations. Start with an in-memory implementation during development, then replace it with the adapter that matches production storage. See [Memory](/sdk/memory) and [Knowledges](/sdk/knowledges).
+Agents accept memory stores and retrieval indexes through public contracts. Start with an in-memory implementation during development, then replace it with the adapter that matches production storage. See [Memory](/sdk/memory) and [Knowledges](/sdk/knowledges).
 
 ### Keep tool authorization in the application
 
@@ -93,7 +100,7 @@ Schemas validate model-produced arguments; they do not authorize a user or tenan
 | Schema library | Zod 4 |
 | Runtime boundary | Modern JavaScript runtimes; individual entry points may require runtime-specific capabilities |
 
-Core's contracts are broadly portable, but not every entry point has the same environment needs. File/PDF loaders need file or binary access, MCP `stdio` needs a process-capable server runtime, and web-stream adapters need `ReadableStream`. Keep those APIs on the server unless the target runtime explicitly supports them.
+Core's contracts are broadly portable, but not every entry point has the same environment needs. PDF extraction needs binary access, MCP `stdio` needs a process-capable server runtime, and web-stream adapters need `ReadableStream`. Keep those APIs on the server unless the target runtime explicitly supports them.
 
 ## Continue learning
 
@@ -105,4 +112,4 @@ Core's contracts are broadly portable, but not every entry point has the same en
 - [Register agents in Studio](/studio/configure/register-agents-and-pipelines)
 - [Inspect tools in Studio](/studio/tools)
 
-For exact exports and signatures, use the [API reference](/packages/core/api-reference). For release history, read the [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/core/CHANGELOG.md).
+For exact exports and signatures, use the [API reference](/packages/core/api-reference). For release history, read the [source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/core/CHANGELOG.md).

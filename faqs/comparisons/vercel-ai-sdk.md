@@ -2,7 +2,7 @@
 
 _Last reviewed: August 2026_
 
-Vercel AI SDK is a provider-agnostic TypeScript toolkit for AI applications and agents. Its strongest distinguishing surface is the combination of a unified model layer with polished streaming UI integrations. Anvia overlaps in provider abstraction, completions, tools, agents, streaming, and React state, but extends a different runtime boundary around memory, pipelines, hooks, skills, persistence adapters, Studio, and Lens.
+Vercel AI SDK is a provider-agnostic TypeScript toolkit for AI applications and agents. Its strongest distinguishing surface is the combination of a unified model layer with polished streaming UI integrations. Anvia overlaps in provider abstraction, completions, tools, agents, streaming, and React state, but extends a different runtime boundary around memory, pipelines, lifecycle callbacks, skills, persistence adapters, Studio, and Lens.
 
 ## What AI SDK does especially well
 
@@ -30,7 +30,7 @@ These are shared capabilities, not reasons by themselves to prefer one stack.
 
 AI SDK’s center is the model-to-application and model-to-UI path. Its primitives are easy to use directly inside application routes, and its UI protocol connects server generation to several web frameworks.
 
-Anvia’s center is a reusable runtime object. An application constructs provider models, tools, stores, indexes, observers, and services, then injects them into completions, agents, extractors, or [typed pipelines](/sdk/pipelines). Agent runs expose a normalized lifecycle across turns, tools, memory, hooks, approvals, and nested work.
+Anvia’s center is a reusable runtime object. An application constructs provider models, tools, stores, indexes, observers, and services, then injects them into completions, agents, extractors, or [typed pipelines](/sdk/pipelines). Agent runs expose a normalized lifecycle across turns, tools, memory, approvals, and nested work.
 
 Anvia also separates surrounding products:
 
@@ -45,7 +45,7 @@ This does not mean AI SDK applications cannot add memory, workflows, observabili
 
 Anvia is a good fit when the application needs one or more of the following:
 
-- agents and deterministic pipelines sharing tools, models, hooks, and events;
+- agents and deterministic pipelines sharing tools, models, lifecycle policy, and events;
 - first-party conversation memory contracts and storage adapters;
 - provider-neutral media, embedding, retrieval, and model-listing contracts;
 - local runtime inspection in Studio plus a separate self-hosted Lens deployment;
@@ -79,4 +79,3 @@ Their model, message, tool, and stream types are not interchangeable. Translate 
 - [Streaming](/sdk/streaming)
 - [React package](/packages/react)
 - [Server package](/packages/server)
-

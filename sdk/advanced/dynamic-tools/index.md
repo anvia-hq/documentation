@@ -1,86 +1,76 @@
 # Tool index
 
-A dynamic tool index connects semantic search results to the concrete tools Anvia can execute.
+A `ToolIndex` joins semantic search policy with the concrete tools an agent can execute.
 
-## Create an in-memory index
-
-```ts
-import { createToolIndex } from '@anvia/core/tool'
-
-const toolIndex = await createToolIndex(
-  embeddingModel,
-  allSupportTools,
-  {
-    metadata(tool) {
-      return {
-        productArea: tool.name.startsWith('billing_')
-          ? 'billing'
-          : 'support',
-        risk: tool.name.includes('refund')
-          ? 'high'
-          : 'normal',
-      }
-    },
-  },
-)
-```
-
-`createToolIndex(...)` resolves every tool definition, embeds its searchable text, builds an in-memory vector index, and retains the concrete tools in a backing `ToolSet`.
-
-Tool-definition or embedding failures reject the call. Build required catalogs before accepting agent requests.
-
-## Attach search policy
+## 1. Create an in-memory index
 
 ```ts
-import { vectorFilter } from '@anvia/core/vector-store'
-
-const agent = new AgentBuilder('billing-support', model)
-  .dynamicTools(toolIndex, {
-    topK: 6,
-    threshold: 0.72,
-    filter: vectorFilter.eq('productArea', 'billing'),
-  })
-  .build()
-```
-
-| Option | Purpose |
-| --- | --- |
-| `topK` | Maximum matching definitions added for one turn. |
-| `threshold` | Rejects weak semantic matches. |
-| `filter` | Restricts eligible tools by trusted metadata. |
-
-## What happens each turn
-
-1. Anvia derives search text from the current runtime prompt.
-2. The index returns relevant tool documents.
-3. Threshold and metadata filtering narrow the results.
-4. Matching definitions are added to the model request.
-5. If the model selects one, Anvia resolves it from `toolIndex.toolSet` and executes it.
-
-Search repeats on later turns. A result from one tool can make another tool relevant to the next model call.
-
-## Use your own vector store
-
-`embedTools(...)` returns embedded tool documents when the catalog should live in another vector database:
-
-```ts
-import { embedTools } from '@anvia/core/tool'
-
-const documents = await embedTools(
-  embeddingModel,
-  supportToolSet,
-  {
+import { Agent } from '@anvia/core';
+import { createToolIndex } from '@anvia/core/tool';
+import { vectorFilter } from '@anvia/core/vector-store';
+const billingIndex = await createToolIndex({
+    model: embeddingModel,
+    tools: supportTools,
+    topK: 5,
+    minScore: 0.72,
     metadata: (_tool, definition) => ({
-      productArea: definition.name.split('_')[0],
+        productArea: definition.name.split('_')[0],
+        risk: definition.name.includes('refund') ? 'high' : 'normal',
     }),
-  },
-)
-
-await vectorStore.upsertDocuments(documents)
+    filter: vectorFilter.eq('productArea', 'billing')
+});
+const agent = new Agent({
+    id: 'billing-support',
+    model,
+    tools: [billingIndex],
+});
 ```
 
-A custom `DynamicToolIndex` must expose both the search contract and the backing `toolSet`. Use `isDynamicToolIndex(...)` when validating an unknown adapter value.
+`topK` is required and must be a positive safe integer. `minScore`, when supplied, must be finite. `filter` restricts matches using metadata produced while embedding.
 
-## Keep the catalog current
+## 2. Know what creation does
 
-Rebuild or re-index when a tool name, description, parameters, metadata, or implementation set changes. A stale vector record may retrieve a definition that no longer matches the executable tool contract.
+`createToolIndex()` performs these steps before it resolves:
+
+1. Deduplicate tools by name, with the last occurrence winning.
+2. Resolve each definition with an empty prompt.
+3. Build searchable text and optional metadata.
+4. Embed those records.
+5. Store them in an `InMemoryVectorStore`.
+6. Return a `ToolIndex` containing search methods, policy, and concrete tools.
+
+Definition or embedding failures reject index creation. Build required catalogs during startup or worker initialization so failures occur before requests are accepted.
+
+## 3. Search on every eligible turn
+
+The agent calls `index.search()` with the current text, `topK`, `minScore`, and `filter`. It resolves each matching `toolName` against `index.tools`, then asks that tool for its current model-facing definition.
+
+Search runs for user text and for textual tool results on later turns. It does not run when the current message yields no search text.
+
+## 4. Use another vector store
+
+`embedTools()` prepares portable embedded records without creating the in-memory index:
+
+```ts
+import { embedTools } from '@anvia/core/tool';
+const { documents } = await embedTools({
+    model: embeddingModel,
+    tools: supportTools,
+    metadata: (_tool, definition) => ({
+        productArea: definition.name.split('_')[0],
+    })
+});
+await externalStore.upsert({
+    documents: documents
+});
+```
+
+An external adapter supplied to an agent must implement the complete `ToolIndex` contract: `kind: 'tool-index'`, the concrete `tools`, `topK`, optional `minScore` and `filter`, plus `search()`. `inspect()` is optional.
+
+Use `isToolIndex()` to check unknown adapter values, but treat that as a structural check rather than proof that search results and concrete tools agree.
+
+## 5. Keep definitions synchronized
+
+Rebuild or re-index when a tool name, description, parameters, embedding text, metadata, or implementation set changes. A stored match must name a tool present in the backing catalog; unmatched records are skipped at runtime.
+
+Next, improve [embedding text](/sdk/advanced/dynamic-tools/embedding-text).

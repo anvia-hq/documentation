@@ -17,7 +17,7 @@
 
 ## Completion behavior
 
-`AnthropicCompletionModel` maps Anvia history, documents, tools, tool choice, multimodal message parts, usage, and streaming events to Anthropic Messages. It accepts either the standard `Anthropic` client or `AnthropicVertex` client.
+The completion handles returned by `AnthropicClient` and `AnthropicVertexClient` map Anvia history, documents, tools, tool choice, multimodal message parts, usage, and streaming events to Anthropic Messages.
 
 Known Claude IDs expose model-aware context information. Custom model strings remain accepted for compatible services, but no context metadata is inferred for unknown IDs.
 

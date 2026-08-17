@@ -8,21 +8,25 @@
 pnpm add @anvia/memory-postgres @anvia/core
 ```
 
-The package includes `pg` and peers with `@anvia/core >=0.13.0 <1.0.0`.
+The package includes `pg` and should be installed with the matching `@anvia/core` release candidate.
 
 ## Connect a store
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
-import { createPostgresMemoryStore } from '@anvia/memory-postgres'
+import { Agent } from '@anvia/core/agent'
+import { PostgresMemoryClient } from '@anvia/memory-postgres'
 
-const memory = await createPostgresMemoryStore({
-  connectionString: process.env.DATABASE_URL,
+const memoryClient = new PostgresMemoryClient({
+  connectionString: process.env.DATABASE_URL!,
 })
+const memory = memoryClient.memoryStore()
+await memory.ensure()
 
-const agent = new AgentBuilder('support', model)
-  .memory(memory, { savePolicy: 'turn' })
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  memory: { store: memory, savePolicy: 'turn' },
+})
 ```
 
 You may pass a compatible client or pool instead of `connectionString`. Pool-like clients let the adapter acquire and release a connection for each transaction.
@@ -38,7 +42,7 @@ You may pass a compatible client or pool instead of `connectionString`. Pool-lik
 
 ## Own the schema in production
 
-The development-friendly default is `createIfMissing: true`. It creates the `pgcrypto` extension, sessions, messages, errors, and the unique message-position index.
+Calling `store.ensure()` creates the `pgcrypto` extension, sessions, messages, errors, and the unique message-position index.
 
 For controlled deployments, generate the same SQL and apply it through your migration system:
 
@@ -53,11 +57,13 @@ const sql = createPostgresMemorySchemaSql({
 Then connect without DDL at application startup:
 
 ```ts
-const memory = await createPostgresMemoryStore({
-  connectionString: process.env.DATABASE_URL,
-  tablePrefix: 'app_',
-  createIfMissing: false,
+const memoryClient = new PostgresMemoryClient({
+  connectionString: process.env.DATABASE_URL!,
 })
+const memory = memoryClient.memoryStore({
+  tablePrefix: 'app_',
+})
+await memory.validate()
 ```
 
 Keep the schema options identical in the migration and runtime configuration. Explicit `tableNames` override the prefix for individual tables.
@@ -67,9 +73,11 @@ Keep the schema options identical in the migration and runtime configuration. Ex
 The default scope combines `sessionId` and `userId`. Add tenant metadata when needed:
 
 ```ts
-const memory = await createPostgresMemoryStore({
-  connectionString: process.env.DATABASE_URL,
-  scope: {
+const memoryClient = new PostgresMemoryClient({
+  connectionString: process.env.DATABASE_URL!,
+})
+const memory = memoryClient.memoryStore({
+  scopeKey: {
     metadataKeys: ['tenantId'],
   },
   lock: 'advisory',
@@ -81,7 +89,7 @@ Advisory locking serializes position assignment for concurrent appends to the sa
 ## Production patterns
 
 - Reuse an application-managed pool when connection ownership and shutdown are already centralized.
-- Apply DDL through migrations and use `createIfMissing: false` in runtime processes.
+- Apply DDL through migrations and call `store.validate()` in runtime processes.
 - Monitor table growth and decide how long conversation and error histories should remain.
 - Keep `validateMessages: true` unless validated messages are guaranteed upstream.
 - Review custom names as identifiers, not arbitrary SQL fragments; the adapter validates and quotes them.
@@ -92,5 +100,5 @@ See [Memory sessions](/sdk/memory/sessions) for context design and [Custom store
 
 - [API reference](/packages/memory-postgres/api-reference)
 - [Memory store adapters](/sdk/memory/store-adapters)
-- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/memory-postgres)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-postgres/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/memory-postgres)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/memory-postgres/CHANGELOG.md)

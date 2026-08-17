@@ -77,7 +77,7 @@ Agent, generation, tool, timing, and error evidence
 
 The evaluation result tells you that behavior missed an expectation. The trace helps explain why.
 
-Trace coverage below 100% is not automatically an evaluation failure, but it limits diagnosis and makes operational metrics less representative. It means at least one trace referenced by evaluation results was not available to the run summary. If trace linkage is required, configure the reporter with `onMissingTrace: 'throw'` and run the suite with `failOnReporterError: true`.
+Trace coverage below 100% is not automatically an evaluation failure, but it limits diagnosis and makes operational metrics less representative. It means at least one trace referenced by evaluation results was not available to the run summary. If trace linkage is required, configure the reporter with `onMissingTrace: 'throw'` and run the suite with `reporterErrorPolicy: 'throw'`.
 
 ## Missing payloads are not missing results
 

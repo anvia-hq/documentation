@@ -9,33 +9,37 @@ pnpm add @anvia/core @anvia/grok
 Create a client for xAI’s API:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { GrokClient, tools as grokTools } from '@anvia/grok'
 
 const grok = new GrokClient({
-  apiKey: process.env.XAI_API_KEY,
+  apiKey: process.env.XAI_API_KEY!,
 })
 
-const agent = new AgentBuilder('researcher', grok.completionModel())
-  .tools([
-    grokTools.webSearch({ allowedDomains: ['x.ai'] }),
-    grokTools.codeInterpreter(),
-  ])
-  .defaultMaxTurns(5)
-  .build()
+const agent = new Agent({
+  id: 'researcher',
+  model: grok.completionModel({ modelId: 'grok-4.5', api: 'responses' }),
+  maxTurns: 5,
+  tools: [grokTools.webSearch({ allowedDomains: ['x.ai'] }), grokTools.codeInterpreter()],
+})
 
-const result = await agent.prompt('Summarize recent xAI product updates.').send()
-console.log(result.output)
-console.log(result.sources)
+const result = await agent.generate({
+    prompt: 'Summarize recent xAI product updates.'
+})
+
+if (result.status === 'completed') {
+  console.log(result.output)
+  console.log(result.sources)
+}
 ```
 
-Responses is the default completion API and `grok-4.5` is the default model. Provider tools require the Responses adapter.
+The example selects Responses and `grok-4.5` explicitly. Provider tools require the Responses adapter.
 
 ## Add media
 
 ```ts
-const image = grok.imageGenerationModel()
-const speech = grok.audioGenerationModel()
+const image = grok.imageGenerationModel({ modelId: 'grok-imagine-image' })
+const speech = grok.speechGenerationModel()
 const transcription = grok.transcriptionModel()
 ```
 

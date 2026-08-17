@@ -1,50 +1,45 @@
 # MCP checklist
 
-Review the connection, capability set, and product boundary before shipping MCP-backed agents.
+Review connection ownership, capability scope, data handling, and operations before shipping an MCP-backed agent.
 
 ## Connection and lifecycle
 
-- Keep MCP credentials and endpoints server-side.
-- Use a stable, meaningful name for every server.
-- Decide whether each connection is shared, tenant-scoped, or job-scoped.
+- Keep credentials and endpoints server-side.
+- Give every server a stable name.
+- Choose shared, tenant, request, or job connection scope deliberately.
 - Close shared connections during shutdown.
 - Close short-lived connections in `finally`.
-- Define whether startup continues when an optional server is unavailable.
+- Decide whether an unavailable optional server degrades or fails startup.
 
 ## Tool review
 
-- Allow-list tools appropriate for the agent's role.
-- Review names, descriptions, input schemas, and result shapes.
-- Re-review tools after server upgrades.
-- Avoid name collisions across local and MCP sources.
+- Allow-list tools appropriate for the agent role.
+- Review names, descriptions, input schemas, result shapes, and side effects.
+- Re-review after server upgrades.
+- Detect name collisions before agent construction.
 - Constrain file, command, database, browser, and network access.
 
 ## Authorization and data
 
 - Enforce user and tenant policy outside prompt text.
-- Keep sensitive product writes in app-owned permission paths.
-- Validate tool input on the remote server.
-- Redact private fields from results and errors.
-- Bound large text, image, resource, and binary results.
+- Keep sensitive product writes in application-owned permission paths.
+- Validate remote tool input on the MCP server.
+- Redact private result and error fields.
+- Bound text, image, resource, and binary results.
 - Treat remote content as untrusted model input.
 
 ## Operations
 
-- Trace MCP calls with the server name and parent run ID.
-- Distinguish connection, remote tool, model, and local tool failures.
-- Map remote failures to safe user-facing messages.
-- Monitor latency, error rate, tool-list changes, and cleanup failures.
-- Test degraded behavior when an optional server is unavailable.
+- Correlate MCP calls with server and parent run IDs.
+- Distinguish connection, listing, argument, remote tool, model, and local tool failures.
+- Map raw failures to safe public messages.
+- Monitor latency, errors, tool-list changes, and cleanup failures.
+- Test degraded behavior for optional servers.
 
-## Test the boundary
+## Boundary tests
 
-| Scenario | Verify |
-| --- | --- |
-| Server adds an unreviewed tool | Agent does not receive it. |
-| User lacks product permission | Remote action is not allowed. |
-| MCP returns private or oversized data | Result is filtered or rejected. |
-| Remote call returns `isError` | Runner maps the failure safely. |
-| Agent run throws | Short-lived server still closes. |
-| Local and MCP tools share a name | Agent construction or review catches it. |
+Verify that a newly listed unreviewed tool does not reach the agent, unauthorized callers cannot perform remote actions, private or oversized output is filtered, and `isError` results are mapped safely.
 
-An MCP integration is production-ready only when the application can explain which server supplied a tool, why the agent was allowed to call it, and how the connection is cleaned up.
+Verify that short-lived servers close when the run throws and name collisions are caught by the application's review step.
+
+The integration is ready only when the application can explain which server supplied a tool, why the caller and agent were allowed to invoke it, how its output is filtered, and who closes the connection.

@@ -57,15 +57,15 @@ The entire import must be valid. One import accepts up to 10,000 cases and rejec
 Evaluation code reads published versions using the same Lens project connection:
 
 ```ts
-import { createLensDatasetClient, lens } from '@anvia/lens'
+import { LensClient } from '@anvia/lens'
 
-const tracing = lens.create()
-const datasets = createLensDatasetClient(tracing)
+const lens = new LensClient()
+const datasets = lens.datasetClient()
 
-const dataset = await datasets.getDataset<string, string>(
-  'support-policy-cases',
-  { version: 'v1' },
-)
+const dataset = await datasets.getDataset<string, string>({
+  name: 'support-policy-cases',
+  version: 'v1',
+})
 
 const result = await runEvalSuite({
   name: 'support-policy-regression',

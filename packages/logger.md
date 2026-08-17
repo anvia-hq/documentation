@@ -11,7 +11,7 @@ pnpm add @anvia/core @anvia/logger
 ## Log an agent run
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { createConsoleLogger, createLoggerObserver } from '@anvia/logger'
 
 const logger = createConsoleLogger({
@@ -19,9 +19,13 @@ const logger = createConsoleLogger({
   name: 'support-agent',
 })
 
-const agent = new AgentBuilder('support', model)
-  .observe(createLoggerObserver(logger))
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  observability: {
+    observers: { logger: createLoggerObserver({ logger }) },
+  },
+})
 ```
 
 Use `createPinoLogger` when the application already uses Pino or needs a custom destination stream. Use `logger.child()` to attach stable request, tenant, or service fields without rebuilding them for every call.
@@ -50,4 +54,4 @@ The package is a server-side logging adapter and declares `@anvia/core` as a pee
 - [Production](/packages/logger/production)
 - [Public API](/packages/logger/api-reference)
 - [Releases](/packages/logger/releases)
-- [Hooks and run control](/sdk/advanced/hooks)
+- [Lifecycle and run control](/sdk/advanced/hooks)

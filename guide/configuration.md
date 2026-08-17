@@ -8,10 +8,13 @@ Anvia configuration is application code. Create concrete dependencies at the edg
 import { OpenAIClient } from '@anvia/openai'
 
 const client = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 
-const model = client.completionModel('gpt-5')
+const model = client.completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
+})
 ```
 
 Keep provider credentials on the server. To change vendors, create a model from another provider package and pass it through the same core APIs.
@@ -19,27 +22,29 @@ Keep provider credentials on the server. To change vendors, create a model from 
 ## Agent defaults
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 
-const agent = new AgentBuilder('support', model)
-  .name('Support')
-  .description('Answers support questions.')
-  .instructions('Answer clearly and ask for missing details.')
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  name: 'Support',
+  description: 'Answers support questions.',
+  instructions: 'Answer clearly and ask for missing details.',
+  maxTurns: 4,
+})
 ```
 
 Turn limits bound model/tool loops. A tool-assisted answer usually needs one turn to request the tool and another to use its result.
 
 ## Request overrides
 
-Configure exceptional requests at the prompt level instead of creating a second agent:
+Configure exceptional runs through `generate(...)` options instead of creating a second agent:
 
 ```ts
-const response = await agent
-  .prompt('Summarize this ticket in one sentence.')
-  .maxTurns(2)
-  .send()
+const response = await agent.generate({
+    prompt: 'Summarize this ticket in one sentence.',
+    maxTurns: 2
+})
 ```
 
 ## Memory
@@ -54,16 +59,19 @@ npx prisma migrate dev --name add_anvia_memory
 ```
 
 ```ts
-import { createPrismaMemoryStore } from '@anvia/memory-prisma'
+import { PrismaMemoryStore } from '@anvia/memory-prisma'
 import { prisma } from './db'
 
-const memory = createPrismaMemoryStore(prisma, {
-  scope: { metadataKeys: ['tenantId'] },
+const memory = new PrismaMemoryStore({
+  client: prisma,
+  scopeKey: { metadataKeys: ['tenantId'] },
 })
 
-const agent = new AgentBuilder('assistant', model)
-  .memory(memory, { savePolicy: 'turn' })
-  .build()
+const agent = new Agent({
+  id: 'assistant',
+  model: model,
+  memory: { store: memory, savePolicy: 'turn' },
+})
 ```
 
 `savePolicy: 'turn'` stores complete model and tool turns together. Use stable product identifiers in storage scope and enforce authorization before calling the agent.
@@ -73,7 +81,14 @@ const agent = new AgentBuilder('assistant', model)
 `@anvia/server` emits JSONL by default. Use SSE only when the client requires `text/event-stream` compatibility:
 
 ```ts
-return createEventStream(agent.prompt(messages).stream(), { format: 'sse' })
+const events = agent.stream({
+    messages
+})
+
+return createClientStreamResponse({
+  events: agentToClientStream({ events }),
+  format: 'sse',
+})
 ```
 
 ## Logging payloads

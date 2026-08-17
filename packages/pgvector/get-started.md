@@ -5,21 +5,24 @@ pnpm add @anvia/core @anvia/pgvector pg pgvector
 ```
 
 ```ts
-import { PgVectorStore } from '@anvia/pgvector'
-
-const store = await PgVectorStore.connect({
-  client: pool,
-  tableName: 'support_docs',
-  vectorSize: 1536,
-  distance: 'cosine',
-  createIfMissing: false,
-})
-
-await store.upsertDocuments(documents)
-const index = store.index(embeddings)
+import { retrieveDocuments } from '@anvia/core/vector-store';
+import { PgVectorClient } from '@anvia/pgvector';
+const storeClient = new PgVectorClient({
+    client: pool
+});
+const store = storeClient.vectorStore({
+    tableName: 'support_docs',
+    dimensions: 1536,
+    metric: "cosine"
+});
+await store.validate();
+await store.upsert({
+    documents: documents
+});
+const results = await retrieveDocuments({ store, model: embeddings, query, topK: 5 });
 ```
 
-The table and `vector` extension must exist when creation is disabled. `connect()` validates that the embedding column exists and has the configured dimension.
+The table and `vector` extension must exist before `validate()`. Use `ensure()` when this process may create missing infrastructure; both methods check the configured dimensions.
 
 Without `client`, pass `connectionString`; the adapter otherwise creates a `pg` pool using standard environment behavior.
 

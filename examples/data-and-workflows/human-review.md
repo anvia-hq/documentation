@@ -29,20 +29,22 @@ Anvia draft pipeline -> application review record (pending)
 
 ```ts
 const Draft = z.object({
-  action: z.literal("issue_refund"),
-  orderId: z.string(),
-  amount: z.number().positive(),
-  rationale: z.string(),
+    action: z.literal("issue_refund"),
+    orderId: z.string(),
+    amount: z.number().positive(),
+    rationale: z.string(),
+});
+const draft = Draft.parse(await refundDraftPipeline.run({
+    input: requestText
+}));
+const review = await reviews.create({
+    tenantId,
+    draft,
+    draftHash: sha256(JSON.stringify(draft)),
+    state: "pending",
+    createdBy: actor.id,
 });
 
-const draft = Draft.parse(await refundDraftPipeline.run(requestText));
-const review = await reviews.create({
-  tenantId,
-  draft,
-  draftHash: sha256(JSON.stringify(draft)),
-  state: "pending",
-  createdBy: actor.id,
-});
 ```
 
 ## Approval and execution boundaries
@@ -93,6 +95,6 @@ a sandbox payment account in integration tests.
 
 ## Source and extensions
 
-- Related cookbook approval flow: [`09_studio/03-tool-approval.ts`](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/09_studio/03-tool-approval.ts)
-- Read [tool control](/sdk/advanced/hooks/tool-control) and [hook production guidance](/sdk/advanced/hooks/production-guidance).
+- Related cookbook approval flow: [`09_studio/03-tool-approval.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/09_studio/03-tool-approval.ts)
+- Read [tool control](/sdk/advanced/hooks/tool-control) and [lifecycle production guidance](/sdk/advanced/hooks/production-guidance).
 - Extend with multi-step approval, reviewer comments, or confidence-based routing.

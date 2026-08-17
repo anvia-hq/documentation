@@ -7,7 +7,7 @@ Use the root package for a convenient combined API or import a component family 
 ## Install
 
 ```sh
-pnpm add @anvia/react-ui @anvia/react react react-dom
+pnpm add @anvia/react-ui @anvia/react @anvia/client react react-dom
 ```
 
 Import the optional base stylesheet once:
@@ -21,6 +21,7 @@ You can omit it and style the stable `data-anvia-*` attributes or the classes pa
 ## Compose a chat interface
 
 ```tsx
+import { createHttpClientTransport } from '@anvia/client'
 import { useChat } from '@anvia/react'
 import {
   ChatProvider,
@@ -31,7 +32,8 @@ import {
 import '@anvia/react-ui/styles.css'
 
 export function SupportChat() {
-  const chat = useChat({ endpoint: '/api/chat' })
+  const transport = createHttpClientTransport({ endpoint: '/api/chat', format: 'jsonl' })
+  const chat = useChat({ transport })
 
   return (
     <ChatProvider controller={chat}>
@@ -108,7 +110,7 @@ Markdown output and tool results may contain model-produced content. Treat custo
 | Package format | ESM |
 | React peer dependency | `>=18` |
 | React DOM peer dependency | `>=18` |
-| `@anvia/react` peer dependency | `>=0.9.0 <1.0.0` |
+| `@anvia/react` peer dependency | Matching `1.0.0-rc.x` release candidate |
 | Styling | Optional public CSS entry points |
 
 The components target React DOM and use browser behavior for rich composer, selection, image, and attachment interactions. Render browser-dependent interactions on the client when using an SSR framework.
@@ -120,4 +122,4 @@ The components target React DOM and use browser behavior for rich composer, sele
 - [Streaming event types](/sdk/streaming/event-types)
 - [Approvals and questions in Studio](/studio/playground/approvals-and-questions)
 
-For exact exports, compound parts, and controller types, use the [API reference](/packages/react-ui/api-reference). For release history, read the [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/react-ui/CHANGELOG.md).
+For exact exports, compound parts, and controller types, use the [API reference](/packages/react-ui/api-reference). For release history, read the [source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/react-ui/CHANGELOG.md).

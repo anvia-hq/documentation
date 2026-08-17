@@ -22,21 +22,23 @@ format permitted documents → answer. The question never supplies `tenantId`, r
 Store flat filterable metadata at embedding time:
 
 ```ts
-const embedded = await embedDocuments(embeddingModel, documents, {
-  id: (document) => document.id,
-  content: (document) => document.text,
-  metadata: (document) => ({
-    tenantId: document.tenantId,
-    visibility: document.visibility,
-    status: document.status,
-  }),
+const { documents: embedded } = await embedDocuments({
+    model: embeddingModel,
+    documents: documents,
+    id: (document) => document.id,
+    content: (document) => document.text,
+    metadata: (document) => ({
+        tenantId: document.tenantId,
+        visibility: document.visibility,
+        status: document.status,
+    })
 });
 ```
 
 ## Derive the eligibility filter
 
 ```ts
-import { vectorFilter } from "@anvia/core/vector-store";
+import { retrieveDocuments, vectorFilter } from "@anvia/core/vector-store";
 
 function filterFor(principal: Principal) {
   const visibility = principal.role === "manager"
@@ -48,15 +50,21 @@ function filterFor(principal: Principal) {
 
   return vectorFilter.and(
     vectorFilter.eq("tenantId", principal.tenantId),
-    vectorFilter.eq("status", "published"),
-    visibility,
+    vectorFilter.and(vectorFilter.eq("status", "published"), visibility),
   );
 }
 
-const results = await index.search({ query, topK: 5, filter: filterFor(principal) });
+const results = await retrieveDocuments({
+  store,
+  model: embeddingModel,
+  query,
+  topK: 5,
+  filter: filterFor(principal),
+});
 ```
 
-The same filter can be passed to `AgentBuilder.dynamicContext(index, { filter, topK: 5 })`.
+The same filter can be passed to `createVectorContext({ store, model, topK, filter })` and included in the
+agent's `context` array.
 
 ## Expected behavior
 
@@ -84,7 +92,7 @@ metadata, stale sessions, filter injection, unpublished content, and pagination/
 
 ## Runnable references
 
-- [Filters and LSH](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/02-filters-and-lsh.ts)
+- [Filters and LSH](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/02-filters-and-lsh.ts)
 - [Customer-support RAG application](/examples/applications/customer-support-rag)
 
 ## Extensions

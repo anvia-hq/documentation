@@ -1,9 +1,10 @@
 # Releases
 
-The current source manifest is `@anvia/core` **0.26.0**. The source changelog is authoritative; this page highlights recent compatibility milestones rather than reproducing every patch.
+The current source manifest is `@anvia/core` **1.0.0-rc.2**. The source changelog is authoritative; the entries below preserve notable v0 compatibility milestones.
 
 | Version | Summary |
 | --- | --- |
+| `1.0.0-rc.2` | Prepared the synchronized Anvia 1.0 package train for its first public release candidate. |
 | `0.26.0` | Hardened MCP HTTP and SSE connections against SSRF, including DNS rebinding, redirects, and OAuth metadata requests; custom transport fetch implementations are rejected. |
 | `0.25.1` | Published updated upstream runtime dependencies. |
 | `0.25.0` | Expanded evaluation CLI handling, deterministic and abstention metrics, totals, score direction, usage/cost aggregation, negative controls, and richer typed suite/reporting contracts. |
@@ -23,4 +24,4 @@ The current source manifest is `@anvia/core` **0.26.0**. The source changelog is
 - Re-run type checking and tests for tool calls, streams, memory persistence, and custom observers after a Core upgrade.
 - Check whether new provider-neutral fields require adapter updates even when application code does not use them directly.
 
-Read the complete [Core changelog](https://github.com/anvia-hq/anvia/blob/main/packages/core/CHANGELOG.md) and verify the installed version with your package manager before applying migration assumptions.
+Read the complete [Core changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/core/CHANGELOG.md) and verify the installed version with your package manager before applying migration assumptions.

@@ -1,83 +1,118 @@
 # Getting started
 
-This quickstart verifies a provider model, wraps it in an agent, and runs one prompt. You need an ESM-compatible TypeScript project, `pnpm`, and an OpenAI API key.
+This tutorial verifies a provider model, wraps it in reusable agent behavior, and runs both a complete and streaming response. You need an ESM-compatible TypeScript project, `pnpm`, and an OpenAI API key.
 
-## Install the runtime
+## 1. Install the release candidate
+
+Install the provider-neutral runtime and the OpenAI adapter from the same release channel. The `rc` tag prevents a v0 stable package from being mixed with the v1 API shown here.
 
 ```bash
-pnpm add @anvia/core @anvia/openai
+pnpm add @anvia/core@rc @anvia/openai@rc
 ```
 
-Set your provider credentials in the environment:
+Keep the provider credential in your application's environment:
 
 ```bash
 export OPENAI_API_KEY=...
 ```
 
-## Verify the model
+## 2. Create the model
 
-Call the model directly before adding agent behavior. This isolates credentials and provider setup from the rest of the runtime.
+Provider clients are explicit dependencies. They receive credentials from your configuration layer and create models that satisfy Anvia's provider-neutral completion contract.
 
 ```ts
-import { createCompletion } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 
-const client = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
+const apiKey = process.env.OPENAI_API_KEY
+
+if (!apiKey) {
+  throw new Error('OPENAI_API_KEY is required')
+}
+
+const client = new OpenAIClient({ apiKey })
+const model = client.completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
 })
+```
 
-const model = client.completionModel('gpt-5')
+Changing providers later only changes this construction step. The agent can continue depending on the same model interface.
 
-const result = await createCompletion(model, {
-  instructions: 'Answer clearly and concisely.',
-  input: 'Summarize Anvia in one sentence.',
+## 3. Verify one completion
+
+Call the model directly before adding agent behavior. This isolates credentials, model access, and provider configuration from the model/tool loop.
+
+```ts
+import { generateCompletion } from '@anvia/core'
+
+const result = await generateCompletion({
+    prompt: 'Summarize Anvia in one sentence.',
+    model,
+    instructions: 'Answer clearly and concisely.'
 })
 
 console.log(result.text)
 ```
 
-`createCompletion` returns visible `text`, normalized `content`, token `usage`, and the full normalized `response`. It does not run tools, save memory, or loop through agent turns.
+`generateCompletion()` makes one provider call. It returns typed `output`, visible `text`, normalized `content`, token `usage`, and `rawResponse`; it does not run tools or save memory.
 
-## Build an agent
+## 4. Define reusable agent behavior
 
-Once the provider works, wrap the model in reusable runtime behavior:
+An agent keeps instructions, limits, tools, context, and other runtime dependencies together. In v1, that configuration goes directly into the constructor.
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 
-const agent = new AgentBuilder('support', model)
-  .instructions('Answer support questions clearly and ask for missing details.')
-  .defaultMaxTurns(4)
-  .build()
+const supportAgent = new Agent({
+  id: 'support',
+  model,
+  instructions: 'Answer support questions clearly. Ask for missing details.',
+  maxTurns: 4,
+})
 ```
 
-The agent depends on the provider-neutral model interface. Changing providers does not require moving provider-specific code into the agent.
+`maxTurns` limits the number of model turns in a run. Tool-assisted agents often need more than one turn because the model must request a tool, receive its result, and then answer.
 
-## Send a prompt
+## 5. Generate an answer
+
+`generate()` runs the agent until it completes or pauses for tool approval. The result status makes that boundary explicit.
 
 ```ts
-const response = await agent
-  .prompt('Explain what the Anvia runtime owns.')
-  .send()
+const response = await supportAgent.generate({
+    prompt: 'Explain what the Anvia runtime owns.'
+})
+
+if (response.status === 'approval_required') {
+  throw new Error(`Approval required for ${response.approval.toolName}`)
+}
 
 console.log(response.output)
+console.log(response.usage)
 ```
 
-The response includes the final `output`, accumulated `usage`, run `messages`, and trace metadata when tracing is enabled.
+A completed response also contains normalized messages, a run ID, context usage when available, and trace metadata when tracing is enabled.
 
-## Stream a response
+## 6. Stream the same agent
 
-Use the same prompt with `stream()` when a UI or CLI should update while the run is active:
+Use `stream()` when a terminal or interface should update while the run is active. It yields provider-neutral events rather than provider-specific stream chunks.
 
 ```ts
-for await (const event of agent.prompt('Draft a short launch note.').stream()) {
-  if (event.type === 'text_delta') process.stdout.write(event.delta)
-  if (event.type === 'final') console.log(event.usage)
+for await (const event of supportAgent.stream({
+    prompt: 'Draft a short launch note.'
+})) {
+  if (event.type === 'text_delta') {
+    process.stdout.write(event.delta)
+  }
+
+  if (event.type === 'final') {
+    process.stdout.write('\n')
+    console.log(event.result.usage)
+  }
 }
 ```
 
-Agent streams include text, reasoning, tool calls, tool results, turn boundaries, final run metadata, and errors.
+Agent streams can also include reasoning deltas, tool calls, tool results, turn boundaries, approval requests, final run metadata, and errors.
 
 ## Next
 
-Continue with [Core concepts](/guide/core-concepts), then [Build applications](/use-cases/build-applications) when you are ready to expose the agent from a server.
+Continue with [Core concepts](/guide/core-concepts) to understand the runtime pieces, then [Build applications](/use-cases/build-applications) when you are ready to expose the agent from a server.

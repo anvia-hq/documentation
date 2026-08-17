@@ -4,88 +4,39 @@ All public symbols are exported from `@anvia/milvus`.
 
 ```ts
 import {
-  filterToMilvusExpr,
-  MilvusVectorIndex,
+  MilvusVectorClient,
   MilvusVectorStore,
+  filterToMilvusExpr,
   type MilvusClientLike,
   type MilvusMetric,
-  type MilvusVectorStoreConnectOptions,
+  type MilvusVectorClientOptions,
+  type MilvusVectorStoreOptions,
 } from '@anvia/milvus'
 ```
 
-## filterToMilvusExpr
+## MilvusVectorClient
 
 ```ts
-function filterToMilvusExpr(
-  filter: VectorFilter | undefined,
-): string | undefined
+class MilvusVectorClient {
+  constructor(options?: MilvusVectorClientOptions)
+  vectorStore<T, Metadata extends VectorMetadata = VectorMetadata>(
+    options: MilvusVectorStoreOptions,
+  ): MilvusVectorStore<T, Metadata>
+  close(): Promise<void>
+}
 ```
 
-Returns a Milvus filter expression, or `undefined` when no filter is supplied.
+`MilvusVectorClientOptions` accepts an injected `client?: MilvusClientLike`, or `address?: string` and optional `token`. `MilvusVectorStoreOptions` contains `collectionName`, `dimensions`, and optional `metric`. The native `MilvusMetric` values are `'COSINE' | 'L2' | 'IP'`.
 
 ## MilvusVectorStore
 
 ```ts
-class MilvusVectorStore<
-  T,
-  Metadata extends VectorMetadata = VectorMetadata,
-> {
-  static connect<T, Metadata extends VectorMetadata = VectorMetadata>(
-    options: MilvusVectorStoreConnectOptions,
-  ): Promise<MilvusVectorStore<T, Metadata>>
-
-  upsertDocuments(
-    documents: Array<EmbeddedDocument<T, Metadata>>,
-  ): Promise<void>
-
-  index(model: EmbeddingModel): MilvusVectorIndex<T, Metadata>
-}
+await store.ensure()
+await store.validate()
+await store.upsert({ documents, providerOptions })
+const results = await store.search({ vector, topK, minScore, filter, providerOptions, abortSignal })
 ```
 
-## MilvusVectorIndex
-
-```ts
-class MilvusVectorIndex<
-  T,
-  Metadata extends VectorMetadata = VectorMetadata,
-> implements VectorSearchIndex<T, Metadata> {
-  constructor(
-    model: EmbeddingModel,
-    client: MilvusClientLike,
-    collectionName: string,
-  )
-
-  search(request: VectorSearchRequest): Promise<Array<VectorSearchResult<T, Metadata>>>
-  searchIds(request: VectorSearchRequest): Promise<Array<{ score: number; id: string }>>
-  asTool(options: VectorSearchToolOptions): Tool<{ query: string; topK?: number }, unknown>
-}
-```
-
-## Types
-
-```ts
-type MilvusMetric = 'COSINE' | 'L2' | 'IP'
-
-type MilvusClientLike = {
-  hasCollection(options: {
-    collection_name: string
-  }): Promise<{ value: boolean }>
-  createCollection(options: Record<string, unknown>): Promise<unknown>
-  createIndex(options: Record<string, unknown>): Promise<unknown>
-  loadCollection(options: {
-    collection_name: string
-  }): Promise<unknown>
-  insert(options: Record<string, unknown>): Promise<unknown>
-  search(options: Record<string, unknown>): Promise<unknown>
-}
-
-type MilvusVectorStoreConnectOptions = {
-  client?: MilvusClientLike
-  collectionName: string
-  vectorSize: number
-  createIfMissing?: boolean
-  metric?: MilvusMetric
-}
-```
+`filterToMilvusExpr(filter)` converts an Anvia `VectorFilter` to a Milvus expression.
 
 Return to the [package guide](/packages/milvus).

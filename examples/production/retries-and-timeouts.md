@@ -20,16 +20,15 @@ timeouts in the provider or HTTP client chosen by the application.
 ## Retry boundary
 
 ```ts
-const response = await agent
-  .prompt(message)
-  .withCompletionRetries({
-    maxAttempts: 3,
-    initialDelayMs: 200,
-    maxDelayMs: 2_000,
-    shouldRetry: ({ error, streaming }) =>
-      !streaming && isTransientProviderFailure(error),
-  })
-  .send();
+const response = await agent.generate({
+    prompt: message,
+    retries: {
+        maxAttempts: 3,
+        initialDelayMs: 200,
+        maxDelayMs: 2000,
+        shouldRetry: ({ error, streaming }) => !streaming && isTransientProviderFailure(error),
+    }
+});
 ```
 
 `maxAttempts` includes the initial attempt. Anvia adds randomized exponential delay up to the cap.
@@ -46,8 +45,8 @@ adapter exposes them. For tools, pass an application `AbortSignal` into the clie
 const lookup = createTool({
   name: "lookup_order",
   description: "Read an order from the commerce service.",
-  input: z.object({ orderId: z.string() }),
-  output: Order,
+  inputSchema: z.object({ orderId: z.string() }),
+  outputSchema: Order,
   async execute({ orderId }) {
     return commerce.getOrder(orderId, {
       signal: AbortSignal.timeout(5_000),
@@ -60,17 +59,23 @@ Anvia does not turn an arbitrary `Promise.race()` timeout into cancellation of p
 deadline that only stops waiting can leave the underlying call running, so use a client that
 actually accepts an abort signal.
 
-For a UI stream, cancelling the `ReadableStream` stops consuming the Anvia async iterator:
+For a custom browser UI, abort the active HTTP request:
 
 ```ts
-const stream = promptRequest.readableStream();
-request.signal.addEventListener("abort", () => {
-  void stream.cancel("Client disconnected");
-}, { once: true });
+const controller = new AbortController();
+
+const response = await fetch("/api/chat", {
+  method: "POST",
+  body: JSON.stringify(payload),
+  signal: controller.signal,
+});
+
+controller.abort();
 ```
 
-This is a consumer cancellation boundary; whether the provider's network request is aborted depends
-on the adapter and transport.
+This is a consumer cancellation boundary. A normal `createClientStreamResponse()` response closes the
+active agent iterator when its reader disconnects; whether provider network work has already
+completed still depends on the adapter and transport.
 
 ## Run and expected behavior
 
@@ -92,6 +97,6 @@ effects. Include one integration test against a mock HTTP server that hangs and 
 
 ## Source and extensions
 
-- Source: [`request/retry.ts`](https://github.com/anvia-hq/anvia/blob/main/packages/core/src/request/retry.ts)
+- Source: [`retry.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/core/src/retry.ts)
 - Read [stream errors and cancellation](/sdk/streaming/errors-and-cancellation) and [failure recovery](/examples/data-and-workflows/failure-recovery).
 - Add circuit breaking, provider fallback, and an operation-wide deadline budget.

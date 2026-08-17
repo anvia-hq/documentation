@@ -1,38 +1,20 @@
-# Hooks and middleware
+# Lifecycle and middleware
 
-Hooks control whether runtime work proceeds. Middleware transforms data as it moves through the runtime.
+Lifecycle observes immutable runtime snapshots. Middleware transforms data moving through completion and tool boundaries.
 
-## Choose by responsibility
-
-| Need | Use |
-| --- | --- |
-| Cancel a run because of policy | Hook |
-| Skip or approve a tool call | Hook |
-| React to run, turn, or completion lifecycle | Hook |
-| Redact a completion request | Middleware |
-| Normalize tool input or output | Middleware |
-| Add metadata or instrumentation to runtime data | Middleware |
-| Collect passive telemetry | Observer |
-
-The distinction is control flow versus transformation. If code decides whether the run continues, it is a hook.
-
-## Control with a hook
+## 1. Observe with lifecycle
 
 ```ts
-import { createHook } from '@anvia/core'
-
-const policyHook = createHook({
-  onToolCall({ toolName, tool }) {
-    if (toolName === 'export_customer_data' && !scope.canExport) {
-      return tool.skip('Data export is not permitted.')
-    }
+const lifecycle: AgentLifecycle = {
+  onToolFinish({ toolName, success, durationMs }) {
+    toolMetrics.record({ toolName, success, durationMs })
   },
-})
+}
 ```
 
-The hook returns a runtime action. It does not rewrite the tool result.
+Lifecycle callback return values are ignored. Throwing fails the run rather than replacing data.
 
-## Transform with middleware
+## 2. Transform with middleware
 
 ```ts
 import { createMiddleware } from '@anvia/core'
@@ -40,33 +22,39 @@ import { createMiddleware } from '@anvia/core'
 const hideInternalErrors = createMiddleware({
   onToolOutput({ result }) {
     if (result.includes('INTERNAL_')) {
-      return 'The tool returned an internal service error.'
+      return 'The service returned an internal error.'
     }
   },
 })
 ```
 
-The middleware returns replacement data. It does not cancel the run.
+Returning `undefined` keeps the current value. Tool output middleware may return replacement text or an object containing replacement text and structured result content.
 
-## Attach at the same scope
+Middleware also supports `onCompletionRequest`, `onCompletionResponse`, and `onToolInput`. Preserve valid request and response shapes when replacing them.
 
-Stable behavior belongs on the agent:
-
-```ts
-const agent = new AgentBuilder('support', model)
-  .hook(policyHook)
-  .middleware(hideInternalErrors)
-  .build()
-```
-
-Request-local behavior belongs on the prompt request:
+## 3. Attach stable and request-local behavior
 
 ```ts
-const result = await agent
-  .prompt(message)
-  .withHook(policyHook)
-  .withMiddleware(hideInternalErrors)
-  .send()
+const agent = new Agent({
+  id: 'support',
+  model,
+  lifecycle,
+  middlewares: [hideInternalErrors],
+})
+
+const result = await agent.generate({
+    prompt: message,
+    lifecycle: requestLifecycle,
+    middlewares: [requestRedaction]
+})
 ```
 
-Keep authorization in the tool handler even when a hook gates the call. Keep schema validation intact even when middleware transforms input or output.
+Agent middleware runs before request-local middleware. Each middleware receives the current value and the original boundary value.
+
+## 4. Choose the other public controls
+
+Use guardrails when model input or output must be allowed, blocked, or rewritten with a recorded policy decision.
+
+Use `requiresApproval` when a tool must suspend before execution. Keep authorization and schema validation in the tool itself even when middleware redacts its model-facing result.
+
+Next, apply the [production guidance](/sdk/advanced/hooks/production-guidance).

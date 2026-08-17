@@ -4,18 +4,18 @@
 
 ```ts
 const mistral = new MistralClient({
-  apiKey: process.env.MISTRAL_API_KEY,
-  serverURL: 'https://api.mistral.ai',
+  apiKey: process.env.MISTRAL_API_KEY!,
+  baseUrl: 'https://api.mistral.ai',
 })
 ```
 
 | Option | Purpose |
 | --- | --- |
 | `apiKey` | Required when `client` is not supplied. |
-| `serverURL` | Overrides the official SDK server URL. |
+| `baseUrl` | Overrides the official SDK base URL. |
 | `client` | Reuses an initialized `Mistral` SDK client. |
 
-The option is spelled `serverURL` to match the official SDK, not `baseUrl`.
+Managed options and `client` injection are mutually exclusive.
 
 ## Inject the official client
 
@@ -31,9 +31,10 @@ Use injection when native Mistral APIs and Anvia model contracts should share cr
 ## Embeddings
 
 ```ts
-const embeddings = mistral.embeddingModel('mistral-embed', {
-  dimensions: 1024,
-  maxBatchSize: 16,
+const embeddings = mistral.embeddingModel({
+    modelId: 'mistral-embed',
+    dimensions: 1024,
+    maxBatchSize: 16
 })
 ```
 
@@ -41,10 +42,10 @@ The current implementation forwards `dimensions` to Mistral and exposes it on th
 
 ## Completion and OCR pass-through
 
-Completion request `additionalParams` is merged without allowing it to replace the adapter’s `model` or `messages`. OCR `additionalParams` likewise cannot replace `model` or `document`; explicitly typed OCR options are applied afterward.
+Completion request `providerOptions` is merged without allowing it to replace the adapter’s `model` or `messages`. OCR `providerOptions` likewise cannot replace `model` or `document`; explicitly typed OCR options are applied afterward.
 
 This ordering protects the selected model and normalized source while still allowing supported provider options.
 
 ## Runtime
 
-The package is ESM, includes declarations, uses the official Mistral SDK, and peers on `@anvia/core >=0.7.1 <1.0.0`. OCR byte uploads and server credentials make it a server-side integration.
+The package is ESM, includes declarations, uses the official Mistral SDK, and should be installed with the matching `@anvia/core` release candidate. OCR byte uploads and server credentials make it a server-side integration.

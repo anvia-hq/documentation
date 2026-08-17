@@ -1,27 +1,92 @@
 # Reasoning
 
-Some providers return reasoning content, sources, tool metadata, or generation details. Treat these as operational data rather than automatically user-visible content.
+Some providers return reasoning text, summaries, signatures, encrypted data, or redacted placeholders alongside visible assistant text. Treat reasoning as operational model content, not as automatically user-visible output.
 
-## Reasoning content
+## 1. Create simple reasoning content
 
 ```ts
-import { AssistantContent, Message } from '@anvia/core'
+import type { AssistantMessage } from '@anvia/core'
 
-const assistant = Message.assistant([
-  AssistantContent.reasoningSummary(
-    'The available evidence points to a payment authorization failure.',
-  ),
-  AssistantContent.text(
-    'The checkout failed while the payment was being authorized.',
-  ),
-])
+const assistant: AssistantMessage = {
+  role: 'assistant',
+  content: [
+    {
+      type: 'reasoning',
+      id: 'reasoning_123',
+      text: 'The payment provider rejected the authorization.',
+    },
+    { type: 'text', text: 'The checkout failed while the payment was being authorized.' },
+  ],
+}
 ```
 
-Assistant helpers also support text reasoning, structured provider content, encrypted blocks, and redacted blocks. Display-safe text is separate from opaque provider reasoning data.
+The optional ID can be important when a provider expects reasoning state to be preserved in later history.
 
-## Generation metadata
+## 2. Preserve structured provider reasoning
 
-Assistant messages created by agent runs can include normalized generation details such as provider, model, usage, context usage, sources, and provider-executed tool calls.
+Preserve provider reasoning representations in `details`:
+
+```ts
+const reasoning: ReasoningPart = {
+  type: 'reasoning',
+  id: 'reasoning_123',
+  text: 'Checked the payment evidence.Authorization failed.',
+  details: [
+    { type: 'summary', text: 'Checked the payment evidence.' },
+    { type: 'encrypted', data: encryptedReasoning },
+    { type: 'text', text: 'Authorization failed.', signature: 'sig_123' },
+    { type: 'redacted', data: redactedMarker },
+  ],
+}
+```
+
+The reasoning object's `text` field contains only displayable `text` and `summary` values. Encrypted and redacted data stays opaque.
+
+## 3. Keep visible output separate
+
+`generateCompletion().text` and an agent's final `output` are built from assistant `text` blocks, not reasoning blocks:
+
+```ts
+const result = await generateCompletion({
+    prompt: 'Explain the incident.',
+    model
+})
+
+console.log(result.text)
+
+for (const item of result.content) {
+  if (item.type === 'reasoning') {
+    console.log(item.text)
+  }
+}
+```
+
+This separation lets an application render the answer without accidentally exposing operational reasoning. Decide deliberately whether summaries are safe for a specific internal interface.
+
+## 4. Handle reasoning streams
+
+Streaming models can emit `reasoning_delta` events with an ID, content type, and optional signature:
+
+```ts
+for await (const event of agent.stream({
+    prompt: input
+})) {
+  if (event.type === 'reasoning_delta') {
+    recordReasoningDelta({
+      id: event.id,
+      type: event.contentType,
+      delta: event.delta,
+      signature: event.signature,
+    })
+  }
+}
+```
+
+Encrypted or redacted deltas may contain opaque data rather than display text. Filter them before client transport and preserve them only when provider continuity or an explicit audit policy requires it.
+
+## 5. Read generation metadata
+
+Assistant messages created by agent runs include normalized generation metadata:
 
 ```ts
 import { getAssistantGenerationMetadata } from '@anvia/core'
@@ -29,12 +94,15 @@ import { getAssistantGenerationMetadata } from '@anvia/core'
 const generation = getAssistantGenerationMetadata(message)
 
 console.log(generation?.provider)
-console.log(generation?.model)
+console.log(generation?.modelId)
 console.log(generation?.usage.totalTokens)
+console.log(generation?.contextUsage)
+console.log(generation?.sources)
+console.log(generation?.providerToolCalls)
 ```
 
-The helper returns `undefined` for manual, legacy, or malformed messages.
+The helper returns `undefined` for non-assistant messages and for missing or malformed framework metadata.
 
-## Decide what to retain
+Choose separately what is retained for conversation continuity, sent to observability, stored for audit, and shown to users. Reasoning, tool details, sources, and provider metadata may contain sensitive information.
 
-Choose separately what is used for conversation continuity, sent to observability, stored for audit, and shown to users. Raw provider responses, reasoning, tool details, and metadata may contain sensitive information or create unnecessary retention risk.
+Continue with [Transcripts](/sdk/messages/transcripts).

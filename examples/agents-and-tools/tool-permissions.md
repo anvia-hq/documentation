@@ -1,79 +1,66 @@
 # Tool permissions
 
-**Type:** Pattern
+Authorization belongs at the tool's application boundary. Build tools from authenticated scope so a model cannot grant itself access by changing prompt text or tool arguments.
 
-## Outcome
-
-Use a hook to allow, skip, or cancel a tool call before its handler executes. Use this as a policy
-boundary around sensitive reads and actions; do not rely on the model to decide its own access.
-
-## Prerequisites
-
-- The [tool-calling recipe](./tool-calling)
-- Authenticated user and tenant context available in the server request
-- `createHook` from `@anvia/core/hooks`
-
-## Policy hook
+## Create tools for one actor
 
 ```ts
-import { createHook } from '@anvia/core/hooks'
+import { createTool } from '@anvia/core'
+import { z } from 'zod'
 
-type Actor = { userId: string; roles: string[] }
+type Actor = {
+  userId: string
+  tenantId: string
+  roles: string[]
+}
 
-function permissionsFor(actor: Actor) {
-  return createHook({
-    onToolCall({ toolName, args, tool }) {
-      if (toolName === 'read_payroll' && !actor.roles.includes('payroll')) {
-        return tool.skip('Access denied. Explain that payroll data is restricted.')
+function createPayrollTools(actor: Actor) {
+  const readPayroll = createTool({
+    name: 'read_payroll',
+    description: 'Read payroll information for one employee.',
+    inputSchema: z.object({
+      employeeId: z.string(),
+    }),
+    outputSchema: z.object({
+      employeeId: z.string(),
+      payBand: z.string(),
+    }),
+    async execute({ employeeId }) {
+      if (!actor.roles.includes('payroll')) {
+        throw new Error('Payroll access denied')
       }
 
-      if (toolName === 'delete_account') {
-        return tool.requestApproval({
-          reason: `Review deletion request: ${args}`,
-          rejectMessage: 'Account deletion was not approved.',
-        })
-      }
-
-      return tool.run()
+      return payroll.findForTenant(actor.tenantId, employeeId)
     },
   })
+
+  return [readPayroll]
 }
 ```
 
-Attach trusted context for one run instead of accepting roles from the prompt:
+Create the agent after authenticating the server request:
 
 ```ts
 const actor = await authenticate(request)
-const result = await agent
-  .prompt(userMessage)
-  .withHook(permissionsFor(actor))
-  .send()
+
+const agent = new Agent({
+  id: 'payroll-assistant',
+  model,
+  instructions: 'Use read_payroll for payroll facts.',
+  tools: createPayrollTools(actor),
+})
+
+const result = await agent.generate({
+    prompt: userMessage
+})
 ```
 
-`authenticate(...)` is application code and is intentionally not implemented by Anvia.
+`authenticate(...)` and the repository are application code. The trusted actor is captured by closure and never comes from the model.
 
-## Run and expected behavior
+## Enforce resource scope too
 
-With a non-payroll actor, `read_payroll` never executes and the model receives the skip message as
-the tool result. Deletion is routed to the configured approval handler. Calls not matched by the
-policy run normally.
+A role check alone is rarely enough. Query through a tenant-scoped repository and confirm the actor may access the specific employee or account. Return only fields the caller and model are allowed to see.
 
-## Boundaries
+Permission failures should become safe application responses; avoid leaking confidential records through errors, traces, or prompts. Cover each allow and deny path with deterministic tests.
 
-A hook is defense in depth, not the only authorization layer. Recheck the actor and resource scope
-inside every sensitive handler because tools can be reused under another agent or hook. Avoid
-including confidential records in skip messages, errors, traces, or prompts. If a policy state is
-unknown, deny or cancel rather than silently running.
-
-In production, centralize policies, log decisions without raw secrets, cover each allow/deny path
-with deterministic tests, and make tenant-scoped repositories impossible to call without a trusted
-tenant identifier.
-
-## Source and extensions
-
-The complete runnable policy is in the
-[permission-hook cookbook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/02_tools/08-tool-permission-hook.ts).
-Next, connect approval to Studio or a durable review queue.
-
-- [Tool security](/sdk/tools/security)
-- [Tool control hooks](/sdk/advanced/hooks/tool-control)
+For a consequential action that also needs a human decision, add [tool approval](./tool-approval). Approval complements authorization; it does not replace it.

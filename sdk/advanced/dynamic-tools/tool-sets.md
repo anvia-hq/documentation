@@ -1,66 +1,64 @@
-# Tool sets
+# Tool catalog
 
-`ToolSet` stores concrete tool implementations and provides the execution boundary used by static and dynamic agents.
+A dynamic catalog starts as an array of normal Anvia tools. The index keeps those concrete implementations so a retrieved definition can be executed later.
 
-## Create a tool set
+## 1. Build normal tools
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
-import { ToolSet } from '@anvia/core/tool'
-
-const supportToolSet = ToolSet.fromTools([
-  createSearchOrdersTool(scope),
-  createGetInvoiceTool(scope),
-  createEscalationTool(scope),
-])
-
-const agent = new AgentBuilder('support', model)
-  .useToolSet(supportToolSet)
-  .build()
+import { Agent } from '@anvia/core';
+import { createToolIndex } from '@anvia/core/tool';
+const supportTools = [
+    createSearchOrdersTool(scope),
+    createGetInvoiceTool(scope),
+    createRequestRefundTool(scope),
+];
+const supportIndex = await createToolIndex({
+    model: embeddingModel,
+    tools: supportTools,
+    topK: 4,
+    minScore: 0.7
+});
 ```
 
-`.useToolSet(...)` makes every tool in the set static, so its definition is available on every model turn.
+There is no separate public `ToolSet` to construct. A `ToolIndex` exposes a read-only `tools` array as its execution backing catalog.
 
-## Inspect the set
+## 2. Keep names unique
+
+Tool names are the link between search results, model-facing definitions, and implementations.
+
+`createToolIndex()` deduplicates repeated names before embedding; the last tool with a name wins. Prefer rejecting duplicates in your own catalog builder so an accidental replacement cannot pass unnoticed.
+
+An agent also rejects a name registered by more than one tool index. A static tool may share a name with an indexed tool, but the static tool wins both model exposure and execution lookup.
+
+## 3. Understand registration and exposure
 
 ```ts
-supportToolSet.contains('get_invoice')
-supportToolSet.get('get_invoice')
-supportToolSet.values()
+const agent = new Agent({
+  id: 'support',
+  model,
+  tools: [alwaysEscalate, supportIndex],
+})
 ```
 
-The lower-level surface includes:
+The agent registers every concrete tool from the index, but sends only retrieved definitions to the model. `agent.tools` therefore represents executable registration, not the definitions visible on a particular turn.
 
-| Method | Purpose |
-| --- | --- |
-| `addTool(...)` | Add one concrete tool. |
-| `addTools(...)` | Add an array or another `ToolSet`. |
-| `deleteTool(name)` | Remove a tool by name. |
-| `contains(name)` | Check whether a tool exists. |
-| `get(name)` | Return one concrete tool. |
-| `values()` | Return all tools. |
-| `getToolDefinitions(prompt?)` | Resolve model-facing definitions. |
-| `call(name, args, context?)` | Parse raw JSON arguments and execute a tool. |
+The constructor snapshots the index's tool list, search policy, and filter. Mutating the original array or index options later does not reconfigure that agent.
 
-Most applications should build a set once from known tools and let the agent runtime call it.
-
-## Call a tool directly
+## 4. Use direct calls carefully
 
 ```ts
-const output = await supportToolSet.call(
+const result = await agent.callTool(
   'get_invoice',
   JSON.stringify({ invoiceId: 'inv_123' }),
 )
 ```
 
-Direct calls are useful in tests and internal tooling. `call(...)` can raise `ToolNotFoundError`, `ToolJsonError`, or `ToolCallError`; map them at the runner boundary when invoking the set outside an agent.
+`agent.callTool()` can call a registered indexed tool without retrieval. It parses input and validates configured output, but it is a low-level direct call: it does not run an agent turn's approval, lifecycle, middleware, or observer flow.
 
-## Avoid shared mutable scope
+Use direct calls in focused tests or behind an application policy boundary. Use `agent.generate()` or `agent.stream()` when the normal agent runtime must enforce run controls.
 
-Do not mutate a global `ToolSet` for each request. If tool handlers close over a user, tenant, transaction, or idempotency key, create the tools and set at that request's trusted runner boundary.
+## 5. Scope concrete tools correctly
 
-Stable stateless tools may be shared, but every execution still needs access to the correct authorization context.
+If handlers close over a user, tenant, transaction, or idempotency key, build the tools at that trusted scope. Do not place request-scoped implementations in a mutable global catalog.
 
-## How it relates to dynamic tools
-
-A `DynamicToolIndex` combines vector search with a backing `ToolSet`. Search returns matching definitions; the backing set provides the implementation when the model calls one of them.
+Next, create the [tool index](/sdk/advanced/dynamic-tools/index).

@@ -88,7 +88,7 @@ export default defineConfig({
                 { text: 'Completion', link: '/sdk/models/completion' },
                 { text: 'Embeddings', link: '/sdk/models/embeddings' },
                 { text: 'Image generation', link: '/sdk/models/image-generation' },
-                { text: 'Audio generation', link: '/sdk/models/audio-generation' },
+                { text: 'Audio generation', link: '/sdk/models/speech-generation' },
                 { text: 'Transcription', link: '/sdk/models/transcription' },
                 { text: 'OCR', link: '/sdk/models/ocr' }
               ]
@@ -226,15 +226,15 @@ export default defineConfig({
               ]
             },
             {
-              text: 'Hooks and run control',
+              text: 'Lifecycle and run control',
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/sdk/advanced/hooks' },
-                { text: 'Create a hook', link: '/sdk/advanced/hooks/create' },
-                { text: 'Hook points', link: '/sdk/advanced/hooks/hook-points' },
+                { text: 'Configure lifecycle', link: '/sdk/advanced/hooks/create' },
+                { text: 'Lifecycle events', link: '/sdk/advanced/hooks/hook-points' },
                 { text: 'Cancellation', link: '/sdk/advanced/hooks/cancellation' },
-                { text: 'Tool control', link: '/sdk/advanced/hooks/tool-control' },
-                { text: 'Hooks and middleware', link: '/sdk/advanced/hooks/middleware' },
+                { text: 'Tool approval', link: '/sdk/advanced/hooks/tool-control' },
+                { text: 'Lifecycle and middleware', link: '/sdk/advanced/hooks/middleware' },
                 { text: 'Production guidance', link: '/sdk/advanced/hooks/production-guidance' }
               ]
             },
@@ -285,7 +285,7 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/sdk/advanced/dynamic-tools' },
-                { text: 'Tool sets', link: '/sdk/advanced/dynamic-tools/tool-sets' },
+                { text: 'Tool catalog', link: '/sdk/advanced/dynamic-tools/tool-sets' },
                 { text: 'Tool index', link: '/sdk/advanced/dynamic-tools/index' },
                 { text: 'Embedding text', link: '/sdk/advanced/dynamic-tools/embedding-text' },
                 { text: 'Static and dynamic', link: '/sdk/advanced/dynamic-tools/static-and-dynamic' },

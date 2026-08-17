@@ -2,64 +2,55 @@
 
 Skills provide procedural guidance. Retrieval supplies relevant facts from a larger or changing corpus.
 
-## Choose by question
+Use stable agent `instructions` for behavior required on every run.
 
-| Need | Use |
-| --- | --- |
-| Stable behavior for every run | Agent `.instructions(...)` |
-| A reusable procedure selected by task | Skills |
-| Relevant facts selected by the current prompt | `.dynamicContext(...)` |
-| Optional model-directed factual search | `index.asTool(...)` |
-| Live state or an application action | A scoped tool |
+Use skills for reusable procedures selected by task.
 
-Skills answer “how should I perform this task?” Retrieval answers “what information is relevant now?”
+Use `createVectorContext()` for facts selected automatically from the current prompt.
 
-## Use skills for procedures
+Use `createVectorSearchTool()` for optional, model-directed factual search.
 
-Good skill content includes:
+Use scoped tools for live state and application actions.
 
-- task sequences and decision rules
-- output style and review rubrics
-- which reference to consult
-- when a deterministic script is useful
+## 1. Use skills for procedures
 
-Do not place thousands of support articles or frequently changing records in skill references.
+Good skill content includes task sequences, decision rules, output rubrics, directed references, and reviewed deterministic helpers.
 
-## Use retrieval for knowledge
+Do not place thousands of articles or frequently changing records in skill references.
 
-Good retrieval content includes:
+## 2. Use retrieval for knowledge
 
-- product documentation
-- support articles
-- policy records
-- customer-safe knowledge
-- source passages with metadata filters
+Good retrieval content includes product documentation, support articles, policy records, and source passages with permission metadata.
 
-Retrieval supports chunking, embeddings, relevance thresholds, and permission-aware filters that a skill directory does not replace.
+Retrieval adds chunking, embeddings, relevance thresholds, and metadata filters that a skill directory does not replace.
 
-## Combine both
+## 3. Combine both boundaries
 
 ```ts
-const supportSkills = await loadSkills(
-  skill.local('skills/support-writing'),
-)
-
-const agent = new AgentBuilder('support', model)
-  .instructions('Answer accurately and disclose missing evidence.')
-  .skills(supportSkills)
-  .dynamicContext(policyIndex, {
+import { Agent, createVectorContext } from '@anvia/core';
+import { loadSkills, skill } from '@anvia/core/skills';
+const supportSkills = await loadSkills(skill.local('skills/support-writing'));
+const policyContext = createVectorContext({
+    store: policyIndex,
+    model: embeddingModel,
     topK: 4,
-    threshold: 0.74,
-    filter: tenantFilter,
-  })
-  .tools([createCustomerLookupTool(scope)])
-  .build()
+    minScore: 0.74,
+    filter: tenantFilter
+});
+const agent = new Agent({
+    id: 'support',
+    model,
+    instructions: 'Answer accurately and disclose missing evidence.',
+    skills: supportSkills,
+    context: [policyContext],
+    tools: [createCustomerLookupTool(scope)],
+});
 ```
 
-Here, the skill guides response structure, dynamic context supplies policy facts, and the local tool reads current customer state with product authorization.
+The skill guides response procedure, the vector context supplies policy facts, and the local tool reads current customer state with product authorization.
 
-## Keep lifecycles separate
+## 4. Keep update lifecycles separate
 
-Update a skill when the procedure or rubric changes. Re-index retrieval when facts or source documents change. Rebuild a tool when service behavior or product policy changes.
+Update a skill when the procedure or rubric changes. Re-index retrieval when facts or source documents change. Update a tool when service behavior or product policy changes.
 
-Keeping those concerns separate avoids re-embedding procedural instructions and prevents factual updates from silently changing how the agent performs a task.
+This avoids re-embedding procedural instructions and prevents factual changes from silently redefining how the agent performs its job.

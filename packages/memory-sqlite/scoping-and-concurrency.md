@@ -3,9 +3,13 @@
 The default scope key is a JSON array containing `sessionId` and `userId`. Add stable tenant metadata when identifiers are not globally unique.
 
 ```ts
-const memory = createSqliteMemoryStore({
+import { SqliteMemoryClient } from '@anvia/memory-sqlite'
+
+const client = new SqliteMemoryClient({
   path: 'data/memory.sqlite',
-  scope: {
+})
+const memory = client.memoryStore({
+  scopeKey: {
     includeUserId: true,
     metadataKeys: ['workspaceId'],
   },

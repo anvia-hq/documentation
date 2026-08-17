@@ -4,7 +4,7 @@
 
 ## Outcome
 
-Move the same `embedDocuments` and `VectorSearchIndex` flow from local memory to a durable backend
+Move the same `embedDocuments` and `retrieveDocuments` flow from local memory to a durable backend
 without coupling agent code to a vendor SDK.
 
 ## When to use it
@@ -14,26 +14,34 @@ memory. Keep `InMemoryVectorStore` for deterministic tests and small demonstrati
 
 ## Shared flow
 
-application documents → `embedDocuments` → adapter `connect(...)` → `upsertDocuments(...)` →
-`store.index(embeddingModel)` → `search(...)` or `.asTool(...)`.
+application documents → `embedDocuments` → adapter client → `vectorStore(...)` →
+`ensure()` or `validate()` → `upsert(...)` → `retrieveDocuments(...)`.
 
 ## pgvector example
 
 ```ts
-import { embedDocuments } from "@anvia/core/embeddings";
-import { PgVectorStore } from "@anvia/pgvector";
-
-const store = await PgVectorStore.connect<Note>({
-  connectionString: process.env.DATABASE_URL!,
-  tableName: "anvia_notes",
-  vectorSize: 384,
+import { retrieveDocuments } from "@anvia/core/vector-store";
+import { PgVectorClient } from "@anvia/pgvector";
+const storeClient = new PgVectorClient({
+    connectionString: process.env.DATABASE_URL!
 });
-await store.upsertDocuments(embedded);
-const index = store.index(embeddingModel);
-const results = await index.search({ query: "technology demand", topK: 5 });
+const store = storeClient.vectorStore<Note>({
+    tableName: "anvia_notes",
+    dimensions: 384
+});
+await store.ensure();
+await store.upsert({
+    documents: embedded
+});
+const results = await retrieveDocuments({
+  store,
+  model: embeddingModel,
+  query: "technology demand",
+  topK: 5,
+});
 ```
 
-`vectorSize` must match the embedding model. Provision tables, collections, indexes, namespaces,
+`dimensions` must match the embedding model. Provision tables, collections, indexes, namespaces,
 and credentials using deployment automation rather than request handlers.
 
 ## Swap at the composition root
@@ -69,11 +77,11 @@ filters, deletion, inspection, empty collections, and dimension errors.
 
 ## Runnable references
 
-- [Chroma](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/06-chromadb-vector-store.ts)
-- [Qdrant](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/07-qdrant-vector-store.ts)
-- [pgvector](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/08-pgvector-store.ts)
-- [Milvus](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/12-milvus-vector-store.ts)
-- [Pinecone](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/13-pinecone-vector-store.ts)
+- [Chroma](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/06-chromadb-vector-store.ts)
+- [Qdrant](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/07-qdrant-vector-store.ts)
+- [pgvector](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/08-pgvector-store.ts)
+- [Milvus](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/12-milvus-vector-store.ts)
+- [Pinecone](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/13-pinecone-vector-store.ts)
 
 ## Extensions
 

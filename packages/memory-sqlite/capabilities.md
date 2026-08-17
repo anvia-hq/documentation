@@ -6,7 +6,7 @@
 | --- | --- |
 | Load and append | Stores core messages in turn order |
 | Clear | Deletes one scoped conversation and its dependent rows |
-| Failed runs | Stored by default; set `errors: 'ignore'` to omit them |
+| Failed runs | Stored by default; set `errorPolicy: 'ignore'` to omit them |
 | Validation | Enabled by default before messages cross the persistence boundary |
 | Inspection | Read-only session listing and transcript access |
 | Compaction | Atomic replacement with conflict detection and aggregate usage |

@@ -1,6 +1,6 @@
 # Releases
 
-Current package version: `0.5.2`.
+Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 history.
 
 ## Notable history
 
@@ -13,6 +13,6 @@ Current package version: `0.5.2`.
 | `0.2.0` | Added evaluation run identity and lifecycle reporting. |
 | `0.1.0` | Introduced native Lens tracing and correlated evaluation reporting. |
 
-This release peers with `@anvia/core >=0.25.0 <1.0.0`.
+Install it with the matching `@anvia/core` and `@anvia/otel` release candidates.
 
-Read the [complete source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/observability-lens/CHANGELOG.md) for every release.
+Read the [complete source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/observability-lens/CHANGELOG.md) for every release.

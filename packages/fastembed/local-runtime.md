@@ -4,12 +4,12 @@ FastEmbed performs inference in the application process. That changes deployment
 
 ## Model initialization
 
-`createFastEmbedEmbeddingModel()` initializes `FlagEmbedding`; the sparse factory initializes `SparseTextEmbedding`. First use may download model files into the configured cache.
+`loadFastEmbedEmbeddingModel({ modelId: DEFAULT_FASTEMBED_EMBEDDING_MODEL })` initializes `FlagEmbedding`; the sparse factory initializes `SparseTextEmbedding`. First use may download model files into the configured cache.
 
 Initialize models during application startup, not inside every request:
 
 ```ts
-export const embeddings = await createFastEmbedEmbeddingModel({
+export const embeddings = await loadFastEmbedEmbeddingModel({
   initOptions: {
     cacheDir: process.env.FASTEMBED_CACHE_DIR,
     showDownloadProgress: false,

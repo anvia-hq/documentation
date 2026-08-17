@@ -1,85 +1,90 @@
 # Completions
 
-Use `completionModel(...)` for agents, direct model calls, extractors, and model-driven pipeline stages.
+Use `completionModel(...)` with an `Agent` when a workflow needs instructions, tools, memory, context, or multiple turns.
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { MistralClient } from '@anvia/mistral'
 
 const mistral = new MistralClient({
-  apiKey: process.env.MISTRAL_API_KEY,
+  apiKey: process.env.MISTRAL_API_KEY!,
 })
 
-const model = mistral.completionModel('mistral-large-latest')
+const model = mistral.completionModel({
+    modelId: 'mistral-large-latest'
+})
 
-export const supportAgent = new AgentBuilder('support', model)
-  .instructions('Answer support questions clearly and concisely.')
-  .build()
+export const supportAgent = new Agent({
+  id: 'support',
+  model,
+  instructions: 'Answer support questions clearly and concisely.',
+})
 ```
 
-The returned model implements Anvia's streaming completion contract, so it can power both `.send()` and `.stream()` agent runs.
-
-## Send one direct request
-
-Call the model directly when the application owns the flow around a single generation:
+## Generate one answer
 
 ```ts
-import { createCompletion } from '@anvia/core'
+const result = await supportAgent.generate({
+    prompt: 'Explain why a refund can take two business days.'
+})
 
-const result = await createCompletion(model, {
-  instructions: 'Write a concise internal incident summary.',
-  input: 'Checkout requests timed out for 12 minutes.',
-  maxTokens: 180,
+if (result.status === 'completed') {
+  console.log(result.output)
+}
+```
+
+`generate(...)` runs the agent to completion and returns its normalized result. Use a direct completion when the application owns a single model call and does not need the agent runtime:
+
+```ts
+import { generateCompletion } from '@anvia/core'
+
+const result = await generateCompletion({
+    prompt: 'Checkout requests timed out for 12 minutes.',
+    model,
+    instructions: 'Write a concise internal incident summary.',
+    maxTokens: 180
 })
 
 console.log(result.text)
 console.log(result.usage.totalTokens)
 ```
 
-Use an [agent](/sdk/agents) when the run needs tools, memory, dynamic context, hooks, or multiple turns.
+The first argument is the input. The configured model and request options belong in the second argument.
 
-## Stream a run
+## Stream an agent run
 
-An agent stream executes only while it is consumed:
+`agent.stream(...)` returns an async iterable. The run advances as the application consumes it:
 
 ```ts
-for await (const event of supportAgent
-  .prompt('Draft a response to this support ticket.')
-  .stream()) {
+for await (const event of supportAgent.stream({
+    prompt: 'Draft a response to this support ticket.'
+})) {
   if (event.type === 'text_delta') {
     process.stdout.write(event.delta)
   }
 }
 ```
 
-Consume through the final event so usage, tool results, observers, and run completion can settle. For browser transport, expose the run through `@anvia/server` rather than sending provider credentials to the client.
+Consume the stream through its terminal event so usage, tool results, observers, and completion state can settle. Use `@anvia/server` for browser transport instead of exposing provider credentials.
 
-## Supported request features
+## Supported requests
 
-The adapter maps these completion features to Mistral chat completions:
+The adapter maps text instructions and message history, temperature, maximum output tokens, streaming text and tool-call deltas, tools, tool choice, output schemas, and provider-specific parameters.
 
-- text instructions and message history
-- temperature and maximum output tokens
-- streaming text and tool-call deltas
-- tools and tool choice
-- JSON output schemas
-- provider-specific request parameters
-
-It rejects chat image inputs and document-file inputs before making the provider request. Mistral OCR remains available as a separate model; see [OCR](/sdk/providers/mistral/ocr).
-
-For model-driven application functions and JSON results, continue to [Tools and schemas](/sdk/providers/mistral/tools-and-schemas).
+It rejects chat image and document inputs before making the provider request. Use [Mistral OCR](/sdk/providers/mistral/ocr) as a separate extraction step for scanned documents and images.
 
 ## Provider-specific parameters
 
-Pass Mistral-specific values through the completion helper's `params` option only at the narrow call site that needs them:
+Pass a Mistral-specific value through `providerOptions` only at the narrow boundary that needs it:
 
 ```ts
-const result = await createCompletion(model, {
-  input: 'Give this release note a short title.',
-  params: {
-    randomSeed: 42,
-  },
+const result = await generateCompletion({
+    prompt: 'Give this release note a short title.',
+    model,
+    providerOptions: {
+        randomSeed: 42,
+    }
 })
 ```
 
-The adapter keeps its selected `model` and normalized `messages`; provider parameters cannot replace those request-identity fields. Verify provider option names against the Mistral API version used by the deployment.
+The adapter preserves the normalized `model` and `messages` fields even if those keys appear in `providerOptions`. Verify provider option names against the Mistral API version used by your deployment.

@@ -27,8 +27,7 @@ type PinoLoggerOptions = LoggerOptions & {
 
 ```ts
 function createLoggerObserver(
-  logger: Logger,
-  options?: LoggerObserverOptions,
+  options: LoggerObserverOptions & { logger: Logger },
 ): import('@anvia/core/observability').AgentObserver
 
 type LoggerObserverOptions = {
@@ -78,4 +77,3 @@ type LoggerOptions = {
 | --- | --- |
 | Functions | `createConsoleLogger`, `createLoggerObserver`, `createPinoLogger` |
 | Types | `ConsoleLoggerOptions`, `LogContext`, `Logger`, `LoggerObserverOptions`, `LoggerOptions`, `LogLevel`, `PinoLoggerOptions` |
-

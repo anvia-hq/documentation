@@ -1,6 +1,6 @@
 # Releases
 
-Current documented package version: `0.5.1`.
+Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 history.
 
 ## Recent changes
 
@@ -22,6 +22,6 @@ Current documented package version: `0.5.1`.
 
 This is a selective operational summary, not a substitute for the source record.
 
-- [Full `@anvia/anthropic` changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-anthropic/CHANGELOG.md)
+- [Full `@anvia/anthropic` changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-anthropic/CHANGELOG.md)
 - [Compatibility and versioning](/packages/compatibility-and-versioning)
 - [API reference](/packages/anthropic/api-reference)

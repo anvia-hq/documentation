@@ -1,87 +1,79 @@
-# Safety
+# Dynamic tool safety
 
-Dynamic selection narrows tool exposure. It does not authorize execution or make a sensitive tool safe.
+Dynamic selection narrows model exposure. It does not authorize execution or make a sensitive tool safe.
 
-## Filter before the model sees a tool
+## 1. Filter before exposure
 
-Store permission-relevant metadata while building the index:
-
-```ts
-const toolIndex = await createToolIndex(
-  embeddingModel,
-  tools,
-  {
-    metadata: (tool) => ({
-      tenantId: scope.tenant.id,
-      plan: scope.tenant.plan,
-      role: scope.operator.role,
-      risk: tool.name.includes('refund')
-        ? 'high'
-        : 'normal',
-    }),
-  },
-)
-```
-
-Then build the filter from trusted application state:
+Create metadata from trusted application data and apply the filter when building the index:
 
 ```ts
-const allowedToolFilter = vectorFilter.and(
-  vectorFilter.eq('tenantId', tenant.id),
-  vectorFilter.eq('plan', tenant.plan),
-  vectorFilter.eq('role', operator.role),
-)
-
-const agent = new AgentBuilder('support-admin', model)
-  .dynamicTools(toolIndex, {
+import { createToolIndex } from '@anvia/core/tool';
+import { vectorFilter } from '@anvia/core/vector-store';
+const allowedFilter = vectorFilter.and(vectorFilter.eq('tenantId', scope.tenantId), vectorFilter.eq('role', scope.operatorRole));
+const supportIndex = await createToolIndex({
+    model: embeddingModel,
+    tools: scopedTools,
     topK: 6,
-    threshold: 0.7,
-    filter: allowedToolFilter,
-  })
-  .build()
+    minScore: 0.7,
+    metadata: (tool) => ({
+        tenantId: scope.tenantId,
+        role: scope.operatorRole,
+        risk: tool.name.includes('refund') ? 'high' : 'normal',
+    }),
+    filter: allowedFilter
+});
 ```
 
-This prevents ineligible definitions from reaching the model. Do not build filters from model output or unverified request fields.
+Do not derive permission filters from model output or unverified request fields. Because the agent snapshots an index's filter, do not reuse a scoped index for another tenant or operator.
 
-## Authorize again in the handler
-
-The selected tool must enforce the real operation boundary:
+## 2. Authorize inside the handler
 
 ```ts
+import { createTool } from '@anvia/core'
+import { z } from 'zod'
+
 const requestRefund = createTool({
   name: 'request_refund',
   description: 'Request a refund for an eligible paid order.',
-  input: refundInput,
+  inputSchema: z.object({
+    orderId: z.string(),
+    amount: z.number().positive(),
+    reason: z.string().min(1),
+  }),
+  requiresApproval: ({ amount }) =>
+    amount > 100
+      ? { reason: `Approve refund of ${amount}` }
+      : false,
   async execute(args) {
     await auth.requirePermission(
-      operator.id,
+      scope.operatorId,
       'orders:refund',
     )
     await policy.assertRefundAllowed(args)
 
     return refunds.request({
       ...args,
-      idempotencyKey,
-      requestedBy: operator.id,
+      requestedBy: scope.operatorId,
+      idempotencyKey: scope.idempotencyKey,
     })
   },
 })
 ```
 
-Catalog metadata can be stale or misconfigured. Handler authorization remains mandatory.
+Catalog metadata may be stale or misconfigured. Re-check identity, tenant, current product state, and operation policy immediately before a side effect.
 
-## Keep approvals on sensitive tools
+## 3. Preserve runtime controls
 
-Dynamic tools use the normal tool runtime. Tool approval policies and hook-driven approvals still apply after selection.
+Indexed tools selected during `agent.generate()` or `agent.stream()` use the normal execution runtime. Keep approval requirements, lifecycle handling, middleware, guardrails, and observers appropriate for their risk.
 
-Do not remove approval because a high-risk tool was retrieved through a filtered catalog. Selection answers “is this capability relevant?” Approval answers “may this specific action proceed?”
+Do not remove approval merely because retrieval used a restrictive filter. Retrieval asks whether a capability is relevant and eligible for exposure; approval decides whether a specific proposed action may proceed.
 
-## Scope executable instances
+## 4. Separate direct calls
 
-If tools close over user, tenant, transaction, or idempotency state, create them at the trusted request or job boundary and build a matching index for that scope. Do not put request-scoped tools into a mutable global catalog.
+`agent.callTool()` can reach any registered indexed tool without first retrieving it and does not run the full agent-turn control flow. Protect direct calls behind a separate application authorization boundary or reserve them for tests.
 
-For stable catalogs stored in a persistent vector database, ensure the backing `ToolSet` resolves execution against the current authorization context.
+## 5. Observe without leaking data
 
-## Observe selected tools
+Record catalog version, applied filter policy, selected tool names, and executed tool name for diagnosis. Avoid logging private arguments or tool results by default.
 
-Record which definitions were selected, which filters applied, and which tool was executed. Avoid logging private arguments or results by default. Unexpected exposure should be diagnosable even when the model never calls the tool.
+Next, review the [dynamic tools checklist](/sdk/advanced/dynamic-tools/checklist).

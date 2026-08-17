@@ -14,8 +14,8 @@ ingestion job for production. Add authorization before indexing private or tenan
 
 ## Request flow
 
-documents → `embedDocuments` → `InMemoryVectorStore` → `index(model).search(...)` → bounded context
-→ `agent.prompt(...).send()`.
+documents → `embedDocuments` → `InMemoryVectorStore` → `retrieveDocuments(...)` → bounded context
+→ `agent.generate(...)`.
 
 ## Setup
 
@@ -27,37 +27,57 @@ pnpm add @anvia/core @anvia/openai @anvia/transformers
 
 ```ts
 import { embedDocuments } from "@anvia/core/embeddings";
-import { InMemoryVectorStore } from "@anvia/core/vector-store";
-import { createTransformersEmbeddingModel } from "@anvia/transformers";
-
-type Note = { id: string; title: string; text: string; source: string };
-const embeddingModel = await createTransformersEmbeddingModel();
-const embedded = await embedDocuments(embeddingModel, notes, {
-  id: (note) => note.id,
-  content: (note) => `${note.title}\n${note.text}`,
-  metadata: (note) => ({ source: note.source }),
+import { InMemoryVectorStore, retrieveDocuments } from "@anvia/core/vector-store";
+import { DEFAULT_TRANSFORMERS_EMBEDDING_MODEL, loadTransformersEmbeddingModel } from "@anvia/transformers";
+type Note = {
+    id: string;
+    title: string;
+    text: string;
+    source: string;
+};
+const embeddingModel = await loadTransformersEmbeddingModel({ modelId: DEFAULT_TRANSFORMERS_EMBEDDING_MODEL });
+const { documents: embedded } = await embedDocuments({
+    model: embeddingModel,
+    documents: notes,
+    id: (note) => note.id,
+    content: (note) => `${note.title}\n${note.text}`,
+    metadata: (note) => ({ source: note.source })
 });
-const index = InMemoryVectorStore.fromDocuments(embedded).index(embeddingModel);
+const store = InMemoryVectorStore.fromDocuments({ documents: embedded });
 ```
 
 ## Retrieve, then answer
 
 ```ts
-const matches = await index.search({ query: question, topK: 4 });
+const matches = await retrieveDocuments({
+  store,
+  model: embeddingModel,
+  query: question,
+  topK: 4,
+});
 const context = matches.map((match) => [
   `Source: ${match.metadata?.source ?? match.id}`,
   match.document.text,
 ].join("\n")).join("\n\n---\n\n");
 
-const response = await agent.prompt([
-  "Answer only from the context. If it is insufficient, say so.",
-  `Question: ${question}`,
-  `Context:\n${context}`,
-].join("\n\n")).send();
+const response = await agent.generate({
+    prompt: [
+        "Answer only from the context. If it is insufficient, say so.",
+        `Question: ${question}`,
+        `Context:\n${context}`,
+    ].join("\n\n")
+});
+
+if (response.status !== "completed") {
+  throw new Error(`Unexpected approval request for ${response.approval.toolName}`);
+}
+
+console.log(response.output);
 ```
 
-`agent` is an ordinary server-side `AgentBuilder` result. Manual retrieval makes the boundary
-visible; use `dynamicContext` when automatic prompt-time retrieval better fits your application.
+`agent` is an ordinary server-side `Agent` result. Manual retrieval makes the boundary
+visible; use `createVectorContext(...)` when automatic prompt-time retrieval better fits your
+application.
 
 ## Run and expected behavior
 
@@ -85,8 +105,8 @@ documents, malicious instructions, embedding failures, and source citation membe
 
 ## Runnable references
 
-- [Embed and search](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/01-embed-and-search.ts)
-- [OpenRouter RAG](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/03-openrouter-rag.ts)
+- [Embed and search](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/01-embed-and-search.ts)
+- [OpenRouter RAG](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/03-openrouter-rag.ts)
 
 ## Extensions
 

@@ -12,7 +12,7 @@ Review the complete execution boundary before allowing agents to run commands or
 
 ## Tenant and data boundaries
 
-- Create a separate ephemeral session for each independent task by default.
+- Create a separate ephemeral sandbox for each independent task by default.
 - Scope persistent workspace IDs to a tenant and resource.
 - Authorize every creation, reopen, artifact download, and preview request.
 - Seed only the files and environment values required by the task.
@@ -21,7 +21,7 @@ Review the complete execution boundary before allowing agents to run commands or
 
 ## Capabilities
 
-- Use an explicit `include` list for model-facing tools.
+- Use an explicit, non-empty `tools` tuple for model-facing tools.
 - Prefer executable allowlists over blocklists.
 - Keep network access disabled unless the task requires it.
 - Add file writes, processes, and ports only for workflows that need them.
@@ -34,16 +34,16 @@ Review the complete execution boundary before allowing agents to run commands or
 - Bound file size and paginated text reads.
 - Set memory, CPU, and PID limits.
 - Cap managed process count and retained process logs.
-- Add a total TTL, idle timeout, and automatic cleanup backstop.
+- Reconcile stopped or leaked containers after worker crashes.
 - Load-test the host for concurrent container creation and execution.
 
 ## Lifecycle and durability
 
-- Destroy sessions in `finally` from the code that creates them.
-- Export required artifacts before destroying an ephemeral session.
+- Destroy sandboxes in `finally` from the code that creates them.
+- Export required artifacts before destroying an ephemeral sandbox.
 - Copy accepted artifacts to tenant-scoped durable object storage.
 - Define retention and deletion for persistent workspaces.
-- Reconcile and remove leaked containers or volumes after worker crashes.
+- Delete application-owned Docker volumes through a separate retention path.
 - Keep job status and artifact references in the product database.
 
 ## Previews and network
@@ -57,13 +57,13 @@ Review the complete execution boundary before allowing agents to run commands or
 
 ## Observability and testing
 
-- Correlate sessions with product job, tenant, and user IDs through metadata.
-- Record session creation, command status, file writes, and destruction through hooks.
+- Correlate sandboxes with product jobs and tenants through validated IDs and labels.
+- Record creation, command status, file writes, and destruction in the owning application layer.
 - Omit command output and file contents from logs unless policy explicitly allows them.
 - Alert on timeouts, output truncation, leaked sessions, and resource saturation.
 - Test rejected traversal and absolute paths.
 - Test blocked executables, excessive timeouts, oversized files, and aborted commands.
-- Test that failures still destroy ephemeral sessions.
+- Test that failures still destroy ephemeral sandboxes.
 - Test that unauthorized users cannot reopen workspaces, download artifacts, or reach previews.
 
 ## Stronger isolation

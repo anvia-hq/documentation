@@ -39,9 +39,12 @@ Set `OPENROUTER_API_KEY`; `ANVIA_MODEL` and `TAVILY_API_KEY` are optional.
 ## Stream application events
 
 ```ts
-const transcript = [...toAnviaHistory(history), Message.user(prompt)];
+const transcript = [...toAnviaHistory(history), { role: "user", content: prompt }];
 
-for await (const event of agent.prompt(transcript).maxTurns(50).stream()) {
+for await (const event of agent.stream({
+    messages: transcript,
+    maxTurns: 50
+})) {
   if (event.type === "text_delta") onDelta(event.delta);
   if (event.type === "reasoning_delta") onReasoningDelta?.(event.delta);
   if (event.type === "tool_call") onToolCall?.(event.toolCall);
@@ -54,9 +57,9 @@ for await (const event of agent.prompt(transcript).maxTurns(50).stream()) {
 }
 ```
 
-The runnable example also reconstructs assistant content with `AssistantContent.toolCall(...)` and
-separate `Message.toolResult(...)` entries. Preserve that ordering: sending only visible text loses
-the tool history the next model turn needs.
+The runnable example also reconstructs structural assistant `tool-call` parts and separate tool
+messages containing matching `tool-result` parts. Preserve that ordering: sending only visible text
+loses the tool history the next model turn needs.
 
 ## Run and expected behavior
 
@@ -86,11 +89,11 @@ and terminal resize behavior.
 
 ## Runnable reference
 
-- [Complete CLI agent](https://github.com/anvia-hq/anvia/tree/main/examples/cli-agent)
+- [Complete CLI agent](https://github.com/anvia-hq/anvia/tree/v1-rc3/examples/cli-agent)
 
 Unlike most documentation snippets, that directory is a runnable multi-file example.
 
 ## Extensions
 
-Add SQLite-backed memory, selectable providers, a permission hook, Docker sandbox tools, session
+Add SQLite-backed memory, selectable providers, tool approval policies, Docker sandbox tools, session
 resume, and an exportable Markdown transcript.

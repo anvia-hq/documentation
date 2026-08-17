@@ -1,6 +1,6 @@
 # Mapping helpers
 
-The package exports the same low-level mapping functions used by `MistralCompletionModel`:
+The package exports the same low-level mapping functions used by its completion handle:
 
 ```ts
 import {
@@ -17,7 +17,7 @@ import {
 const params = toMistralChatParams('mistral-large-latest', request)
 ```
 
-The function converts Anvia messages, documents, tools, tool choice, schemas, and generation settings into a Mistral chat parameter object. `additionalParams` cannot override `model` or `messages`.
+The function converts Anvia messages, documents, tools, tool choice, schemas, and generation settings into a Mistral chat parameter object. `providerOptions` cannot override `model` or `messages`.
 
 `mistralMessageHelpers.messageToMistralMessages(message)` exposes message conversion separately. A single Anvia message can become multiple Mistral messages depending on its parts.
 
@@ -40,6 +40,6 @@ Use the helpers for:
 - tests around provider payload compatibility;
 - a gateway adapter that already returns Mistral chat shapes.
 
-Prefer `MistralCompletionModel` for ordinary requests. The helpers are low-level and accept `unknown` provider responses; malformed payloads can throw or normalize to empty content depending on the missing field. Keep fixture coverage for every shape the custom transport emits.
+Prefer `MistralClient.completionModel({ modelId })` for ordinary requests. The helpers are low-level and accept `unknown` provider responses; malformed payloads can throw or normalize to empty content depending on the missing field. Keep fixture coverage for every shape the custom transport emits.
 
 The exact function signatures are in the [API reference](/packages/mistral/api-reference).

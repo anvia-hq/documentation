@@ -16,13 +16,13 @@
 
 ## Completion
 
-`MistralCompletionModel` maps Anvia messages and tools to Mistral chat parameters and normalizes complete responses and stream chunks. Known IDs provide model-aware context metadata.
+The completion handle maps Anvia messages and tools to Mistral chat parameters and normalizes complete responses and stream chunks. Known IDs provide model-aware context metadata.
 
 Tool arguments are parsed as JSON. Malformed arguments throw instead of becoming an unvalidated string. Missing provider tool-call IDs are derived deterministically, and tool-result names are preserved.
 
 ## Embeddings
 
-The adapter defaults to `mistral-embed`, batches 1,024 inputs by default, and validates that the response count and vector values match the request. When supplied, `dimensions` is forwarded to Mistral and also describes the expected vector shape to Anvia.
+`embeddingModel({ modelId, ... })` requires an explicit model ID, batches 1,024 inputs by default, and validates that the response count and vector values match the request. When supplied, `dimensions` is forwarded to Mistral and also describes the expected vector shape to Anvia.
 
 ## OCR
 

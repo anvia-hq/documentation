@@ -10,19 +10,19 @@ Create one client per runtime boundary or request scope rather than rebuilding t
 import { GeminiClient } from '@anvia/gemini'
 
 const gemini = new GeminiClient({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY!,
 })
 
-export const supportModel = gemini.completionModel(
-  process.env.GEMINI_MODEL ?? 'gemini-2.5-flash',
-)
+export const supportModel = gemini.completionModel({
+    modelId: process.env.GEMINI_MODEL ?? 'gemini-2.5-flash'
+})
 ```
 
 Validate required environment values at startup. Keep model selection in reviewed configuration so a rollout or rollback does not require rewriting agents.
 
 ## Bound every request
 
-Set maximum output tokens for direct completions and a small `defaultMaxTurns(...)` for agents. Validate upload ownership, size, duration, dimensions, and MIME type before loading media. Cancel streamed work when the caller disconnects.
+Set maximum output tokens for direct completions and a small agent `maxTurns` value. Validate upload ownership, size, duration, dimensions, and MIME type before loading media. Cancel streamed work when the caller disconnects.
 
 Translate provider and SDK errors into safe application errors. Log an internal request or trace ID, but do not expose raw Google errors, credentials, project details, or media payloads to the browser.
 

@@ -1,9 +1,10 @@
 # Releases
 
-The current source manifest is `@anvia/react` **0.11.5**. Recent releases mainly track Core protocol changes while preserving the hook/transport boundary.
+The current source manifest is `@anvia/react` **1.0.0-rc.2**. The entries below preserve notable v0 protocol milestones.
 
 | Version | Summary |
 | --- | --- |
+| `1.0.0-rc.2` | Synchronized React with the Anvia 1.0 release-candidate train. |
 | `0.11.5` | Updated the Core dependency to `0.26.0`. |
 | `0.11.4` | Updated the Core dependency to `0.25.1`. |
 | `0.11.0` | Added model-aware context limits and active context usage to hook results. |
@@ -25,4 +26,4 @@ The current source manifest is `@anvia/react` **0.11.5**. Recent releases mainly
 - When enabling resume, test reload, reconnect, terminal cleanup, and expired/missing server state.
 - Keep smoothing lifecycle mounted long enough to drain when upgrading from preset-era versions.
 
-Read the complete [React changelog](https://github.com/anvia-hq/anvia/blob/main/packages/react/CHANGELOG.md).
+Read the complete [React changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/react/CHANGELOG.md).

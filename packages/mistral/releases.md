@@ -1,6 +1,6 @@
 # Releases
 
-Current documented package version: `0.4.1`.
+Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 history.
 
 ## Recent changes
 
@@ -22,6 +22,6 @@ Current documented package version: `0.4.1`.
 
 These are selected behavior changes. Dependency-only and workspace metadata releases remain in the complete record.
 
-- [Full `@anvia/mistral` changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-mistral/CHANGELOG.md)
+- [Full `@anvia/mistral` changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-mistral/CHANGELOG.md)
 - [Compatibility and versioning](/packages/compatibility-and-versioning)
 - [API reference](/packages/mistral/api-reference)

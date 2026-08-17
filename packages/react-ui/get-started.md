@@ -3,7 +3,7 @@
 Install React UI with its controller package and React peers.
 
 ```sh
-pnpm add @anvia/react-ui @anvia/react react react-dom
+pnpm add @anvia/react-ui @anvia/react @anvia/client react react-dom
 ```
 
 Import the optional structural stylesheet once:
@@ -15,12 +15,14 @@ import '@anvia/react-ui/styles.css'
 Compose a controller and component families:
 
 ```tsx
+import { createHttpClientTransport } from '@anvia/client'
 import { useChat } from '@anvia/react'
 import { ChatProvider, Composer, Message, Thread } from '@anvia/react-ui'
 import '@anvia/react-ui/styles.css'
 
 export function Chat() {
-  const chat = useChat({ endpoint: '/api/chat' })
+  const transport = createHttpClientTransport({ endpoint: '/api/chat', format: 'jsonl' })
+  const chat = useChat({ transport })
 
   return (
     <ChatProvider controller={chat}>

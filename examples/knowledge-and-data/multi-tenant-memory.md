@@ -14,30 +14,29 @@ belong to several organizations.
 ## Request flow
 
 session middleware → tenant membership check → application conversation lookup → opaque memory
-scope → `agent.session(...)` → prompt. Tenant and user values come from trusted server state.
+scope → `agent.generate({ prompt, session })`. Tenant and user values come from trusted server state.
 
 ## Resolve an owned conversation
 
 ```ts
-type Principal = { tenantId: string; userId: string };
-
-async function promptConversation(
-  principal: Principal,
-  publicConversationId: string,
-  question: string,
-) {
-  const conversation = await conversations.findOwned({
-    tenantId: principal.tenantId,
-    userId: principal.userId,
-    publicId: publicConversationId,
-  });
-  if (conversation === undefined) throw new Error("Conversation not found");
-
-  // `memoryKey` is application-generated and never accepted directly from the caller.
-  return agent
-    .session(conversation.memoryKey, { userId: principal.userId })
-    .prompt(question)
-    .send();
+type Principal = {
+    tenantId: string;
+    userId: string;
+};
+async function promptConversation(principal: Principal, publicConversationId: string, question: string) {
+    const conversation = await conversations.findOwned({
+        tenantId: principal.tenantId,
+        userId: principal.userId,
+        publicId: publicConversationId,
+    });
+    if (conversation === undefined)
+        throw new Error("Conversation not found");
+    // `memoryKey` is application-generated and never accepted directly from the caller.
+    const session = { sessionId: conversation.memoryKey, userId: principal.userId, metadata: { tenantId: principal.tenantId } };
+    return agent.generate({
+        prompt: question,
+        session,
+    });
 }
 ```
 
@@ -77,7 +76,7 @@ guessed IDs, concurrent turns, conversation deletion, and database-policy enforc
 
 ## Runnable reference
 
-- [Session memory contract](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/01_basics/06-session-memory.ts)
+- [Session memory contract](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/01_basics/06-session-memory.ts)
 
 The cookbook demonstrates Anvia session mechanics; tenant repositories and identity checks here are
 suggested application architecture.

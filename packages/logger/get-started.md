@@ -11,7 +11,7 @@ pnpm add @anvia/core @anvia/logger
 ## Attach an observer
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { createLoggerObserver, createPinoLogger } from '@anvia/logger'
 
 const logger = createPinoLogger({
@@ -20,11 +20,21 @@ const logger = createPinoLogger({
   bindings: { environment: process.env.NODE_ENV },
 })
 
-const agent = new AgentBuilder('support', model)
-  .observe(createLoggerObserver(logger))
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  observability: {
+    observers: { logger: createLoggerObserver({ logger }) },
+  },
+})
 
-await agent.prompt('Where is order A123?').send()
+const result = await agent.generate({
+    prompt: 'Where is order A123?'
+})
+
+if (result.status === 'approval_required') {
+  logger.info('Agent paused for approval', { approval: result.approval })
+}
 ```
 
 The observer creates child loggers for the run and each tool call. Stable trace, session, user, agent, turn, and tool fields can therefore be searched without parsing the message text.
@@ -36,7 +46,8 @@ For local development, replace `createPinoLogger` with `createConsoleLogger`. Bo
 Payload capture is off by default:
 
 ```ts
-const observer = createLoggerObserver(logger, {
+const observer = createLoggerObserver({
+  logger,
   includeRequest: false,
   includeResponse: false,
   includeOutput: false,

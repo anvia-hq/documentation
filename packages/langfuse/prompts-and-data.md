@@ -5,10 +5,12 @@ The package includes focused clients for Langfuse prompts and datasets. They reu
 ## Managed prompts
 
 ```ts
-import { createLangfusePromptClient } from '@anvia/langfuse'
+import { LangfuseClient } from '@anvia/langfuse'
 
-const prompts = createLangfusePromptClient(tracing)
-const instructions = await prompts.getPromptText('support-agent', {
+const langfuse = new LangfuseClient()
+const prompts = langfuse.promptClient()
+const instructions = await prompts.getPromptText({
+  name: 'support-agent',
   label: 'production',
 })
 ```
@@ -18,12 +20,10 @@ Text and chat prompts are supported. Results are cached in memory for 60 seconds
 ## Datasets
 
 ```ts
-import { createLangfuseDatasetClient } from '@anvia/langfuse'
-
-const datasets = createLangfuseDatasetClient(tracing)
+const datasets = langfuse.datasetClient()
 await datasets.createDataset({ name: 'support-cases' })
-await datasets.upsertItems('support-cases', cases)
-const dataset = await datasets.getDataset('support-cases')
+await datasets.upsertItems({ name: 'support-cases', items: cases })
+const dataset = await datasets.getDataset({ name: 'support-cases' })
 ```
 
 The dataset client can create datasets, paginate items, upsert cases, and publish experiment run items. Per-item experiment failures are returned in `errors`; successful items can still be posted.

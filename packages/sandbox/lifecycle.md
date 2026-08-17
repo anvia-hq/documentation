@@ -1,55 +1,58 @@
 # Lifecycle
 
-Application code owns every created session. Lifecycle timers reduce leaks but do not replace explicit cleanup.
+Application code owns every created sandbox. The rc3 API makes image acquisition, creation, pausing, resumption, and destruction explicit.
 
 ## Ephemeral workspaces
 
-Ephemeral mode is the default. Destroying the session removes the container and its ephemeral workspace resources.
-
 ```ts
-const session = await sandbox.createSession()
+const sandbox = await client.createSandbox({
+  image: 'node:22-bookworm',
+  workspace: { type: 'ephemeral' },
+  network: { mode: 'none' },
+})
 
 try {
-  await runAgentWithWorkspace(session)
+  await runAgentWithWorkspace(sandbox.runtime)
 } finally {
-  await session.destroy()
+  await sandbox.destroy()
 }
 ```
 
-Keep `destroy()` in `finally` around the complete workflow, including failures during tools, previews, or result handling.
+Destroying the sandbox removes its container and owned ephemeral volume. Keep `destroy()` in `finally` around the complete workflow.
 
-## Automatic cleanup
+`DockerSandbox` also implements `AsyncDisposable`, so runtimes that support explicit resource management can use `await using`:
 
 ```ts
-const sandbox = DockerSandbox.node({
-  lifecycle: {
-    autoDestroy: true,
-    ttlMs: 30 * 60_000,
-    idleTimeoutMs: 5 * 60_000,
-  },
+await using sandbox = await client.createSandbox({
+  image: 'node:22-bookworm',
+  workspace: { type: 'ephemeral' },
+  network: { mode: 'none' },
 })
 ```
 
-`autoDestroy` defaults to true, but a timer exists only when TTL or idle timeout is configured. TTL measures total session lifetime. Idle cleanup follows public sandbox activity; a managed process running without API activity does not by itself keep the session alive.
-
-## Persistent workspaces
+## Existing Docker volumes
 
 ```ts
-const session = await sandbox.createSession({
+const sandbox = await client.createSandbox({
+  id: `project-${project.id}`,
+  image: 'node:22-bookworm',
   workspace: {
-    mode: 'persistent',
-    id: 'project-42',
-    destroyOnSessionDestroy: false,
+    type: 'docker-volume',
+    name: `anvia-project-${project.id}`,
   },
+  network: { mode: 'none' },
 })
 ```
 
-A named persistent workspace can be reused by later sessions. Its volume survives session destruction by default. Set `destroyOnSessionDestroy: true` only when the name is used for a bounded session and data should be deleted with it.
+The named volume must already exist. `destroy()` removes the container but does not remove an application-owned Docker volume. Volume authorization, retention, deletion, and concurrency remain application responsibilities.
 
-Persistent workspace IDs need an application retention and ownership policy. They are identifiers, not authorization. Avoid deriving them directly from untrusted user input.
+## Stop and resume
 
-## Processes and ports
+```ts
+await sandbox.stop()
+const resumed = await client.resumeSandbox({ id: sandbox.id })
+```
 
-Destroying the session removes its container, managed processes, and published port mappings. Published ports are bound to `127.0.0.1`, but the application still owns any proxy that exposes them beyond the host.
+`stop()` preserves the container for a later `resumeSandbox()` call. `destroy()` is terminal. Persist the sandbox ID only when the application has an authorization and cleanup policy for resumable containers.
 
-When Studio inspects a sandbox, Studio remains read-only and does not destroy it. Use Studio's `serve({ onShutdown })` or the owning service's shutdown path to call `session.destroy()`.
+Destroying a sandbox also removes managed processes and published port mappings. Studio inspection is read-only and never assumes cleanup ownership.

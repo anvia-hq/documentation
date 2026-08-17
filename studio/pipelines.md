@@ -2,7 +2,7 @@
 
 Studio turns an Anvia pipeline into a runnable development surface. Register a pipeline once, then use the browser to inspect its graph, supply input, watch stages change state, read runtime logs, and rerun saved inputs.
 
-Studio does not replace the pipeline API. Build and type the workflow with `PipelineBuilder`; use Studio to understand how that workflow behaves while you develop it.
+Studio does not replace the pipeline API. Build and type the workflow with `Pipeline`; use Studio to understand how that workflow behaves while you develop it.
 
 ![Studio pipeline inspector showing a branching pipeline graph](/images/studio/pipeline-graph.png)
 
@@ -11,33 +11,31 @@ Studio does not replace the pipeline API. Build and type the workflow with `Pipe
 Pass built pipelines alongside any agents that Studio should expose:
 
 ```ts
-import { PipelineBuilder } from '@anvia/core/pipeline'
-import { Studio } from '@anvia/studio'
-import { z } from 'zod'
-
-const ticketPipeline = new PipelineBuilder(z.string(), {
-  id: 'ticket-triage-pipeline',
-  name: 'Ticket triage',
-  description: 'Normalizes a ticket and prepares a routing decision.',
-  metadata: { owner: 'support-operations' },
+import { Pipeline } from '@anvia/core/pipeline';
+import { Studio } from '@anvia/studio';
+import { z } from 'zod';
+const ticketPipeline = new Pipeline({
+    id: 'ticket-triage-pipeline',
+    name: 'Ticket triage',
+    description: 'Normalizes a ticket and prepares a routing decision.',
+    metadata: { owner: 'support-operations' },
+    inputSchema: z.string(),
 })
-  .step((ticket) => ticket.trim(), {
+    .step({
     id: 'normalize-ticket',
     name: 'Normalize ticket',
-  })
-  .step(
-    (ticket) => ({
-      ticket,
-      priority: ticket.toLowerCase().includes('outage') ? 'high' : 'normal',
-    }),
-    {
-      id: 'classify-priority',
-      name: 'Classify priority',
-    },
-  )
-  .build()
+    run: ({ input: ticket }) => ticket.trim()
+})
+    .step({
+    id: 'classify-priority',
+    name: 'Classify priority',
+    run: ({ input: ticket }) => ({
+        ticket,
+        priority: ticket.toLowerCase().includes('outage') ? 'high' : 'normal',
+    })
+});
+new Studio([ticketPipeline]).start({ port: 4021 });
 
-new Studio([ticketPipeline]).start({ port: 4021 })
 ```
 
 Open `http://localhost:4021/ui/pipelines`. The Pipelines item remains available even when no

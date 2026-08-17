@@ -26,42 +26,55 @@ pnpm add @anvia/core @anvia/transformers @anvia/pgvector
 ## Load and normalize
 
 ```ts
-import { PdfFileLoader, pdfPageLoaderToDocuments } from "@anvia/core/loaders";
+import { readFile } from "node:fs/promises";
+import { chunkText, extractPdfText } from "@anvia/core/documents";
 
-const pages = await pdfPageLoaderToDocuments(
-  PdfFileLoader.withGlob(approvedPath).readWithPath().byPage(),
-);
+const data = await readFile(approvedPath);
+const { pages } = await extractPdfText({ data });
 
-const chunks = pages.map((page) => ({
-  id: `${sourceId}@${version}#page=${page.additionalProps?.pageNumber ?? 0}`,
-  text: page.text,
+const chunks = pages.flatMap((page) =>
+  chunkText({
+    text: page.text,
+    strategy: "recursive",
+    maxSize: 1_600,
+    overlap: 200,
+    separators: ["\n\n", "\n", ". ", " "],
+  }).map((chunk) => ({
+  id: `${sourceId}@${version}#page=${page.pageNumber}&chunk=${chunk.index}`,
+  text: chunk.text,
   sourceId,
   version,
-  pageNumber: page.additionalProps?.pageNumber ?? null,
-}));
+  pageNumber: page.pageNumber,
+  start: chunk.start,
+  end: chunk.end,
+  })),
+);
 ```
 
-For long pages, use an application-owned splitter and include the chunk number in the ID. Anvia
-does not infer your document semantics, overlap policy, or versioning scheme.
+Tune `chunkText()` for the source and include the chunk number in the ID. Anvia does not infer your
+document semantics, overlap policy, or versioning scheme.
 
 ## Embed and upsert
 
 ```ts
-const embedded = await embedDocuments(embeddingModel, chunks, {
-  id: (chunk) => chunk.id,
-  content: (chunk) => chunk.text,
-  metadata: (chunk) => ({
-    sourceId: chunk.sourceId,
-    version: chunk.version,
-    pageNumber: chunk.pageNumber,
-  }),
+const { documents: embedded } = await embedDocuments({
+    model: embeddingModel,
+    documents: chunks,
+    id: (chunk) => chunk.id,
+    content: (chunk) => chunk.text,
+    metadata: (chunk) => ({
+        sourceId: chunk.sourceId,
+        version: chunk.version,
+        pageNumber: chunk.pageNumber,
+    })
 });
-
-await store.upsertDocuments(embedded);
+await store.upsert({
+    documents: embedded
+});
 ```
 
-`upsertDocuments` is the durable-adapter shape demonstrated by Chroma, Qdrant, pgvector, and other
-adapters. The local `InMemoryVectorStore` instead uses synchronous `addDocuments(...)`.
+All RC vector stores use `store.upsert({ documents })`. Call `store.ensure()` during provisioning,
+or `store.validate()` when startup must fail rather than create missing infrastructure.
 
 ## Expected behavior
 
@@ -72,13 +85,13 @@ complete version is ready according to application policy.
 ## Failure cases
 
 Partial upserts, corrupted PDFs, dimension changes, duplicate source IDs, changed splitters,
-deleted sources, and concurrent versions require recovery plans. `ignoreErrors()` is convenient for
-exploration but can silently create incomplete production corpora unless failures are recorded.
+deleted sources, and concurrent versions require recovery plans. Record extraction failures rather
+than silently creating an incomplete production corpus.
 
 ## Security and ownership
 
 The application owns source authorization, malware scanning, file paths, licensing, PII handling,
-retention, and deletion. Loader output is untrusted. Never let a request provide an arbitrary glob
+retention, and deletion. Parsed output is untrusted. Never let a request provide an arbitrary path
 or make the model decide which source version is active.
 
 ## Production changes and tests
@@ -89,8 +102,8 @@ version races, source deletion, dimension mismatch, and provenance round trips.
 
 ## Runnable references
 
-- [Document loaders](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/04-document-loaders.ts)
-- [pgvector adapter](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/08-pgvector-store.ts)
+- [Document utilities](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/04-documents.ts)
+- [pgvector adapter](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/08-pgvector-store.ts)
 
 ## Extensions
 

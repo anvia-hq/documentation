@@ -1,58 +1,48 @@
 # Write SKILL.md
 
-`SKILL.md` combines required frontmatter with the procedural instructions an agent loads when it selects the skill.
+`SKILL.md` combines YAML frontmatter with procedural instructions that the model can load through `get_skill_instructions`.
 
-## Add required frontmatter
+## 1. Add frontmatter
 
 ```md
 ---
 name: release-notes
-description: Draft release notes from product changes.
+description: Draft customer-facing release notes from product changes.
+license: MIT
+metadata:
+  owner: release-team
 ---
 ```
 
-| Field | Requirement |
-| --- | --- |
-| `name` | Required; must match the directory and use the supported name format. |
-| `description` | Required; tells the agent when the skill is relevant. |
-| `license` | Optional metadata exposed on the loaded skill. |
-| `metadata` | Optional application-owned metadata. |
+`name` and `description` are required. The name must match the directory, use the supported format, and be at most 64 characters. The description must be non-empty and at most 1,024 characters.
 
-Anvia exposes optional metadata but does not enforce your product's license, visibility, tenant, or environment policy.
+`license` is optional string metadata. `metadata` is an optional object retained on the loaded `Skill`. Anvia does not enforce license, tenant, visibility, or environment policy from these fields.
 
-## Write actionable instructions
+## 2. Write an actionable procedure
 
 ```md
-# Release Notes
+# Release notes
 
 Create release notes from the supplied product changes.
 
 1. Read `references/style-guide.md`.
 2. Group changes by user impact.
-3. Do not include internal ticket IDs or unreleased security details.
-4. Return Markdown with Summary, Improvements, and Fixes sections.
+3. Exclude internal ticket IDs and unreleased security details.
+4. Return Markdown with Summary, Improvements, and Fixes.
 
-Use `scripts/collect-changes.sh` only when the request does not include change data.
+Use `scripts/collect-changes.sh` only when change data is absent.
 ```
 
-State the goal, required sequence, allowed supporting files, safety constraints, and expected output. Prefer direct instructions over background explanation.
+State the goal, required sequence, relevant assets, safety constraints, and expected output. Prefer direct operational instructions over broad background explanation.
 
-## Write a useful description
+## 3. Make the description selective
 
-The description appears in the compact skill catalog before the full instructions are loaded. It should identify both the capability and the trigger.
+The initial catalog contains the name and description before full instructions are loaded. Describe both the capability and its trigger.
 
-```yaml
-description: Draft customer-facing release notes from product changes.
-```
+Avoid vague text such as “Helpful release skill.” Overlapping descriptions make skill selection unpredictable.
 
-Avoid descriptions such as “Helpful release skill.” They do not give the model enough information to select the skill reliably.
+## 4. Keep security outside skill text
 
-## Point to assets explicitly
+Skills guide model behavior; they do not authorize users or protect side effects. Keep authentication, validation, approvals, and irreversible actions in application services and tools.
 
-Name the relevant reference or script and explain when to use it. The model can see listed asset paths, but it should not have to guess which file contains the required policy or example.
-
-Keep large examples and detailed rubrics in `references/` so `SKILL.md` remains a focused workflow rather than another factual corpus.
-
-## Avoid hidden product policy
-
-Skills guide model behavior. They are not a security boundary. Keep authorization, input validation, approvals, and irreversible side effects in tools, hooks, and application services.
+Next, add [references and scripts](/sdk/advanced/skills/assets).

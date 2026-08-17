@@ -1,12 +1,12 @@
 # Endpoint setup
 
-Install Anvia Core and its OpenAI provider adapter:
+Install Anvia Core and the OpenAI provider adapter:
 
 ```sh
 pnpm add @anvia/core @anvia/openai
 ```
 
-Create the client in server-only code. Keep both the endpoint and its credential in deployment configuration:
+Create the client in server-only code. Keep the endpoint and credential in deployment configuration:
 
 ```ts
 import { OpenAIClient } from '@anvia/openai'
@@ -21,15 +21,14 @@ if (!apiKey || !baseUrl) {
 export const compatible = new OpenAIClient({
   apiKey,
   baseUrl,
-  completionApi: 'chat',
 })
 ```
 
-`OpenAIClient` requires either `apiKey` or an already-created OpenAI SDK `client`. Browser code should call an application route; it should never receive the provider credential.
+`OpenAIClient` requires an API key when it creates the underlying SDK client. Alternatively, pass an already-created SDK `client`. Browser code should call your server, never receive the provider credential.
 
-## Set the base URL correctly
+## Set the API root correctly
 
-Use the API root expected by the target provider, including a version segment such as `/v1` when its documentation requires one:
+Use the API root documented by the target provider, including `/v1` or another path prefix when required:
 
 ```dotenv
 COMPATIBLE_BASE_URL=https://provider.example.com/v1
@@ -37,9 +36,9 @@ COMPATIBLE_API_KEY=replace-with-a-deployment-secret
 COMPATIBLE_MODEL=provider/model-name
 ```
 
-Do not guess whether the URL should include `/v1`, `/openai`, or another prefix. The OpenAI SDK appends resource paths to `baseUrl`, so a wrong root commonly produces a 404 even when the hostname and credential are valid.
+Do not guess the prefix. The OpenAI SDK appends resource paths to `baseUrl`, so an incorrect root commonly returns 404 even when the hostname and credential are valid.
 
-Validate deployment configuration before constructing agents:
+Validate trusted configuration before constructing models:
 
 ```ts
 const endpoint = new URL(baseUrl)
@@ -49,9 +48,9 @@ if (endpoint.protocol !== 'https:' && endpoint.hostname !== 'localhost') {
 }
 ```
 
-## Add gateway headers
+## Add trusted gateway headers
 
-Use `headers` only for trusted values required by the endpoint, such as a gateway workspace or routing header:
+Use `headers` for server-controlled gateway values such as workspace or route selection:
 
 ```ts
 const workspace = process.env.COMPATIBLE_WORKSPACE
@@ -59,18 +58,17 @@ const workspace = process.env.COMPATIBLE_WORKSPACE
 export const compatible = new OpenAIClient({
   apiKey,
   baseUrl,
-  completionApi: 'chat',
   headers: workspace
     ? { 'X-Provider-Workspace': workspace }
     : undefined,
 })
 ```
 
-Keep these headers server-side. Do not let a browser or model-generated tool argument supply routing, authorization, organization, or billing headers.
+Do not let a browser request or model-generated tool argument choose authorization, organization, billing, or routing headers.
 
 ## Reuse an OpenAI SDK client
 
-When the application owns transport configuration, construct the official OpenAI client first and inject it:
+When application infrastructure owns SDK transport configuration, inject that client:
 
 ```ts
 import OpenAI from 'openai'
@@ -84,11 +82,9 @@ const sdk = new OpenAI({
 export const compatible = new OpenAIClient({ client: sdk })
 ```
 
-Notice the option names: Anvia's client uses `baseUrl`, while the OpenAI SDK constructor uses `baseURL`.
+The option names differ intentionally: Anvia uses `baseUrl`, while the OpenAI SDK uses `baseURL`.
 
-## Create the model boundary
-
-Export an Anvia model from the provider module rather than exporting credentials or spreading endpoint configuration through agents:
+## Export the model boundary
 
 ```ts
 const modelId = process.env.COMPATIBLE_MODEL
@@ -97,8 +93,9 @@ if (!modelId) {
   throw new Error('COMPATIBLE_MODEL is required')
 }
 
-export const supportModel = compatible.completionModel(modelId)
+export const supportModel = compatible.completionModel({
+    modelId: modelId
+})
 ```
 
-The calling agent now depends on an Anvia completion model, not the gateway configuration.
-
+Agents now depend on an Anvia completion model rather than credentials or endpoint configuration.

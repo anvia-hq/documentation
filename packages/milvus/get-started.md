@@ -5,23 +5,26 @@ pnpm add @anvia/core @anvia/milvus @zilliz/milvus2-sdk-node
 ```
 
 ```ts
-import { MilvusVectorStore } from '@anvia/milvus'
-
-const store = await MilvusVectorStore.connect({
-  client,
-  collectionName: 'support_docs',
-  vectorSize: 1536,
-  metric: 'COSINE',
-  createIfMissing: false,
-})
-
-await store.upsertDocuments(documents)
-const index = store.index(embeddings)
+import { retrieveDocuments } from '@anvia/core/vector-store';
+import { MilvusVectorClient } from '@anvia/milvus';
+const storeClient = new MilvusVectorClient({
+    client
+});
+const store = storeClient.vectorStore({
+    collectionName: 'support_docs',
+    dimensions: 1536,
+    metric: 'cosine'
+});
+await store.validate();
+await store.upsert({
+    documents: documents
+});
+const results = await retrieveDocuments({ store, model: embeddings, query, topK: 5 });
 ```
 
 Documents must already contain dense embeddings. Without a client, the adapter connects to `localhost:19530`; inject a configured client for any remote deployment.
 
-`connect()` loads the collection. When automatic creation is enabled, it also creates the Anvia fields and a baseline HNSW index.
+`ensure()` creates and loads a missing collection, while `validate()` requires the existing collection to match the configured dimensions and metric.
 
 ## Next
 

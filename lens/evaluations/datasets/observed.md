@@ -24,7 +24,7 @@ const result = await runEvalSuite({
   ],
   target,
   metrics,
-  reporters: [lensEvaluation.reporter],
+  reporters: [lensEvaluation],
 })
 ```
 
@@ -35,9 +35,10 @@ The suite name identifies what is being measured. The dataset name and version i
 Observed reconstruction needs the evaluation payload, not only the outcome. Enable evaluation payloads when creating the Lens integration:
 
 ```ts
-import { lens } from '@anvia/lens'
+import { LensClient } from '@anvia/lens'
 
-const lensEvaluation = lens.evals({
+const lens = new LensClient()
+const lensEvaluation = lens.evalReporter({
   includePayloads: true,
   includeMetadata: true,
 })

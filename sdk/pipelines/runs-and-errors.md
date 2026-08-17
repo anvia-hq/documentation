@@ -1,86 +1,75 @@
 # Runs and errors
 
-`run(...)` resolves the final stage output and forwards validation or stage failures to the caller.
+`run()` validates the input, executes stages in order, and resolves with the final output. Any validation or stage failure rejects the run.
 
-## Observe a run
+## 1. Observe stage execution
+
+Pass a pipeline observer to one run:
 
 ```ts
-const result = await pipeline.run(input, {
-  observer: {
-    async onEvent(event) {
-      await workflowEvents.append({
-        type: event.type,
-        nodeId: event.node.id,
-        nodeLabel: event.node.label,
-        durationMs:
-          'durationMs' in event ? event.durationMs : undefined,
-      })
-    },
-  },
-})
+const result = await pipeline.run({
+    input: input,
+    observer: {
+        async onEvent(event) {
+            await workflowEvents.append({
+                type: event.type,
+                nodeId: event.node.id,
+                nodeLabel: event.node.label,
+                durationMs: 'durationMs' in event ? event.durationMs : undefined,
+            });
+        },
+    }
+});
+
 ```
 
-Observers receive `stage_started`, `stage_completed`, and `stage_failed`. Completed and failed events include duration. Observer errors also reject the run.
+Observers receive `stage_started`, `stage_completed`, and `stage_failed`. Completed and failed events include `durationMs`; failed events also include the error. An observer error rejects the run.
 
-Use agent observers for model and tool activity inside an agent stage. Use pipeline observers for workflow-stage status.
+Pipeline observers describe workflow stages. Configure agent observers separately for model and tool activity inside an `.agent()` stage.
 
-## Inspect the graph
+## 2. Inspect the graph
 
 ```ts
-import { PipelineBuilder } from '@anvia/core/pipeline'
-import { z } from 'zod'
-
-const pipeline = new PipelineBuilder(z.string(), {
-  id: 'ticket_triage',
-  name: 'Ticket triage',
+const pipeline = new Pipeline({
+    id: 'ticket-triage',
+    name: 'Ticket triage',
+    inputSchema: z.string(),
 })
-  .step((text) => text.trim(), {
+    .step({
     id: 'normalize',
     name: 'Normalize ticket',
-  })
-  .step((text) => ({ text, route: 'support' }), {
+    run: ({ input: text }) => text.trim()
+})
+    .step({
     id: 'route',
     name: 'Route ticket',
-  })
-  .build()
+    run: ({ input: text }) => ({ text, route: 'support' })
+});
+const graph = pipeline.graph();
 
-const graph = pipeline.graph()
-console.log(graph)
 ```
 
-The result is:
+The returned snapshot contains pipeline metadata, nodes, and edges. Node kinds include `input`, `step`, `pipeline`, `parallel`, `branch`, `agent`, `extractor`, and `output`.
 
-```json
-{
-  "id": "ticket_triage",
-  "name": "Ticket triage",
-  "nodes": [
-    { "id": "input", "kind": "input", "label": "Input" },
-    { "id": "normalize", "kind": "step", "label": "Normalize ticket" },
-    { "id": "route", "kind": "step", "label": "Route ticket" },
-    { "id": "output", "kind": "output", "label": "Output" }
-  ],
-  "edges": [
-    { "id": "edge_1", "source": "input", "target": "normalize" },
-    { "id": "edge_2", "source": "normalize", "target": "route" },
-    { "id": "edge_3", "source": "route", "target": "output" }
-  ]
-}
-```
+The graph describes workflow structure, not a particular run's inputs, outputs, timing, or errors. Use observer events for runtime state.
 
-The graph describes input, step, nested pipeline, parallel, agent, extractor, and output nodes. It contains workflow metadata—not a run's values or result.
+## 3. Map failures at the runner
 
-## Map failures at the runner
-
-Input validation throws before the first stage. Later errors come from steps, nested pipelines, agents, or extractors.
+Input validation fails before the first stage. Later errors may come from steps, nested operations, parallel branches, agents, or extractors:
 
 ```ts
 try {
-  return await pipeline.run(input)
-} catch (error) {
-  await workflowErrors.record(error)
-  return { status: 'failed' }
+    return await pipeline.run({
+        input: input
+    });
 }
+catch (error) {
+    await workflowErrors.record(error);
+    return { status: 'failed' };
+}
+
 ```
 
-Retry the narrow failing boundary when it is safe. Do not retry an entire pipeline after partial side effects unless those effects are idempotent or transactionally guarded.
+Retry the narrow failing boundary when it is safe. Do not retry an entire pipeline after partial side effects unless those effects are idempotent, transactionally guarded, or keyed so repeats replace the same result.
+
+For slow or durable work, run the pipeline in a [production worker](/sdk/pipelines/production-workers).

@@ -7,18 +7,21 @@ Configure `OpenAIClient` once, then create capability-specific model objects.
 | Option | Purpose |
 | --- | --- |
 | `apiKey` | Credential used when `client` is not supplied. |
-| `baseUrl` | Replaces the OpenAI API base URL and defaults completion to Chat. |
+| `baseUrl` | Replaces the OpenAI API base URL. |
 | `headers` | Adds default SDK headers. |
-| `completionApi` | Forces `'responses'` or `'chat'`. |
 | `client` | Reuses an initialized official OpenAI SDK client. |
 
 ```ts
 const openai = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
-  completionApi: 'responses',
+  apiKey: process.env.OPENAI_API_KEY!,
   headers: {
     'X-Application': 'support-api',
   },
+})
+
+const model = openai.completionModel({
+  modelId: 'gpt-5.5',
+  api: 'responses',
 })
 ```
 
@@ -26,28 +29,29 @@ When `client` is provided, its transport, retry, timeout, and connection setting
 
 ## Completion request options
 
-Use normal Anvia completion or prompt request methods for messages, tools, schemas, temperature, token limits, and cancellation. Provider-only fields belong in `additionalParams`:
+Use normal Anvia agent or direct-completion options for messages, tools, schemas, temperature, and token limits. Provider-only fields belong in `providerOptions`:
 
 ```ts
 const response = await model.completion({
   chatHistory,
   documents: [],
   tools: [],
-  additionalParams: {
+  providerOptions: {
     reasoning: { effort: 'high' },
   },
 })
 ```
 
-Only send fields supported by the selected OpenAI API and model. `additionalParams` is a pass-through, not cross-provider validation.
+Only send fields supported by the selected OpenAI API and model. `providerOptions` is a pass-through, not cross-provider validation.
 
 ## Embedding options
 
 ```ts
-const embeddings = openai.embeddingModel('text-embedding-3-small', {
-  dimensions: 768,
-  user: 'tenant-safe-correlation-id',
-  maxBatchSize: 128,
+const embeddings = openai.embeddingModel({
+    modelId: 'text-embedding-3-small',
+    dimensions: 768,
+    user: 'tenant-safe-correlation-id',
+    maxBatchSize: 128
 })
 ```
 
@@ -55,8 +59,8 @@ const embeddings = openai.embeddingModel('text-embedding-3-small', {
 
 ## Media options
 
-Image, speech, and transcription requests accept `additionalParams`. These objects are merged into the provider request, so provider fields can override adapter defaults. Use this intentionally and test the resulting media type and output shape.
+Image, speech, and transcription requests accept `providerOptions`. These objects are merged into the provider request, so provider fields can override adapter defaults. Use this intentionally and test the resulting media type and output shape.
 
 ## Runtime and production
 
-The package is ESM, includes TypeScript declarations, peers on `@anvia/core >=0.7.1 <1.0.0`, and uses the official `openai` SDK. Keep it in a trusted server runtime. If an edge runtime is required, validate the official SDK, upload APIs, binary handling, and streaming behavior in that exact environment.
+The package is ESM, includes TypeScript declarations, should be installed with the matching `@anvia/core` release candidate, and uses the official `openai` SDK. Keep it in a trusted server runtime. If an edge runtime is required, validate the official SDK, upload APIs, binary handling, and streaming behavior in that exact environment.

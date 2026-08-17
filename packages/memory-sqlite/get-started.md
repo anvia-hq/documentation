@@ -7,19 +7,23 @@ pnpm add @anvia/core @anvia/memory-sqlite
 ```
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
-import { createSqliteMemoryStore } from '@anvia/memory-sqlite'
+import { Agent } from '@anvia/core/agent'
+import { SqliteMemoryClient } from '@anvia/memory-sqlite'
 
-const memory = createSqliteMemoryStore({
+const client = new SqliteMemoryClient({
   path: 'data/anvia-memory.sqlite',
 })
+const memory = client.memoryStore()
+await memory.ensure()
 
-const agent = new AgentBuilder('support', model)
-  .memory(memory, { savePolicy: 'turn' })
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  memory: { store: memory, savePolicy: 'turn' },
+})
 ```
 
-The store creates its tables on first use. Omitting `path` selects `:memory:`, which is useful for tests but disappears with the process. The package is ESM-only and uses Node's built-in `node:sqlite` `DatabaseSync` API.
+`ensure()` creates and validates the tables. Pass `path: ':memory:'` for tests that should disappear with the process. The package is ESM-only and uses Node's built-in `node:sqlite` `DatabaseSync` API.
 
 Keep the same `sessionId`, `userId`, and relevant metadata when continuing a conversation; those values form the default storage scope.
 

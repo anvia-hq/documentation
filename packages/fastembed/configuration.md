@@ -5,28 +5,24 @@ Dense and sparse factories accept parallel option shapes.
 ## Dense model
 
 ```ts
-const dense = await createFastEmbedEmbeddingModel({
-  model: 'fast-bge-base-en-v1.5',
+const dense = await loadFastEmbedEmbeddingModel({
+  modelId: 'fast-bge-base-en-v1.5',
   maxBatchSize: 64,
-  initOptions: {
-    cacheDir: './.cache/fastembed',
-    maxLength: 512,
-    showDownloadProgress: false,
-    executionProviders: ['cpu'],
-  },
+  cacheDir: './.cache/fastembed',
+  maxLength: 512,
+  showDownloadProgress: false,
+  executionProviders: ['cpu'],
 })
 ```
 
 ## Sparse model
 
 ```ts
-const sparse = await createFastEmbedSparseEmbeddingModel({
-  model: 'prithivida/Splade_PP_en_v1',
+const sparse = await loadFastEmbedSparseEmbeddingModel({
+  modelId: 'prithivida/Splade_PP_en_v1',
   maxBatchSize: 64,
-  initOptions: {
-    cacheDir: './.cache/fastembed',
-    showDownloadProgress: false,
-  },
+  cacheDir: './.cache/fastembed',
+  showDownloadProgress: false,
 })
 ```
 
@@ -34,19 +30,21 @@ const sparse = await createFastEmbedSparseEmbeddingModel({
 
 ## Option behavior
 
-- `model` selects the FastEmbed enum-backed model.
+- `modelId` selects the FastEmbed enum-backed model.
 - `maxBatchSize` controls adapter batching and is clamped to an integer of at least one.
 - `cacheDir` controls model asset placement.
 - `maxLength` and other initialization options are passed to FastEmbed.
-- `initOptions` are forwarded and the selected top-level model is also added as `model`; avoid supplying a conflicting `modelName`.
 
 ## Direct construction
 
-Use `new FastEmbedEmbeddingModel(runtime, options)` or the sparse equivalent when the application already owns an initialized runtime or tests need a fake:
+Use the adapter functions when the application already owns an initialized runtime or tests need a fake:
 
 ```ts
-const model = new FastEmbedEmbeddingModel(runtime, {
-  model: 'fast-bge-small-en-v1.5',
+import { adaptFastEmbedEmbeddingModel } from '@anvia/fastembed'
+
+const model = adaptFastEmbedEmbeddingModel({
+  runtime,
+  modelId: 'fast-bge-small-en-v1.5',
 })
 ```
 

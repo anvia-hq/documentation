@@ -4,33 +4,36 @@ Quick reference for the core runtime surfaces used throughout these guides.
 
 ## Completion functions
 
-- `createCompletion(model, request)` returns normalized `text`, `content`, `usage`, and `response`.
-- `createCompletionStream(model, request)` yields normalized provider completion events such as `text_delta`.
-- `createParsedCompletion(model, { schema, input })` returns schema-validated `data` or throws.
+- `generateCompletion({ model, prompt | messages, ...options })` returns normalized `output`, `text`, `content`, `usage`, and `rawResponse`.
+- `streamCompletion({ model, prompt | messages, ...options })` yields normalized events such as `text_delta` and a final `result`.
+- `generateCompletion({ model, prompt | messages, outputSchema, ...options })` returns schema-validated `output` or throws.
 
-## Agent builder
+## Agent construction
 
 ```ts
-new AgentBuilder(id, model)
-  .name(name)
-  .description(description)
-  .instructions(instructions)
-  .tools(tools)
-  .context(document, id)
-  .memory(store, options)
-  .observe(observer)
-  .defaultMaxTurns(turns)
-  .build()
+new Agent({
+  id: id,
+  model: model,
+  name: name,
+  description: description,
+  instructions: instructions,
+  memory: { store: store, ...options },
+  maxTurns: turns,
+  context: [{ id: id, text: document }],
+  tools: [...tools],
+  observability: { observers: { observer } },
+})
 ```
 
-Use only the methods required by the agent.
+Pass only the options required by the agent. Construction returns a ready-to-use runtime.
 
-## Prompt execution
+## Agent execution
 
-- `agent.prompt(input).send()` returns final `output`, `usage`, `messages`, and optional `trace`.
-- `agent.prompt(input).maxTurns(n).send()` overrides the turn limit for one request.
-- `agent.prompt(input).stream()` yields runtime events.
-- `agent.session(sessionId, scope)` creates a durable session surface.
+- `agent.generate({ prompt | messages, ...runOptions })` returns a completed, blocked, or approval-required result.
+- `agent.generate({ prompt, maxTurns: n })` overrides the turn limit for one run.
+- `agent.stream({ prompt | messages, ...runOptions })` yields runtime events.
+- `agent.resume(pending, decision)` continues an approval-required run.
+- `agent.generate({ prompt, session: { sessionId, userId? } })` runs with persisted memory.
 
 ## Agent stream events
 
@@ -49,10 +52,13 @@ Use only the methods required by the agent.
 ## Server stream
 
 ```ts
-createEventStream(events, { format: 'jsonl' | 'sse' })
+createClientStreamResponse({
+  events: agentToClientStream({ events }),
+  format: 'jsonl' | 'sse',
+})
 ```
 
-JSONL is the default. React clients normally send `{ messages, stream: true, metadata? }`.
+JSONL is the default. React clients send `{ messages, metadata?, resume? }` through a `ClientTransport`.
 
 ## External reference
 

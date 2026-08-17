@@ -1,85 +1,79 @@
-# Tool control
+# Tool approval
 
-`onToolCall` gives application policy a final decision after the model selects a tool and before its handler executes.
+Use `requiresApproval` on a tool when execution must pause for a person or external policy decision.
 
-## Choose a tool action
-
-| Action | Result |
-| --- | --- |
-| `tool.run()` | Execute the selected tool. |
-| `tool.skip(reason)` | Return the reason as the tool result and let the agent continue. |
-| `tool.cancel(reason)` | Stop the entire prompt run. |
-| `tool.requestApproval(options)` | Pause for the configured approval workflow. |
-
-Returning nothing also allows the tool to run.
-
-## Gate a tool with request policy
+## 1. Protect every call
 
 ```ts
-import { createHook } from '@anvia/core'
+const deleteAccount = createTool({
+  name: 'delete_account',
+  description: 'Permanently delete an account.',
+  inputSchema: z.object({ accountId: z.string() }),
+  outputSchema: z.string(),
+  requiresApproval: {
+    reason: 'Deleting an account requires reviewer approval.',
+  },
+  async execute({ accountId }) {
+    await accounts.delete(accountId)
+    return 'Account deleted.'
+  },
+})
+```
 
-function createToolPolicy(scope: {
-  canRequestRefund: boolean
-  requiresRefundApproval: boolean
-}) {
-  return createHook({
-    onToolCall({ toolName, tool }) {
-      if (toolName !== 'request_refund') {
-        return tool.run()
-      }
+Use `requiresApproval: true` when no fixed reason is needed.
 
-      if (!scope.canRequestRefund) {
-        return tool.skip('Refund access is not available.')
-      }
+## 2. Require approval conditionally
 
-      if (scope.requiresRefundApproval) {
-        return tool.requestApproval({
-          reason: 'This refund requires reviewer approval.',
-        })
-      }
+The callback receives parsed tool input and trusted run context:
 
-      return tool.run()
-    },
+```ts
+const requestRefund = createTool({
+  name: 'request_refund',
+  description: 'Request a refund for a settled charge.',
+  inputSchema: z.object({
+    chargeId: z.string(),
+    amount: z.number().positive(),
+  }),
+  requiresApproval({ amount }, context) {
+    if (amount <= 100) return false
+
+    return {
+      reason: `Review refund above the automatic limit for ${context.run.agentId}.`,
+    }
+  },
+  async execute(input) {
+    return refunds.request(input)
+  },
+})
+```
+
+Return `false` to run immediately, `true` to request approval, or `{ reason }` to request it with context. The input is parsed once and the same value is used after approval.
+
+## 3. Resume a generated run
+
+```ts
+const pending = await agent.generate({
+    prompt: message
+})
+
+if (pending.status === 'approval_required') {
+  console.log(pending.approval.toolName)
+  console.log(pending.approval.input)
+  console.log(pending.approval.reason)
+
+  const result = await agent.resume(pending, {
+    approved: reviewer.approved,
+    reason: reviewer.reason,
   })
 }
 ```
 
-Build `scope` from authenticated application state before the run. Do not ask the model whether the user has permission.
+A stream yields `approval_required` and ends that segment. Pass the exact pending event to `agent.resume()`; approval continuations are tied to the originating agent and in-memory pending object.
 
-## Skip or cancel
+## 4. Keep authorization inside execution
 
-Use `tool.skip(...)` when the rejected call can become information for the next model turn. The skip reason is returned as the tool result, so the model can explain the limitation or choose another path.
+Approval is orchestration, not the final security boundary. The tool handler must re-check current user, tenant, resource, and business permissions immediately before the side effect.
 
-Use `tool.cancel(...)` when continuing the run would itself be unsafe or meaningless.
+Approval may take time, so verify that the resource state and authorization are still valid when execution resumes.
 
-```ts
-const hook = createHook({
-  onToolCall({ toolName, tool }) {
-    if (toolName === 'deploy_release' && deployment.frozen) {
-      return tool.cancel('Deployments are frozen.')
-    }
-  },
-})
-```
-
-## Request approval
-
-```ts
-const hook = createHook({
-  onToolCall({ toolName, tool }) {
-    if (toolName === 'delete_account') {
-      return tool.requestApproval({
-        reason: 'Deleting an account requires reviewer approval.',
-      })
-    }
-  },
-})
-```
-
-The prompt request must have an approval handler. Without one, Anvia raises
-`ToolApprovalRequiredError`. See [Human approval](/studio/playground/approvals-and-questions) for the
-interactive Studio workflow.
-
-## Keep enforcement in the tool
-
-Hooks improve orchestration, but the tool handler remains the security boundary. It must validate its parsed input, re-check user and tenant permissions, enforce business rules, and protect side effects even if the hook allowed the call.
+Next, compare [lifecycle and middleware](/sdk/advanced/hooks/middleware).

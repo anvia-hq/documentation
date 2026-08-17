@@ -7,17 +7,16 @@ Open `http://localhost:4021/ui/knowledge/static-context`.
 ## Add static context
 
 ```ts
-const agent = new AgentBuilder('support-agent', model)
-  .instructions('Use the support policy when it applies.')
-  .context(
-    [
+const agent = new Agent({
+  id: 'support-agent',
+  model: model,
+  instructions: 'Use the support policy when it applies.',
+  context: [{ id: 'enterprise-escalation', text: [
       'Enterprise escalation policy',
       'Blocked enterprise orders require a support lead summary.',
       'Confirm an engineering owner before making customer commitments.',
-    ].join('\n'),
-    'enterprise-escalation',
-  )
-  .build()
+    ].join('\n') }],
+})
 ```
 
 The second `.context(...)` argument is the document ID. Give it a stable, descriptive value: Studio displays that ID beside the text, and it is more useful in debugging than an automatically generated name such as `static_doc_0`.

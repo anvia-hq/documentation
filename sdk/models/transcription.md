@@ -1,42 +1,69 @@
 # Transcription models
 
-Transcription models convert audio bytes into normalized text. They fit upload processors, meeting notes, call review, and media pipelines.
+Transcription models convert audio bytes into normalized text. They fit upload processors, meeting notes, support-call review, accessibility, and media pipelines.
 
-## Create a transcription model
+## 1. Create a transcription model
+
+Construct the provider model in server-side configuration.
 
 ```ts
-import { WHISPER_1, OpenAIClient } from '@anvia/openai'
+import { OpenAIClient } from '@anvia/openai'
 
-const openai = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+const client = new OpenAIClient({ apiKey })
 
-export const transcriptionModel = openai.transcriptionModel(WHISPER_1)
+export const transcriptionModel = client.transcriptionModel({ modelId: 'whisper-1' })
 ```
 
-OpenAI, Gemini, and Grok currently provide transcription adapters.
+OpenAI, Gemini, and Grok provide v1 RC transcription adapters. Supported formats, size limits, languages, and optional parameters vary by provider.
 
-## Transcribe audio
+## 2. Read the audio bytes
+
+Validate authorization, media type, and size before loading an upload into memory.
 
 ```ts
 import { readFile } from 'node:fs/promises'
-import { transcriptionRequest } from '@anvia/core/transcription'
 
-const audio = await readFile('support-call.wav')
+const audioPath = 'support-call.wav'
+const audio = await readFile(audioPath)
+```
 
-const transcript = await transcriptionRequest(transcriptionModel)
-  .data(audio)
-  .filename('support-call.wav')
-  .language('en')
-  .prompt('Transcribe the customer support call exactly.')
-  .temperature(0)
-  .send()
+`transcribe()` accepts a `Uint8Array` or `ArrayBuffer`. Empty audio is rejected before the provider is called.
+
+## 3. Transcribe the audio
+
+Pass the bytes first and the model plus filename in the options object.
+
+```ts
+import { transcribe } from '@anvia/core/transcription'
+import { transcriptionModel } from './models'
+
+const transcript = await transcribe({
+    audio: {
+        data: audio,
+        filename: audioPath
+    },
+    model: transcriptionModel,
+    language: 'en',
+    prompt: 'Transcribe the customer support call exactly.',
+    temperature: 0
+})
 
 console.log(transcript.text)
 ```
 
-The request accepts `Uint8Array` or `ArrayBuffer` audio data. A useful filename helps providers infer the media type.
+A useful filename helps the provider infer the media type. Language, prompt, temperature, provider parameters, and retry behavior are optional.
 
-## Production boundary
+## 4. Handle the result safely
 
-Validate file size, media type, and access before reading bytes. Keep raw audio out of memory, traces, and event logs, and protect or redact transcripts before sending them to downstream agents or indexes.
+The normalized result contains `text` and the raw provider response.
+
+```ts
+await transcripts.save({
+  recordingId,
+  text: transcript.text,
+})
+```
+
+Audio and transcripts may contain private or regulated information. Define access, retention, deletion, redaction, and downstream-use rules before sending transcripts to agents, indexes, analytics, or logs.
+
+For document and image extraction, continue with [OCR models](/sdk/models/ocr).

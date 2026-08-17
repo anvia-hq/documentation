@@ -5,14 +5,11 @@ xAI provider tools run on xAI infrastructure. They are configurations, not local
 ```ts
 import { tools as grokTools } from '@anvia/grok'
 
-const agent = new AgentBuilder('researcher', grok.completionModel())
-  .tools([
-    localDatabaseTool,
-    grokTools.webSearch({ allowedDomains: ['x.ai'] }),
-    grokTools.xSearch({ allowedHandles: ['xai'] }),
-    grokTools.codeInterpreter(),
-  ])
-  .build()
+const agent = new Agent({
+  id: 'researcher',
+  model: grok.completionModel({ modelId: 'grok-4.5', api: 'responses' }),
+  tools: [localDatabaseTool, grokTools.webSearch({ allowedDomains: ['x.ai'] }), grokTools.xSearch({ allowedHandles: ['xai'] }), grokTools.codeInterpreter()],
+})
 ```
 
 Core separates local executable tools from provider tools. The Responses adapter sends provider tools to xAI and normalizes returned sources and provider tool calls.

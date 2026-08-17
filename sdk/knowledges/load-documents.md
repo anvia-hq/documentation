@@ -1,72 +1,79 @@
-# Load documents
+# Load and chunk documents
 
-Loaders turn files and bytes into `Document` values for ingestion. Run them in build jobs, imports, startup tasks, or background workers—not on every prompt.
+Anvia RC keeps document parsing deliberately small: the core package extracts PDF text and chunks text, while your application owns file discovery, storage reads, source IDs, and error handling. Run ingestion in a script, worker, or deployment job—not on every agent request.
 
-## Load text files
+## 1. Read application-approved text
 
-```ts
-import {
-  FileLoader,
-  fileLoaderToDocuments,
-} from '@anvia/core/loaders'
-
-const documents = await fileLoaderToDocuments(
-  FileLoader
-    .withGlob('content/support/**/*.md')
-    .readWithPath()
-    .ignoreErrors(),
-)
-```
-
-`readWithPath()` preserves the source path. The resulting document uses that path as its ID and stores it in `additionalProps.source`.
-
-Use `withDir(...)` for direct children of one directory. It does not recurse.
-
-## Load PDFs
-
-Page-level documents are usually easier to retrieve and cite than a whole PDF.
+Use the file, object-storage, or database API appropriate for your application. For example, a Node.js worker can read a path it resolved from a trusted source:
 
 ```ts
-import {
-  PdfFileLoader,
-  pdfPageLoaderToDocuments,
-} from '@anvia/core/loaders'
+import { readFile } from 'node:fs/promises'
 
-const pages = await pdfPageLoaderToDocuments(
-  PdfFileLoader
-    .withGlob('manuals/**/*.pdf')
-    .readWithPath()
-    .byPage()
-    .ignoreErrors(),
-)
-```
-
-Each page includes its source, media type, and zero-based page number. Use `pdfLoaderToDocuments(...)` only when each PDF is small enough to retrieve as one document.
-
-## Chunk large sources
-
-Core loaders preserve files or PDF pages; application code decides how arbitrary text is chunked. `splitIntoSections` is not an Anvia export—the example below defines a small helper for Markdown files.
-
-```ts
-function splitIntoSections(text: string): string[] {
-  // ponytail: Markdown headings only; use a token-aware chunker for oversized sections.
-  return text
-    .split(/\n(?=#{1,6}\s)/)
-    .map((section) => section.trim())
-    .filter(Boolean)
+const path = 'content/support/reset-links.md'
+const text = await readFile(path, 'utf8')
+const document = {
+  id: path,
+  text,
+  metadata: { source: path, mediaType: 'text/markdown' },
 }
+```
+
+Do not accept an arbitrary filesystem path or glob from a request. File discovery, access control, retries, and skipped-file reporting belong to the ingestion job.
+
+## 2. Extract PDF pages
+
+`extractPdfText()` accepts PDF bytes and returns one text value per page. Page numbers are one-based:
+
+```ts
+import { readFile } from 'node:fs/promises'
+import { extractPdfText } from '@anvia/core/documents'
+
+const path = 'manuals/setup.pdf'
+const data = await readFile(path)
+const { pages } = await extractPdfText({ data })
+
+const documents = pages.map((page) => ({
+  id: `${path}#page=${page.pageNumber}`,
+  text: page.text,
+  metadata: {
+    source: path,
+    mediaType: 'application/pdf',
+    pageNumber: page.pageNumber,
+  },
+}))
+```
+
+Image-only PDFs need OCR before they can be indexed. Treat PDF bytes as untrusted input and apply size limits, malware scanning, timeouts, and cancellation outside the parser.
+
+## 3. Chunk long text
+
+Use `chunkText()` with either a fixed-width or recursive separator strategy. Keep chunk IDs stable so a later ingestion run replaces the same records:
+
+```ts
+import { chunkText } from '@anvia/core/documents'
 
 const chunks = documents.flatMap((document) =>
-  splitIntoSections(document.text).map((text, index) => ({
-    id: `${document.id}#section=${index}`,
-    text,
-    source: document.additionalProps?.source ?? document.id,
+  chunkText({
+    text: document.text,
+    strategy: 'recursive',
+    maxSize: 1_600,
+    overlap: 200,
+    separators: ['\n\n', '\n', '. ', ' '],
+  }).map((chunk) => ({
+    id: `${document.id}#chunk=${chunk.index}`,
+    text: chunk.text,
+    metadata: {
+      ...document.metadata,
+      parentId: document.id,
+      start: chunk.start,
+      end: chunk.end,
+    },
   })),
 )
 ```
 
-Keep chunk IDs stable so a later ingestion run can replace changed content without leaving duplicates.
+`chunkText()` measures JavaScript string length, not model tokens. Choose boundaries and limits that fit the content and embedding model you use.
 
-## Handle failed sources
+## 4. Continue to embeddings
 
-Without `.ignoreErrors()`, loaders yield `LoaderResult` values so an import can report each failure. Skipping unreadable files is convenient for backfills, but production jobs should still make missing knowledge visible.
+Pass the normalized values to `embedDocuments()` using `id`, `content`, and `metadata` selectors, then upsert the returned embedded documents into a vector store. See [create embeddings](/sdk/knowledges/embeddings).

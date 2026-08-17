@@ -8,43 +8,49 @@
 pnpm add @anvia/redis @anvia/core @anvia/openai redis
 ```
 
-The ESM package includes the Redis client and peers with `@anvia/core >=0.7.1 <1.0.0`. The target Redis deployment must support the `FT.*` search commands used by the adapter.
+The ESM package includes the Redis client and should be installed with the matching `@anvia/core` release candidate. The target Redis deployment must support the `FT.*` search commands used by the adapter.
 
 ## Store and search documents
 
 ```ts
-import { embedDocuments } from '@anvia/core/embeddings'
-import { RedisVectorStore } from '@anvia/redis'
-import { OpenAIClient } from '@anvia/openai'
-
+import { retrieveDocuments } from "@anvia/core/vector-store";
+import { embedDocuments } from '@anvia/core/embeddings';
+import { RedisVectorClient } from '@anvia/redis';
+import { OpenAIClient } from '@anvia/openai';
 const openai = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-const embeddings = openai.embeddingModel('text-embedding-3-small')
+    apiKey: process.env.OPENAI_API_KEY!,
+});
+const embeddings = openai.embeddingModel({
+    modelId: 'text-embedding-3-small'
+});
 const sourceDocuments = [
-  {
-    id: 'password-reset',
-    text: 'Password reset links expire after 30 minutes.',
-  },
-]
-
-const documents = await embedDocuments(embeddings, sourceDocuments, {
-  id: (document) => document.id,
-  content: (document) => document.text,
-})
-
-const store = await RedisVectorStore.connect({
-  indexName: 'support_docs',
-  keyPrefix: 'knowledge:support:',
-  vectorSize: 1536,
-})
-
-await store.upsertDocuments(documents)
-
-const results = await store.index(embeddings).search({
-  query: 'How do I reset a password?',
-  topK: 5,
-})
+    {
+        id: 'password-reset',
+        text: 'Password reset links expire after 30 minutes.',
+    },
+];
+const { documents } = await embedDocuments({
+    model: embeddings,
+    documents: sourceDocuments,
+    id: (document) => document.id,
+    content: (document) => document.text
+});
+const storeClient = new RedisVectorClient({});
+const store = storeClient.vectorStore({
+    indexName: 'support_docs',
+    keyPrefix: 'knowledge:support:',
+    dimensions: 1536
+});
+await store.ensure();
+await store.upsert({
+    documents: documents
+});
+const results = await retrieveDocuments({
+    store: store,
+    model: embeddings,
+    query: 'How do I reset a password?',
+    topK: 5
+});
 ```
 
 Without an injected client, the adapter connects to `REDIS_URL` or `redis://localhost:6379`.
@@ -53,7 +59,7 @@ Without an injected client, the adapter connects to `REDIS_URL` or `redis://loca
 
 By default, `connect()` checks the index and creates a hash-backed HNSW index when missing. The default key prefix is `anvia:<indexName>:` and the default distance is `COSINE`. The vector field uses `FLOAT32` with the configured dimension.
 
-For production, create and tune the search index through deployment automation, then pass `createIfMissing: false`. Keep `indexName`, prefix, dimension, distance, and field layout consistent with the adapter.
+For production, create and tune the search index through deployment automation, then call `validate()`. Keep `indexName`, prefix, dimension, distance, and field layout consistent with the adapter.
 
 The adapter writes hashes without expiration. Retention, deletion, and stale-document cleanup belong to the application. Metadata names beginning with `__anvia_` are reserved.
 
@@ -70,5 +76,5 @@ The adapter writes hashes without expiration. Retention, deletion, and stale-doc
 - [API reference](/packages/redis/api-reference)
 - [Vector stores](/sdk/knowledges/vector-stores)
 - [Metadata filters](/sdk/knowledges/metadata-filters)
-- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/vector-redis)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-redis/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/vector-redis)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/vector-redis/CHANGELOG.md)

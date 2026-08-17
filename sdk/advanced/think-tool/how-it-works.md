@@ -1,8 +1,8 @@
-# How it works
+# How the think tool works
 
-`createThinkTool()` creates a regular Anvia tool whose only job is to echo a short text checkpoint back into the model-tool loop.
+`createThinkTool()` returns a regular Anvia tool whose implementation echoes one validated string.
 
-## Tool contract
+## 1. Inspect the contract
 
 ```ts
 import { createThinkTool } from '@anvia/core'
@@ -10,7 +10,7 @@ import { createThinkTool } from '@anvia/core'
 const think = createThinkTool()
 ```
 
-Its contract is equivalent to:
+The input and output are equivalent to:
 
 ```ts
 type Input = {
@@ -20,44 +20,38 @@ type Input = {
 type Output = string
 ```
 
-When the model calls it with:
+Given this call:
 
 ```json
 {
-  "thought": "The logs and deployment time correlate; check the changed configuration next."
+  "thought": "The deployment time matches the first errors; inspect the changed configuration next."
 }
 ```
 
-the tool returns that same text. It does not contact another model, search a knowledge base, write memory directly, or execute an application action.
+the tool returns the value of `thought`. It does not contact another model, retrieve documents, persist memory directly, or perform an application action.
 
-## Runtime sequence
+## 2. Follow the runtime sequence
 
 ```text
-Model turn
-  └─ calls think({ thought })
-       └─ Anvia validates the input
-            └─ returns the thought as a tool result
-                 └─ next model turn continues with that result
+Model emits think({ thought })
+  -> Anvia validates the argument
+  -> tool returns the same text
+  -> result enters the active transcript
+  -> next model turn continues from that result
 ```
 
-Because this is a normal tool call, using it requires the model to continue into another turn. Set a turn limit that leaves enough room for the actual tools and final response.
+The call consumes a tool turn and requires another model turn to continue. Leave enough `maxTurns` for evidence gathering, the checkpoint, any later actions, and the final answer.
 
-## What the checkpoint changes
+## 3. Understand what changes
 
-The checkpoint makes the model's current decision state explicit in the transcript. It can help the next turn remain focused after several tool results or clarify which missing fact should be collected next.
+The echoed result makes a concise decision state explicit to the next turn. This may help after several observations or when the model must choose which missing fact to collect.
 
-It does not add facts or guarantee better reasoning. A vague checkpoint simply echoes vague text; a strong instruction is what makes the checkpoint useful.
+It adds no new facts and guarantees no improvement. A vague checkpoint merely echoes vague text; bounded instructions and evaluation determine whether the extra turn is worthwhile.
 
-## What the runtime observes
+## 4. Treat it as normal tool activity
 
-The call follows the same lifecycle as other tools:
+The runtime applies the normal tool path: input parsing, configured lifecycle handling, middleware, observers, stream events, transcript updates, and subsequent model generation.
 
-| Stage | Runtime behavior |
-| --- | --- |
-| Tool request | Validates the `thought` argument. |
-| Tool execution | Returns the text without an external side effect. |
-| Tool result | Adds the echoed text to the active model transcript. |
-| Next turn | Lets the model select another tool or produce the answer. |
-| Observability | Reports normal tool activity according to observer capture policy. |
+That visibility helps evaluation and debugging, but it also makes the checkpoint retained application data rather than hidden chain-of-thought.
 
-This visibility is useful for evaluation and debugging, but it also means think content should be treated as retained application data rather than invisible chain-of-thought.
+Next, decide [when to use it](/sdk/advanced/think-tool/when-to-use).

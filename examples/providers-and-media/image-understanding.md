@@ -16,24 +16,40 @@ question answering, or a first-pass review when the chosen model supports image 
 ## Implementation
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
-import { Message, UserContent } from '@anvia/core/completion'
+import { Agent } from '@anvia/core/agent'
+import type { UserMessage } from '@anvia/core/completion'
 import { OpenAIClient } from '@anvia/openai'
 
-const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY })
-const model = client.completionModel('gpt-5')
+const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! })
+const model = client.completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
+})
 if (!model.capabilities.imageInput) throw new Error('Selected model has no image input.')
 
-const agent = new AgentBuilder('visual-reviewer', model)
-  .instructions('Describe only visible evidence. State uncertainty clearly.')
-  .build()
+const agent = new Agent({
+  id: 'visual-reviewer',
+  model: model,
+  instructions: 'Describe only visible evidence. State uncertainty clearly.',
+})
 
-const response = await agent.prompt(Message.user([
-  UserContent.text('Describe the scene in three bullets.'),
-  UserContent.imageUrl('https://example.com/authorized-image.jpg', { detail: 'auto' }),
-])).send()
+const prompt: UserMessage = {
+  role: 'user',
+  content: [
+    { type: 'text', text: 'Describe the scene in three bullets.' },
+    {
+      type: 'image',
+      image: { type: 'url', url: 'https://example.com/authorized-image.jpg' },
+      detail: 'auto',
+    },
+  ],
+}
 
-console.log(response.output)
+const response = await agent.generate({ messages: [prompt] })
+
+if (response.status === 'completed') {
+  console.log(response.output)
+}
 ```
 
 ## Run and expected behavior
@@ -55,7 +71,7 @@ checks or human review.
 ## Source and extensions
 
 Run the
-[image attachment cookbook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/04_providers_and_multimodal/05-image-attachment.ts).
+[image attachment cookbook](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/05-image-attachment.ts).
 Next, compare URL and base64 inputs or combine the result with a validated structured schema.
 
 - [Multimodal inputs](/sdk/advanced/multimodal/inputs)

@@ -22,17 +22,21 @@ If an agent has its own memory store, that source takes precedence on the Memory
 Anvia's SQLite, Postgres, Drizzle, and Prisma memory adapters expose the optional read-only `MemoryInspector` interface. Register one with the agent as usual:
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
-import { createSqliteMemoryStore } from '@anvia/memory-sqlite'
+import { Agent } from '@anvia/core/agent'
+import { SqliteMemoryClient } from '@anvia/memory-sqlite'
 import { Studio } from '@anvia/studio'
 
-const memory = createSqliteMemoryStore({
+const memoryClient = new SqliteMemoryClient({
   path: 'data/anvia-memory.sqlite',
 })
+const memory = memoryClient.memoryStore()
+await memory.ensure()
 
-const agent = new AgentBuilder('support', model)
-  .memory(memory, { savePolicy: 'turn' })
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  memory: { store: memory, savePolicy: 'turn' },
+})
 
 new Studio([agent]).start({ port: 4021 })
 ```
@@ -47,14 +51,14 @@ import type { MemoryInspector, MemoryStore } from '@anvia/core/memory'
 const inspector: MemoryInspector = {
   listConversations: ({ limit, userId }) =>
     listStoredConversations({ limit, userId }),
-  getConversation: (ref) => getStoredConversation(ref),
+  getConversation: ({ ref }) => getStoredConversation(ref),
 }
 
 const memory: MemoryStore = {
   inspector,
-  load: (context) => loadMessages(context),
+  load: ({ scope }) => loadMessages(scope),
   append: (input) => appendMessages(input),
-  clear: (context) => clearMessages(context),
+  clear: ({ scope }) => clearMessages(scope),
 }
 ```
 
@@ -130,4 +134,3 @@ GET /memory/sources/:sourceRef/conversations/:conversationRef/steps
 ```
 
 Treat these routes as a trusted development surface. They can expose prompts, tool arguments and results, model output, metadata, and user identifiers from the connected store. Do not publish Studio as a production memory administration API.
-

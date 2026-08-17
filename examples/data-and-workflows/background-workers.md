@@ -53,22 +53,25 @@ claims in the queue payload.
 
 ```ts
 async function processResearchJob(jobId: string): Promise<void> {
-  const claimed = await jobs.claim(jobId); // atomic application operation
-  if (!claimed) return;
-
-  try {
-    const input = await projects.authorizedResearchInput(claimed.projectId);
-    const output = await researchPipeline.run(input, {
-      observer: {
-        onEvent: (event) => jobs.recordPipelineEvent(jobId, event),
-      },
-    });
-    await jobs.complete(jobId, output);
-  } catch (error) {
-    await jobs.fail(jobId, safeErrorCode(error));
-    throw error; // let the queue apply its configured retry policy
-  }
+    const claimed = await jobs.claim(jobId); // atomic application operation
+    if (!claimed)
+        return;
+    try {
+        const input = await projects.authorizedResearchInput(claimed.projectId);
+        const output = await researchPipeline.run({
+            input: input,
+            observer: {
+                onEvent: (event) => jobs.recordPipelineEvent(jobId, event),
+            }
+        });
+        await jobs.complete(jobId, output);
+    }
+    catch (error) {
+        await jobs.fail(jobId, safeErrorCode(error));
+        throw error; // let the queue apply its configured retry policy
+    }
 }
+
 ```
 
 The repository methods and queue client above are intentionally application-owned interfaces, not
@@ -90,7 +93,7 @@ verify lease recovery before treating the design as durable.
 Re-authorize access when reading job status. Use opaque IDs, encrypt sensitive source data, limit
 worker egress, and separate queues by trust level. Add idempotency keys for every external write,
 lease expiry, retry ceilings, a dead-letter queue, progress throttling, and graceful shutdown. Do not
-assume a `PipelineRunObserver` is a durable event store.
+assume a `PipelineRunObserver` is a durable audit log.
 
 ## Tests
 
@@ -101,5 +104,5 @@ queue; integration-test the queue adapter separately.
 ## Source and extensions
 
 - Adapt [pipeline production workers](/sdk/pipelines/production-workers).
-- The unit of work can be based on [`05_pipelines/08-research-pipeline.ts`](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/05_pipelines/08-research-pipeline.ts).
+- The unit of work can be based on [`05_pipelines/08-research-pipeline.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/05_pipelines/08-research-pipeline.ts).
 - Extend with webhook completion, polling, resumable UI status, or per-tenant worker quotas.

@@ -9,31 +9,40 @@ pnpm add @anvia/core @anvia/openai
 Create one client at the server boundary. Construction requires `apiKey` unless an initialized OpenAI client is supplied.
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 
 const openai = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 
-const agent = new AgentBuilder(
-  'support',
-  openai.completionModel('gpt-5'),
-)
-  .instructions('Answer support questions clearly.')
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: openai.completionModel({
+      modelId: 'gpt-5.5',
+      api: "responses"
+  }),
+  instructions: 'Answer support questions clearly.',
+  maxTurns: 4,
+})
 
-const result = await agent.prompt('Draft a concise reply to this ticket.').send()
-console.log(result.output)
+const result = await agent.generate({
+    prompt: 'Draft a concise reply to this ticket.'
+})
+
+if (result.status === 'completed') {
+  console.log(result.output)
+}
 ```
 
-`completionModel()` uses the Responses adapter by default. It returns an Anvia `StreamingCompletionModel`, so the same object works with agents and direct completion APIs.
+`completionModel({ modelId, api })` requires `api: 'responses' | 'chat'`. It returns an Anvia `StreamingCompletionModel`, so the same object works with agents and direct completion APIs.
 
 ## Stream a run
 
 ```ts
-for await (const event of agent.prompt('Explain the resolution.').stream()) {
+for await (const event of agent.stream({
+    prompt: 'Explain the resolution.'
+})) {
   if (event.type === 'text_delta') {
     process.stdout.write(event.delta)
   }
@@ -47,10 +56,12 @@ The agent stream includes runtime events around the provider stream: turns, tool
 Create only the capability objects the process needs:
 
 ```ts
-const embeddings = openai.embeddingModel('text-embedding-3-small')
-const image = openai.imageGenerationModel()
-const speech = openai.audioGenerationModel()
-const transcription = openai.transcriptionModel()
+const embeddings = openai.embeddingModel({
+    modelId: 'text-embedding-3-small'
+})
+const image = openai.imageGenerationModel({ modelId: 'gpt-image-1' })
+const speech = openai.speechGenerationModel({ modelId: 'tts-1' })
+const transcription = openai.transcriptionModel({ modelId: 'whisper-1' })
 ```
 
 These objects share the underlying OpenAI SDK client but do not share request state.

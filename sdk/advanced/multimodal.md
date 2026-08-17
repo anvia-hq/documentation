@@ -1,36 +1,39 @@
-# Multimodal
+# Multimodal workflows
 
-Multimodal workflows move between media, model-readable content, normalized text, and stored assets. Anvia keeps those capabilities separate so each stage can use the right model and the application can control every storage and permission boundary.
-
-## Choose the capability
-
-| Need | Use |
-| --- | --- |
-| Ask a completion model about an image or document | [Media input](/sdk/advanced/multimodal/inputs) |
-| Create image bytes from a prompt | [Image generation](/sdk/advanced/multimodal/image) |
-| Turn text into audio | [Audio generation](/sdk/advanced/multimodal/audio) |
-| Turn audio into text | [Transcription](/sdk/advanced/multimodal/transcription) |
-| Recover text and layout from a scanned file | [OCR](/sdk/advanced/multimodal/ocr) |
-| Return an image from an agent tool | [Multimodal tool results](/sdk/advanced/multimodal/tool-results) |
-| Connect several media stages | [Multimodal pipelines](/sdk/advanced/multimodal/pipelines) |
-| Prepare a workflow for production | [Production checklist](/sdk/advanced/multimodal/checklist) |
-
-## Separate understanding from generation
-
-Image and document input are capabilities of a **completion model**. Image generation, audio generation, transcription, and OCR use their own model contracts.
+Multimodal workflows move between media, model-readable content, normalized text, and stored assets. Anvia keeps these capabilities separate so each stage can use the correct model contract.
 
 ```text
-Image or document ──→ completion model ──→ text or tool calls
-Text prompt ────────→ image model ───────→ image bytes
-Text script ────────→ audio model ───────→ audio bytes
-Audio bytes ────────→ transcription ─────→ text
-Scanned file ───────→ OCR ───────────────→ pages and Markdown
+Image or document -> completion model -> text or tool calls
+Text prompt       -> image model      -> image bytes
+Text script       -> audio model      -> audio bytes
+Audio bytes       -> transcription    -> text
+Scanned file      -> OCR              -> pages and Markdown
 ```
 
-A model that can inspect an image does not automatically generate images, and a provider package may implement only some of these contracts. Start with [Models](/sdk/models) to construct the required models, then use this section to compose them into an application workflow.
+A completion model that inspects an image does not automatically generate images. A provider package may implement only some of these contracts.
 
-## Keep media at the application boundary
+## 1. Choose the capability
 
-Anvia normalizes requests and responses, but the application still owns uploads, object storage, signed URLs, permissions, retention, moderation, and background jobs. Avoid carrying large byte arrays through agent memory, traces, or pipeline results. Store the asset and pass a small reference to later stages whenever they do not need the bytes directly.
+- Use [media input](/sdk/advanced/multimodal/inputs) to ask a completion model about an image or document.
+- Use [image generation](/sdk/advanced/multimodal/image) to create image bytes from text.
+- Use [audio generation](/sdk/advanced/multimodal/audio) to synthesize speech.
+- Use [transcription](/sdk/advanced/multimodal/transcription) to turn audio into text.
+- Use [OCR](/sdk/advanced/multimodal/ocr) for scanned document text and layout.
+- Use [structured tool results](/sdk/advanced/multimodal/tool-results) when the next model turn needs an image returned by a tool.
+- Use [multimodal pipelines](/sdk/advanced/multimodal/pipelines) to make representation changes explicit.
 
-Before launch, smoke test the exact provider, model ID, media type, dimensions, voice, and provider-specific parameters used by the workflow. Capability names alone do not prove that a particular request shape is supported.
+## 2. Keep media at the application boundary
+
+Anvia normalizes model requests and responses. The application still owns uploads, object storage, signed URLs, authorization, retention, moderation, and background jobs.
+
+Avoid carrying large byte arrays or base64 strings through agent memory, traces, queues, and product database rows. Store the asset and pass a stable ID until a model stage genuinely needs the bytes.
+
+## 3. Validate the exact provider path
+
+Capability flags catch unsupported completion inputs, but they cannot prove that every model ID supports a particular media type, dimension, voice, format, or provider parameter.
+
+Smoke test the exact provider, model ID, content type, and options used in production. Treat all media understanding and extraction as fallible model output.
+
+## 4. Review production boundaries
+
+Before launch, use the [multimodal production checklist](/sdk/advanced/multimodal/checklist).

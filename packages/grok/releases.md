@@ -1,6 +1,6 @@
 # Releases
 
-Current documented package version: `0.4.1`.
+Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 history.
 
 ## Recent changes
 
@@ -14,7 +14,7 @@ Current documented package version: `0.4.1`.
 
 Many `0.2.x` patch releases track fixes inherited from the delegated OpenAI-compatible adapter, including streaming tools, reasoning history, usage on failures, and provider dependency updates. Check both changelogs when diagnosing compatibility behavior.
 
-- [Full `@anvia/grok` changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-grok/CHANGELOG.md)
-- [OpenAI adapter changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-openai/CHANGELOG.md)
+- [Full `@anvia/grok` changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-grok/CHANGELOG.md)
+- [OpenAI adapter changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-openai/CHANGELOG.md)
 - [Compatibility and versioning](/packages/compatibility-and-versioning)
 - [API reference](/packages/grok/api-reference)

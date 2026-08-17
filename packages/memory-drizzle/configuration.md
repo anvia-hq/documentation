@@ -3,12 +3,13 @@
 Use the canonical exported schema or inject compatible table objects:
 
 ```ts
-const memory = createDrizzleMemoryStore(db, {
+const memory = new DrizzleMemoryStore({
+  db,
   schema: drizzleMemorySchema,
   lock: 'advisory',
-  errors: 'store',
+  errorPolicy: 'store',
   validateMessages: true,
-  scope: {
+  scopeKey: {
     includeUserId: true,
     metadataKeys: ['tenantId'],
   },

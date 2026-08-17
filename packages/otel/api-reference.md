@@ -1,65 +1,47 @@
 # `@anvia/otel` API reference
 
-All public symbols are exported from `@anvia/otel`.
-
-## Tracing
-
 ```ts
-const otel: {
-  create(options?: OtelTracingOptions): OtelTracing
-}
-
-type OtelTracing = import('@anvia/core/observability').AgentObserver
+import {
+  createOtelObserver,
+  createOtelEvalReporter,
+  type OtelObserverOptions,
+  type OtelEvalReporterOptions,
+} from '@anvia/otel'
 ```
 
-`otel.create()` returns an observer that emits agent, generation, and tool activity through OpenTelemetry.
+## `createOtelObserver`
 
 ```ts
-type OtelTracingOptions = {
-  tracer?: import('@opentelemetry/api').Tracer
-  tracerName?: string
-  tracerVersion?: string
-  serviceName?: string
-  captureMode?: 'safe' | 'full'
-  captureMaxBytes?: number
-  transformInput?: (value: unknown) => unknown
-  transformOutput?: (value: unknown) => unknown
-}
+const observer = createOtelObserver({
+  tracer,
+  tracerName,
+  tracerVersion,
+  serviceName,
+  captureMode,
+  captureMaxBytes,
+  transformInput,
+  transformOutput,
+})
 ```
 
-If `tracer` is omitted, the adapter resolves a tracer from the active OpenTelemetry API provider using the configured name and version.
+The observer emits agent runs, generations, tools, and child-agent work through the supplied tracer or the active global provider. It does not create, register, flush, or shut down an OpenTelemetry SDK.
 
-## Evaluation reporter
+## `createOtelEvalReporter`
 
 ```ts
-function createOtelEvalReporter<
-  Input = unknown,
-  Output = unknown,
-  Expected = unknown,
->(
-  options?: OtelEvalReporterOptions,
-): import('@anvia/core/evals').EvalReporter<Input, Output, Expected>
+const reporter = createOtelEvalReporter({
+  logger,
+  loggerName,
+  loggerVersion,
+  traceObserver,
+  publishInvalid,
+  includeMetadata,
+  includePayloads,
+  captureMaxBytes,
+  transformInput,
+  transformOutput,
+  onMissingTrace,
+})
 ```
 
-```ts
-type OtelEvalReporterOptions = {
-  logger?: import('@opentelemetry/api-logs').Logger
-  loggerName?: string
-  loggerVersion?: string
-  publishInvalid?: boolean
-  includeMetadata?: boolean
-  includePayloads?: boolean
-  captureMaxBytes?: number
-  transformInput?: (value: unknown) => unknown
-  transformOutput?: (value: unknown) => unknown
-  onMissingTrace?: 'emit' | 'ignore' | 'warn' | 'throw'
-}
-```
-
-## Export inventory
-
-| Kind | Public exports |
-| --- | --- |
-| Values | `otel`, `createOtelEvalReporter` |
-| Types | `OtelTracing`, `OtelTracingOptions`, `OtelEvalReporterOptions` |
-
+Pass the reporter to `runEvalSuite()`. When no logger is supplied it uses the active global OpenTelemetry logging provider.

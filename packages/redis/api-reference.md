@@ -4,96 +4,41 @@ All public symbols are exported from `@anvia/redis`.
 
 ```ts
 import {
-  filterToRedisQuery,
-  RedisVectorIndex,
+  RedisVectorClient,
   RedisVectorStore,
+  filterToRedisQuery,
   type RedisClientLike,
   type RedisDistance,
-  type RedisVectorStoreConnectOptions,
+  type RedisMetadataFieldType,
+  type RedisMetadataSchema,
+  type RedisVectorClientOptions,
+  type RedisVectorStoreOptions,
 } from '@anvia/redis'
 ```
 
-## filterToRedisQuery
+## RedisVectorClient
 
 ```ts
-function filterToRedisQuery(filter: VectorFilter | undefined): string
+class RedisVectorClient {
+  constructor(options?: RedisVectorClientOptions)
+  vectorStore<T, Metadata extends VectorMetadata = VectorMetadata>(
+    options: RedisVectorStoreOptions,
+  ): RedisVectorStore<T, Metadata>
+  close(): Promise<void>
+}
 ```
 
-Returns the RediSearch query fragment for an Anvia vector filter.
+`RedisVectorClientOptions` accepts an injected `client?: RedisClientLike` or `url?: string`. `RedisVectorStoreOptions` contains `indexName`, `dimensions`, and optional `keyPrefix`, `metric`, and `metadataSchema`. Metadata schema values are `'numeric' | 'tag'`; native distance values are `'COSINE' | 'L2' | 'IP'`.
 
 ## RedisVectorStore
 
 ```ts
-class RedisVectorStore<
-  T,
-  Metadata extends VectorMetadata = VectorMetadata,
-> {
-  static connect<T, Metadata extends VectorMetadata = VectorMetadata>(
-    options: RedisVectorStoreConnectOptions,
-  ): Promise<RedisVectorStore<T, Metadata>>
-
-  upsertDocuments(
-    documents: Array<EmbeddedDocument<T, Metadata>>,
-  ): Promise<void>
-
-  index(model: EmbeddingModel): RedisVectorIndex<T, Metadata>
-}
+await store.ensure()
+await store.validate()
+await store.upsert({ documents, providerOptions })
+const results = await store.search({ vector, topK, minScore, filter, providerOptions, abortSignal })
 ```
 
-## RedisVectorIndex
-
-```ts
-class RedisVectorIndex<
-  T,
-  Metadata extends VectorMetadata = VectorMetadata,
-> implements VectorSearchIndex<T, Metadata> {
-  constructor(
-    model: EmbeddingModel,
-    client: RedisClientLike,
-    indexName: string,
-  )
-
-  search(request: VectorSearchRequest): Promise<Array<VectorSearchResult<T, Metadata>>>
-  searchIds(request: VectorSearchRequest): Promise<Array<{ score: number; id: string }>>
-  asTool(options: VectorSearchToolOptions): Tool<{ query: string; topK?: number }, unknown>
-}
-```
-
-## Types
-
-```ts
-type RedisDistance = 'COSINE' | 'L2' | 'IP'
-
-type RedisClientLike = {
-  ft: {
-    create(
-      indexName: string,
-      schema: Record<string, unknown>,
-      options?: Record<string, unknown>,
-    ): Promise<unknown>
-    search(
-      indexName: string,
-      query: string,
-      options?: Record<string, unknown>,
-    ): Promise<unknown>
-    dropindex(indexName: string): Promise<unknown>
-    info(indexName: string): Promise<unknown>
-  }
-  hSet(
-    key: string,
-    fieldValues: Record<string, unknown>,
-  ): Promise<unknown>
-  expire(key: string, seconds: number): Promise<unknown>
-}
-
-type RedisVectorStoreConnectOptions = {
-  client?: RedisClientLike
-  indexName: string
-  keyPrefix?: string
-  vectorSize: number
-  createIfMissing?: boolean
-  distance?: RedisDistance
-}
-```
+`filterToRedisQuery(filter, metadataSchema)` converts a supported Anvia filter into a Redis Search query.
 
 Return to the [package guide](/packages/redis).

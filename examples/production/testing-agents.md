@@ -21,7 +21,7 @@ smoke-test job.
 ## Testing pyramid
 
 ```text
-many: schema, tool, pipeline, hook, and fake-model unit tests
+many: schema, tool, pipeline, lifecycle, and fake-model unit tests
 some: database/queue/HTTP adapter integration tests
 few: live provider smoke tests and behavioral eval suites
 ```
@@ -32,8 +32,7 @@ Implement the public completion contract for unit tests:
 
 ```ts
 import {
-  AgentBuilder,
-  AssistantContent,
+  Agent,
   type CompletionModel,
   type CompletionRequest,
   type CompletionResponse,
@@ -42,7 +41,7 @@ import {
 
 class StaticModel implements CompletionModel {
   readonly provider = "test";
-  readonly defaultModel = "static";
+  readonly modelId = "static";
   readonly capabilities = {
     streaming: false,
     tools: false,
@@ -55,15 +54,21 @@ class StaticModel implements CompletionModel {
 
   async completion(_request: CompletionRequest): Promise<CompletionResponse> {
     return {
-      choice: [AssistantContent.text("Refunds are available for 30 days.")],
+      choice: [{ type: "text", text: "Refunds are available for 30 days." }],
       usage: Usage.empty(),
       rawResponse: { fixture: "refund-policy-v1" },
     };
   }
 }
 
-const agent = new AgentBuilder("support-test", new StaticModel()).build();
-const response = await agent.prompt("What is the refund window?").send();
+const agent = new Agent({
+  id: "support-test",
+  model: new StaticModel(),
+});
+const response = await agent.generate({
+    prompt: "What is the refund window?"
+});
+if (response.status !== "completed") throw new Error("Unexpected approval request");
 expect(response.output).toContain("30 days");
 ```
 
@@ -103,6 +108,6 @@ and live smoke/eval jobs on a controlled schedule or release boundary.
 
 ## Source and extensions
 
-- Static model source: [`10_integrations/08-lens-native.ts`](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/10_integrations/08-lens-native.ts)
-- Eval source: [`08_evals/04-agent-eval-target.ts`](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/08_evals/04-agent-eval-target.ts)
+- Static model source: [`10_integrations/08-lens-native.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/10_integrations/08-lens-native.ts)
+- Eval source: [`08_evals/04-agent-eval-target.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/08_evals/04-agent-eval-target.ts)
 - Continue to [evaluations](/examples/production/evaluations) and [quality gates](/examples/production/quality-gates).

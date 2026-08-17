@@ -18,35 +18,49 @@ The root exports the principal components, providers, hooks, and shared types fr
 ### Providers
 
 ```ts
-type ChatController<TEvent = unknown> = UseChatResult<TEvent>
+type ChatController<
+  Metadata extends ClientMetadata = ClientMetadata,
+  Data extends ClientDataMap = ClientDataMap,
+> = UseChatResult<ClientTransport<ClientStreamRequest, Data, Metadata>>
 
-type ChatProviderProps<TEvent = unknown> = {
-  controller: ChatController<TEvent>
+type ChatProviderProps<
+  Metadata extends ClientMetadata = ClientMetadata,
+  Data extends ClientDataMap = ClientDataMap,
+> = {
+  controller: ChatController<Metadata, Data>
   children?: ReactNode
 }
 
-function ChatProvider<TEvent = unknown>(
-  props: ChatProviderProps<TEvent>,
+function ChatProvider<Metadata extends ClientMetadata, Data extends ClientDataMap>(
+  props: ChatProviderProps<Metadata, Data>,
 ): ReactElement
 
-function useChatContext<TEvent = unknown>(): ChatController<TEvent>
+function useChatContext<Metadata extends ClientMetadata, Data extends ClientDataMap>():
+  ChatController<Metadata, Data>
 ```
 
 `ChatProvider` makes an `@anvia/react` `useChat` result available to chat, composer, message, and human-input primitives. `useChatContext` throws when used outside the provider.
 
 ```ts
-type CompletionController<TEvent = unknown> = UseCompletionResult<TEvent>
+type CompletionController<
+  Metadata extends ClientMetadata = ClientMetadata,
+  Data extends ClientDataMap = ClientDataMap,
+> = UseCompletionResult<Metadata, Data>
 
-type CompletionProviderProps<TEvent = unknown> = {
-  controller: CompletionController<TEvent>
+type CompletionProviderProps<
+  Metadata extends ClientMetadata = ClientMetadata,
+  Data extends ClientDataMap = ClientDataMap,
+> = {
+  controller: CompletionController<Metadata, Data>
   children?: ReactNode
 }
 
-function CompletionProvider<TEvent = unknown>(
-  props: CompletionProviderProps<TEvent>,
+function CompletionProvider<Metadata extends ClientMetadata, Data extends ClientDataMap>(
+  props: CompletionProviderProps<Metadata, Data>,
 ): ReactElement
 
-function useCompletionContext<TEvent = unknown>(): CompletionController<TEvent>
+function useCompletionContext<Metadata extends ClientMetadata, Data extends ClientDataMap>():
+  CompletionController<Metadata, Data>
 ```
 
 `CompletionProvider` supplies a `useCompletion` controller to the completion component family.
@@ -111,7 +125,7 @@ import {
 | `Composer.ClearQuote` | Clears the quote |
 | `Composer.TriggerMenu` | Renders matches for active inline triggers |
 | `Composer.TriggerItem` | Renders one trigger result |
-| `Composer.Submit` | Submits when content is present and the chat is idle |
+| `Composer.Submit` | Submits when content is present and the chat is not submitted or streaming |
 | `Composer.Stop` | Stops the active chat request |
 
 The root's important additional props are:
@@ -136,17 +150,17 @@ type ComposerRootProps = PrimitiveProps<'form'> & {
 ```
 
 ```ts
-type ComposerSubmitMessageArgs<TEvent = unknown> = {
+type ComposerSubmitMessageArgs<Data extends ClientDataMap = ClientDataMap> = {
   input: string
   attachments: UIAttachment[]
   entities: ComposerEntity[]
-  chat: ChatController<TEvent>
+  chat: ChatController<ClientMetadata, Data>
   quote?: ComposerQuote
   clear(): void
 }
 
-type ComposerSubmitMessage<TEvent = unknown> = (
-  args: ComposerSubmitMessageArgs<TEvent>,
+type ComposerSubmitMessage<Data extends ClientDataMap = ClientDataMap> = (
+  args: ComposerSubmitMessageArgs<Data>,
 ) => Promise<void> | void
 ```
 

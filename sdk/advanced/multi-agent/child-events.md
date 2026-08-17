@@ -1,10 +1,8 @@
 # Child events
 
-Forward child-agent runtime events when operators or internal systems need to inspect nested work.
+Enable child streaming when internal operators or application logic need to inspect nested agent progress.
 
-## Enable child streaming
-
-Set `stream: true` on the agent tool:
+## 1. Forward child events
 
 ```ts
 const policyReview = policyAgent.asTool({
@@ -15,45 +13,45 @@ const policyReview = policyAgent.asTool({
 })
 ```
 
-Without `stream: true`, the coordinator still receives the child's final output as the tool result, but nested runtime events are not forwarded into the parent stream.
+Child events are forwarded only when the parent is itself consumed with `stream()` and the child model supports streaming.
 
-## Consume events from the parent
-
-Only the parent request needs to be consumed:
+## 2. Consume the parent stream
 
 ```ts
-const request = supportAgent
-  .session(threadId, { userId: user.id })
-  .prompt(message)
-
-for await (const event of request.stream()) {
-  if (event.type === 'agent_tool_event') {
-    await operationsLog.write({
-      childAgentId: event.agentId,
-      toolName: event.toolName,
-      childEvent: event.event.type,
-    })
-  }
-
-  if (event.type === 'final') {
-    await responses.save(event.output)
-  }
+const session = { sessionId: threadId, userId: user.id };
+for await (const event of supportAgent.stream({
+    prompt: message,
+    session: session
+})) {
+    if (event.type === 'agent_tool_event') {
+        await operationsLog.write({
+            parentTurn: event.turn,
+            childAgentId: event.agentId,
+            childAgentName: event.agentName,
+            toolName: event.toolName,
+            internalCallId: event.internalCallId,
+            childEventType: event.event.type,
+        });
+    }
+    if (event.type === 'final') {
+        if (event.result.status === 'completed') {
+            await responses.save(event.result.output);
+        }
+    }
 }
 ```
 
-An `agent_tool_event` identifies the child agent and the parent tool call, then carries the nested child event in `event.event`.
+`agent_tool_event` identifies the parent turn, tool and call, child agent, and wrapped child event.
 
-## Keep one stream owner
+## 3. Keep one stream owner
 
-The parent stream is the product runtime boundary. Consume it completely so parent events, child events, tool results, final output, and memory writes can finish normally.
+Consume the parent stream completely so child work, parent tool results, final output, memory writes, lifecycle callbacks, and observers can settle normally.
 
-Do not start a second consumer for the child. Anvia forwards enabled child events through the active parent tool call.
+Do not create a second consumer for the child. Anvia forwards its enabled events through the active parent tool call.
 
-## Project events for the UI
+## 4. Project events for clients
 
-Child events are operational detail. Do not send raw reasoning, tool arguments, tool results, or provider metadata directly to a browser.
-
-Map nested activity to a small product-safe status:
+Nested events can contain private prompts, reasoning, tool arguments, tool results, model requests, and errors. Map them to a reviewed product status:
 
 ```ts
 function toClientEvent(event: AgentStreamEvent) {
@@ -66,8 +64,6 @@ function toClientEvent(event: AgentStreamEvent) {
 }
 ```
 
-Expose full nested events only in reviewed internal inspection surfaces. Apply appropriate retention and redaction when sending them to logs or an observability backend.
+Use `turn`, `toolName`, `toolCallId`, `internalCallId`, and `agentId` to attach nested work to the correct delegation. Apply redaction and retention rules to operational event storage.
 
-## Group nested work
-
-Use the child agent ID, tool name, call IDs, and parent run ID to keep events attached to the correct delegation. This becomes essential when a coordinator invokes several specialists in one run.
+Next, define [memory boundaries](/sdk/advanced/multi-agent/memory).

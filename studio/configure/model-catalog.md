@@ -14,27 +14,34 @@ import { OpenAIClient } from '@anvia/openai'
 import { Studio } from '@anvia/studio'
 
 const openai = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 
 const anthropic = new AnthropicClient({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
 new Studio([agent], {
   models: {
-    default: 'openai:gpt-5.6-luna',
+    defaultModelRef: {
+      providerId: 'openai',
+      modelId: 'gpt-5.6-luna',
+    },
     providers: [
       {
         id: 'openai',
         name: 'OpenAI',
-        createCompletionModel: (model) => openai.completionModel(model),
+        createCompletionModel: ({ modelId }) => openai.completionModel({
+          modelId,
+          api: 'responses',
+        }),
         listModels: () => openai.listModels(),
       },
       {
         id: 'anthropic',
         name: 'Anthropic',
-        createCompletionModel: (model) => anthropic.completionModel(model),
+        createCompletionModel: ({ modelId }) =>
+          anthropic.completionModel({ modelId }),
         listModels: () => anthropic.listModels(),
       },
     ],
@@ -42,7 +49,7 @@ new Studio([agent], {
 }).start()
 ```
 
-A model reference has the form `provider:model`. Provider IDs must be non-empty and cannot contain `:`. Model IDs must be non-empty and may contain additional colons.
+A configuration model reference is an object with `providerId` and `modelId`. Studio serializes it as `provider:model` in its HTTP API and session metadata. Provider IDs must be non-empty and cannot contain `:`. Model IDs must be non-empty and may contain additional colons.
 
 Provider IDs must be unique. Static model IDs must also be unique within their provider. Studio rejects duplicate provider or static model IDs while creating the runtime.
 
@@ -54,8 +61,11 @@ Add static definitions for the models you want to describe precisely in Studio:
 {
   id: 'openai',
   name: 'OpenAI',
-  defaultModel: 'gpt-5.6-luna',
-  createCompletionModel: (model) => openai.completionModel(model),
+  defaultModelId: 'gpt-5.6-luna',
+  createCompletionModel: ({ modelId }) => openai.completionModel({
+      modelId,
+      api: 'responses',
+  }),
   listModels: () => openai.listModels(),
   models: [
     {
@@ -109,14 +119,20 @@ Configure a global default and optionally override it per agent:
 ```ts
 new Studio([supportAgent, researchAgent], {
   models: {
-    default: 'openai:gpt-5.6-luna',
+    defaultModelRef: {
+      providerId: 'openai',
+      modelId: 'gpt-5.6-luna',
+    },
     providers: [openaiProvider, anthropicProvider],
     agents: {
       'support': {
-        default: 'openai:gpt-5.6-luna',
+        defaultModelRef: {
+          providerId: 'openai',
+          modelId: 'gpt-5.6-luna',
+        },
         allowed: [
-          'openai:gpt-5.6-luna',
-          'anthropic:claude-opus-4-8',
+          { providerId: 'openai', modelId: 'gpt-5.6-luna' },
+          { providerId: 'anthropic', modelId: 'claude-opus-4-8' },
         ],
       },
       'research': {
@@ -129,13 +145,13 @@ new Studio([supportAgent, researchAgent], {
 
 | Policy | Behavior |
 | --- | --- |
-| Global `default` | Used when the request, session, and agent policy do not select a model. |
-| Agent `default` | Overrides the global default for that agent. |
-| Agent `allowed` | Limits selection to exact references or provider wildcards such as `anthropic:*`. |
+| Global `defaultModelRef` | Used when the request, session, and agent policy do not select a model. |
+| Agent `defaultModelRef` | Overrides the global default for that agent. |
+| Agent `allowed` | Limits selection to exact `{ providerId, modelId }` references or provider wildcards such as `anthropic:*`. |
 
 Without `allowed`, an agent may select any model from a registered provider. An empty `allowed` array allows none. Policy keys must match registered agent IDs, including any duplicate suffix inferred by Studio.
 
-The provider-level `defaultModel` describes that provider in the catalog. It is not another run-selection fallback; configure the global or agent `default` when Studio should select a model automatically.
+The provider-level `defaultModelId` describes that provider in the catalog. It is not another run-selection fallback; configure the global or agent `defaultModelRef` when Studio should select a model automatically.
 
 ::: warning Keep defaults inside the policy
 Studio normalizes defaults and allowed entries, but it does not require an agent default to appear in its `allowed` list during startup. Configure them consistently so the default is not rejected when the agent runs.

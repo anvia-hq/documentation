@@ -1,28 +1,22 @@
 # Privacy and visibility
 
-Treat think content as tool transcript data. “Private” means it is not intended as the user-facing answer; it does not mean the runtime hides or discards it.
+Treat think content as ordinary tool transcript data. It may be internal to the product experience, but the runtime does not make it secret or ephemeral.
 
-## Know where it can appear
+## 1. Know where it may appear
 
-A think call may be present in:
+A think call and result may be present in:
 
-- model-facing tool call and result messages
+- model-facing messages
 - memory-backed session history
 - agent stream events
 - application logs and observability traces
 - internal transcript or Studio views
 
-The exact retention depends on the memory, streaming, logging, and observability configuration owned by the application.
+Retention depends on the application's memory, logging, streaming, and observability configuration.
 
-## Keep sensitive values out
+## 2. Keep sensitive values out
 
-Do not ask the model to place these values in a checkpoint:
-
-- credentials, API keys, or access tokens
-- hidden security policy
-- raw personal or regulated data
-- unrestricted tool responses
-- private reasoning that must never be retained
+Do not ask the model to record credentials, tokens, hidden security policy, raw personal data, regulated data, or unrestricted tool output.
 
 Prefer a short operational summary:
 
@@ -31,22 +25,24 @@ The deployment timestamp aligns with the first errors. Database latency
 does not. Verify the configuration change before proposing rollback.
 ```
 
-This preserves the useful decision state without copying all underlying evidence.
+This preserves the decision state without copying the complete evidence or requesting hidden chain-of-thought.
 
-## Separate internal and user-facing streams
+## 3. Project a safe user experience
 
-Tool events are useful for internal inspection but rarely belong in the browser transcript. Project the agent stream into product-safe statuses instead of forwarding raw think arguments or results:
+Raw tool events are useful for internal operation but rarely belong in the browser transcript:
 
 ```text
-think tool call              → "Reviewing evidence"
-internal tool result         → not forwarded
-final agent output           → user-visible response
+think tool call       -> "Reviewing evidence"
+echoed tool result    -> internal only
+final agent output    -> user-visible response
 ```
 
-Apply the same principle to traces: capture enough to operate the system, redact sensitive fields, restrict access, and set an appropriate retention period.
+Project raw stream events into explicit product-safe statuses. Apply access control, redaction, and retention limits to traces as well.
 
-## Review memory behavior
+## 4. Review memory behavior
 
-If memory persists completed messages, think calls and results may become part of later session context. Keep checkpoints concise and relevant to the ongoing conversation.
+If memory persists completed messages, the checkpoint may become context for later requests in the session. Keep it concise, accurate, and relevant to the ongoing conversation.
 
-If a checkpoint should never survive the run, do not assume its tool name makes it ephemeral. Configure the surrounding persistence boundary accordingly or avoid recording the sensitive content in the first place.
+If text must never survive the run, do not rely on the tool name. Configure the persistence boundary accordingly or keep the sensitive value out of the checkpoint.
+
+Next, use the [production checklist](/sdk/advanced/think-tool/checklist).

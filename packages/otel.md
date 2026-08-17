@@ -11,20 +11,22 @@ pnpm add @anvia/core @anvia/otel
 Configure the OpenTelemetry SDK and exporters in the host application, then attach the observer:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
-import { otel } from '@anvia/otel'
+import { Agent } from '@anvia/core'
+import { createOtelObserver } from '@anvia/otel'
 
-const tracing = otel.create({
+const tracing = createOtelObserver({
   serviceName: 'support-api',
   captureMode: 'safe',
 })
 
-const agent = new AgentBuilder('support', model)
-  .observe(tracing)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  observability: { observers: { tracing } },
+})
 ```
 
-`otel.create()` does not replace SDK registration or exporter setup. It emits through a supplied tracer or the active global OpenTelemetry provider.
+`createOtelObserver()` does not replace SDK registration or exporter setup. It emits through a supplied tracer or the active global OpenTelemetry provider.
 
 ## Evaluation reporting
 

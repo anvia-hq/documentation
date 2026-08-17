@@ -4,11 +4,13 @@ Use `baseUrl` when a service exposes an Anthropic-compatible Messages API:
 
 ```ts
 const client = new AnthropicClient({
-  apiKey: process.env.PROVIDER_API_KEY,
+  apiKey: process.env.PROVIDER_API_KEY!,
   baseUrl: 'https://provider.example.com',
 })
 
-const model = client.completionModel('provider/model-name')
+const model = client.completionModel({
+    modelId: 'provider/model-name'
+})
 ```
 
 ## What compatibility must include
@@ -40,4 +42,4 @@ Before moving an existing Anthropic agent to a compatible endpoint:
 5. Test stream cancellation and provider errors.
 6. Confirm subsequent tool-result turns preserve required content.
 
-Keep endpoint-specific fields in `additionalParams` and isolate them at provider construction or request policy boundaries.
+Keep endpoint-specific fields in `providerOptions` and isolate them at provider construction or request policy boundaries.

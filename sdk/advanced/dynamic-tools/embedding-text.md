@@ -1,76 +1,79 @@
 # Embedding text
 
-Embedding text determines which prompts retrieve a tool. It should describe the capability accurately in the language users and agents are likely to use.
+Embedding text determines which prompts retrieve a tool. Describe the capability in the language users are likely to use, without implying permissions the tool does not have.
 
-## Default text
+## 1. Start with the default
 
-By default, `createToolIndex(...)` embeds each tool's:
+By default, `embedTools()` and `createToolIndex()` embed three parts of each resolved definition:
 
 - name
 - description
 - JSON parameters
 
-Clear tool definitions are therefore the first retrieval improvement. Fix vague names and descriptions before adding custom search terms.
+Clear tool names, descriptions, and input schemas are therefore the first retrieval improvement.
 
-## Customize the content
+## 2. Add precise domain language
 
 ```ts
-const toolIndex = await createToolIndex(
-  embeddingModel,
-  tools,
-  {
-    content(_tool, definition) {
-      return [
+import { createToolIndex } from '@anvia/core/tool';
+const billingIndex = await createToolIndex({
+    model: embeddingModel,
+    tools: billingTools,
+    topK: 5,
+    minScore: 0.72,
+    content: (_tool, definition) => [
         definition.name,
         definition.description,
         JSON.stringify(definition.parameters),
-        'Use for refunds, credits, invoice adjustments, and payment disputes.',
-      ]
-    },
-  },
-)
+        'Refunds, credits, invoice adjustments, and payment disputes.',
+    ]
+});
 ```
 
-`content(...)` may return one string or an array of strings. Include useful synonyms, product language, and concrete intents that genuinely match the tool.
+`content()` may return one string or several strings. Multiple strings are embedded as parts of the same tool record and retained as newline-separated document text.
 
-## Describe when to use the tool
+Useful additions include product terminology, common synonyms, and concrete user intents that genuinely match the operation.
 
-Weak:
+## 3. Describe one actionable capability
+
+Weak text:
 
 ```text
 Manage billing.
 ```
 
-Stronger:
+Stronger text:
 
 ```text
 Request a refund for an eligible paid order after validating the amount and reason.
 ```
 
-The stronger description identifies the action, target, and relevant conditions without promising permissions the tool does not have.
+The stronger version identifies the action, target, and conditions. It is easier to distinguish from invoice lookup, credit creation, or dispute review.
 
-## Keep metadata separate
-
-Embedding text controls semantic relevance. Metadata controls eligibility.
+## 4. Keep eligibility in metadata
 
 ```ts
-const toolIndex = await createToolIndex(embeddingModel, tools, {
-  content: (_tool, definition) => [
-    definition.name,
-    definition.description,
-  ],
-  metadata: (tool) => ({
-    tenantId: scope.tenantId,
-    role: scope.role,
-    risk: tool.name.includes('refund') ? 'high' : 'normal',
-  }),
-})
+import { vectorFilter } from '@anvia/core/vector-store';
+const billingIndex = await createToolIndex({
+    model: embeddingModel,
+    tools: billingTools,
+    topK: 5,
+    content: (_tool, definition) => [
+        definition.name,
+        definition.description,
+    ],
+    metadata: (tool) => ({
+        plan: scope.plan,
+        risk: tool.name.includes('refund') ? 'high' : 'normal',
+    }),
+    filter: vectorFilter.eq('plan', scope.plan)
+});
 ```
 
-Do not place tenant IDs or permissions only in embedding text. Enforce them with filters and inside the tool handler.
+Embedding text controls semantic relevance. Metadata filters control eligibility before exposure. The tool handler must still enforce the real authorization boundary at execution time.
 
-## Avoid keyword stuffing
+## 5. Evaluate positive and negative examples
 
-Do not add unrelated terms merely to force a tool into more result sets. That makes selection less predictable and exposes capabilities to prompts they do not serve.
+Test common wording, domain synonyms, ambiguous prompts, and unrelated requests. Tune `topK` and minScore using measured selection results rather than keyword stuffing.
 
-Evaluate real user phrases, ambiguous requests, and negative examples. Retrieval quality should be measured by whether the correct tool is selected—and whether irrelevant tools stay hidden.
+Next, combine [static and dynamic tools](/sdk/advanced/dynamic-tools/static-and-dynamic).

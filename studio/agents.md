@@ -6,25 +6,27 @@ Open `http://localhost:4021/ui/agents` when Studio is running on port `4021`.
 
 ## Register agents with Studio
 
-Pass one or more built agents to `Studio`:
+Pass one or more agents to `Studio`:
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
+import { Agent } from '@anvia/core/agent'
 import { OpenAIClient } from '@anvia/openai'
 import { Studio } from '@anvia/studio'
 
 const client = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 
-const supportAgent = new AgentBuilder(
-  'support-operations',
-  client.completionModel('gpt-5.6-luna'),
-)
-  .name('Support operations')
-  .description('Looks up tickets and prepares support actions.')
-  .defaultMaxTurns(4)
-  .build()
+const supportAgent = new Agent({
+  id: 'support-operations',
+  model: client.completionModel({
+      modelId: 'gpt-5.6-luna',
+      api: "responses"
+  }),
+  name: 'Support operations',
+  description: 'Looks up tickets and prepares support actions.',
+  maxTurns: 4,
+})
 
 new Studio([supportAgent]).start({ port: 4021 })
 ```
@@ -44,13 +46,13 @@ Studio asks the running server for a summary of each registered agent. The summa
 | Observers | Observers attached to the agent. |
 | Prompts | Quick prompts configured for this agent in Studio. |
 | Memory | Whether the agent has a memory implementation. |
-| Hook | Whether the agent has a prompt hook. |
+| Lifecycle | Whether the agent has lifecycle callbacks. |
 | Schema | Whether the agent requires structured output. |
 | Turns | The configured default maximum number of turns, when set. |
 
 The counts are intentionally compact. For example, **context 3** means the agent has three static and dynamic context registrations in total; it does not mean that all three were retrieved for the latest prompt.
 
-Likewise, an MCP count is provenance, not an additional tool set. MCP tools participate in the agent's registered tools and are identified separately so you can see which capabilities come from connected servers.
+Likewise, an MCP count is provenance, not an additional tool collection. MCP tools participate in the agent's registered tools and are identified separately so you can see which capabilities come from connected servers.
 
 ## What the view does not show
 

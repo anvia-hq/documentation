@@ -6,17 +6,15 @@ Use `embeddingModel(...)` to turn text into vectors for ingestion, retrieval, cl
 import { OpenAIClient } from '@anvia/openai'
 
 const openai = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 
-export const embeddingModel = openai.embeddingModel(
-  'text-embedding-3-small',
-  {
+export const embeddingModel = openai.embeddingModel({
+    modelId: 'text-embedding-3-small',
     dimensions: 1536,
     maxBatchSize: 512,
-    user: 'tenant-123',
-  },
-)
+    user: 'tenant-123'
+})
 ```
 
 ## Embed application text
@@ -24,12 +22,18 @@ export const embeddingModel = openai.embeddingModel(
 ```ts
 import { embedText, embedTexts } from '@anvia/core/embeddings'
 
-const query = await embedText(embeddingModel, 'refund timeline')
+const { embedding: query } = await embedText({
+  model: embeddingModel,
+  text: 'refund timeline',
+})
 
-const documents = await embedTexts(embeddingModel, [
-  'Refunds are reviewed within two business days.',
-  'Password reset links expire after 30 minutes.',
-])
+const { embeddings: documents } = await embedTexts({
+  model: embeddingModel,
+  texts: [
+    'Refunds are reviewed within two business days.',
+    'Password reset links expire after 30 minutes.',
+  ],
+})
 ```
 
 The adapter returns one embedding for each input, preserves input order, and rejects mismatched provider response counts or indexes rather than returning silently misaligned vectors.
@@ -47,8 +51,10 @@ The optional `user` value is forwarded as provider metadata. Use a stable, non-s
 Keep one configured embedding model with the index it belongs to:
 
 ```ts
-export const supportIndex = vectorStore.index(embeddingModel)
+export const supportRetrieval = {
+  store: vectorStore,
+  model: embeddingModel,
+}
 ```
 
 Ingestion and query code should share that boundary so model ID, dimensions, normalization assumptions, and store schema cannot drift independently. See [Knowledges](/sdk/knowledges) for the complete ingestion and retrieval flow.
-

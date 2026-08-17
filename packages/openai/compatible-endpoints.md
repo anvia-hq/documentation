@@ -4,20 +4,22 @@
 
 ```ts
 const provider = new OpenAIClient({
-  apiKey: process.env.PROVIDER_API_KEY,
+  apiKey: process.env.PROVIDER_API_KEY!,
   baseUrl: 'https://provider.example.com/v1',
 })
 
-const model = provider.completionModel('provider/model-name')
+const model = provider.completionModel({
+    modelId: 'provider/model-name',
+    api: 'chat',
+})
 ```
 
-Supplying `baseUrl` selects Chat Completions by default because compatibility endpoints commonly implement `/chat/completions`, not the full Responses API. Override this only when the service documents Responses compatibility:
+Compatibility endpoints commonly implement `/chat/completions`, not the full Responses API. Select Responses only when the service documents that compatibility:
 
 ```ts
-const provider = new OpenAIClient({
-  apiKey,
-  baseUrl,
-  completionApi: 'responses',
+const responsesModel = provider.completionModel({
+  modelId: 'provider/model-name',
+  api: 'responses',
 })
 ```
 
@@ -38,7 +40,7 @@ Test each factory independently. Do not infer media support from a successful co
 
 Some compatible Chat endpoints return reasoning in provider-specific fields while using ordinary OpenAI tool calls. The adapter retains recognized reasoning history so later tool-result turns can be accepted by providers that require it.
 
-Provider rules still apply. For example, a provider may reject forced tool choice while a thinking mode is active. Put provider-only thinking controls in `additionalParams`, and let the model choose tools when the endpoint requires that behavior.
+Provider rules still apply. For example, a provider may reject forced tool choice while a thinking mode is active. Put provider-only thinking controls in `providerOptions`, and let the model choose tools when the endpoint requires that behavior.
 
 ## Production checklist
 

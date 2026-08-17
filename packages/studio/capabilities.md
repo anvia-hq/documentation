@@ -5,7 +5,7 @@ Studio discovers its surfaces from registered targets and configured stores.
 | Surface | Package behavior |
 | --- | --- |
 | Playground | Runs real agents, streams JSONL events, stores transcripts, supports cancel, approvals, questions, attachments, and model selection |
-| Agents | Reports identity, model, tools, context, memory, middleware, hooks, limits, and runtime metadata |
+| Agents | Reports identity, model, tools, context, memory, middleware, lifecycle configuration, limits, and runtime metadata |
 | Tools | Shows schemas and metadata and can invoke registered tools directly |
 | MCP | Shows server/tool origin and can invoke MCP-backed tools |
 | Pipelines | Exposes graphs, typed input metadata, runs, logs, stored history, and replay |

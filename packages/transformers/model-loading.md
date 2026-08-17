@@ -1,14 +1,14 @@
 # Model loading
 
-`TransformersEmbeddingModel.create()` dynamically initializes a Transformers.js `feature-extraction` pipeline.
+`loadTransformersEmbeddingModel()` dynamically initializes a Transformers.js `feature-extraction` pipeline.
 
 ## Startup pattern
 
 Create the model once during process initialization:
 
 ```ts
-export const embeddings = await createTransformersEmbeddingModel({
-  model: process.env.EMBEDDING_MODEL ?? 'Xenova/all-MiniLM-L6-v2',
+export const embeddings = await loadTransformersEmbeddingModel({
+  modelId: process.env.EMBEDDING_MODEL ?? 'Xenova/all-MiniLM-L6-v2',
 })
 ```
 
@@ -30,4 +30,4 @@ This package is ESM and has no browser-specific wrapper. A model working in Node
 
 ## Custom loading
 
-When the application needs a custom cache, local path, quantization, or pipeline wrapper not represented by `TransformersEmbeddingModelOptions`, initialize that pipeline itself and pass the compatible extractor to the constructor. The application then owns loading failures and cleanup.
+When the application needs a custom pipeline wrapper, initialize it and pass the compatible extractor to `adaptTransformersEmbeddingModel({ runtime, modelId, ... })`. The application then owns loading failures and cleanup.

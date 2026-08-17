@@ -1,26 +1,14 @@
 # Tracing
 
-The adapter maps an Anvia run to a root internal span, then creates child spans for model generations and tools.
-
-| Runtime activity | Span |
-| --- | --- |
-| Agent run | Root internal span |
-| Model turn | Client span named `model.turn.<turn>` |
-| Tool execution | Internal span named `tool.<name>` |
-| Child agent | Nested run, generation, and tool spans |
-| Run event | Event on the root span |
-
-The observer exposes the generated trace and observation identifiers to the runtime. If the run includes a trace identifier, the adapter attempts to create the root under that trace context.
-
-## Use an explicit tracer
-
 ```ts
-const tracing = otel.create({
-  tracer: tracerProvider.getTracer('support-agent', '1.4.0'),
+import { createOtelObserver } from '@anvia/otel'
+
+const tracing = createOtelObserver({
   serviceName: 'support-api',
+  captureMode: 'safe',
 })
 ```
 
-Supplying a tracer makes ownership explicit and avoids relying on global registration. Without one, `tracerName` and `tracerVersion` select the global tracer.
+Attach the observer to an agent. It uses a supplied `tracer` or the active global tracer provider and emits run, generation, tool, child-agent, and error spans.
 
-Successful spans receive an OK status. Failures record the error and end the affected span. Tool stream events are also used to construct nested child-agent observations.
+The package does not initialize exporters or own provider lifecycle. Configure and start the application's OpenTelemetry SDK before invoking observed agents.

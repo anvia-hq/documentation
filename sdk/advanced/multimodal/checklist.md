@@ -1,37 +1,46 @@
-# Production checklist
+# Multimodal production checklist
 
 Use this checklist before shipping a workflow that accepts or produces media.
 
 ## Models and requests
 
-- Smoke test the exact provider and model ID for every required capability.
-- Validate image dimensions, audio duration, file size, media type, voice, and format before the provider request.
-- Keep provider-specific `additionalParams` in typed configuration.
-- Set timeouts, bounded retries, and cost limits for every model stage.
-- Treat OCR, transcription, and image understanding as fallible model output.
+- Smoke test the exact provider, adapter, and model ID for every capability.
+- Validate dimensions, duration, file size, detected media type, voice, and format.
+- Keep provider-specific `providerOptions` in typed allow-listed configuration.
+- Set bounded retries and application-level time or cost limits for each stage.
+- Treat OCR, transcription, and image understanding as fallible output.
+- Verify structured image tool results survive the exact provider path.
 
 ## Storage and privacy
 
 - Keep raw media in application-owned object or media storage.
-- Pass asset IDs through queues, pipelines, sessions, and product records instead of byte arrays or base64.
+- Pass asset IDs through queues, pipelines, sessions, and product records.
 - Use short-lived signed URLs when a provider must fetch a private asset.
-- Enforce user and tenant authorization before loading or exposing media.
-- Define retention and deletion for source assets, provider-side uploads, transcripts, OCR output, and generated assets.
-- Keep sensitive media and transcripts out of traces, logs, and agent memory unless explicitly required and protected.
+- Authorize user and tenant access before loading or exposing media.
+- Define retention and deletion for sources, provider uploads, transcripts, OCR output, and generated assets.
+- Keep sensitive media and extracted text out of traces, logs, and memory unless explicitly protected.
 
 ## Workflow behavior
 
 - Separate media conversion from analysis and product writes.
-- Persist expensive intermediate output when it is safe and useful for retries.
-- Make product writes and generated-asset publication idempotent.
-- Use a durable worker for long files, bulk work, progress reporting, or restart-safe execution.
-- Apply content policy before publishing generated media.
-- Provide human review for critical values, regulated decisions, or identity-sensitive media.
+- Persist expensive intermediate output when safe and useful for retries.
+- Make product writes and asset publication idempotent.
+- Use a durable worker for long files, bulk work, progress, or restart safety.
+- Apply product content policy before publishing generated media.
+- Require human review for critical values, regulated decisions, or identity-sensitive output.
 
 ## Product experience
 
 - Show upload, processing, failure, and completion states explicitly.
-- Do not imply that OCR output proves authenticity or that a model description is certain.
-- Make generated or synthetic media clear to users where the product requires disclosure.
-- Check that the UI can safely render every media type returned by a model or tool.
-- Provide a retry or fallback path that does not duplicate stored assets or product records.
+- Do not imply that OCR proves authenticity or that a model description is certain.
+- Disclose generated or synthetic media when product policy requires it.
+- Render only allow-listed media types in the UI.
+- Provide retry and fallback paths that cannot duplicate assets or product records.
+
+## Final verification
+
+- Test invalid, empty, oversized, and unauthorized media.
+- Test provider timeouts and retry exhaustion.
+- Test the exact output media type before storage and display.
+- Test source and generated-asset deletion.
+- Confirm stream, trace, and memory payloads do not contain unintended bytes or base64.

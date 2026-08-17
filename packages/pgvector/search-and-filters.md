@@ -1,16 +1,15 @@
 # Search and filters
 
 ```ts
-import { vectorFilter } from '@anvia/core/vector-store'
-
-const results = await store.index(embeddings).search({
-  query: 'reset a password',
-  topK: 5,
-  filter: vectorFilter.and(
-    vectorFilter.eq('tenantId', 'acme'),
-    vectorFilter.gt('revision', 3),
-  ),
-})
+import { retrieveDocuments } from "@anvia/core/vector-store";
+import { vectorFilter } from '@anvia/core/vector-store';
+const results = await retrieveDocuments({
+    store: store,
+    model: embeddings,
+    query: 'reset a password',
+    topK: 5,
+    filter: vectorFilter.and(vectorFilter.eq('tenantId', 'acme'), vectorFilter.gt('revision', 3))
+});
 ```
 
 `filterToPgVectorWhere` produces parameterized SQL and values. Equality serializes the metadata value for JSONB comparison; `gt` and `lt` require numeric metadata and reject other types.

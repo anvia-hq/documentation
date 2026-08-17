@@ -1,6 +1,6 @@
 # Middleware
 
-Middleware transforms runtime data without changing the core tool contract. Use hooks when behavior decides whether a run continues; use middleware when data needs to be transformed.
+Middleware transforms runtime data without changing the core tool contract. Use guardrails or approvals when behavior decides whether a run continues; use middleware when completion or tool data needs to be transformed.
 
 ## Create middleware
 
@@ -21,18 +21,20 @@ const hideInternalErrors = createMiddleware({
 ## Attach it to an agent
 
 ```ts
-const agent = new AgentBuilder('support', model)
-  .middleware(hideInternalErrors)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  middlewares: [hideInternalErrors],
+})
 ```
 
-Agent middleware applies to every run. Request middleware applies only to one prompt.
+Agent middleware applies to every run. Run middleware applies only to one call.
 
 ```ts
-const response = await agent
-  .prompt(message)
-  .withMiddleware(hideInternalErrors)
-  .send()
+const response = await agent.generate({
+    prompt: message,
+    middlewares: [hideInternalErrors]
+})
 ```
 
 ## Choose an interception point
@@ -44,7 +46,7 @@ const response = await agent
 | `onToolInput` | After approval and before the tool handler runs. |
 | `onToolOutput` | Before tool output is sent back to the model. |
 
-Agent-level middleware runs before request-level middleware.
+Agent-level middleware runs before run-level middleware.
 
 ## Keep contracts in the handler
 

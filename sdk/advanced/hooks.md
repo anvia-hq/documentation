@@ -1,57 +1,60 @@
-# Hooks and run control
+# Lifecycle and run control
 
-Hooks let application code observe and control an agent while it runs. They can cancel a run, skip a tool, request approval, or react to lifecycle events without putting policy into the prompt.
+The v1 public API separates passive lifecycle callbacks from the features that can change execution:
 
-## Explore hooks
-
-| Page | Learn how to |
-| --- | --- |
-| [Create a hook](/sdk/advanced/hooks/create) | Define a hook and attach it globally or to one request. |
-| [Hook points](/sdk/advanced/hooks/hook-points) | Choose the correct run, turn, completion, or tool event. |
-| [Cancellation](/sdk/advanced/hooks/cancellation) | Stop a run intentionally and handle the resulting error. |
-| [Tool control](/sdk/advanced/hooks/tool-control) | Run, skip, cancel, or request approval for a tool call. |
-| [Hooks and middleware](/sdk/advanced/hooks/middleware) | Choose control flow or data transformation. |
-| [Production guidance](/sdk/advanced/hooks/production-guidance) | Keep policies fast, testable, and observable. |
-
-## A minimal hook
-
-```ts
-import { AgentBuilder, createHook } from '@anvia/core'
-
-const policyHook = createHook({
-  onRunStart({ maxTurns, run }) {
-    if (maxTurns > 8) {
-      return run.cancel('This workflow allows at most 8 turns.')
-    }
-  },
-  onToolCall({ toolName, tool }) {
-    if (toolName === 'delete_account') {
-      return tool.requestApproval({
-        reason: 'Deleting an account requires reviewer approval.',
-      })
-    }
-  },
-})
-
-const agent = new AgentBuilder('support', model)
-  .hook(policyHook)
-  .build()
+```text
+Lifecycle   -> observe run, step, tool, finish, and error events
+Guardrails  -> allow, block, or rewrite model input and output
+Approval    -> suspend before a protected tool executes
+Middleware  -> transform completion and tool data
+Stream      -> expose progress and stop consumption
 ```
 
-Returning nothing continues normally. Control methods return explicit actions that the runtime applies after the callback.
+`createHook()` and the agent `hook` option are not public v1 APIs. Use the focused surface that matches the policy.
 
-## What hooks should own
+## 1. Observe a run
 
-Hooks are useful for:
+```ts
+import { Agent } from '@anvia/core'
+import type { AgentLifecycle } from '@anvia/core'
 
-- request and environment policy
-- run limits and cancellation
-- tool gating and approval
-- audit annotations and lifecycle signals
-- request-local decisions that belong beside the runtime
+const lifecycle: AgentLifecycle = {
+  onStart({ runId, maxTurns }) {
+    audit.info('agent.started', { runId, maxTurns })
+  },
+  onToolFinish({ runId, toolName, success, durationMs }) {
+    audit.info('agent.tool.finished', {
+      runId,
+      toolName,
+      success,
+      durationMs,
+    })
+  },
+  onError({ runId, error }) {
+    audit.error('agent.failed', { runId, error })
+  },
+}
 
-Hooks are not the final authorization boundary for tools. A tool handler must still validate permissions and business rules immediately before reading private data or performing a side effect.
+const agent = new Agent({
+  id: 'support',
+  model,
+  lifecycle,
+})
+```
 
-## Hooks are not React hooks
+Lifecycle callbacks receive snapshots and return no control action. If a lifecycle callback throws, the run fails, so telemetry that must never affect execution belongs in an observer. See the [agent runtime lifecycle](/sdk/agents/runtime-lifecycle) for how these surfaces fit together.
 
-These are server-side Anvia runtime hooks created with `createHook(...)`. They are unrelated to React hooks such as `useChat(...)`.
+## 2. Apply run control deliberately
+
+Use guardrails to block or rewrite model-facing input and output; see [Stable behavior](/sdk/agents/stable-behavior). Use tool `requiresApproval` for human or policy approval before a side effect. Use an authenticated tool handler as the final authorization boundary.
+
+Use client abort and iterator closure to stop a normal stream. Cancellation cannot undo a tool call or write that already completed.
+
+## 3. Continue through the section
+
+- [Configure lifecycle callbacks](/sdk/advanced/hooks/create)
+- [Choose lifecycle events](/sdk/advanced/hooks/hook-points)
+- [Understand cancellation](/sdk/advanced/hooks/cancellation)
+- [Protect tools with approval](/sdk/advanced/hooks/tool-control)
+- [Choose lifecycle or middleware](/sdk/advanced/hooks/middleware)
+- [Apply production guidance](/sdk/advanced/hooks/production-guidance)

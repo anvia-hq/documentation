@@ -10,19 +10,19 @@ Create one client per runtime boundary or request scope. Avoid constructing a ne
 import { AnthropicClient } from '@anvia/anthropic'
 
 const anthropic = new AnthropicClient({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
-export const supportModel = anthropic.completionModel(
-  process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-20250514',
-)
+export const supportModel = anthropic.completionModel({
+    modelId: process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-20250514'
+})
 ```
 
 Validate required environment variables at startup. Keep model selection in configuration so a rollout or rollback does not require rewriting agents.
 
 ## Bound every run
 
-Set `maxTokens` for direct completions and a small `defaultMaxTurns(...)` for agents. Validate upload sizes before sending image or PDF content, and cancel streams when the caller disconnects.
+Set `maxTokens` for direct completions and a small agent `maxTurns` value. Validate upload sizes before sending image or PDF content, and cancel streams when the caller disconnects.
 
 Provider errors should be logged with a request or trace ID, then translated into a safe application error. Do not expose raw SDK errors or provider credentials to the browser.
 
@@ -60,4 +60,3 @@ Do not treat `listModels()` as a capability check or automatically route product
 - Reasoning and multimodal payloads follow explicit retention rules.
 - Every required capability has a live smoke test.
 - Fallbacks and retries are visible, bounded, and tested.
-

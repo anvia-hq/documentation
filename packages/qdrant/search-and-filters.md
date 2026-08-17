@@ -1,29 +1,31 @@
 # Search and filters
 
-Dense search accepts the standard request. Hybrid search adds index configuration:
+Use `retrieveDocuments()` for both dense and hybrid text retrieval:
 
 ```ts
-const index = store.index({
-  dense,
-  sparse,
-  fusion: 'rrf',
-  prefetchLimit: 40,
-})
+import { retrieveDocuments, vectorFilter } from '@anvia/core/vector-store'
 
-const results = await index.search({
+const denseResults = await retrieveDocuments({
+  store: denseStore,
+  model: dense,
   query: 'reset a password',
   topK: 5,
-  threshold: 0.7,
+  minScore: 0.7,
+  filter: vectorFilter.eq('tenantId', 'acme'),
+})
+
+const hybridResults = await retrieveDocuments({
+  store: hybridStore,
+  models: { dense, sparse },
+  query: 'reset a password',
+  topK: 5,
+  fusion: 'rrf',
   filter: vectorFilter.eq('tenantId', 'acme'),
 })
 ```
 
-`filterToQdrantFilter` translates `eq`, `gt`, `lt`, `and`, and `or` into Qdrant `must`, `should`, match, and range clauses.
+`filterToQdrantFilter()` translates `eq`, `gt`, `lt`, `and`, and `or` into native Qdrant filters for direct client calls.
 
-For dense search, `threshold` is sent to Qdrant as `score_threshold` and is also enforced while
-normalizing results. For hybrid search it applies to the final fused score rather than either
-retriever's similarity scale.
+For raw vector queries, call `store.search({ vector, topK, minScore, filter })`. A hybrid store also exposes `searchHybrid({ vector, sparseVector, fusion, topK, minScore, filter, providerOptions })`; Qdrant's `providerOptions.prefetchLimit` controls candidates per branch.
 
-Hybrid `prefetchLimit` controls how many candidates each dense and sparse branch contributes before
-fusion; final `topK` controls returned logical results. Tune both on evaluation data. Filters still
-require independent authorization.
+Tune result count, thresholds, fusion, and prefetch on evaluation data. Metadata filters narrow retrieval but do not replace application authorization.

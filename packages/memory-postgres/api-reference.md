@@ -5,43 +5,38 @@ All public symbols are exported from `@anvia/memory-postgres`.
 ```ts
 import {
   createPostgresMemorySchemaSql,
-  createPostgresMemoryScopeKey,
-  createPostgresMemoryStore,
+  PostgresMemoryClient,
   PostgresMemoryStore,
-  type PostgresMemoryAppendInput,
   type PostgresMemoryClientLike,
-  type PostgresMemoryContext,
-  type PostgresMemoryErrorInput,
-  type PostgresMemoryErrorMode,
+  type PostgresMemoryClientOptions,
+  type PostgresMemoryErrorPolicy,
   type PostgresMemoryLockMode,
   type PostgresMemoryPoolLike,
   type PostgresMemoryQueryResult,
   type PostgresMemorySchemaOptions,
-  type PostgresMemoryScopeOptions,
   type PostgresMemoryStoreOptions,
   type PostgresMemoryTableNames,
   type PostgresMemoryTransactionClientLike,
 } from '@anvia/memory-postgres'
 ```
 
-## Functions
+## PostgresMemoryClient
 
 ```ts
-function createPostgresMemoryStore(
-  options?: PostgresMemoryStoreOptions,
-): Promise<PostgresMemoryStore>
+class PostgresMemoryClient implements AsyncDisposable {
+  constructor(options:
+    | { connectionString: string; client?: never }
+    | { client: PostgresMemoryClientLike; connectionString?: never }
+  )
 
-function createPostgresMemoryScopeKey(
-  context: MemoryContext,
-  options?: PostgresMemoryScopeOptions,
-): string
-
-function createPostgresMemorySchemaSql(
-  options?: PostgresMemorySchemaOptions,
-): string
+  memoryStore(options?: PostgresMemoryStoreOptions): PostgresMemoryStore
+  nativeClient(): Promise<PostgresMemoryClientLike>
+  close(): Promise<void>
+  [Symbol.asyncDispose](): Promise<void>
+}
 ```
 
-`createPostgresMemorySchemaSql()` uses the same table-name resolution as the store.
+A connection string creates a managed `pg.Pool`. An injected client remains owned by the application.
 
 ## PostgresMemoryStore
 
@@ -49,29 +44,32 @@ function createPostgresMemorySchemaSql(
 class PostgresMemoryStore implements MemoryStore {
   readonly kind: 'postgres'
   readonly inspector: MemoryInspector
-  readonly compaction: MemoryCompactionStore
+  readonly compaction: MemoryCompactionCapability
 
-  static connect(
-    options?: PostgresMemoryStoreOptions,
-  ): Promise<PostgresMemoryStore>
-
-  load(context: MemoryContext): Promise<Message[]>
-  append(input: MemoryAppendInput): Promise<void>
-  clear(context: MemoryContext): Promise<void>
-  recordError(input: MemoryErrorInput): Promise<void>
+  ensure(): Promise<void>
+  validate(): Promise<void>
+  load(options: MemoryLoadOptions): Promise<Message[]>
+  append(options: MemoryAppendOptions): Promise<void>
+  clear(options: MemoryClearOptions): Promise<void>
+  recordError(options: MemoryErrorOptions): Promise<void>
 }
 ```
 
-## Store and schema options
+Create a store with `client.memoryStore()`. Call `ensure()` when the adapter should create its schema, or `validate()` after application-managed migrations.
+
+## Schema helper
 
 ```ts
-type PostgresMemoryErrorMode = 'store' | 'ignore'
-type PostgresMemoryLockMode = 'advisory' | 'none'
+function createPostgresMemorySchemaSql(
+  options?: PostgresMemorySchemaOptions,
+): string
+```
 
-type PostgresMemoryScopeOptions = {
-  includeUserId?: boolean
-  metadataKeys?: string[]
-}
+## Options
+
+```ts
+type PostgresMemoryErrorPolicy = 'store' | 'ignore'
+type PostgresMemoryLockMode = 'advisory' | 'none'
 
 type PostgresMemoryTableNames = {
   sessions?: string
@@ -85,19 +83,14 @@ type PostgresMemorySchemaOptions = {
 }
 
 type PostgresMemoryStoreOptions = PostgresMemorySchemaOptions & {
-  client?: PostgresMemoryClientLike
-  connectionString?: string
-  createIfMissing?: boolean
-  scope?: PostgresMemoryScopeOptions | ((context: MemoryContext) => string)
-  errors?: PostgresMemoryErrorMode
+  scopeKey?: MemoryScopeKeyResolver
+  errorPolicy?: PostgresMemoryErrorPolicy
   validateMessages?: boolean
   lock?: PostgresMemoryLockMode
 }
 ```
 
-The default prefix is `anvia_`. Runtime defaults are `createIfMissing: true`, `errors: 'store'`, `validateMessages: true`, and `lock: 'advisory'`.
-
-## Client types
+## Client contracts
 
 ```ts
 type PostgresMemoryQueryResult = {
@@ -109,6 +102,7 @@ type PostgresMemoryClientLike = {
     text: string,
     values?: readonly unknown[],
   ): Promise<PostgresMemoryQueryResult>
+  end?(): Promise<void>
 }
 
 type PostgresMemoryTransactionClientLike = PostgresMemoryClientLike & {
@@ -118,14 +112,6 @@ type PostgresMemoryTransactionClientLike = PostgresMemoryClientLike & {
 type PostgresMemoryPoolLike = PostgresMemoryClientLike & {
   connect(): Promise<PostgresMemoryTransactionClientLike>
 }
-```
-
-## Core aliases
-
-```ts
-type PostgresMemoryAppendInput = MemoryAppendInput
-type PostgresMemoryContext = MemoryContext
-type PostgresMemoryErrorInput = MemoryErrorInput
 ```
 
 Return to the [package guide](/packages/memory-postgres).

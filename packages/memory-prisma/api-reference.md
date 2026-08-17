@@ -1,43 +1,23 @@
 # @anvia/memory-prisma API reference
 
-All module symbols below are exported from `@anvia/memory-prisma`. The package also exposes the `anvia-memory-prisma` executable used by `npx @anvia/memory-prisma init`; the CLI is not a JavaScript subpath export.
+The package exports the Prisma memory store and its delegate contracts. It also provides the `anvia-memory-prisma` executable used by `npx @anvia/memory-prisma init`; the CLI is not a JavaScript subpath export.
 
 ```ts
 import {
-  createPrismaMemoryScopeKey,
-  createPrismaMemoryStore,
   PrismaMemoryStore,
-  type PrismaMemoryAppendData,
-  type PrismaMemoryAppendInput,
   type PrismaMemoryClientLike,
-  type PrismaMemoryContext,
   type PrismaMemoryConventionalDelegates,
   type PrismaMemoryDelegates,
-  type PrismaMemoryErrorData,
   type PrismaMemoryErrorDelegate,
-  type PrismaMemoryErrorInput,
-  type PrismaMemoryErrorMode,
+  type PrismaMemoryErrorPolicy,
   type PrismaMemoryMessageDelegate,
-  type PrismaMemoryScopeOptions,
-  type PrismaMemorySessionCreateData,
+  type PrismaMemoryMessageRow,
+  type PrismaMemoryPositionRow,
   type PrismaMemorySessionDelegate,
+  type PrismaMemorySessionRow,
   type PrismaMemoryStoreOptions,
   type PrismaMemoryTransactionOptions,
 } from '@anvia/memory-prisma'
-```
-
-## Functions
-
-```ts
-function createPrismaMemoryStore(
-  client: unknown,
-  options?: PrismaMemoryStoreOptions,
-): PrismaMemoryStore
-
-function createPrismaMemoryScopeKey(
-  context: MemoryContext,
-  options?: PrismaMemoryScopeOptions,
-): string
 ```
 
 ## PrismaMemoryStore
@@ -46,62 +26,48 @@ function createPrismaMemoryScopeKey(
 class PrismaMemoryStore implements MemoryStore {
   readonly kind: 'prisma'
   readonly inspector: MemoryInspector | undefined
-  readonly compaction: MemoryCompactionStore | undefined
+  readonly compaction: MemoryCompactionCapability | undefined
 
-  static fromClient(
-    client: unknown,
-    options?: PrismaMemoryStoreOptions,
-  ): PrismaMemoryStore
-
-  static fromDelegates(
-    delegates: PrismaMemoryDelegates,
-    options?: PrismaMemoryStoreOptions,
-  ): PrismaMemoryStore
-
-  load(context: MemoryContext): Promise<Message[]>
-  append(input: MemoryAppendInput): Promise<void>
-  clear(context: MemoryContext): Promise<void>
-  recordError(input: MemoryErrorInput): Promise<void>
+  constructor(options: PrismaMemoryStoreOptions)
+  validate(): Promise<void>
+  load(options: MemoryLoadOptions): Promise<Message[]>
+  append(options: MemoryAppendOptions): Promise<void>
+  clear(options: MemoryClearOptions): Promise<void>
+  recordError(options: MemoryErrorOptions): Promise<void>
 }
 ```
 
-## Options
+Pass either the conventional generated Prisma client or explicit delegates:
 
 ```ts
-type PrismaMemoryErrorMode = 'store' | 'ignore'
-
-type PrismaMemoryScopeOptions = {
-  includeUserId?: boolean
-  metadataKeys?: string[]
-}
-
-type PrismaMemoryTransactionOptions = {
-  isolationLevel?: string
-}
-
 type PrismaMemoryStoreOptions = {
-  scope?: PrismaMemoryScopeOptions | ((context: MemoryContext) => string)
-  errors?: PrismaMemoryErrorMode
+  scopeKey?: MemoryScopeKeyResolver
+  errorPolicy?: PrismaMemoryErrorPolicy
   validateMessages?: boolean
   transaction?: PrismaMemoryTransactionOptions
-}
+} & (
+  | { client: object; delegates?: never }
+  | { delegates: PrismaMemoryDelegates; client?: never }
+)
 ```
-
-Defaults are `includeUserId: true`, `metadataKeys: []`, `errors: 'store'`, and `validateMessages: true`.
 
 ## Delegate contracts
 
 ```ts
+type PrismaMemorySessionRow = { id: string }
+type PrismaMemoryMessageRow = { message: unknown }
+type PrismaMemoryPositionRow = { position: number }
+
 type PrismaMemorySessionDelegate = {
-  upsert(args: unknown): Promise<{ id: string }>
+  upsert(args: unknown): Promise<PrismaMemorySessionRow>
   deleteMany(args: unknown): Promise<unknown>
   findMany?(args: unknown): Promise<unknown[]>
   findUnique?(args: unknown): Promise<unknown | null>
 }
 
 type PrismaMemoryMessageDelegate = {
-  findMany(args: unknown): Promise<Array<{ message: unknown }>>
-  findFirst(args: unknown): Promise<{ position: number } | null>
+  findMany(args: unknown): Promise<PrismaMemoryMessageRow[]>
+  findFirst(args: unknown): Promise<PrismaMemoryPositionRow | null>
   createMany(args: unknown): Promise<unknown>
   deleteMany?(args: unknown): Promise<{ count: number }>
 }
@@ -119,7 +85,11 @@ type PrismaMemoryDelegates = {
     options?: PrismaMemoryTransactionOptions,
   ): Promise<T>
 }
+```
 
+## Conventional client
+
+```ts
 type PrismaMemoryConventionalDelegates = {
   agentMemorySession: PrismaMemorySessionDelegate
   agentMemoryMessage: PrismaMemoryMessageDelegate
@@ -134,39 +104,16 @@ type PrismaMemoryClientLike = PrismaMemoryConventionalDelegates & {
 }
 ```
 
-## Data types
+## Policies
 
 ```ts
-type PrismaMemorySessionCreateData = {
-  scopeKey: string
-  sessionId: string
-  userId?: string
-  metadata: JsonObject
-}
+type PrismaMemoryErrorPolicy = 'store' | 'ignore'
 
-type PrismaMemoryAppendData = {
-  memorySessionId: string
-  runId: string
-  turn: number
-  position: number
-  role: Message['role']
-  message: Message
-}
-
-type PrismaMemoryErrorData = {
-  memorySessionId: string
-  runId: string
-  error: JsonValue
-  messages: Message[]
+type PrismaMemoryTransactionOptions = {
+  isolationLevel?: string
 }
 ```
 
-## Core aliases
-
-```ts
-type PrismaMemoryAppendInput = MemoryAppendInput
-type PrismaMemoryContext = MemoryContext
-type PrismaMemoryErrorInput = MemoryErrorInput
-```
+Inspection is available when the optional session lookup methods exist. Atomic compaction additionally requires `messages.deleteMany`.
 
 Return to the [package guide](/packages/memory-prisma).

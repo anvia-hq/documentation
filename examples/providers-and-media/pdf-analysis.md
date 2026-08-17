@@ -5,7 +5,7 @@
 ## Outcome
 
 Attach a PDF to a prompt and ask a document-capable completion model for a concise analysis. Use
-direct document input for small, one-off files; prefer loaders, OCR, and retrieval for repeated or
+direct document input for small, one-off files; prefer text extraction, OCR, and retrieval for repeated or
 large document workflows.
 
 ## Prerequisites
@@ -17,28 +17,41 @@ large document workflows.
 ## Implementation
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
-import { Message, UserContent } from '@anvia/core/completion'
+import { Agent } from '@anvia/core/agent'
+import type { UserMessage } from '@anvia/core/completion'
 import { OpenAIClient } from '@anvia/openai'
 
-const model = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY })
-  .completionModel('gpt-5')
+const model = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! })
+    .completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
+})
 if (!model.capabilities.documentInput) throw new Error('Selected model has no document input.')
 
-const analyst = new AgentBuilder('document-analyst', model)
-  .instructions('Use only the attached document. Say when evidence is missing.')
-  .build()
+const analyst = new Agent({
+  id: 'document-analyst',
+  model: model,
+  instructions: 'Use only the attached document. Say when evidence is missing.',
+})
 
-const response = await analyst.prompt(Message.user([
-  UserContent.text('Summarize the document and list its stated action items.'),
-  UserContent.documentUrl(
-    'https://example.com/private-report.pdf',
-    'application/pdf',
-    { filename: 'report.pdf' },
-  ),
-])).send()
+const prompt: UserMessage = {
+  role: 'user',
+  content: [
+    { type: 'text', text: 'Summarize the document and list its stated action items.' },
+    {
+      type: 'file',
+      data: { type: 'url', url: 'https://example.com/private-report.pdf' },
+      mediaType: 'application/pdf',
+      filename: 'report.pdf',
+    },
+  ],
+}
 
-console.log(response.output)
+const response = await analyst.generate({ messages: [prompt] })
+
+if (response.status === 'completed') {
+  console.log(response.output)
+}
 ```
 
 ## Run and expected behavior
@@ -54,13 +67,13 @@ a URL or upload available. A model summary can omit or misread content and is no
 document is authentic. Do not expose permanent public links to private files.
 
 In production, use short-lived signed URLs, timeouts, retention controls, and document-specific
-evaluations. Extract once with a loader or OCR and index chunks when users will query the same file
+evaluations. Extract once with `extractPdfText()` or OCR and index chunks when users will query the same file
 repeatedly.
 
 ## Source and extensions
 
 Run the
-[PDF attachment cookbook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/04_providers_and_multimodal/06-pdf-attachment.ts).
+[PDF attachment cookbook](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/06-pdf-attachment.ts).
 Next, add citations from extracted chunks or use OCR for scanned pages.
 
 - [Multimodal inputs](/sdk/advanced/multimodal/inputs)

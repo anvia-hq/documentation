@@ -21,7 +21,7 @@ fact.
 
 ## Packages
 
-- `@anvia/core` provides `AgentBuilder` and session handling.
+- `@anvia/core` provides `Agent` and session handling.
 - `@anvia/openai` provides the OpenAI completion model adapter.
 - `@anvia/memory-sqlite` provides the supported durable `MemoryStore` used here.
 - `tsx`, `typescript`, and `@types/node` run and type-check the example locally.
@@ -33,7 +33,7 @@ authenticated application user
         |
         | supplies stable sessionId, userId, and tenantId
         v
-agent.session(...) -> Agent -> OpenAI completion model
+agent.generate({ prompt, session }) -> Agent -> OpenAI completion model
         |
         | load before each prompt; append after each completed turn
         v
@@ -58,7 +58,7 @@ data/
 ::: code-group
 
 ```ts [src/memory.ts]
-import { createSqliteMemoryStore } from "@anvia/memory-sqlite";
+import { SqliteMemoryClient } from "@anvia/memory-sqlite";
 
 export const scope = {
   sessionId: "project-chat-123",
@@ -66,38 +66,44 @@ export const scope = {
   tenantId: "tenant-789",
 };
 
-export function createMemory() {
-  return createSqliteMemoryStore({
-    path: "data/anvia-memory.sqlite",
-    scope: {
-      includeUserId: true,
-      metadataKeys: ["tenantId"],
-    },
-  });
-}
+export const memoryClient = new SqliteMemoryClient({
+  path: "data/anvia-memory.sqlite",
+});
+
+export const memory = memoryClient.memoryStore({
+  scopeKey: {
+    includeUserId: true,
+    metadataKeys: ["tenantId"],
+  },
+});
 ```
 
 ```ts [src/agent.ts]
-import { AgentBuilder } from "@anvia/core/agent";
+import { Agent } from "@anvia/core/agent";
 import { OpenAIClient } from "@anvia/openai";
-import { createMemory } from "./memory.js";
+import { memory } from "./memory.js";
 
 export function createProjectAgent() {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("Set OPENAI_API_KEY before running this example.");
 
   const openai = new OpenAIClient({ apiKey });
-  return new AgentBuilder("project-assistant", openai.completionModel("gpt-5"))
-    .instructions("Answer concisely. Use stored conversation facts when relevant.")
-    .memory(createMemory(), { savePolicy: "turn" })
-    .build();
+  return new Agent({
+    id: "project-assistant",
+    model: openai.completionModel({
+        modelId: "gpt-5.5",
+        api: "responses"
+    }),
+    instructions: "Answer concisely. Use stored conversation facts when relevant.",
+    memory: { store: memory, savePolicy: "turn" },
+  });
 }
 ```
 
 ```ts [src/cli.ts]
 import { mkdir } from "node:fs/promises";
 import { createProjectAgent } from "./agent.js";
-import { scope } from "./memory.js";
+import { memory, scope } from "./memory.js";
 
 async function main(): Promise<void> {
   const command = process.argv[2];
@@ -106,15 +112,24 @@ async function main(): Promise<void> {
   }
 
   await mkdir("data", { recursive: true });
-  const session = createProjectAgent().session(scope.sessionId, {
+  await memory.ensure();
+  const agent = createProjectAgent();
+  const session = {
+    sessionId: scope.sessionId,
     userId: scope.userId,
     metadata: { tenantId: scope.tenantId },
-  });
+  };
 
   const prompt = command === "write"
     ? "Remember that the launch codename is Firefly."
     : "What is the launch codename?";
-  const response = await session.prompt(prompt).send();
+  const response = await agent.generate({
+    prompt,
+    session,
+  });
+  if (response.status !== "completed") {
+    throw new Error(`Unexpected approval request for ${response.approval.toolName}`);
+  }
   console.log(response.output);
   if (command === "write") console.log("The completed turn is stored in SQLite.");
 }
@@ -165,13 +180,13 @@ write command with the same scope appends another turn rather than replacing the
 
 ## How it works
 
-`createSqliteMemoryStore(...)` is an official Anvia memory adapter. Supplying a file path makes
-the store survive process restarts; omitting `path` would create an in-memory database instead.
-The adapter creates its tables on first access.
+`SqliteMemoryClient` owns the SQLite connection and `memoryStore()` creates the official Anvia
+memory adapter. Supplying a file path makes the store survive process restarts; use `':memory:'`
+for an in-memory database. This example calls `ensure()` before the first run.
 
-`.memory(memory, { savePolicy: "turn" })` attaches the store and saves complete model-and-tool
-turns together. `agent.session(...)` carries the memory context for every prompt made through
-that session. Before a prompt runs, Anvia calls the store's public `load(...)` contract; after a
+`memory: { store: memory, savePolicy: "turn" }` attaches the store and saves complete model-and-tool
+turns together. The `session` property carries the memory scope for every prompt in that
+conversation. Before a prompt runs, Anvia calls the store's public `load(...)` contract; after a
 completed turn, it appends the new messages according to the save policy.
 
 The SQLite scope includes `sessionId` and `userId` by default. This example also selects
@@ -180,7 +195,7 @@ The SQLite scope includes `sessionId` and `userId` by default. This example also
 ## Production and security notes
 
 - **Scope is not authorization.** A matching session scope only selects stored rows. Before
-  calling `agent.session(...)`, verify that the authenticated caller may access that tenant,
+  passing a session scope to the agent, verify that the authenticated caller may access that tenant,
   user, and conversation. Never trust IDs supplied by a browser without this check.
 - Generate stable, opaque conversation IDs in your product database. Do not use a request ID or
   create a new session ID for every turn.
@@ -208,5 +223,5 @@ changing each scope dimension prevents recall, invalid persisted messages are re
 concurrent prompts follow your application's ordering policy. Delete the temporary database after
 the suite.
 
-- Cookbook foundation: [`01_basics/06-session-memory.ts`](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/01_basics/06-session-memory.ts)
-- Adapter tests: [`packages/memory-sqlite/test`](https://github.com/anvia-hq/anvia/tree/main/packages/memory-sqlite/test)
+- Cookbook foundation: [`01_basics/06-session-memory.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/01_basics/06-session-memory.ts)
+- Adapter tests: [`packages/memory-sqlite/test`](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/memory-sqlite/test)

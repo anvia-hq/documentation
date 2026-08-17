@@ -9,7 +9,7 @@ Anvia is provider-neutral, but support is not universal. A provider package expo
 | Text generation, agents, tools, or structured responses | [Completion model](/sdk/models/completion) |
 | Semantic search and retrieval | [Embedding model](/sdk/models/embeddings) |
 | Image creation | [Image generation](/sdk/models/image-generation) |
-| Speech or audio creation | [Audio generation](/sdk/models/audio-generation) |
+| Speech or audio creation | [Audio generation](/sdk/models/speech-generation) |
 | Audio-to-text | [Transcription](/sdk/models/transcription) |
 | Document or image text extraction | [OCR](/sdk/models/ocr) |
 

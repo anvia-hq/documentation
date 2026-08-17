@@ -74,7 +74,7 @@ export type ConversationRepository = {
 ```
 
 ```ts [src/agent.ts]
-import { AgentBuilder } from "@anvia/core/agent";
+import { Agent } from "@anvia/core/agent";
 import { OpenAIClient } from "@anvia/openai";
 
 const apiKey = process.env.OPENAI_API_KEY;
@@ -82,12 +82,14 @@ if (!apiKey) throw new Error("Missing OPENAI_API_KEY.");
 
 const openai = new OpenAIClient({ apiKey });
 
-export const supportAgent = new AgentBuilder(
-  "support",
-  openai.completionModel("gpt-5"),
-)
-  .instructions("Answer support questions clearly and concisely.")
-  .build();
+export const supportAgent = new Agent({
+  id: "support",
+  model: openai.completionModel({
+      modelId: "gpt-5.5",
+      api: "responses"
+  }),
+  instructions: "Answer support questions clearly and concisely.",
+});
 ```
 
 ```ts [src/server.ts]
@@ -118,15 +120,19 @@ export function createPostHandler(auth: AuthService, conversations: Conversation
 
     await auth.authorize(principal, "conversation:prompt", conversation);
 
-    const response = await supportAgent
-      .prompt(parsed.data.message)
-      .withTrace({
-        name: "support-request",
-        userId: principal.userId,
-        sessionId: conversation.id,
-        metadata: { tenantId: principal.tenantId },
-      })
-      .send();
+    const response = await supportAgent.generate({
+        prompt: parsed.data.message,
+        trace: {
+            name: "support-request",
+            userId: principal.userId,
+            sessionId: conversation.id,
+            metadata: { tenantId: principal.tenantId },
+        }
+    });
+
+    if (response.status !== "completed") {
+      return Response.json({ error: "approval_required" }, { status: 409 });
+    }
 
     return Response.json({ output: response.output });
   };
@@ -160,7 +166,7 @@ agent for endpoint tests and separately test the real agent contract.
 
 ## Source and extensions
 
-- Transport source: [`01_basics/07-server-react-transport.ts`](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/01_basics/07-server-react-transport.ts)
+- Transport source: [`01_basics/07-server-react-transport.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/01_basics/07-server-react-transport.ts)
 - Add [rate limits](/examples/production/rate-limits) and [persistent memory](/examples/data-and-workflows/persistent-memory).
 - Review [memory sessions](/sdk/memory/sessions) and [tool control](/sdk/advanced/hooks/tool-control).
 - Extend with service accounts, webhook signatures, or step-up approval for high-risk tools.

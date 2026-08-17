@@ -1,22 +1,19 @@
 # Lifecycle
 
-The Lens adapter owns isolated telemetry providers, so the tracing instance also owns their flush and shutdown lifecycle.
-
-## Long-lived server
+Create one `LensClient` per process or worker lifecycle and reuse its observer across agents.
 
 ```ts
-const tracing = lens.createFromEnv({ serviceName: 'support-api' })
+import { LensClient } from '@anvia/lens'
 
-process.once('SIGTERM', async () => {
-  await tracing.shutdown()
-  process.exit(0)
-})
+const lens = new LensClient({ serviceName: 'support-api' })
+const tracing = lens.observer()
+
+try {
+  await runWork(tracing)
+  await lens.flush()
+} finally {
+  await lens.close()
+}
 ```
 
-Integrate shutdown with the application's existing signal handling rather than registering competing handlers in every module.
-
-## Scripts and workers
-
-Call `flush()` after the last run when the process continues, or `shutdown()` when it will not use the observer again. `lens.evals()` flushes on evaluation run end by default, but an explicit final shutdown remains the safest script boundary.
-
-`timeoutMs` bounds Lens HTTP requests. Network delivery can still fail, so decide whether observability failure should fail the command, be retried by the job system, or only be reported. Do not repeatedly create tracing instances per request; share one instance for the process or worker lifecycle.
+`flush()` delivers buffered data while keeping the client usable. `close()` performs final shutdown and is idempotent; new observer work is rejected afterward. Stop accepting work and wait for active runs before closing a long-lived service.

@@ -5,9 +5,9 @@ Anthropic’s provider adapter supplies streaming Claude completion models for A
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `0.5.1` |
+| Version | `1.0.0-rc.2` |
 | Runtime | ESM, server-side JavaScript |
-| Peer | `@anvia/core >=0.7.1 <1.0.0` |
+| Peer | Matching `@anvia/core` release candidate |
 
 ## Install
 
@@ -18,22 +18,28 @@ pnpm add @anvia/anthropic @anvia/core
 ## Create a Claude agent
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { AnthropicClient } from '@anvia/anthropic'
 
 const anthropic = new AnthropicClient({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
-const agent = new AgentBuilder(
-  'assistant',
-  anthropic.completionModel('claude-sonnet-4-20250514'),
-)
-  .instructions('Give direct, well-supported answers.')
-  .build()
+const agent = new Agent({
+  id: 'assistant',
+  model: anthropic.completionModel({
+      modelId: 'claude-sonnet-4-20250514'
+  }),
+  instructions: 'Give direct, well-supported answers.',
+})
 
-const result = await agent.prompt('Summarize the release notes.').send()
-console.log(result.output)
+const result = await agent.generate({
+    prompt: 'Summarize the release notes.'
+})
+
+if (result.status === 'completed') {
+  console.log(result.output)
+}
 ```
 
 ## Capabilities
@@ -55,11 +61,13 @@ The package maps Anvia history, documents, tools, tool results, reasoning, strea
 
 ```ts
 const compatible = new AnthropicClient({
-  apiKey: process.env.PROVIDER_API_KEY,
+  apiKey: process.env.PROVIDER_API_KEY!,
   baseUrl: 'https://provider.example.com',
 })
 
-const model = compatible.completionModel('provider/model-name')
+const model = compatible.completionModel({
+    modelId: 'provider/model-name'
+})
 ```
 
 ### Run Claude through Vertex AI
@@ -72,7 +80,9 @@ const vertex = new AnthropicVertexClient({
   region: 'global',
 })
 
-const model = vertex.completionModel('claude-sonnet-5')
+const model = vertex.completionModel({
+    modelId: 'claude-sonnet-5'
+})
 ```
 
 The Vertex client follows Google authentication through the official Anthropic Vertex SDK. It can use Application Default Credentials or explicit SDK authentication options, but it does not expose `listModels()` because Vertex does not provide Anthropic’s Models API.
@@ -91,4 +101,4 @@ The Vertex client follows Google authentication through the official Anthropic V
 - [API reference](/packages/anthropic/api-reference)
 - [Releases](/packages/anthropic/releases)
 - [Anthropic SDK guide](/sdk/providers/anthropic)
-- [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-anthropic/CHANGELOG.md)
+- [Source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-anthropic/CHANGELOG.md)

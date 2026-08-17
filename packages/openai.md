@@ -5,9 +5,9 @@ OpenAI’s provider adapter covers the broadest set of Anvia model contracts: co
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `0.5.1` |
+| Version | `1.0.0-rc.2` |
 | Runtime | ESM, server-side JavaScript |
-| Peer | `@anvia/core >=0.7.1 <1.0.0` |
+| Peer | Matching `@anvia/core` release candidate |
 
 ## Install
 
@@ -18,35 +18,42 @@ pnpm add @anvia/openai @anvia/core
 ## Create a completion model
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 
 const openai = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 
-const agent = new AgentBuilder(
-  'assistant',
-  openai.completionModel('gpt-5'),
-)
-  .instructions('Answer clearly and concisely.')
-  .build()
+const agent = new Agent({
+  id: 'assistant',
+  model: openai.completionModel({
+      modelId: 'gpt-5.5',
+      api: "responses"
+  }),
+  instructions: 'Answer clearly and concisely.',
+})
 
-const result = await agent.prompt('Explain semantic search in one paragraph.').send()
-console.log(result.output)
+const result = await agent.generate({
+    prompt: 'Explain semantic search in one paragraph.'
+})
+
+if (result.status === 'completed') {
+  console.log(result.output)
+}
 ```
 
-The client uses OpenAI’s Responses API by default. A custom `baseUrl` selects the Chat Completions adapter by default, which is useful for OpenAI-compatible services. Set `completionApi` explicitly when the endpoint supports both.
+The required `api` model option selects OpenAI Responses or Chat Completions. A custom `baseUrl` changes the endpoint but does not select the API.
 
 ## Capabilities
 
 | Capability | Factory | Default |
 | --- | --- | --- |
-| Streaming completion | `completionModel()` | `gpt-5` |
-| Dense embeddings | `embeddingModel()` | `text-embedding-3-small` |
-| Image generation | `imageGenerationModel()` | `gpt-image-1` |
-| Text-to-speech | `audioGenerationModel()` | `tts-1` |
-| Transcription | `transcriptionModel()` | `whisper-1` |
+| Streaming completion | `completionModel({ modelId, api })` | Explicit model and API |
+| Dense embeddings | `embeddingModel({ modelId })` | Explicit model |
+| Image generation | `imageGenerationModel({ modelId })` | Explicit model |
+| Text-to-speech | `speechGenerationModel({ modelId })` | Explicit model |
+| Transcription | `transcriptionModel({ modelId })` | Explicit model |
 | Model inventory | `listModels()` | Provider model list |
 
 Both completion adapters normalize messages, tool calls, reasoning, usage, structured output, and streaming events into Anvia contracts. The Responses adapter is the native OpenAI path; the Chat adapter supports OpenAI-compatible endpoints and preserves provider-specific reasoning history when required.
@@ -57,23 +64,29 @@ Both completion adapters normalize messages, tool calls, reasoning, usage, struc
 
 ```ts
 const compatible = new OpenAIClient({
-  apiKey: process.env.PROVIDER_API_KEY,
+  apiKey: process.env.PROVIDER_API_KEY!,
   baseUrl: 'https://provider.example.com/v1',
-  completionApi: 'chat',
 })
 
-const model = compatible.completionModel('provider/model-name')
+const model = compatible.completionModel({
+    modelId: 'provider/model-name',
+    api: 'chat',
+})
 ```
 
 ### Reuse one client across model capabilities
 
 ```ts
-const completion = openai.completionModel('gpt-5')
-const embeddings = openai.embeddingModel('text-embedding-3-small', {
-  dimensions: 1536,
-  maxBatchSize: 64,
+const completion = openai.completionModel({
+    modelId: 'gpt-5.5',
+    api: 'responses',
 })
-const images = openai.imageGenerationModel()
+const embeddings = openai.embeddingModel({
+    modelId: 'text-embedding-3-small',
+    dimensions: 1536,
+    maxBatchSize: 64
+})
+const images = openai.imageGenerationModel({ modelId: 'gpt-image-1' })
 ```
 
 Create the provider client once at the server boundary. Keep credentials there, inject the returned model contracts, and keep fallback policy and tenant routing in application code.
@@ -92,4 +105,4 @@ Create the provider client once at the server boundary. Keep credentials there, 
 - [API reference](/packages/openai/api-reference)
 - [Releases](/packages/openai/releases)
 - [OpenAI SDK guide](/sdk/providers/openai)
-- [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-openai/CHANGELOG.md)
+- [Source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-openai/CHANGELOG.md)

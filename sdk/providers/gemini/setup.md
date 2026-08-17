@@ -20,12 +20,12 @@ Create the client in a server-only module:
 import { GeminiClient } from '@anvia/gemini'
 
 export const gemini = new GeminiClient({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY!,
 })
 
-export const completionModel = gemini.completionModel(
-  'gemini-2.5-flash',
-)
+export const completionModel = gemini.completionModel({
+    modelId: 'gemini-2.5-flash'
+})
 ```
 
 Construction fails when the API key is missing or empty. Validate environment configuration at startup so the deployment fails before it accepts traffic.
@@ -33,18 +33,15 @@ Construction fails when the API key is missing or empty. Validate environment co
 ## Use the model with an agent
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
+import { Agent } from '@anvia/core'
 import { completionModel } from './gemini'
 
-export const supportAgent = new AgentBuilder(
-  'support',
-  completionModel,
-)
-  .instructions(
-    'Answer support questions clearly. Use tools for account data.',
-  )
-  .defaultMaxTurns(4)
-  .build()
+export const supportAgent = new Agent({
+  id: 'support',
+  model: completionModel,
+  instructions: 'Answer support questions clearly. Use tools for account data.',
+  maxTurns: 4,
+})
 ```
 
 The agent remains provider-neutral. Provider selection stays in the model module, making it easier to test the workflow with a fake model or replace the deployment later.
@@ -58,7 +55,7 @@ import { GoogleGenAI } from '@google/genai'
 import { GeminiClient } from '@anvia/gemini'
 
 const google = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY!,
 })
 
 export const gemini = new GeminiClient({ client: google })

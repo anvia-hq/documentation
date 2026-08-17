@@ -4,22 +4,22 @@
 
 | Capability | Support |
 | --- | --- |
-| Dense document/query vectors | `FastEmbedEmbeddingModel` |
-| Sparse passage vectors | `FastEmbedSparseEmbeddingModel.embedTexts()` |
-| Sparse query vectors | `FastEmbedSparseEmbeddingModel.embedQuery()` |
+| Dense document/query vectors | `loadFastEmbedEmbeddingModel(...)` handle |
+| Sparse passage vectors | Sparse handle `embedTexts()` |
+| Sparse query vectors | Sparse handle `embedQuery()` |
 | Hybrid retrieval | Combine dense and sparse with a capable vector store |
 | Remote API calls | None after model assets are available locally |
 | Browser runtime | Not the intended target |
 
 ## Dense embeddings
 
-The default model is `fast-bge-small-en-v1.5`. The adapter accepts FastEmbed’s non-custom model enum values, batches 256 inputs by default, and returns one Anvia `Embedding` per input.
+`DEFAULT_FASTEMBED_EMBEDDING_MODEL` is `fast-bge-small-en-v1.5`; pass it or another supported ID as `modelId`. The adapter accepts FastEmbed’s non-custom model enum values, batches 256 inputs by default, and returns one Anvia `Embedding` per input.
 
 Runtime batches may contain plain arrays or typed arrays. The adapter validates the batch/vector shapes and final output count.
 
 ## Sparse embeddings
 
-The default sparse model is `prithivida/Splade_PP_en_v1`. Passage embedding accepts batches; query embedding accepts one query. Returned parallel `indices` and `values` arrays must be numeric and have equal lengths.
+`DEFAULT_FASTEMBED_SPARSE_EMBEDDING_MODEL` is `prithivida/Splade_PP_en_v1`; pass it or another supported ID as `modelId`. Passage embedding accepts batches; query embedding accepts one query. Returned parallel `indices` and `values` arrays must be numeric and have equal lengths.
 
 Sparse output is useful only with a store and search configuration that understands sparse or hybrid vectors. Qdrant can combine named dense and sparse vectors with reciprocal-rank fusion.
 

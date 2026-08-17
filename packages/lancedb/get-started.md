@@ -5,20 +5,25 @@ pnpm add @anvia/core @anvia/lancedb @lancedb/lancedb
 ```
 
 ```ts
-import { LanceDBVectorStore } from '@anvia/lancedb'
-
-const store = await LanceDBVectorStore.connect({
-  uri: 'data/lancedb',
-  tableName: 'support_docs',
-  vectorSize: 1536,
-})
-
-await store.upsertDocuments(documents)
-
-const results = await store.index(embeddings).search({
-  query: 'reset a password',
-  topK: 5,
-})
+import { retrieveDocuments } from "@anvia/core/vector-store";
+import { LanceDBVectorClient } from '@anvia/lancedb';
+const storeClient = new LanceDBVectorClient({
+    uri: 'data/lancedb'
+});
+const store = storeClient.vectorStore({
+    tableName: 'support_docs',
+    dimensions: 1536
+});
+await store.ensure();
+await store.upsert({
+    documents: documents
+});
+const results = await retrieveDocuments({
+    store: store,
+    model: embeddings,
+    query: 'reset a password',
+    topK: 5
+});
 ```
 
 Documents must already contain embeddings. The default URI is `~/.anvia/lancedb`; use an explicit durable URI or injected connection in deployed services.

@@ -1,12 +1,13 @@
 # Vertex AI
 
-Select Vertex by setting the discriminant `vertexai: true`:
+Select Vertex with the `vertexAi` connection object:
 
 ```ts
 const vertex = new GeminiClient({
-  vertexai: true,
-  project: 'my-gcp-project',
-  location: 'us-central1',
+  vertexAi: {
+    projectId: 'my-gcp-project',
+    location: 'us-central1',
+  },
 })
 ```
 
@@ -41,10 +42,12 @@ The agent and pipeline code can keep the same Anvia model interface. Swap the co
 
 ```ts
 const client = useVertex
-  ? new GeminiClient({ vertexai: true, project, location })
+  ? new GeminiClient({ vertexAi: { projectId: project, location } })
   : new GeminiClient({ apiKey })
 
-const model = client.completionModel(configuredModelId)
+const model = client.completionModel({
+    modelId: configuredModelId
+})
 ```
 
 Do not assume one model ID is served identically by both platforms. Treat a platform switch as a provider migration and replay representative tests.

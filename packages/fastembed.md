@@ -5,9 +5,9 @@ FastEmbed provides local dense and sparse embedding models for Anvia retrieval w
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `0.3.0` |
+| Version | `1.0.0-rc.2` |
 | Runtime | ESM, Node.js with FastEmbed native runtime support |
-| Peer | `@anvia/core >=0.7.1 <1.0.0` |
+| Peer | Matching `@anvia/core` release candidate |
 
 ## Install
 
@@ -20,9 +20,9 @@ pnpm add @anvia/fastembed @anvia/core
 ## Create local embeddings
 
 ```ts
-import { createFastEmbedEmbeddingModel } from '@anvia/fastembed'
+import { DEFAULT_FASTEMBED_EMBEDDING_MODEL, loadFastEmbedEmbeddingModel } from '@anvia/fastembed'
 
-const embeddings = await createFastEmbedEmbeddingModel()
+const embeddings = await loadFastEmbedEmbeddingModel({ modelId: DEFAULT_FASTEMBED_EMBEDDING_MODEL })
 const vectors = await embeddings.embedTexts([
   'Password reset links expire after 30 minutes.',
   'Enterprise customers receive priority support.',
@@ -35,9 +35,9 @@ console.log(vectors[0].vector)
 
 | Capability | Factory | Default model |
 | --- | --- | --- |
-| Dense embeddings | `createFastEmbedEmbeddingModel()` | `fast-bge-small-en-v1.5` |
-| Sparse passage embeddings | `createFastEmbedSparseEmbeddingModel()` | `prithivida/Splade_PP_en_v1` |
-| Sparse query embeddings | `FastEmbedSparseEmbeddingModel.embedQuery()` | Same sparse model |
+| Dense embeddings | `loadFastEmbedEmbeddingModel({ modelId: DEFAULT_FASTEMBED_EMBEDDING_MODEL })` | `fast-bge-small-en-v1.5` |
+| Sparse passage embeddings | `loadFastEmbedSparseEmbeddingModel({ modelId: DEFAULT_FASTEMBED_SPARSE_EMBEDDING_MODEL })` | `prithivida/Splade_PP_en_v1` |
+| Sparse query embeddings | Loaded sparse model's `embedQuery()` | Same sparse model |
 | Remote provider call | No | Runs locally |
 
 Sparse passage and query encoders are intentionally separate methods. Use them with a hybrid-capable store such as Qdrant; do not substitute passage encoding for query encoding.
@@ -47,22 +47,20 @@ Sparse passage and query encoders are intentionally separate methods. Use them w
 ### Choose another dense model
 
 ```ts
-const embeddings = await createFastEmbedEmbeddingModel({
-  model: 'fast-bge-base-en-v1.5',
+const embeddings = await loadFastEmbedEmbeddingModel({
+  modelId: 'fast-bge-base-en-v1.5',
   maxBatchSize: 32,
-  initOptions: {
-    cacheDir: './.cache/fastembed',
-    showDownloadProgress: false,
-  },
+  cacheDir: './.cache/fastembed',
+  showDownloadProgress: false,
 })
 ```
 
 ### Add sparse vectors for hybrid search
 
 ```ts
-import { createFastEmbedSparseEmbeddingModel } from '@anvia/fastembed'
+import { DEFAULT_FASTEMBED_SPARSE_EMBEDDING_MODEL, loadFastEmbedSparseEmbeddingModel } from '@anvia/fastembed'
 
-const sparse = await createFastEmbedSparseEmbeddingModel()
+const sparse = await loadFastEmbedSparseEmbeddingModel({ modelId: DEFAULT_FASTEMBED_SPARSE_EMBEDDING_MODEL })
 const [passage] = await sparse.embedTexts(['A document to index'])
 const query = await sparse.embedQuery('What should I retrieve?')
 ```
@@ -83,4 +81,4 @@ Use the same dense model, sparse model, and preprocessing rules for ingestion an
 - [API reference](/packages/fastembed/api-reference)
 - [Releases](/packages/fastembed/releases)
 - [Embeddings guide](/sdk/knowledges/embeddings)
-- [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/embedding-fastembed/CHANGELOG.md)
+- [Source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/embedding-fastembed/CHANGELOG.md)

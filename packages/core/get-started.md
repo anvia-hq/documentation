@@ -7,30 +7,37 @@ pnpm add @anvia/core @anvia/openai zod
 ```
 
 ```ts
-import { AgentBuilder, createTool } from '@anvia/core'
+import { Agent, createTool } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 import { z } from 'zod'
 
 const model = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
-}).completionModel('gpt-5')
+    apiKey: process.env.OPENAI_API_KEY!,
+}).completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
+})
 
 const currentTime = createTool({
   name: 'current_time',
   description: 'Return the current server time.',
-  input: z.object({}),
-  output: z.object({ iso: z.string() }),
+  inputSchema: z.object({}),
+  outputSchema: z.object({ iso: z.string() }),
   execute: async () => ({ iso: new Date().toISOString() }),
 })
 
-const agent = new AgentBuilder('assistant', model)
-  .instructions('Answer briefly and use tools when they provide fresher data.')
-  .tools([currentTime])
-  .defaultMaxTurns(4)
-  .build()
+const agent = new Agent({
+  id: 'assistant',
+  model: model,
+  instructions: 'Answer briefly and use tools when they provide fresher data.',
+  maxTurns: 4,
+  tools: [currentTime],
+})
 
-const response = await agent.prompt('What time is it?').send()
-console.log(response.output)
+const response = await agent.generate({
+    prompt: 'What time is it?'
+})
+if (response.status === 'completed') console.log(response.output)
 ```
 
 Keep the API key and agent execution on the server. A browser should call an authenticated application route rather than construct the provider client itself.
@@ -39,11 +46,11 @@ Keep the API key and agent execution on the server. A browser should call an aut
 
 | Need | Start with |
 | --- | --- |
-| One model request | `createCompletion` |
-| Schema-validated data | `createParsedCompletion` |
-| Reusable instructions or automatic tools | `AgentBuilder` |
-| Explicit typed stages | `PipelineBuilder` |
-| Persistent conversation | `agent.session(...)` with a `MemoryStore` |
+| One model request | `generateCompletion` |
+| Schema-validated data | `generateCompletion` |
+| Reusable instructions or automatic tools | `Agent` |
+| Explicit typed stages | `Pipeline` |
+| Persistent conversation | `agent.generate({ prompt, session })` with a `MemoryStore` |
 
 Core does not require Studio, React, or Lens. Add those packages only when the application needs their development, client, or observability surfaces.
 

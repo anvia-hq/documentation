@@ -1,16 +1,15 @@
 # Search and filters
 
 ```ts
-import { vectorFilter } from '@anvia/core/vector-store'
-
-const results = await store.index(embeddings).search({
-  query: 'reset a password',
-  topK: 5,
-  filter: vectorFilter.and(
-    vectorFilter.eq('tenantId', 'acme'),
-    vectorFilter.gt('revision', 3),
-  ),
-})
+import { retrieveDocuments } from "@anvia/core/vector-store";
+import { vectorFilter } from '@anvia/core/vector-store';
+const results = await retrieveDocuments({
+    store: store,
+    model: embeddings,
+    query: 'reset a password',
+    topK: 5,
+    filter: vectorFilter.and(vectorFilter.eq('tenantId', 'acme'), vectorFilter.gt('revision', 3))
+});
 ```
 
 `filterToRedisQuery` translates string equality to a quoted field query, booleans to tag values, numbers to exact ranges, comparisons to open numeric ranges, and compounds to RediSearch intersection or union syntax.

@@ -1,27 +1,65 @@
 # Core concepts
 
-Anvia keeps runtime primitives separate so applications can adopt only the behavior they need.
+Anvia keeps its runtime primitives separate so an application can adopt only the behavior it needs. The provider, agent, tools, memory, and transport are explicit objects rather than hidden global configuration.
 
-| Primitive | Responsibility |
-| --- | --- |
-| Model | A provider-neutral completion interface created by a provider package. |
-| Completion | One model call controlled directly by application code. |
-| Agent | Reusable instructions and runtime behavior around a model. |
-| Prompt | One configured agent request, executed with `send()` or `stream()`. |
-| Tool | A typed application action the model may request. |
-| Memory | Durable message history loaded by session identity. |
-| Context | Stable documents attached to requests without a tool call. |
-| Observer | A consumer of structured runtime lifecycle events. |
+## Models are the provider boundary
 
-## Completions and agents
+A provider package creates a model that implements Anvia's completion contract. Provider credentials and options stay in the provider-specific construction step.
 
-Use `createCompletion` for one request where your application owns every step. Use `createCompletionStream` when that same call should emit text incrementally.
+```ts
+import { OpenAIClient } from '@anvia/openai'
 
-Use an agent when behavior is reused or needs multiple model/tool turns. `AgentBuilder` defines stable defaults; each `agent.prompt(...)` creates an independent request that may override them.
+const client = new OpenAIClient({ apiKey })
+const model = client.completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
+})
+```
 
-## Tools
+Agents, extractors, and pipelines depend on that model interface. Switching providers does not require moving provider-specific configuration into those higher-level primitives.
 
-Tools connect a model to product data and actions. Inputs are parsed before application code runs, and an optional output schema validates the result.
+## Completions are one model call
+
+Use `generateCompletion()` when application code owns the entire interaction and does not need an agent loop.
+
+```ts
+import { generateCompletion } from '@anvia/core'
+
+const result = await generateCompletion({
+    prompt: 'Summarize this support ticket.',
+    model,
+    instructions: 'Return one concise paragraph.'
+})
+
+console.log(result.text)
+```
+
+Use `streamCompletion()` for the same direct interaction when output should arrive incrementally.
+
+## Agents own reusable runtime behavior
+
+An agent combines a model with stable instructions and optional tools, context, memory, guardrails, observers, middleware, and run limits.
+
+```ts
+import { Agent } from '@anvia/core'
+
+const agent = new Agent({
+  id: 'support',
+  model,
+  instructions: 'Help customers understand their orders.',
+  maxTurns: 4,
+})
+
+const response = await agent.generate({
+    prompt: 'Where is order A-100?'
+})
+```
+
+Each call to `generate()` or `stream()` creates an independent run. Per-run options can tighten limits or attach lifecycle, guardrail, retry, middleware, and tracing behavior without changing the agent object.
+
+## Tools expose application-owned actions
+
+Tools let the model request a narrow operation. Anvia validates declared input and output schemas; the application still owns authorization, business rules, side effects, and redaction.
 
 ```ts
 import { createTool } from '@anvia/core'
@@ -30,36 +68,73 @@ import { z } from 'zod'
 const lookupOrder = createTool({
   name: 'lookup_order',
   description: 'Look up an order by id.',
-  input: z.object({ orderId: z.string() }),
-  output: z.object({ orderId: z.string(), status: z.string() }),
+  inputSchema: z.object({
+    orderId: z.string(),
+  }),
+  outputSchema: z.object({
+    orderId: z.string(),
+    status: z.string(),
+  }),
   execute: async ({ orderId }) => ({ orderId, status: 'processing' }),
 })
 ```
 
-Keep tools narrow. Authorization remains the application's responsibility, even when schemas validate the shape of a call.
+Pass the tool through the agent options. During a run, Anvia sends its definition to the model, executes valid tool requests, and returns normalized tool results to the next turn.
 
-## Memory and sessions
+## Memory is durable session history
 
-Memory stores conversation history. A session supplies the durable identity used to load and append that history:
+A memory store loads and appends normalized messages. The agent supplies the policy; a session supplies the durable identity.
 
 ```ts
-const session = agent.session('thread_123', {
-  userId: 'user_456',
-  metadata: { tenantId: 'tenant_789' },
-})
-
-await session.prompt('Remember that my project is named Anvia.').send()
-const response = await session.prompt('What is my project named?').send()
+const memoryAgent = new Agent({
+    id: 'support',
+    model,
+    memory: { store: memoryStore },
+});
+const session = { sessionId: 'thread_123', userId: 'user_456', metadata: { tenantId: 'tenant_789' } };
+await memoryAgent.generate({
+    prompt: 'Remember that my project is named Anvia.',
+    session: session
+});
+const response = await memoryAgent.generate({
+    prompt: 'What is my project named?',
+    session: session
+});
 ```
 
-Storage scope isolates records; it does not authorize access. Verify the current user before invoking a session.
+Session identity scopes storage; it does not authorize access. Authenticate the caller and verify the user or tenant before creating the session.
 
-## Context and retrieval
+## Context supplies stable knowledge
 
-Static context sends the same small, stable document with each request. Use it for policies, glossaries, or checklists. Use retrieval for large or frequently changing knowledge bases so the application can select relevant material first.
+Small policies, glossaries, and checklists can be attached directly as documents. They are supplied to the model without requiring a tool call.
 
-## Runtime events
+```ts
+const policyAgent = new Agent({
+  id: 'policy-support',
+  model,
+  context: [
+    {
+      id: 'refund-policy',
+      text: 'Refunds are available within 30 days of delivery.',
+    },
+  ],
+})
+```
 
-Agent streams expose structured events including `turn_start`, `text_delta`, `reasoning_delta`, `tool_call`, `tool_result`, `turn_end`, `agent_tool_event`, `final`, and `error`.
+Use retrieval indexes for large or frequently changing knowledge collections so only relevant documents enter a run.
 
-The same event model can drive a terminal, an HTTP stream, a React interface, application logs, or an observability system without changing the agent itself.
+## Streams are the application boundary
+
+Agent streams expose structured events such as `turn_start`, `text_delta`, `reasoning_delta`, `tool_call`, `tool_result`, `turn_end`, `approval_required`, `final`, and `error`.
+
+```ts
+for await (const event of agent.stream({
+    prompt: 'Explain order A-100.'
+})) {
+  if (event.type === 'text_delta') process.stdout.write(event.delta)
+  if (event.type === 'tool_result') console.log(event.toolName, event.result)
+  if (event.type === 'final') console.log(event.result.runId, event.result.usage)
+}
+```
+
+The same event model can drive a terminal, an HTTP response, a React interface, application logs, or an observability system without changing the agent.

@@ -1,7 +1,7 @@
 # Production
 
 - Inject a client configured for TLS, authentication, HTTP, gRPC, and shutdown.
-- Pre-create collections with no vectorizer and use `createIfMissing: false`.
+- Pre-create collections with no vectorizer and call `validate()` at startup.
 - Provision metadata properties and filter indexes explicitly.
 - Keep embedding dimensions and collection distance stable.
 - Test batch retry and repeated-UUID behavior before making ingestion resumable.

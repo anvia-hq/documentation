@@ -1,27 +1,34 @@
 # Configuration
 
 ```ts
-const memory = createSqliteMemoryStore({
+import { SqliteMemoryClient } from '@anvia/memory-sqlite'
+
+const client = new SqliteMemoryClient({
   path: 'data/memory.sqlite',
-  createIfMissing: true,
+})
+const memory = client.memoryStore({
   validateMessages: true,
-  errors: 'store',
-  scope: {
+  errorPolicy: 'store',
+  scopeKey: {
     includeUserId: true,
     metadataKeys: ['tenant.id'],
   },
 })
 ```
 
-`path` defaults to `:memory:`. `createIfMissing`, `validateMessages`, and error storage default to enabled. Nested metadata paths are supported when building a scope key.
+`path` is required unless an existing database is injected. Message validation and error storage default to enabled. Nested metadata paths are supported when building a scope key.
 
 For complete control, pass a function:
 
 ```ts
-const memory = createSqliteMemoryStore({
+import { SqliteMemoryClient } from '@anvia/memory-sqlite'
+
+const client = new SqliteMemoryClient({
   path: 'data/memory.sqlite',
-  scope: ({ sessionId, metadata }) =>
-    JSON.stringify([metadata?.tenantId ?? null, sessionId]),
+})
+const memory = client.memoryStore({
+  scopeKey: ({ scope }) =>
+    JSON.stringify([scope.metadata?.tenantId ?? null, scope.sessionId]),
 })
 ```
 

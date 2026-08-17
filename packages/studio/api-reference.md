@@ -44,6 +44,7 @@ type StudioOptions = {
   stores?: StudioStores
   ui?: boolean | StudioUiOptions
   models?: StudioModelConfig
+  sandboxes?: readonly StudioSandboxRegistration[]
 }
 ```
 
@@ -54,21 +55,27 @@ The target configuration types are `StudioAgent`, `StudioAgentConfig`, `StudioAg
 ## Models
 
 ```ts
-type StudioModelRef = string | { provider: string; model: string }
+type StudioModelRef = { providerId: string; modelId: string }
 
 type StudioModelProvider = {
   id: string
   name?: string
-  defaultModel?: string
+  defaultModelId?: string
   models?: StudioModelDefinition[]
-  createCompletionModel(model: string): CompletionModel | StreamingCompletionModel
-  listModels?: () => Promise<ModelList>
+  createCompletionModel(options: { modelId: string }):
+    CompletionModel | StreamingCompletionModel
+  listModels?: (options?: { abortSignal?: AbortSignal }) => Promise<ModelList>
   metadata?: JsonObject
+}
+
+type StudioAgentModelPolicy = {
+  defaultModelRef?: StudioModelRef
+  allowed?: Array<StudioModelRef | `${string}:*`>
 }
 
 type StudioModelConfig = {
   providers: StudioModelProvider[]
-  default?: StudioModelRef
+  defaultModelRef?: StudioModelRef
   agents?: Record<string, StudioAgentModelPolicy>
 }
 ```
@@ -124,7 +131,7 @@ Trace records use `StudioTrace`, `StudioTraceSummary`, `StudioTraceObservation`,
 
 ## Requests, events, and errors
 
-`AgentRunRequest` accepts one message plus optional history; `AgentRunUIRequest` accepts a UI message array. Both support session, streaming, max-turn, tool-concurrency, model, metadata, and trace controls. `AgentRunResponse` aliases `PromptResponse`.
+`AgentRunRequest` accepts a normalized `messages` array plus optional session ID, streaming, max-turn, tool-concurrency, model, metadata, and trace controls. `AgentRunResponse` aliases Core `AgentResponse`.
 
 `AgentRunStreamEvent` combines core agent events with Studio approval, question, session-log, pipeline-log, and pipeline-final events.
 
@@ -156,8 +163,8 @@ The remaining public types are grouped by the Studio surface that produces or co
 | Pipeline runs | `StudioPipelineRunRequest`, `StudioPipelineReplayRequest`, `StudioPipelineRunResponse`, `StudioPipelineRunRecord`, `StudioPipelineRunSaveInput`, `StudioPipelineRunListOptions`, `StudioPipelineRunGetOptions`, `StudioPipelineRunStatus`, `StudioPipelineFinalEvent` |
 | Pipeline logs | `StudioPipelineLogEntry`, `StudioPipelineLogAppendInput`, `StudioPipelineLogListOptions`, `StudioPipelineLogLevel`, `StudioPipelineLogCategory`, `StudioPipelineLogEvent` |
 | Knowledge | `StudioAgentKnowledgeConfig`, `StudioKnowledgeSourceKind`, `StudioKnowledgeSourceSummary`, `StudioStaticKnowledgeDocument`, `StudioKnowledgeEvidence`, `StudioKnowledgeEvidenceDocument`, `StudioKnowledgeItem`, `StudioKnowledgeItemKind`, `StudioKnowledgeItemsPage`, `StudioKnowledgeSummary` |
-| Memory inspection | `StudioMemoryContext`, `StudioMemoryAppendInput`, `StudioMemoryErrorInput`, `StudioMemoryUserSummary`, `StudioMemoryConversationSummary`, `StudioMemoryConversationsPage`, `StudioMemoryUsersPage`, `StudioMemoryConversationMessages`, `StudioMemoryConversationSteps`, `StudioMemoryMessageRecord`, `StudioMemorySourceKind`, `StudioMemorySourceSummary`, `StudioMemorySourcesPage`, `StudioMemorySourceConversationSummary`, `StudioMemorySourceConversationsPage`, `StudioMemorySourceUsersPage`, `StudioMemorySourceConversationMessages`, `StudioMemorySourceConversationSteps` |
-| Sandboxes | `StudioSandboxCapabilities`, `StudioSandboxSummary`, `StudioSandboxesSummary`, `StudioSandboxFileType`, `StudioSandboxFileEntry`, `StudioSandboxFilesResponse`, `StudioSandboxPort`, `StudioSandboxPortsResponse`, `StudioSandboxProcessStatus`, `StudioSandboxProcess`, `StudioSandboxProcessesResponse`, `StudioSandboxProcessLogsResponse` |
+| Memory inspection | `StudioMemoryScope`, `StudioMemoryAppendOptions`, `StudioMemoryErrorOptions`, `StudioMemoryUserSummary`, `StudioMemoryConversationSummary`, `StudioMemoryConversationsPage`, `StudioMemoryUsersPage`, `StudioMemoryConversationMessages`, `StudioMemoryConversationSteps`, `StudioMemoryMessageRecord`, `StudioMemorySourceKind`, `StudioMemorySourceSummary`, `StudioMemorySourcesPage`, `StudioMemorySourceConversationSummary`, `StudioMemorySourceConversationsPage`, `StudioMemorySourceUsersPage`, `StudioMemorySourceConversationMessages`, `StudioMemorySourceConversationSteps` |
+| Sandboxes | `StudioSandboxInspector`, `StudioSandboxRegistration`, `StudioSandboxCapabilities`, `StudioSandboxSummary`, `StudioSandboxesSummary`, `StudioSandboxFileType`, `StudioSandboxFileEntry`, `StudioSandboxFilesResponse`, `StudioSandboxPort`, `StudioSandboxPortsResponse`, `StudioSandboxProcessStatus`, `StudioSandboxProcess`, `StudioSandboxProcessesResponse`, `StudioSandboxProcessLogsResponse` |
 | Observability | `StudioObservabilityEventType`, `StudioObservabilityEvent`, `AgentTraceInfo`, `AgentTraceOptions` |
 
 The exact fields for these transport and storage types are part of the published declarations. Prefer consuming the types directly instead of reproducing request shapes locally.

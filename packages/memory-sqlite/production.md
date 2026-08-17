@@ -9,6 +9,6 @@ SQLite is a strong fit for a durable single-process service, desktop tool, or ed
 - Review disk growth from messages, errors, and compacted history.
 - Test your Node version for `node:sqlite` support.
 
-The adapter opens a synchronous `DatabaseSync` connection and does not expose a close method. Treat the store as process-scoped. For multiple replicas, remote failover, or independently managed database connections, use a shared adapter such as [Postgres](/packages/memory-postgres).
+The client opens a synchronous `DatabaseSync` connection and exposes `close()` plus `Symbol.asyncDispose`. Close a managed client during application shutdown. For multiple replicas, remote failover, or independently managed database connections, use a shared adapter such as [Postgres](/packages/memory-postgres).
 
 Compaction is opt-in at the agent layer; read [Compaction](/sdk/memory/compaction) before enabling model-generated summaries.

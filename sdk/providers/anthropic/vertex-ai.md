@@ -1,6 +1,6 @@
 # Vertex AI
 
-Use `AnthropicVertexClient` when Claude is provisioned through Google Vertex AI. It returns the same `AnthropicCompletionModel` used by the direct client, so agents and completions do not need Vertex-specific code.
+Use `AnthropicVertexClient` when Claude is provisioned through Google Vertex AI. It returns the same Core streaming-completion contract as the direct client, so agents and completions do not need Vertex-specific code.
 
 ## Configure Application Default Credentials
 
@@ -22,9 +22,9 @@ export const vertexAnthropic = new AnthropicVertexClient({
   region: process.env.CLOUD_ML_REGION ?? 'global',
 })
 
-export const model = vertexAnthropic.completionModel(
-  'claude-sonnet-5',
-)
+export const model = vertexAnthropic.completionModel({
+    modelId: 'claude-sonnet-5'
+})
 ```
 
 The official Vertex SDK resolves Application Default Credentials. In Google-hosted environments, prefer the workload's attached service identity over a long-lived JSON key.
@@ -59,4 +59,3 @@ Install `google-auth-library` directly when application code imports it. Validat
 - Model listing is not available on `AnthropicVertexClient`.
 
 Run an authenticated startup check or smoke test in each deployment environment. Local ADC success does not prove that the production workload identity has access to the selected Claude model.
-

@@ -7,19 +7,23 @@ pnpm add @anvia/core @anvia/memory-postgres pg
 ```
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
-import { createPostgresMemoryStore } from '@anvia/memory-postgres'
+import { Agent } from '@anvia/core/agent'
+import { PostgresMemoryClient } from '@anvia/memory-postgres'
 
-const memory = await createPostgresMemoryStore({
-  connectionString: process.env.DATABASE_URL,
+const client = new PostgresMemoryClient({
+  connectionString: process.env.DATABASE_URL!,
 })
+const memory = client.memoryStore()
+await memory.ensure()
 
-const agent = new AgentBuilder('support', model)
-  .memory(memory, { savePolicy: 'turn' })
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  memory: { store: memory, savePolicy: 'turn' },
+})
 ```
 
-The factory is asynchronous because it can create and verify database objects. By default it provisions the extension, tables, and index. Production deployments usually run the exported schema SQL during migrations, then start with `createIfMissing: false`.
+The client is lazy. `ensure()` provisions and verifies the extension, tables, and index. Production deployments usually run the exported schema SQL during migrations, then call `validate()` at startup.
 
 ## Next
 

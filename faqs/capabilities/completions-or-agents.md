@@ -1,6 +1,6 @@
 # Should I use a completion or an agent?
 
-Use a direct completion when one model call is the complete workflow. Use an agent when Anvia needs to manage reusable instructions, tools, memory, retrieval, hooks, or multiple model turns.
+Use a direct completion when one model call is the complete workflow. Use an agent when Anvia needs to manage reusable instructions, tools, memory, retrieval, lifecycle policy, or multiple model turns.
 
 | Need | Prefer |
 | --- | --- |

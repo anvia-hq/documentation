@@ -11,14 +11,14 @@ Lens does not create or authenticate application users. It treats `userId` as an
 Add the same opaque application identifier to every relevant request:
 
 ```ts
-const response = await agent
-  .prompt(messages)
-  .withTrace({
-    name: 'assistant-reply',
-    userId: account.telemetryId,
-    sessionId: conversation.id,
-  })
-  .send()
+const response = await agent.generate({
+    messages: messages,
+    trace: {
+        name: 'assistant-reply',
+        userId: account.telemetryId,
+        sessionId: conversation.id,
+    }
+})
 ```
 
 Use an internal ID that remains stable across sessions. Avoid email addresses, display names, access tokens, or other sensitive and mutable values. Authorization must still be enforced by the application; knowing a Lens user ID does not grant access to that product user.

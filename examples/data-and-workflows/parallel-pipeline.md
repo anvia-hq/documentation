@@ -11,7 +11,7 @@ branch succeeds.
 
 Use named parallel branches when all branches consume the same input and do not depend on each
 other—for example classification, risk detection, and priority estimation. Keep dependent work in
-sequential `.step()` or `.use()` stages.
+sequential `.step()` or `.compose()` stages.
 
 ## Flow and semantics
 
@@ -51,51 +51,58 @@ export type IncidentType = z.infer<typeof Incident>;
 ```
 
 ```ts [src/branches.ts]
-import { PipelineBuilder } from "@anvia/core/pipeline";
+import { Pipeline } from "@anvia/core/pipeline";
 import { Incident } from "./schema.js";
+export const classification = new Pipeline({ id: "classification", inputSchema: Incident })
+  .step({
+    id: "classify-topic",
+    run: ({ input: { summary } }) => ({
+      topic: summary.toLowerCase().includes("payment") ? "billing" : "operations",
+    }),
+});
+export const signals = new Pipeline({ id: "signals", inputSchema: Incident })
+  .step({
+    id: "detect-signals",
+    run: ({ input: { summary } }) => ({
+      outage: summary.toLowerCase().includes("outage"),
+      missedOrders: summary.toLowerCase().includes("missed orders"),
+    }),
+});
+export const priority = new Pipeline({ id: "priority", inputSchema: Incident })
+  .step({
+    id: "estimate-priority",
+    run: ({ input: { summary } }) => ({
+      priority: /outage|missed orders/i.test(summary) ? "high" as const : "normal" as const,
+    }),
+});
 
-export const classification = new PipelineBuilder(Incident)
-  .step(({ summary }) => ({
-    topic: summary.toLowerCase().includes("payment") ? "billing" : "operations",
-  }))
-  .build();
-
-export const signals = new PipelineBuilder(Incident)
-  .step(({ summary }) => ({
-    outage: summary.toLowerCase().includes("outage"),
-    missedOrders: summary.toLowerCase().includes("missed orders"),
-  }))
-  .build();
-
-export const priority = new PipelineBuilder(Incident)
-  .step(({ summary }) => ({
-    priority: /outage|missed orders/i.test(summary) ? "high" as const : "normal" as const,
-  }))
-  .build();
 ```
 
 ```ts [src/pipeline.ts]
-import { PipelineBuilder } from "@anvia/core/pipeline";
+import { Pipeline } from "@anvia/core/pipeline";
 import { classification, priority, signals } from "./branches.js";
 import { Incident } from "./schema.js";
-
-export const triage = new PipelineBuilder(Incident, { id: "incident-triage" })
-  .parallel({ classification, signals, priority }, { name: "Analyze incident" })
-  .step(
-    (result) => ({
+export const triage = new Pipeline({ id: "incident-triage", inputSchema: Incident })
+  .parallel({
+    id: "analyze-incident",
+    name: "Analyze incident",
+    branches: { classification, signals, priority },
+  })
+  .step({
+    id: "merge-triage",
+    name: "Merge triage",
+    run: ({ input: result }) => ({
       ...result.classification,
       ...result.signals,
       ...result.priority,
     }),
-    { name: "Merge triage" },
-  )
-  .build();
+  });
+
 ```
 
 ```ts [src/run.ts]
 import type { PipelineRunObserver } from "@anvia/core/pipeline";
 import { triage } from "./pipeline.js";
-
 const observer: PipelineRunObserver = {
   onEvent(event) {
     if (event.type === "stage_failed") {
@@ -103,11 +110,15 @@ const observer: PipelineRunObserver = {
     }
   },
 };
+const result = await triage.run({
+  input: {
+    id: "inc_123",
+    summary: "Payment outage caused missed orders.",
+  },
+  observer,
+});
+console.log(result.output);
 
-console.log(await triage.run({
-  id: "inc_123",
-  summary: "Payment outage caused missed orders.",
-}, { observer }));
 ```
 
 :::
@@ -120,7 +131,7 @@ pnpm tsx src/run.ts
 
 ## Expected behavior
 
-The result is `{ topic: "billing", outage: true, missedOrders: true, priority: "high" }`.
+The run's `output` is `{ topic: "billing", outage: true, missedOrders: true, priority: "high" }`.
 `PipelineRunObserver` receives lifecycle events, but it does not persist them or retry stages.
 
 ## Failure, security, and ownership
@@ -138,6 +149,6 @@ use `.parallel()` for a small, known set of branches.
 
 ## Source and extensions
 
-- Source: [`05_pipelines/04-named-parallel.ts`](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/05_pipelines/04-named-parallel.ts)
+- Source: [`05_pipelines/04-named-parallel.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/05_pipelines/04-named-parallel.ts)
 - Read [parallel and batch pipelines](/sdk/pipelines/parallel-and-batch).
 - Extend with provider-backed classification, per-branch telemetry, or an explicit partial-result policy.

@@ -23,7 +23,7 @@ The built-in SQLite implementation uses dedicated `anvia_studio_*` tables. Each 
 
 ## Models
 
-Register providers with stable IDs and a `createCompletionModel` factory. Optional static definitions and `listModels` populate the catalog. Per-agent policies define defaults and allowed `provider:model` references.
+Register providers with stable IDs and a `createCompletionModel({ modelId })` factory. Optional static definitions and `listModels` populate the catalog. Global and per-agent defaults use `{ providerId, modelId }`; allowed entries accept the same object or a provider wildcard such as `openai:*`.
 
 Model policy is enforced by the Studio runtime; a request outside an agent's allowed set is rejected. The factory still owns provider credentials and provider-specific construction.
 

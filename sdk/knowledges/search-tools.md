@@ -1,41 +1,46 @@
 # Search tools
 
-Expose an index as a tool when the model should decide whether retrieval is needed or refine its query across turns.
+A search tool lets the model decide when to query a vector store. Use it when retrieval is optional, when the first query may need refinement, or when an agent has several specialized knowledge sources.
 
 ## Create the tool
 
 ```ts
-const searchRunbooks = runbookIndex.asTool({
+import { createVectorSearchTool, vectorFilter } from '@anvia/core/vector-store'
+
+const runbookFilter = vectorFilter.and(
+  vectorFilter.eq('tenantId', request.auth.tenantId),
+  vectorFilter.eq('published', true),
+)
+
+const searchRunbooks = createVectorSearchTool({
   name: 'search_runbooks',
-  description: 'Search incident runbooks for operational guidance.',
+  description: 'Search approved incident runbooks for operational guidance.',
+  store: runbookStore,
+  model: embeddingModel,
   topK: 3,
-  threshold: 0.72,
+  minScore: 0.72,
   filter: runbookFilter,
 })
 ```
 
-Every `VectorSearchIndex` supports `asTool(...)`. The tool accepts a query and returns scored search results to the model.
+The generated tool accepts `query` and an optional positive `topK`. A call-time `topK` overrides the configured default; the configured minimum score and filter still apply.
 
 ## Add it to an agent
 
 ```ts
-const agent = new AgentBuilder('incident-assistant', model)
-  .instructions(
-    'Search runbooks before answering incident response questions.',
-  )
-  .tools([searchRunbooks])
-  .defaultMaxTurns(3)
-  .build()
+const agent = new Agent({
+  id: 'incident-assistant',
+  model,
+  instructions: 'Search runbooks before giving incident-response guidance.',
+  maxTurns: 3,
+  tools: [searchRunbooks],
+})
+
+const result = await agent.generate({
+  prompt: 'The API error rate increased after deployment. What should I check?',
+})
 ```
 
-The model can search, inspect the result, refine its query, and then produce a final answer. Keep the turn limit bounded.
+Use [automatic retrieval](/sdk/knowledges/automatic-retrieval) when the same store is relevant to most prompts and the first turn should already contain supporting documents. Use a regular application [tool](/sdk/tools) for live records, authorization checks, and actions.
 
-## Search tool or automatic retrieval
-
-| Use | Choose |
-| --- | --- |
-| Knowledge is relevant to most prompts. | [Automatic retrieval](/sdk/knowledges/automatic-retrieval) |
-| Search is occasional or may require query refinement. | Search tool |
-| Data is live, permissioned, or actionable. | An application [tool](/sdk/tools) |
-
-Apply [metadata filters](/sdk/knowledges/metadata-filters) before exposing results. The model should never decide which tenant or visibility scope it may search.
+Construct metadata filters from authenticated application state. The model may choose the semantic query and result count, but it must not choose tenant, workspace, visibility, or access scope.

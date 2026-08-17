@@ -1,28 +1,24 @@
 # Multimodal pipelines
 
-Multimodal pipelines connect deterministic media handling with specialized model stages. A useful pipeline makes every representation change visible: an asset becomes bytes, bytes become normalized text, text becomes structured data, and product code persists the result.
-
-## Design around representation changes
+A useful media pipeline makes every representation change explicit.
 
 ```text
-Upload reference
-   ↓ permission and media validation
-Audio or document bytes
-   ↓ transcription or OCR
-Normalized text
-   ↓ extractor or agent
-Structured result
-   ↓ application service
-Product record
+Asset ID
+  -> authorize and load bytes
+  -> transcribe or OCR
+  -> normalize text
+  -> extract or reason
+  -> persist through a product service
 ```
 
-Keep uploads and stored assets outside the pipeline value when possible. Pass an asset ID and load the bytes only in the stage that needs them.
+Pass an asset ID through the pipeline and load bytes only in the stage that needs them.
 
-## Build a transcription pipeline
+## 1. Build a transcription pipeline
 
 ```ts
-import { PipelineBuilder } from '@anvia/core/pipeline'
-import { transcriptionRequest } from '@anvia/core/transcription'
+import { Pipeline } from '@anvia/core/pipeline'
+import { extract } from '@anvia/core/extractor'
+import { transcribe } from '@anvia/core/transcription'
 import { z } from 'zod'
 
 const CallAsset = z.object({
@@ -30,43 +26,67 @@ const CallAsset = z.object({
   filename: z.string(),
 })
 
-const reviewCall = new PipelineBuilder(CallAsset)
-  .step(async ({ assetId, filename }) => {
+const reviewCall = new Pipeline({
+  id: 'review-call',
+  inputSchema: CallAsset,
+})
+  .step({
+    id: 'transcribe',
+    run: async ({ input: { assetId, filename } }) => {
     const asset = await mediaStore.getAuthorized(assetId)
 
-    const transcript = await transcriptionRequest(transcriptionModel)
-      .data(asset.bytes)
-      .filename(filename)
-      .temperature(0)
-      .send()
+    const transcript = await transcribe({
+        audio: {
+            data: asset.bytes,
+            filename
+        },
+        model: transcriptionModel,
+        temperature: 0,
+        retries: {
+            maxAttempts: 3,
+        }
+    })
 
-    return { assetId, transcript: transcript.text }
+    return {
+      assetId,
+      transcript: transcript.text,
+    }
+    },
   })
-  .step(async ({ assetId, transcript }) => ({
-    assetId,
-    transcript,
-    review: await callReviewExtractor.extract(transcript),
-  }))
-  .build()
+  .step({
+    id: 'review',
+    run: async ({ input: { assetId, transcript } }) => {
+      const review = await extract({
+        model: reviewModel,
+        text: transcript,
+        outputSchema: callReviewSchema,
+      })
+      return { assetId, transcript, review: review.output }
+    },
+  })
 ```
 
-`mediaStore` and `callReviewExtractor` are injected application dependencies. Authorization happens before bytes are returned, and the pipeline hands text—not audio—into the extraction stage.
+`mediaStore`, `reviewModel`, and `callReviewSchema` are application dependencies. Authorization happens before bytes are returned, and extraction receives text rather than audio.
 
-## Choose the failure boundary
+## 2. Choose each failure boundary
 
-Each media stage can fail differently:
+- Reject missing, expired, or unauthorized assets without calling a model.
+- Retry transient transcription or OCR provider failures at that model call.
+- Handle invalid extraction output through bounded extraction retry or human review.
+- Protect product writes with idempotency and conflict handling.
 
-| Stage | Typical failure | Useful recovery |
-| --- | --- | --- |
-| Asset load | missing, expired, or unauthorized asset | reject without calling a model |
-| Transcription or OCR | unsupported media, provider timeout | retry the model stage when safe |
-| Extraction or agent | invalid structured output, model limit | retry or route for review |
-| Product write | conflict or service failure | use an idempotent service method |
+Persist expensive intermediate transcription or OCR output when it is safe and useful. A later analysis retry can then reuse text without processing the media again.
 
-Persist a transcript or OCR result when it is expensive and safe to retain. A later extraction retry can then reuse that intermediate result instead of paying to process the media again.
+## 3. Keep product writes separate
 
-## Use a worker for durable work
+Shape and validate the final result before calling the product service. This keeps model retries from silently repeating a write.
 
-An Anvia pipeline runs in the current JavaScript process. It does not make a media job durable. Use BullMQ, Trigger.dev, or another job system when the workflow must survive restarts, expose progress, or process large backlogs.
+Store raw media and generated assets outside the pipeline value whenever possible. Do not move base64 through graph metadata, observers, or job messages.
 
-The queue payload should contain stable IDs and options, not raw base64 media. The worker can resolve the authorized asset, run the pipeline, store outputs, and update application-owned job status.
+## 4. Add durability outside Pipeline
+
+An Anvia pipeline runs in the current process. Use a durable worker when a media job must survive restarts, expose progress, or process a large backlog.
+
+Queue stable IDs and approved options, not raw media. The worker resolves the authorized asset, runs the pipeline, stores outputs, and updates product-owned status.
+
+Next, review the [production checklist](/sdk/advanced/multimodal/checklist).

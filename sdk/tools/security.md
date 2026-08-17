@@ -10,7 +10,7 @@ The model can propose valid arguments for data it should not access. Check user 
 const requestRefund = createTool({
   name: 'request_refund',
   description: 'Create a refund request for an eligible order.',
-  input: z.object({
+  inputSchema: z.object({
     orderId: z.string(),
     amountCents: z.number().int().positive(),
     reason: z.string().min(1),

@@ -19,31 +19,35 @@ ANVIA_LENS_SECRET_KEY=sk_...
 Then attach the observer:
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
-import { lens } from '@anvia/lens'
+import { Agent } from '@anvia/core'
+import { LensClient } from '@anvia/lens'
 
-const tracing = lens.createFromEnv({
+const lens = new LensClient({
   serviceName: 'support-api',
   environment: 'production',
-  captureMode: 'safe',
 })
+const tracing = lens.observer({ captureMode: 'safe' })
 
-const agent = new AgentBuilder('support', model)
-  .observe(tracing)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  observability: { observers: { tracing } },
+})
 ```
 
 ## Evaluations and datasets
 
-Use `lens.evals()` when one lifecycle should own both the trace observer and evaluation reporter. Use `createLensDatasetClient()` to read a named, published dataset version for local or CI evaluation runs.
+One `LensClient` can create a matching trace observer, evaluation reporter, and managed-dataset client.
 
 ```ts
-const integration = lens.evals({ optional: false })
+const lens = new LensClient()
+const observer = lens.observer()
+const reporter = lens.evalReporter({ includeMetadata: true })
 
 try {
-  // Run evaluation suites with integration.observer and integration.reporter.
+  // Attach observer to the target and pass reporter to runEvalSuite().
 } finally {
-  await integration.shutdown()
+  await lens.close()
 }
 ```
 

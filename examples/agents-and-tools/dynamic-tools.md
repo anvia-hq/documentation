@@ -1,77 +1,58 @@
 # Dynamic tools
 
-**Type:** Pattern
+A `ToolIndex` retrieves relevant definitions from a large catalog instead of sending every tool to every model turn.
 
-## Outcome
-
-Retrieve only the tools relevant to the current prompt instead of sending an entire large catalog
-to the model. Use this for dozens or hundreds of narrow tools where smaller tool context improves
-cost and model selection.
-
-## Prerequisites
-
-- A set of accurately named and described Anvia tools
-- An `EmbeddingModel` appropriate for the tool descriptions
-- `createToolIndex` from `@anvia/core/tool`
-
-## Build and attach the index
+## Build the index
 
 ```ts
-import { AgentBuilder } from '@anvia/core/agent'
-import { createTool, createToolIndex } from '@anvia/core/tool'
-import { z } from 'zod'
-
+import { Agent, createTool } from '@anvia/core';
+import { createToolIndex } from '@anvia/core/tool';
+import { z } from 'zod';
 const issueRefund = createTool({
-  name: 'issue_refund',
-  description: 'Issue a refund for a customer order.',
-  input: z.object({ orderId: z.string() }),
-  output: z.string(),
-  execute: ({ orderId }) => `refund queued for ${orderId}`,
-})
-
+    name: 'issue_refund',
+    description: 'Issue a refund for a customer order.',
+    inputSchema: z.object({ orderId: z.string() }),
+    outputSchema: z.string(),
+    execute: ({ orderId }) => `refund queued for ${orderId}`,
+});
 const updateAddress = createTool({
-  name: 'update_address',
-  description: 'Update the shipping address for an order.',
-  input: z.object({ orderId: z.string(), address: z.string() }),
-  output: z.string(),
-  execute: ({ orderId }) => `address updated for ${orderId}`,
-})
-
-const toolIndex = await createToolIndex(embeddingModel, [issueRefund, updateAddress])
-
-const agent = new AgentBuilder('support', completionModel)
-  .dynamicTools(toolIndex, { topK: 1, threshold: 0.9 })
-  .build()
-
-const response = await agent.prompt('Refund order A-100.').send()
+    name: 'update_address',
+    description: 'Update the shipping address for an order.',
+    inputSchema: z.object({
+        orderId: z.string(),
+        address: z.string(),
+    }),
+    outputSchema: z.string(),
+    execute: ({ orderId }) => `address updated for ${orderId}`,
+});
+const toolIndex = await createToolIndex({
+    model: embeddingModel,
+    tools: [issueRefund, updateAddress],
+    topK: 1,
+    minScore: 0.9
+});
 ```
 
-`embeddingModel` and `completionModel` are provider-neutral Anvia model instances. Select concrete
-providers as shown in the package guides.
+`embeddingModel` is any Anvia embedding model. Tool names and descriptions become retrieval content.
 
-## Run and expected behavior
+## Attach it like any other tool source
 
-For a refund prompt, the index should expose `issue_refund` and omit unrelated definitions. Dynamic
-retrieval occurs from prompt text on each turn; results depend on tool descriptions, embedding
-quality, `topK`, and the threshold, so assert selected definitions with a deterministic embedding
-model in tests.
+```ts
+const agent = new Agent({
+  id: 'support',
+  model: completionModel,
+  tools: [toolIndex],
+})
 
-## Boundaries
+const result = await agent.generate({
+    prompt: 'Refund order A-100.'
+})
+```
 
-Retrieval is not authorization. The index can narrow what the model sees, but every returned tool
-still needs normal policy checks. A threshold that is too high can hide a required tool; one that is
-too low can surface irrelevant or dangerous choices. Never put secrets in tool descriptions.
+The runtime retrieves definitions from the index for each turn. A refund prompt should expose `issue_refund` while omitting the unrelated address tool.
 
-In production, version and cache the index, evaluate recall on representative prompts, maintain a
-small always-available safe set where needed, and measure both retrieval relevance and end-to-end
-tool-call accuracy.
+Retrieval is not authorization. Every selected tool still requires normal scope and policy checks. Evaluate recall on representative prompts: an excessive minScore can hide a required tool, while a permissive one can expose irrelevant choices.
 
-## Source and extensions
+Version and cache the index, keep descriptions free of secrets, and test selected definitions with a deterministic embedding model before measuring end-to-end tool-call accuracy.
 
-The
-[dynamic-tools cookbook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/02_tools/09-dynamic-tools.ts)
-uses deterministic fake models to prove exactly which tool reaches each completion turn. Next, use
-a real embedding adapter and build an offline retrieval evaluation set.
-
-- [Dynamic tools](/sdk/advanced/dynamic-tools)
-- [Tool security](/sdk/tools/security)
+Continue with the full [dynamic tools guide](/sdk/advanced/dynamic-tools).

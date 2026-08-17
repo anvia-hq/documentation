@@ -79,7 +79,7 @@ Capabilities reflect current registration and adapter availability:
 | `tools` | An agent has static or dynamic tools. |
 | `mcps` | An agent has a tool carrying MCP server provenance. |
 | `sandboxes` | Studio discovers at least one sandbox session from registered tools. |
-| `approvals` | An agent has a hook or an approval-enabled static tool. |
+| `approvals` | An agent has at least one tool with `requiresApproval`. |
 | `knowledge` | An agent has static context, dynamic context, or dynamic tools. |
 
 The map contains discovered, enabled capabilities. A missing entry usually means the required target or adapter was not registered; it does not necessarily indicate an error.
@@ -149,7 +149,7 @@ For deeper debugging:
 | --- | --- |
 | Did this local run call the expected model and tools? | [Traces](/studio/traces) |
 | Did Studio preserve the conversation and runtime logs? | [Sessions](/studio/sessions) |
-| Is an agent configured with the expected model, tools, memory, and hooks? | [Agents](/studio/agents) |
+| Is an agent configured with the expected model, tools, memory, and lifecycle policy? | [Agents](/studio/agents) |
 | Is a sandbox still available and what is running inside it? | [Sandboxes](/studio/sandboxes) |
 | What happened across deployed environments over time? | [Lens](/lens/) |
 

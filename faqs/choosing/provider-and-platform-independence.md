@@ -7,7 +7,7 @@ Provider neutrality means agents and workflows depend on Core model contracts ra
 Platform independence means Anvia is not tied to one web framework or hosting vendor. Server helpers use Fetch and Web Streams APIs, and the runtime is composed in TypeScript. Individual features still have environment requirements:
 
 - MCP `stdio` requires a process-capable server runtime.
-- File and PDF loaders require appropriate file or binary access.
+- File reads and PDF extraction require appropriate file or binary access.
 - React UI targets React DOM and browser interactions.
 - Resumable streams need shared durable storage in multi-worker deployments.
 - Long-running pipelines may need application-owned queues and workers.

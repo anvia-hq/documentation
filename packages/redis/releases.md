@@ -1,5 +1,7 @@
 # Releases
 
+Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 history.
+
 Notable releases include:
 
 - `0.2.7` refreshed upstream runtime dependencies.
@@ -9,4 +11,4 @@ Notable releases include:
 - `0.2.2` moved `@anvia/core` to peer dependencies.
 - `0.2.0` introduced Redis hash storage and RediSearch HNSW retrieval.
 
-See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-redis/CHANGELOG.md).
+See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/vector-redis/CHANGELOG.md).

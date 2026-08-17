@@ -4,94 +4,41 @@ All public symbols are exported from `@anvia/chroma`.
 
 ```ts
 import {
-  ChromaVectorIndex,
+  ChromaVectorClient,
   ChromaVectorStore,
   filterToChromaWhere,
   type ChromaClientLike,
   type ChromaCollectionLike,
-  type ChromaVectorStoreConnectOptions,
+  type ChromaVectorClientOptions,
+  type ChromaVectorStoreOptions,
 } from '@anvia/chroma'
 ```
 
-## filterToChromaWhere
+## ChromaVectorClient
 
 ```ts
-function filterToChromaWhere(
-  filter: VectorFilter | undefined,
-): unknown
+class ChromaVectorClient {
+  constructor(options?: ChromaVectorClientOptions)
+  vectorStore<T, Metadata extends VectorMetadata = VectorMetadata>(
+    options: ChromaVectorStoreOptions,
+  ): ChromaVectorStore<T, Metadata>
+  close(): Promise<void>
+}
 ```
 
-Converts an Anvia vector filter into the value passed to Chroma's `where` query option.
+`ChromaVectorClientOptions` accepts either an injected `client?: ChromaClientLike` or `path?: string` for the default client.
 
 ## ChromaVectorStore
 
-```ts
-class ChromaVectorStore<
-  T,
-  Metadata extends VectorMetadata = VectorMetadata,
-> {
-  static connect<T, Metadata extends VectorMetadata = VectorMetadata>(
-    options: ChromaVectorStoreConnectOptions,
-  ): Promise<ChromaVectorStore<T, Metadata>>
-
-  upsertDocuments(
-    documents: Array<EmbeddedDocument<T, Metadata>>,
-  ): Promise<void>
-
-  index(model: EmbeddingModel): ChromaVectorIndex<T, Metadata>
-}
-```
-
-## ChromaVectorIndex
+`ChromaVectorStoreOptions` contains `collectionName`, `dimensions`, optional `metric`, and optional Chroma `metadata` and `configuration` objects.
 
 ```ts
-class ChromaVectorIndex<
-  T,
-  Metadata extends VectorMetadata = VectorMetadata,
-> implements VectorSearchIndex<T, Metadata> {
-  constructor(model: EmbeddingModel, collection: ChromaCollectionLike)
-
-  search(
-    request: VectorSearchRequest,
-  ): Promise<Array<VectorSearchResult<T, Metadata>>>
-
-  searchIds(
-    request: VectorSearchRequest,
-  ): Promise<Array<{ score: number; id: string }>>
-
-  asTool(
-    options: VectorSearchToolOptions,
-  ): Tool<{ query: string; topK?: number }, unknown>
-}
+await store.ensure()
+await store.validate()
+await store.upsert({ documents, providerOptions })
+const results = await store.search({ vector, topK, minScore, filter, providerOptions, abortSignal })
 ```
 
-## Types
-
-```ts
-type ChromaClientLike = {
-  getCollection(
-    options: Record<string, unknown>,
-  ): Promise<ChromaCollectionLike>
-  createCollection(
-    options: Record<string, unknown>,
-  ): Promise<ChromaCollectionLike>
-  getOrCreateCollection?(
-    options: Record<string, unknown>,
-  ): Promise<ChromaCollectionLike>
-}
-
-type ChromaCollectionLike = {
-  upsert(options: Record<string, unknown>): Promise<unknown>
-  query(options: Record<string, unknown>): Promise<unknown>
-}
-
-type ChromaVectorStoreConnectOptions = {
-  client?: ChromaClientLike
-  collectionName: string
-  createIfMissing?: boolean
-  metadata?: Record<string, unknown>
-  configuration?: Record<string, unknown>
-}
-```
+`ensure()` creates a missing collection and validates its configuration. `validate()` never creates infrastructure. `filterToChromaWhere(filter)` converts an Anvia `VectorFilter` for direct Chroma calls.
 
 Return to the [package guide](/packages/chroma).

@@ -6,17 +6,15 @@ Use `embeddingModel(...)` to create vectors for retrieval, semantic similarity, 
 import { GeminiClient } from '@anvia/gemini'
 
 const gemini = new GeminiClient({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY!,
 })
 
-export const documentEmbeddings = gemini.embeddingModel(
-  'gemini-embedding-001',
-  {
+export const documentEmbeddings = gemini.embeddingModel({
+    modelId: 'gemini-embedding-001',
     taskType: 'RETRIEVAL_DOCUMENT',
     dimensions: 768,
-    maxBatchSize: 100,
-  },
-)
+    maxBatchSize: 100
+})
 ```
 
 ## Embed text
@@ -39,21 +37,17 @@ The adapter preserves input order and returns one `{ document, vector }` result 
 For retrieval, configure separate model objects for indexed documents and search queries:
 
 ```ts
-const documentEmbeddings = gemini.embeddingModel(
-  'gemini-embedding-001',
-  {
+const documentEmbeddings = gemini.embeddingModel({
+    modelId: 'gemini-embedding-001',
     taskType: 'RETRIEVAL_DOCUMENT',
-    dimensions: 768,
-  },
-)
+    dimensions: 768
+})
 
-const queryEmbeddings = gemini.embeddingModel(
-  'gemini-embedding-001',
-  {
+const queryEmbeddings = gemini.embeddingModel({
+    modelId: 'gemini-embedding-001',
     taskType: 'RETRIEVAL_QUERY',
-    dimensions: 768,
-  },
-)
+    dimensions: 768
+})
 ```
 
 Keep the model ID and output dimensions identical between indexed documents and queries. Changing either requires re-embedding the stored collection.
@@ -71,12 +65,7 @@ The selected Google model must support the requested task type.
 
 ## Model options
 
-| Option | Purpose |
-| --- | --- |
-| `dimensions` | Sends Google's output dimensionality and exposes it on the Anvia model. |
-| `maxBatchSize` | Limits the number of texts in each provider request. |
-| `taskType` | Tunes embeddings for the declared workload. |
-| `title` | Supplies a document title in the embedding configuration. |
+`dimensions` sends Google's output dimensionality and exposes it on the Anvia model. `maxBatchSize` limits texts per provider request. `taskType` declares the workload. `title` supplies one shared document title in the embedding configuration.
 
 Use `title` only where one title meaningfully applies to the texts sent through that model instance. For document collections with different titles, create appropriately scoped models or omit the shared option.
 

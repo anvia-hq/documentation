@@ -1,59 +1,127 @@
 # Store adapters
 
-Choose the adapter that matches the database layer your application already operates.
+Anvia provides Prisma, Drizzle, direct Postgres, and SQLite memory stores. Choose the adapter that matches the database and migration workflow the application already operates.
 
-| Package | Use when |
-| --- | --- |
-| [`@anvia/memory-prisma`](/packages/memory-prisma/get-started) | The application already uses Prisma and owns Prisma migrations. |
-| [`@anvia/memory-drizzle`](/packages/memory-drizzle/get-started) | The application uses Drizzle with Postgres. |
-| [`@anvia/memory-postgres`](/packages/memory-postgres/get-started) | The application owns a Postgres pool without an ORM. |
-| [`@anvia/memory-sqlite`](/packages/memory-sqlite/get-started) | Local or small deployments need durable SQLite storage. |
-
-All official adapters implement `MemoryStore`, maintain ordered message rows, support scoped conversations, and expose compaction and read-only inspection capabilities.
+Keep every package on the v1 release-candidate channel while the core API is in RC.
 
 ## Prisma
 
-Generate the models, review them, and apply them through the application's normal migration workflow.
+Use Prisma when the application already owns a Prisma schema and client:
 
-```sh
-pnpm add @anvia/memory-prisma @anvia/core @prisma/client
+```bash
+pnpm add @anvia/core@rc @anvia/memory-prisma@rc @prisma/client
 npx @anvia/memory-prisma init
 npx @anvia/memory-prisma init --write
 npx prisma validate
 npx prisma migrate dev --name add_anvia_memory
 ```
 
+The init command is a dry run unless `--write` is supplied. By default it creates `prisma/models/anvia-memory.prisma`; use the explicit `--append-to-schema` flag only after reviewing the generated models.
+
 ```ts
-const memory = createPrismaMemoryStore(prisma, {
-  scope: { metadataKeys: ['tenantId'] },
+import { PrismaMemoryStore } from '@anvia/memory-prisma'
+
+const memoryStore = new PrismaMemoryStore({
+  client: prisma,
+  scopeKey: { metadataKeys: ['tenantId'] },
 })
 ```
 
-## Drizzle
+The conventional client path expects the generated `agentMemorySession`, `agentMemoryMessage`, and `agentMemoryError` delegates. Pass a custom `delegates` object to the constructor when model names differ.
 
-Add `drizzleMemorySchema` to the Drizzle schema and generate a migration normally.
+See [Prisma memory](/packages/memory-prisma/get-started).
 
-```ts
-const memory = createDrizzleMemoryStore(db)
+## Drizzle with Postgres
+
+Use Drizzle when memory tables should live in the application's Drizzle schema and migration flow:
+
+```bash
+pnpm add @anvia/core@rc @anvia/memory-drizzle@rc drizzle-orm
+npx @anvia/memory-drizzle init
+npx @anvia/memory-drizzle init --write
+npx drizzle-kit generate
+npx drizzle-kit migrate
 ```
 
-## Postgres
-
 ```ts
-const memory = await createPostgresMemoryStore({
-  connectionString: process.env.DATABASE_URL,
+import {
+  DrizzleMemoryStore,
+  drizzleMemorySchema,
+} from '@anvia/memory-drizzle'
+
+export const schema = {
+  ...drizzleMemorySchema,
+}
+
+const memoryStore = new DrizzleMemoryStore({
+  db,
+  scopeKey: { metadataKeys: ['tenantId'] },
 })
 ```
 
-The adapter creates its tables by default. Set `createIfMissing: false` when migrations own schema creation.
+Ensure the generated schema exports are included by the `schema` path in the Drizzle configuration.
+
+See [Drizzle memory](/packages/memory-drizzle/get-started).
+
+## Direct Postgres
+
+Use the Postgres adapter when the application owns a connection string or `pg`-compatible client without an ORM:
+
+```bash
+pnpm add @anvia/core@rc @anvia/memory-postgres@rc
+```
+
+```ts
+import { PostgresMemoryClient } from '@anvia/memory-postgres'
+
+const memoryClient = new PostgresMemoryClient({
+  connectionString: process.env.DATABASE_URL!,
+})
+const memoryStore = memoryClient.memoryStore({
+  scopeKey: { metadataKeys: ['tenantId'] },
+})
+await memoryStore.ensure()
+```
+
+Call `ensure()` when the adapter owns schema creation. When application migrations own it, apply `createPostgresMemorySchemaSql()` and call `validate()` at startup.
+
+See [Postgres memory](/packages/memory-postgres/get-started).
 
 ## SQLite
 
-```ts
-const memory = createSqliteMemoryStore({
-  path: 'data/anvia-memory.sqlite',
-  scope: { metadataKeys: ['tenantId'] },
-})
+Use SQLite for local tools, desktop applications, tests, or small single-node deployments:
+
+```bash
+pnpm add @anvia/core@rc @anvia/memory-sqlite@rc
 ```
 
-SQLite uses Node's built-in `node:sqlite` driver and creates its tables by default.
+```ts
+import { SqliteMemoryClient } from '@anvia/memory-sqlite'
+
+const memoryClient = new SqliteMemoryClient({
+  path: 'data/anvia-memory.sqlite',
+})
+const memoryStore = memoryClient.memoryStore({
+  scopeKey: { metadataKeys: ['tenantId'] },
+})
+await memoryStore.ensure()
+```
+
+The adapter uses the runtime's built-in `node:sqlite` support. Pass `path: ':memory:'` for an in-memory database. Use `ensure()` for adapter-owned schema setup or `validate()` after application-managed migrations.
+
+See [SQLite memory](/packages/memory-sqlite/get-started).
+
+## Shared adapter behavior
+
+Official adapters:
+
+- key storage by `sessionId` and `userId` by default, with optional metadata paths;
+- preserve ordered, complete provider-neutral messages;
+- validate stored message shapes by default;
+- record failed runs unless `errorPolicy: 'ignore'` is selected;
+- expose atomic compaction through `store.compaction`; and
+- expose read-only conversation inspection for Studio and internal tooling.
+
+Postgres and Drizzle use advisory locking by default for ordered concurrent writes. Scope and locking prevent storage collisions, but authorization remains the application's responsibility.
+
+Continue with [Custom stores](/sdk/memory/custom-stores).

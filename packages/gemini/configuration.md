@@ -6,7 +6,7 @@
 
 ```ts
 const gemini = new GeminiClient({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY!,
 })
 ```
 
@@ -16,11 +16,12 @@ const gemini = new GeminiClient({
 
 ```ts
 const gemini = new GeminiClient({
-  vertexai: true,
-  project: 'my-gcp-project',
-  location: 'us-central1',
-  googleAuthOptions: {
-    credentials: trustedServiceAccount,
+  vertexAi: {
+    projectId: 'my-gcp-project',
+    location: 'us-central1',
+    googleAuthOptions: {
+      credentials: trustedServiceAccount,
+    },
   },
 })
 ```
@@ -41,11 +42,12 @@ Injection is useful when application code also calls native files, caches, or li
 ## Embedding configuration
 
 ```ts
-const model = gemini.embeddingModel('gemini-embedding-001', {
-  dimensions: 768,
-  maxBatchSize: 50,
-  taskType: 'RETRIEVAL_DOCUMENT',
-  title: 'Product documentation',
+const model = gemini.embeddingModel({
+    modelId: 'gemini-embedding-001',
+    dimensions: 768,
+    maxBatchSize: 50,
+    taskType: 'RETRIEVAL_DOCUMENT',
+    title: 'Product documentation'
 })
 ```
 
@@ -57,4 +59,4 @@ Completion, images, and transcription accept provider-specific additional parame
 
 ## Runtime
 
-The package is ESM, uses Node binary utilities for media conversion, includes declarations, and peers on `@anvia/core >=0.7.1 <1.0.0`. Validate media and streaming behavior before targeting a non-Node runtime.
+The package is ESM, uses Node binary utilities for media conversion, includes declarations, and should be installed with the matching `@anvia/core` release candidate. Validate media and streaming behavior before targeting a non-Node runtime.

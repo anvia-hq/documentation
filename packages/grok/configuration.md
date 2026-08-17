@@ -4,9 +4,8 @@
 
 ```ts
 const grok = new GrokClient({
-  apiKey: process.env.XAI_API_KEY,
+  apiKey: process.env.XAI_API_KEY!,
   baseUrl: 'https://api.x.ai/v1',
-  completionApi: 'responses',
   headers: { 'X-Application': 'research-service' },
   fetch: customFetch,
 })
@@ -17,28 +16,27 @@ const grok = new GrokClient({
 | `apiKey` | Credential for completion and media requests. |
 | `baseUrl` | Defaults to `https://api.x.ai/v1`. |
 | `headers` | Default SDK and media request headers. |
-| `completionApi` | Selects `'responses'` or `'chat'`. |
 | `client` | Reuses an initialized OpenAI-compatible SDK client. |
 | `fetch` | Supplies transport for SDK, image URLs, TTS, and STT. |
 
-When an injected client is used, Grok attempts to reuse its base URL, API key, fetch, and default headers for the xAI-specific media models. Supplying explicit options is clearer when the client hides custom transport state.
+When an injected client is used, pass the required `http` object with the media credential and optional base URL, headers, and fetch implementation. Select Responses or Chat explicitly on `completionModel({ modelId, api })`.
 
 ## Completion options
 
-Provider controls belong in `additionalParams`:
+Provider controls belong in `providerOptions`:
 
 ```ts
 const response = await model.completion({
   chatHistory,
   documents: [],
   tools: [],
-  additionalParams: {
+  providerOptions: {
     reasoning: { effort: 'high' },
   },
 })
 ```
 
-Provider-tool factories are preferable to manually authored `additionalParams.tools` because they validate xAI-specific configuration. Legacy raw tools are still merged by the Responses adapter.
+Provider-tool factories are preferable to manually authored `providerOptions.tools` because they validate xAI-specific configuration. Legacy raw tools are still merged by the Responses adapter.
 
 ## Media transport
 
@@ -46,4 +44,4 @@ Without `options.fetch`, the package uses a compatible `fetch` from the injected
 
 ## Runtime
 
-The package is ESM, uses Node binary utilities, depends on `@anvia/openai` and the official `openai` SDK, and peers on `@anvia/core >=0.7.1 <1.0.0`. Validate binary, `FormData`, and fetch support in edge runtimes.
+The package is ESM, uses Node binary utilities, depends on `@anvia/openai` and the official `openai` SDK, and should use matching Anvia release-candidate versions. Validate binary, `FormData`, and fetch support in edge runtimes.

@@ -15,4 +15,4 @@ Do not hide ownership boundaries merely to make everything look like one SDK. Pr
 
 Anvia does not require Studio or Lens for these integrations. Studio can help inspect the Anvia portion locally, while Lens can observe configured Anvia runs. Neither automatically traces unrelated SDK calls unless you connect them through supported telemetry or application instrumentation.
 
-See the [`@anvia/core` API reference](/packages/core/api-reference), [hooks and middleware](/sdk/advanced/hooks), and [observability packages](/packages/catalog) for the available extension boundaries.
+See the [`@anvia/core` API reference](/packages/core/api-reference), [lifecycle and middleware](/sdk/advanced/hooks), and [observability packages](/packages/catalog) for the available extension boundaries.

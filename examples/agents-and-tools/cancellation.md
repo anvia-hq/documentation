@@ -1,81 +1,51 @@
 # Cancellation
 
-**Type:** Recipe
+Cancellation stops future work when a stream's output is no longer needed. It does not undo model usage or tool side effects that already completed.
 
-## Outcome
+## Stop from React
 
-Stop consuming an Anvia stream when the user clicks Stop, and use run-control hooks when policy must
-cancel before a provider or tool step. These are different boundaries and should be implemented
-deliberately.
+`useChat` owns the active request and exposes `stop()`:
 
-## Prerequisites
+```tsx
+import { createHttpClientTransport } from '@anvia/client'
+import { useChat } from '@anvia/react'
 
-- A streaming-capable agent built from [First agent](../essentials/first-agent)
-- Ownership of the `ReadableStream` in the code that handles the stop action
+const transport = createHttpClientTransport({ endpoint: '/api/chat', format: 'jsonl' })
+const chat = useChat({ transport })
 
-## Cancel from the consumer
-
-Create the stream and retain the same object where your stop handler can reach it:
-
-```ts
-const promptRequest = agent.prompt(userMessage)
-const stream = promptRequest.readableStream()
-
-stopButton.addEventListener('click', () => {
-  void stream.cancel('User stopped the run')
-})
-
-return new Response(stream, {
-  headers: { 'content-type': 'application/x-ndjson' },
-})
+return (
+  <button
+    type="button"
+    disabled={chat.status !== 'streaming'}
+    onClick={() => chat.stop()}
+  >
+    Stop
+  </button>
+)
 ```
 
-If the HTTP framework owns or locks the body, connect its disconnect callback at the framework
-boundary instead of trying to recover the stream later. `cancel()` closes consumption by returning
-the underlying async iterator; it is not a promise that every provider has already stopped billing
-or that a tool side effect was rolled back.
-
-## Cancel from policy
+## Stop a custom browser request
 
 ```ts
-import { createHook } from '@anvia/core/hooks'
-import { PromptCancelledError } from '@anvia/core/request'
+const controller = new AbortController()
 
-const policy = createHook({
-  onToolCall({ toolName, tool }) {
-    if (toolName === 'delete_account') return tool.cancel('Deletion is disabled.')
-    return tool.run()
-  },
+const response = await fetch('/api/chat', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ messages }),
+  signal: controller.signal,
 })
 
-try {
-  await agent.prompt(userMessage).withHook(policy).send()
-} catch (error) {
-  if (!(error instanceof PromptCancelledError)) throw error
-  console.log(error.reason)
-}
+// Call this from the Stop button.
+controller.abort()
 ```
 
-## Expected behavior
+For a normal `createClientStreamResponse()` response, disconnecting closes the event iterator. Closing an active `AgentStream` cancels its run. There is no separate public `stream.cancel()` method.
 
-Consumer cancellation stops further stream delivery. Hook cancellation rejects the prompt with
-`PromptCancelledError` before the blocked handler executes. Neither mechanism reverses side
-effects that completed earlier.
+## Handle uncertain side effects
 
-## Boundaries
+Stopping prevents future turns and tool calls, but a write may already have reached an external service. Design write tools with authorization, idempotency keys, transactional boundaries where possible, and an operation-status record that can reconcile an uncertain result.
 
-Design tools for cancellation explicitly: use idempotency keys, pass abort signals through your own
-service APIs where supported, and record whether an operation was requested, committed, or unknown.
-Never report “cancelled” as “rolled back.” In production, test disconnect behavior on the actual
-runtime and reconcile operations whose final status is uncertain.
+Do not report “cancelled” as “rolled back.” A resumable stream intentionally behaves differently: it keeps draining and storing the original run after the reader disconnects.
 
-## Source and extensions
-
-Cancellation behavior is implemented by
-[`PromptRequest.readableStream()`](https://github.com/anvia-hq/anvia/blob/main/packages/core/src/request/prompt-request.ts)
-and demonstrated through hook control in the
-[permission cookbook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/02_tools/08-tool-permission-hook.ts).
-Next, add an operation-status endpoint and recovery UI.
-
-- [Hook cancellation](/sdk/advanced/hooks/cancellation)
-- [Streaming cancellation](/sdk/streaming/errors-and-cancellation)
+Continue with [streaming errors and cancellation](/sdk/streaming/errors-and-cancellation) and [resumable streams](/sdk/streaming/resumable-streams).

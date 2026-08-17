@@ -20,19 +20,22 @@ ANVIA_LENS_RELEASE=2026.08.1
 ```
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
-import { lens } from '@anvia/lens'
+import { Agent } from '@anvia/core'
+import { LensClient } from '@anvia/lens'
 
-const tracing = lens.createFromEnv({ captureMode: 'safe' })
+const lens = new LensClient()
+const tracing = lens.observer({ captureMode: 'safe' })
 
-const agent = new AgentBuilder('support', model)
-  .observe(tracing)
-  .build()
+const agent = new Agent({
+  id: 'support',
+  model: model,
+  observability: { observers: { tracing } },
+})
 ```
 
-`createFromEnv()` requires a complete connection. For code that may run without Lens, pass `optional: true`; no credentials produces a disabled no-op observer, while partial credentials still fail fast.
+`LensClient` reads the `ANVIA_LENS_*` environment variables and requires a complete connection. For code that may run without Lens, construct it with `{ optional: true }`; no credentials produces a disabled no-op observer, while partial credentials still fail fast.
 
-Call `flush()` before a short-lived script exits and `shutdown()` during graceful service termination.
+Call `lens.flush()` before a short-lived script exits and `lens.close()` during graceful service termination.
 
 ## Next
 

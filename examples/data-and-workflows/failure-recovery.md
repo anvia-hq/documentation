@@ -29,15 +29,15 @@ external write -> application idempotency + durable checkpoint
 ## Request-level completion retries
 
 ```ts
-const response = await agent
-  .prompt(input)
-  .withCompletionRetries({
-    maxAttempts: 3,
-    initialDelayMs: 200,
-    maxDelayMs: 2_000,
-    shouldRetry: ({ error }) => isTransientProviderFailure(error),
-  })
-  .send();
+const response = await agent.generate({
+    prompt: input,
+    retries: {
+        maxAttempts: 3,
+        initialDelayMs: 200,
+        maxDelayMs: 2000,
+        shouldRetry: ({ error }) => isTransientProviderFailure(error),
+    }
+});
 ```
 
 Anvia's default completion retry classifier covers common timeouts, connection failures, `429`, and
@@ -88,6 +88,6 @@ worker restart. Use fake time for backoff tests.
 
 ## Source and extensions
 
-- Retry implementation: [`request/retry.ts`](https://github.com/anvia-hq/anvia/blob/main/packages/core/src/request/retry.ts)
+- Retry implementation: [`retry.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/core/src/retry.ts)
 - Read [pipeline runs and errors](/sdk/pipelines/runs-and-errors) and [background workers](/examples/data-and-workflows/background-workers).
 - Extend with circuit breakers, provider fallback, reconciliation jobs, and operator replay tooling.

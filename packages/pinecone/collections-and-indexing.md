@@ -1,8 +1,8 @@
 # Indexes and namespaces
 
-Use infrastructure automation to provision the index with its dimension, metric, cloud, region, and capacity mode. Then connect with `createIfMissing: false`.
+Use infrastructure automation to provision the index with its dimension, metric, cloud, region, and capacity mode. Then call `validate()` at startup.
 
-The adapter's automatic path attempts a serverless AWS `us-east-1` index and waits for readiness, but it does not receive a vector dimension in `PineconeVectorStoreConnectOptions`. Creation errors are treated as a possible already-existing index and may surface only when later operations run. This makes the path unsuitable as a production provisioning contract.
+`ensure()` first checks whether the index exists. If it is missing, the store requires an explicit `spec`, then creates the index with the configured `dimensions` and `metric` and waits for readiness. If the index already exists, or after creation, `validate()` checks the configured dimension and metric when Pinecone reports them.
 
 The namespace defaults to the empty string. Use stable namespaces only when they match the corpus lifecycle and isolation model. Namespace changes point at different data; they do not migrate vectors.
 

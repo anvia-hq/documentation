@@ -1,62 +1,66 @@
 # MCP
 
-MCP connects Anvia agents to tools hosted by external Model Context Protocol servers. Anvia connects to the server, lists its tools, adapts them to normal runtime tools, and manages them through the same agent loop.
-
-## Explore MCP
-
-| Page | Learn how to |
-| --- | --- |
-| [Connect a server](/sdk/advanced/mcp/connect) | Connect through stdio and own the server lifecycle. |
-| [HTTP and SSE](/sdk/advanced/mcp/transports) | Connect to remote MCP servers. |
-| [Result mapping](/sdk/advanced/mcp/results) | Understand how MCP content becomes Anvia tool output. |
-| [Trust boundaries](/sdk/advanced/mcp/security) | Review tools, enforce permissions, and filter results. |
-| [Local tools](/sdk/advanced/mcp/local-tools) | Combine external capabilities with app-owned actions. |
-| [Observability](/sdk/advanced/mcp/observability) | Trace MCP tools and connection failures. |
-| [MCP checklist](/sdk/advanced/mcp/checklist) | Verify lifecycle, safety, and failure handling. |
-
-## The connection flow
+Model Context Protocol connects Anvia agents to tools hosted by external servers.
 
 ```text
-Application → MCP connection → list tools → review tools → agent → call server
+Application -> connect -> list tools -> review -> agent -> remote call
 ```
 
-The application owns the connection, credentials, allowed tool set, user and tenant scope, and cleanup. The MCP server owns its remote implementation and must enforce its own permissions.
+The application owns connection scope, credentials, the allowed tool set, product authorization, and cleanup. The MCP server owns its remote implementation and must validate every call.
 
-## Connect and run
+## 1. Connect and run
 
 ```ts
-import { AgentBuilder } from '@anvia/core'
-import { connectMcp, mcp } from '@anvia/core/mcp'
+import { Agent } from '@anvia/core'
+import { McpClient } from '@anvia/core/mcp'
 
-const filesystem = await connectMcp(
-  mcp.stdio({
-    name: 'filesystem',
+const client = new McpClient({
+  name: 'docs-filesystem',
+  transport: {
+    type: 'stdio',
     command: 'npx',
     args: [
       '@modelcontextprotocol/server-filesystem',
       '/workspace/docs',
     ],
-  }),
-)
+  },
+})
+const filesystem = await client.connect()
 
 try {
-  const agent = new AgentBuilder('docs-operator', model)
-    .instructions('Use filesystem tools only for documentation files.')
-    .mcp([filesystem])
-    .build()
+  const agent = new Agent({
+    id: 'docs-operator',
+    model,
+    instructions: 'Use filesystem tools only for documentation files.',
+    mcpServers: [filesystem],
+  })
 
-  const response = await agent
-    .prompt('List the documentation files.')
-    .send()
+  const response = await agent.generate({
+      prompt: 'List the documentation files.'
+  })
 
-  console.log(response.output)
+  if (response.status === 'completed') {
+    console.log(response.output)
+  }
 } finally {
-  await filesystem.close()
+  await client.close()
 }
 ```
 
-`.mcp([filesystem])` exposes all adapted tools from that connected server. For privileged or changing servers, review and allow-list `filesystem.tools` before adding them with `.tools(...)`.
+`client.connect()` connects, lists the server's tools, and adapts them into normal Anvia tools. `mcpServers` registers every adapted tool from that server.
 
-## Treat MCP as external capability
+## 2. Review external capability
 
-An MCP connection does not grant product authorization. Keep credentials server-side, resolve tenant scope in application code, constrain broad file or command servers, and filter remote output before it reaches a user.
+For privileged or changing servers, allow-list `server.tools` and pass only the reviewed subset through `tools`.
+
+An MCP connection does not grant product authorization. Keep credentials server-side, resolve user and tenant scope in application code, constrain broad file or command servers, and filter remote output before public transport.
+
+## 3. Continue through the section
+
+- [Connect and own a server](/sdk/advanced/mcp/connect)
+- [Use HTTP and SSE transports](/sdk/advanced/mcp/transports)
+- [Understand result mapping](/sdk/advanced/mcp/results)
+- [Enforce trust boundaries](/sdk/advanced/mcp/security)
+- [Combine MCP and local tools](/sdk/advanced/mcp/local-tools)
+- [Observe MCP operations](/sdk/advanced/mcp/observability)
+- [Review the MCP checklist](/sdk/advanced/mcp/checklist)

@@ -59,50 +59,58 @@ destinations, cap response sizes, and return `Evidence[]`. Search results are un
 
 ```ts
 // src/pipelines/research.ts
-import { PipelineBuilder } from "@anvia/core/pipeline";
+import { Pipeline } from "@anvia/core/pipeline";
 import { z } from "zod";
 import { searchApprovedSources } from "../sources/search.js";
+const sources = new Pipeline({ id: "research-sources", inputSchema: z.string() })
+    .step({
+    id: "step-1",
+    run: ({ input: topic }) => searchApprovedSources(topic)
+});
+const quality = new Pipeline({ id: "research-quality", inputSchema: z.string() })
+    .step({
+    id: "step-2",
+    run: async ({ input: topic }) => ({
+        topic,
+        caveats: ["Search coverage is bounded by the configured providers."],
+    })
+});
+export const evidencePipeline = new Pipeline({
+    id: "research-evidence",
+    inputSchema: z.string(),
+}).parallel({
+    id: "parallel-1",
+    branches: { sources, quality }
+});
 
-const sources = new PipelineBuilder(z.string())
-  .step((topic) => searchApprovedSources(topic))
-  .build();
-
-const quality = new PipelineBuilder(z.string())
-  .step(async (topic) => ({
-    topic,
-    caveats: ["Search coverage is bounded by the configured providers."],
-  }))
-  .build();
-
-export const evidencePipeline = new PipelineBuilder(z.string())
-  .parallel({ sources, quality })
-  .build();
 ```
 
 ## Synthesize without inventing sources
 
 ```ts
 // src/agents/synthesizer.ts
-import { AgentBuilder } from "@anvia/core/agent";
+import { Agent } from "@anvia/core/agent";
 import { OpenAIClient } from "@anvia/openai";
 
-const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY });
+const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! });
 
-export const synthesizer = new AgentBuilder(
-  "research-synthesizer",
-  client.completionModel("gpt-5.5"),
-)
-  .instructions([
+export const synthesizer = new Agent({
+  id: "research-synthesizer",
+  model: client.completionModel({
+      modelId: "gpt-5.5",
+      api: "responses"
+  }),
+  instructions: [
     "Use only the supplied evidence packet.",
     "Separate findings, uncertainty, and next steps.",
     "Cite the supplied source URLs; never create a URL.",
-  ].join("\n"))
-  .build();
+  ].join("\n"),
+});
 ```
 
-The request handler runs `await evidencePipeline.run(topic)`, serializes the bounded packet, then
-calls `await synthesizer.prompt(packet).send()`. Store the packet beside the report so reviewers
-can inspect exactly what the model saw.
+The request handler runs `await evidencePipeline.run({ input: topic })`, serializes the bounded `result.output`, then
+calls `await synthesizer.generate({ prompt: packet })`. Check for a completed agent result before using its `output`.
+Store the packet beside the report so reviewers can inspect exactly what the model saw.
 
 ## Run and expected behavior
 
@@ -132,8 +140,8 @@ completion model.
 
 ## Runnable references
 
-- [Research pipeline](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/05_pipelines/08-research-pipeline.ts)
-- [Parallel specialists](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/07_multi_agent/02-parallel-specialists.ts)
+- [Research pipeline](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/05_pipelines/08-research-pipeline.ts)
+- [Parallel specialists](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/07_multi_agent/02-parallel-specialists.ts)
 
 The files above demonstrate current Anvia APIs. The service structure in this page is a suggested
 application architecture, not a published runnable project.

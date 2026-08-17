@@ -1,8 +1,8 @@
 # Validation
 
-Local skill loading validates package structure and throws `SkillValidationError` with one or more path-specific issues.
+The local loader validates `SKILL.md` structure and throws `SkillValidationError` with path-specific issues.
 
-## Handle validation errors
+## 1. Report validation issues
 
 ```ts
 import {
@@ -12,9 +12,7 @@ import {
 } from '@anvia/core/skills'
 
 try {
-  const skillSet = await loadSkills(
-    skill.local('skills'),
-  )
+  await loadSkills(skill.local('skills'))
 } catch (error) {
   if (error instanceof SkillValidationError) {
     for (const issue of error.issues) {
@@ -26,35 +24,26 @@ try {
 }
 ```
 
-Each issue contains the affected path and a readable validation message.
+## 2. Know what local loading validates
 
-## What loading validates
+`SKILL.md` must begin and end YAML frontmatter correctly. Frontmatter must be an object with a valid required name and description.
 
-Local validation covers:
+The name must match the directory, use lowercase letters, numbers, and hyphens, and fit the 64-character limit. The description is limited to 1,024 characters.
 
-- required frontmatter
-- directory and skill-name consistency
-- supported name format
-- required descriptions and description limits
-- discovered reference and script paths
+The loader discovers regular files recursively under `references/` and `scripts/`. Missing optional asset directories are valid.
 
-At runtime, generated tools also reject absolute paths, path traversal, and access to unlisted assets. Script execution has a timeout and capped output.
+Runtime tools separately enforce contained, listed asset paths and script timeout and output limits.
 
-## Validate before requests
+## 3. Validate before serving
 
-Load skills during startup and fail clearly when a required package is invalid. Also run the same loader in CI so a broken skill does not reach deployment.
+Load required skills during startup and run the same loader in CI. Do not silently remove a required invalid skill.
 
-Do not catch `SkillValidationError` and silently remove a required skill. If an optional skill source may fail, report degraded capability through application status and make the omission visible to operators.
+When an optional source fails, expose the degraded capability to operators instead of pretending the full catalog loaded.
 
-## Test behavioral quality separately
+## 4. Test behavior separately
 
-Structural validation proves the package can load; it does not prove the instructions are good. Test representative tasks for:
+Structural validation does not prove useful or safe instructions. Test correct skill and reference selection, script execution only when needed, expected output shape, path rejection, script failure, timeout, truncation, and client-event redaction.
 
-- correct skill selection
-- correct reference selection
-- scripts running only when needed
-- expected output structure
-- refusal to access unlisted paths
-- safe handling of script failure and oversized output
+Custom `SkillLoader` results are trusted and require their own validation.
 
-Keep factual corpora out of skills when size makes skill selection or instruction loading unreliable.
+Next, choose between [skills and retrieval](/sdk/advanced/skills/skills-and-retrieval).
