@@ -77,6 +77,9 @@ function relativePagePath(path: string, base: string) {
   >
     <span class="docs-version-selector__label">Documentation version</span>
     <span class="docs-version-selector__control">
+      <span class="docs-version-selector__value" aria-hidden="true">
+        {{ selectedChannel === 'rc' && placement === 'navbar' ? 'RC · v1' : selectedChannel === 'rc' ? 'Release candidate (v1)' : 'Current · v0.x' }}
+      </span>
       <select
         v-model="selectedChannel"
         :disabled="isSwitching"
@@ -103,37 +106,50 @@ function relativePagePath(path: string, base: string) {
 
 .docs-version-selector__control {
   position: relative;
-  display: block;
-}
-
-select {
-  min-width: 132px;
-  height: 34px;
+  display: flex;
+  width: 176px;
+  height: 36px;
+  align-items: center;
   padding: 0 30px 0 12px;
   border: 1px solid var(--vp-c-divider);
   border-radius: 8px;
   background: var(--vp-c-bg-elv);
-  color: var(--vp-c-text-1);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 32px;
-  appearance: none;
-  cursor: pointer;
   transition: border-color 160ms ease, background-color 160ms ease;
 }
 
-select:hover {
+select {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  opacity: 0;
+  appearance: none;
+  cursor: pointer;
+}
+
+.docs-version-selector__value {
+  display: block;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.docs-version-selector__control:has(select:hover) {
   border-color: var(--vp-c-border);
   background: var(--vp-c-bg-soft);
 }
 
-select:focus-visible {
+.docs-version-selector__control:has(select:focus-visible) {
   outline: 2px solid var(--vp-c-brand-1);
   outline-offset: 2px;
 }
 
-select:disabled {
+.docs-version-selector__control:has(select:disabled) {
   cursor: wait;
   opacity: 0.65;
 }
@@ -160,21 +176,26 @@ select:disabled {
   display: none;
 }
 
+@media (min-width: 960px) {
+  .docs-version-selector--navbar {
+    margin-left: 16px;
+  }
+}
+
 @media (max-width: 767px) {
   .docs-version-selector--navbar {
     display: block;
     margin-right: 8px;
   }
 
-  .docs-version-selector--navbar select {
-    min-width: 118px;
-    max-width: 148px;
+  .docs-version-selector--navbar .docs-version-selector__control {
+    width: 156px;
     height: 32px;
     padding-right: 26px;
     padding-left: 10px;
-    font-size: 12px;
-    line-height: 30px;
   }
+
+  .docs-version-selector--navbar .docs-version-selector__value { font-size: 12px; }
 
   .docs-version-selector--mobile {
     display: block;
@@ -193,10 +214,11 @@ select:disabled {
     text-transform: uppercase;
   }
 
-  .docs-version-selector--mobile select {
+  .docs-version-selector--mobile .docs-version-selector__control {
     width: 100%;
     height: 40px;
-    font-size: 14px;
   }
+
+  .docs-version-selector--mobile .docs-version-selector__value { font-size: 14px; }
 }
 </style>

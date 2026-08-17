@@ -25,8 +25,8 @@ const currentUrl = __DOCS_VERSION_CONFIG__.currentUrl
   gap: 10px;
   height: 44px;
   padding: 0 20px;
-  background: #2a2a2a;
-  color: #ffffff;
+  background: var(--ops-line);
+  color: var(--ops-accent-deep);
   font-size: 13px;
   font-weight: 500;
   line-height: 1.35;
@@ -34,7 +34,7 @@ const currentUrl = __DOCS_VERSION_CONFIG__.currentUrl
 }
 
 .docs-rc-banner a {
-  color: #ffffff;
+  color: var(--ops-accent-deep);
   font-weight: 700;
   text-decoration: underline;
   text-decoration-color: rgb(255 255 255 / 45%);
@@ -47,7 +47,7 @@ const currentUrl = __DOCS_VERSION_CONFIG__.currentUrl
 
 .docs-rc-banner a:focus-visible {
   border-radius: 3px;
-  outline: 2px solid #ffffff;
+  outline: 2px solid var(--ops-accent-deep);
   outline-offset: 3px;
 }
 

@@ -60,7 +60,17 @@ The site has two documentation channels during the v1 release-candidate period:
 The branch remains named `staging` because it is a moving preview. The public selector calls it
 **Release candidate (v1)** so readers understand that the documented API is not yet stable.
 
-Run a channel locally with its dedicated command:
+Run both channels locally behind one browser-visible origin:
+
+```sh
+pnpm dev
+```
+
+Open `/` for the current docs and `/v1-rc/` for the release candidate. Both URLs use
+`http://localhost:5173`; the development runner manages the RC server used internally by Vite's
+path proxy.
+
+To run only one channel while debugging its build, use its dedicated command:
 
 ```sh
 pnpm docs:dev:current

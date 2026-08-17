@@ -4,6 +4,7 @@
   --vp-font-family-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
   --vp-sidebar-width: 304px;
   --vp-layout-max-width: 100%;
+  --docs-nav-brand-width: 176px;
   --docs-content-max-width: 52rem;
 
   /* Brand — from anvia-web */
@@ -114,28 +115,44 @@
   --ops-muted: #7a7a7a;
   --ops-dim: #4e4e4e;
   --ops-line: #2a2a2a;
+  --ops-hair: var(--ops-line);
   --ops-accent: #c4c4c4;
   --ops-accent-deep: #e0e0e0;
   --ops-accent-ink: #080808;
+  --ops-glow: transparent;
+  --ops-invert: #c4c4c4;
+  --ops-invert-text: #080808;
   --ink: var(--ops-ink);
   --text-muted: var(--ops-muted);
   --text-subtle: var(--ops-muted);
   --text-faint: var(--ops-dim);
-  --canvas: var(--ops-bg);
+  --canvas: var(--ops-sheet);
+  --canvas-pattern: var(--ops-card);
   --paper: var(--ops-sheet);
   --surface: var(--ops-card);
   --surface-subtle: var(--ops-card);
   --surface-hover: #141414;
-  --surface-tint: #141414;
+  --surface-tint: var(--ops-card);
   --surface-overlay: rgba(8, 8, 8, .94);
+  --surface-overlay-strong: rgba(8, 8, 8, .96);
+  --surface-ring: rgba(0, 0, 0, .84);
   --line: var(--ops-line);
   --soft-line: var(--ops-line);
   --strong-line: #3a3a3a;
+  --shadow: #000000;
+  --shadow-soft: #050505;
+  --shadow-accent: #262828;
+  --shadow-strong: #000000;
   --code-surface: var(--ops-card);
+  --code-hover: #141414;
   --code-text: var(--ops-ink);
+  --code-gutter: var(--ops-dim);
   --inline-code: var(--ops-card);
-  --vp-c-bg: var(--ops-bg);
-  --vp-c-bg-alt: var(--ops-bg);
+  --inverse-surface: var(--ops-invert);
+  --inverse-text: var(--ops-invert-text);
+  --image-matte: var(--ops-bg);
+  --vp-c-bg: var(--ops-sheet);
+  --vp-c-bg-alt: var(--ops-sheet);
   --vp-c-bg-elv: var(--ops-card);
   --vp-c-bg-soft: var(--ops-card);
   --vp-c-gutter: var(--ops-line);
@@ -158,19 +175,19 @@
   --vp-code-block-bg: var(--ops-card);
   --vp-code-block-color: var(--ops-ink);
   --vp-nav-bg-color: var(--surface-overlay);
-  --vp-sidebar-bg-color: var(--ops-bg);
+  --vp-sidebar-bg-color: var(--ops-sheet);
   --vp-local-nav-bg-color: var(--surface-overlay);
-  --vp-button-brand-text: var(--ops-accent-ink);
-  --vp-button-brand-bg: #ffffff;
-  --vp-button-brand-hover-text: var(--ops-accent-ink);
-  --vp-button-brand-hover-bg: #e8e8e8;
-  --vp-button-brand-active-text: var(--ops-accent-ink);
-  --vp-button-brand-active-bg: #e8e8e8;
+  --vp-button-brand-text: var(--ops-invert-text);
+  --vp-button-brand-bg: var(--ops-invert);
+  --vp-button-brand-hover-text: var(--ops-invert-text);
+  --vp-button-brand-hover-bg: var(--ops-accent-deep);
+  --vp-button-brand-active-text: var(--ops-invert-text);
+  --vp-button-brand-active-bg: var(--ops-accent-deep);
   --vp-home-hero-name-color: var(--ops-ink);
   --vp-local-search-bg: var(--ops-sheet);
   --vp-local-search-result-bg: var(--ops-sheet);
-  --vp-local-search-highlight-bg: #ffffff;
-  --vp-local-search-highlight-text: var(--ops-accent-ink);
+  --vp-local-search-highlight-bg: var(--ops-invert);
+  --vp-local-search-highlight-text: var(--ops-invert-text);
 }
 
 html,
@@ -195,7 +212,7 @@ body {
 }
 
 .VPNavBar {
-  border-bottom: 1px solid var(--vp-c-divider) !important;
+  border-bottom: 0 !important;
 }
 
 .VPNavBar,
@@ -215,7 +232,17 @@ body {
 }
 
 .VPNavBar .divider {
-  display: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 4;
+  display: block !important;
+  padding-left: 0 !important;
+  pointer-events: none;
+}
+
+.VPNavBar .divider-line {
+  background-color: var(--line) !important;
 }
 
 .VPNavBarTitle.has-sidebar .title {
@@ -236,7 +263,7 @@ body {
 }
 
 .dark .VPButton.brand {
-  color: #080808 !important;
+  color: var(--ops-invert-text) !important;
 }
 
 .dark .VPNavBarTitle .title span {
@@ -284,7 +311,7 @@ body {
 
 @media (min-width: 1280px) {
   .VPDoc .container {
-    justify-content: flex-start !important;
+    justify-content: center !important;
   }
 
   .VPDoc.has-aside .content {
@@ -296,7 +323,7 @@ body {
 
   .VPDoc.has-aside .content-container {
     margin-right: auto;
-    margin-left: 0;
+    margin-left: auto;
   }
 
   .VPDoc .aside {
@@ -307,7 +334,7 @@ body {
 
   .VPDoc .aside-container,
   .VPDoc .aside-curtain {
-    right: 0 !important;
+    right: 32px !important;
     left: auto !important;
   }
 }
@@ -323,14 +350,14 @@ body {
     padding-left: var(--vp-sidebar-width) !important;
   }
 
-  .VPNavBar.has-sidebar .title {
+  .VPNavBar.has-sidebar > .wrapper > .container > .title {
     padding-left: 32px !important;
-    width: var(--vp-sidebar-width) !important;
+    width: var(--docs-nav-brand-width) !important;
   }
 
-  .VPNavBar.has-sidebar .content {
+  .VPNavBar.has-sidebar > .wrapper > .container > .content {
     padding-right: 32px !important;
-    padding-left: var(--vp-sidebar-width) !important;
+    padding-left: var(--docs-nav-brand-width) !important;
   }
 
   .VPLocalNav {
@@ -471,12 +498,14 @@ body {
 }
 
 @media (min-width: 960px) {
-  .VPNavBar.has-sidebar .content {
-    padding-left: var(--vp-sidebar-width) !important;
+  .VPNavBar.has-sidebar > .wrapper > .container > .content {
+    padding-left: var(--docs-nav-brand-width) !important;
   }
 
-  .VPNavBar.has-sidebar .title {
+  .VPNavBar.has-sidebar > .wrapper > .container > .title {
     z-index: 3;
+    padding-left: 32px !important;
+    width: var(--docs-nav-brand-width) !important;
     background-color: var(--vp-nav-bg-color);
   }
 
