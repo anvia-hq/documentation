@@ -1,66 +1,50 @@
 # Tool calling
 
-**Type:** Recipe
-
-## Outcome
-
-Let an agent call a typed function and use its result in a final answer. Choose this pattern when the
-model needs live application data or a capability that should remain in trusted code.
-
-## Prerequisites
-
-- Node.js 22 or newer, pnpm, and a server-side `OPENAI_API_KEY`
-- `pnpm add @anvia/core @anvia/openai zod`
-- `pnpm add -D tsx typescript @types/node`
-
-## Implementation
+Tools let a model request live application data or a capability that remains in trusted code. Anvia validates the call, runs the handler, and gives the result back to the model.
 
 ```ts
-import { Agent } from '@anvia/core/agent'
-import { createTool } from '@anvia/core/tool'
+import { Agent, createTool } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 import { z } from 'zod'
 
 const add = createTool({
   name: 'add',
   description: 'Add two numbers.',
-  input: z.object({ x: z.number(), y: z.number() }),
-  output: z.number(),
+  inputSchema: z.object({
+    x: z.number(),
+    y: z.number(),
+  }),
+  outputSchema: z.number(),
   execute: ({ x, y }) => x + y,
 })
 
 const agent = new Agent({
   id: 'calculator',
-  model: new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY }).completionModel('gpt-5'),
-  instructions: 'Use the add tool for arithmetic, then explain the result briefly.',
+  model: new OpenAIClient({
+      apiKey: process.env.OPENAI_API_KEY!,
+  }).completionModel({
+      modelId: 'gpt-5.5',
+      api: "responses"
+  }),
+  instructions: 'Use add for arithmetic, then explain the result briefly.',
   maxTurns: 2,
   tools: [add],
 })
 
-console.log((await agent.prompt('What is 12 + 30?').send()).output)
+const result = await agent.generate({
+    prompt: 'What is 12 + 30? Use the add tool.'
+})
+
+if (result.status === 'approval_required') {
+  throw new Error(`Approval required for ${result.approval.toolName}`)
+}
+if (result.status === 'blocked') throw new Error(`Agent blocked at ${result.stage}`)
+
+console.log(result.output)
 ```
 
-## Run and expected behavior
+The first model turn requests `add`. Anvia parses its arguments with `inputSchema`, executes the function, validates the returned number with `outputSchema`, and allows a second model turn to produce the final answer.
 
-Save as `tool-call.ts`, run `pnpm tsx tool-call.ts`, and expect an answer containing `42`. The first
-model turn can request `add`; Anvia validates its arguments, runs the handler, returns the validated
-tool result, and gives the model another turn to answer.
+Zod validates shape, not identity, authorization, or business rules. Enforce those inside the handler using trusted request scope. Keep side effects narrow and idempotent where practical, and always set a deliberate turn limit.
 
-## Boundaries
-
-Zod validates shape, not identity, authorization, or business invariants. Enforce those inside the
-handler using trusted request context. Keep side effects idempotent where possible, set a turn
-limit, and never expose arbitrary network, filesystem, or database access as a broad tool.
-
-For production, separate tool definitions from service implementations, add audit-safe hooks, map
-tool failures to safe results, and test the complete call/result/final-answer loop for each model.
-
-## Source and extensions
-
-Run the
-[tool-call cookbook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/02_tools/01-tool-call.ts).
-Next, add [permissions](./tool-permissions), [approval](./tool-approval), or concurrent independent
-tool calls.
-
-- [Define tools](/sdk/tools/define)
-- [Validation and execution](/sdk/tools/validation-and-execution)
+Continue with [tool permissions](./tool-permissions), [approval](./tool-approval), or [middleware](./tool-middleware).

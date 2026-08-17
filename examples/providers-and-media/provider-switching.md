@@ -26,20 +26,29 @@ import { OpenAIClient } from '@anvia/openai'
 
 function completionModel(provider: string): StreamingCompletionModel {
   if (provider === 'anthropic') {
-    return new AnthropicClient({ apiKey: process.env.ANTHROPIC_API_KEY })
-      .completionModel(process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-20250514')
+    return new AnthropicClient({ apiKey: process.env.ANTHROPIC_API_KEY! })
+        .completionModel({
+        modelId: process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-20250514'
+    })
   }
   if (provider === 'gemini') {
-    return new GeminiClient({ apiKey: process.env.GEMINI_API_KEY })
-      .completionModel(process.env.GEMINI_MODEL ?? 'gemini-2.5-flash')
+    return new GeminiClient({ apiKey: process.env.GEMINI_API_KEY! })
+        .completionModel({
+        modelId: process.env.GEMINI_MODEL ?? 'gemini-2.5-flash'
+    })
   }
   if (provider === 'mistral') {
-    return new MistralClient({ apiKey: process.env.MISTRAL_API_KEY })
-      .completionModel(process.env.MISTRAL_MODEL ?? 'mistral-large-latest')
+    return new MistralClient({ apiKey: process.env.MISTRAL_API_KEY! })
+        .completionModel({
+        modelId: process.env.MISTRAL_MODEL ?? 'mistral-large-latest'
+    })
   }
   if (provider === 'openai') {
-    return new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY })
-      .completionModel(process.env.OPENAI_MODEL ?? 'gpt-5')
+    return new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! })
+        .completionModel({
+        modelId: process.env.OPENAI_MODEL ?? 'gpt-5.5',
+        api: "responses"
+    })
   }
   throw new Error(`Unsupported provider: ${provider}`)
 }
@@ -51,7 +60,13 @@ const agent = new Agent({
   instructions: 'Answer in two sentences or less.',
 })
 
-console.log((await agent.prompt('What is a model boundary?').send()).output)
+const result = await agent.generate({
+    prompt: 'What is a model boundary?'
+})
+
+if (result.status === 'completed') {
+  console.log(result.output)
+}
 ```
 
 ## Run and expected behavior
@@ -72,10 +87,10 @@ the exact account and model, compare normalized usage and quality, and keep roll
 
 ## Source and extensions
 
-Compare the runnable [OpenAI](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/01_basics/01-text-call.ts),
-[Anthropic](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/04_providers_and_multimodal/11-anthropic-text-call.ts),
-[Gemini](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/04_providers_and_multimodal/01-gemini-text-call.ts),
-and [Mistral](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/04_providers_and_multimodal/02-mistral-text-call.ts)
+Compare the runnable [OpenAI](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/01_basics/01-text-call.ts),
+[Anthropic](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/11-anthropic-text-call.ts),
+[Gemini](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/01-gemini-text-call.ts),
+and [Mistral](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/02-mistral-text-call.ts)
 examples. Next, build a provider conformance test and an offline quality evaluation.
 
 - [Choose a provider](/sdk/providers/choose-a-provider)

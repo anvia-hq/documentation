@@ -51,12 +51,15 @@ import { OpenAIClient } from '@anvia/openai'
 import { Studio } from '@anvia/studio'
 
 const client = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 
 const agent = new Agent({
   id: 'support',
-  model: client.completionModel('gpt-5'),
+  model: client.completionModel({
+      modelId: 'gpt-5.5',
+      api: "responses"
+  }),
   name: 'Support',
   description: 'Answers product support questions.',
   instructions: 'Answer clearly. Ask for missing details before making assumptions.',

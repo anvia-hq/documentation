@@ -1,21 +1,20 @@
 # Model boundary
 
-Keep provider selection at one narrow application boundary. Provider clients create models; models satisfy Anvia capability contracts; workflows receive those models as dependencies.
+Keep provider selection at one narrow application boundary. Clients create models; models satisfy Anvia capability contracts; workflows receive models as dependencies.
 
-## Who owns what
+## 1. Assign clear ownership
 
-| Layer | Owns | Should not own |
-| --- | --- | --- |
-| Provider client | Credentials, base URL, SDK transport, provider authentication | Prompts, tool policy, memory, product permissions |
-| Model object | One runtime capability and its provider request mapping | Route handling, tenant selection, business state |
-| Agent or workflow | Instructions, tools, context, limits, hooks, memory, output contract | Provider credentials or SDK setup |
-| Application | Model selection, fallback policy, secrets, logging, deployment configuration | Hidden provider switching inside prompts |
+The provider client owns credentials, base URL, SDK transport, and vendor authentication.
 
-The model is the seam between vendor-specific configuration and provider-neutral product behavior.
+The model object owns one runtime capability and its provider request mapping.
 
-## Return contracts from factories
+The agent or workflow owns instructions, tools, context, limits, lifecycle, memory, and output behavior.
 
-Export a Core interface rather than a concrete provider model when the caller does not need provider-specific methods:
+The application owns selection, fallback policy, secrets, logging, and deployment configuration.
+
+Do not let prompts select credentials or hide provider switching inside model instructions.
+
+## 2. Return Core contracts from factories
 
 ```ts
 import type { CompletionModel } from '@anvia/core'
@@ -24,80 +23,93 @@ import { OpenAIClient } from '@anvia/openai'
 
 export type ModelTarget = 'openai' | 'anthropic'
 
-export function createSupportModel(target: ModelTarget): CompletionModel {
+export function createSupportModel(
+  target: ModelTarget,
+): CompletionModel {
   if (target === 'anthropic') {
-    const anthropic = new AnthropicClient({
-      apiKey: process.env.ANTHROPIC_API_KEY,
+    const client = new AnthropicClient({
+      apiKey: process.env.ANTHROPIC_API_KEY!,
     })
 
-    return anthropic.completionModel('claude-sonnet-4-20250514')
+    return client.completionModel({
+        modelId: 'claude-sonnet-4-20250514'
+    })
   }
 
-  const openai = new OpenAIClient({
-    apiKey: process.env.OPENAI_API_KEY,
+  const client = new OpenAIClient({
+    apiKey: process.env.OPENAI_API_KEY!,
   })
 
-  return openai.completionModel('gpt-5')
+  return client.completionModel({
+      modelId: 'gpt-5.5',
+      api: "responses"
+  })
 }
 ```
 
-The agent factory can now stay provider-neutral:
+Callers that need only completion behavior should depend on `CompletionModel`, not a concrete provider class.
+
+## 3. Keep agent factories provider-neutral
 
 ```ts
-import type { CompletionModel } from '@anvia/core'
-import { Agent } from '@anvia/core'
+import { Agent, type CompletionModel } from '@anvia/core'
 
-export function createSupportAgent(model: CompletionModel) {
+export function createSupportAgent(
+  model: CompletionModel,
+) {
   return new Agent({
     id: 'support',
-    model: model,
-    instructions: 'Resolve support questions using the available tools.',
+    model,
+    instructions:
+      'Resolve support questions with the available tools.',
     maxTurns: 4,
   })
 }
 ```
 
-Construct long-lived clients once per runtime boundary when the upstream SDK is designed for reuse. Use request-scoped construction only when credentials, tenant routing, or endpoint selection truly changes per request.
+Reuse long-lived clients when the upstream SDK supports it. Construct them per request only when credentials, tenant routing, or endpoint selection truly vary.
 
-## Mix providers deliberately
-
-Provider-neutral does not mean every workflow must use a single provider. Select a model for each job:
+## 4. Mix providers explicitly
 
 ```ts
-const answerModel = openai.completionModel(process.env.ANSWER_MODEL)
-const judgeModel = anthropic.completionModel(process.env.JUDGE_MODEL)
-const embeddingModel = gemini.embeddingModel('gemini-embedding-001')
+const answerModel = openai.completionModel({
+    modelId: answerModelId
+})
+const judgeModel = anthropic.completionModel({
+    modelId: judgeModelId
+})
+const embeddingModel = gemini.embeddingModel({
+    modelId: 'gemini-embedding-001'
+})
 ```
 
-This makes a mixed stack explicit. It also lets each capability be benchmarked and replaced independently.
+Each capability can then be benchmarked, traced, and replaced independently. Avoid constructing provider clients inside tool handlers or prompt-processing functions.
 
-Avoid passing provider clients into tools or constructing them inside prompt handlers. Doing so spreads credentials, retry behavior, and vendor types through the application.
-
-## Inspect completion capabilities
-
-Every completion model declares the contract implemented by its adapter:
+## 5. Inspect completion declarations
 
 ```ts
 if (!answerModel.capabilities.outputSchema) {
-  throw new Error('The configured answer model does not expose output schemas')
+  throw new Error(
+    'The configured answer model does not expose output schemas.',
+  )
 }
 
-if (attachments.length > 0 && !answerModel.capabilities.documentInput) {
-  throw new Error('The configured answer model does not accept document files')
+if (
+  attachments.length > 0 &&
+  !answerModel.capabilities.documentInput
+) {
+  throw new Error(
+    'The configured model does not accept document files.',
+  )
 }
 ```
 
-The declaration helps reject an unsupported workflow early. It still cannot confirm that a particular upstream model ID or account has the feature enabled, so keep a live smoke test for critical capabilities.
+This catches adapter-level mismatches early. It is not a network probe for the selected upstream model, account, or region.
 
-## Treat fallback as product behavior
+## 6. Treat fallback as product behavior
 
-Anvia models are swappable at the contract boundary, but provider behavior is not automatically identical. A fallback can change tool semantics, schema adherence, media support, reasoning fields, latency, and cost.
+Fallback may change tool semantics, schema adherence, media support, reasoning fields, latency, and cost. Make it explicit in application code and test every fallback against the same workflow and eval set.
 
-Make fallback selection visible in application code. Before enabling it, run the same workflow tests and eval set against every candidate. Do not silently catch every provider error and send the request elsewhere; decide which failures are safe to retry or reroute.
+Keep provider-specific request options beside the model factory. When vendor parameters spread through routes, agents, and tools, move them back to this boundary.
 
-## Keep provider-specific options local
-
-Provider-specific parameters are appropriate when the workflow intentionally depends on them. Keep those parameters beside model selection, document the dependency, and include the exact configuration in smoke tests.
-
-If provider-specific request options begin appearing throughout routes, agents, and tools, the model boundary is leaking. Move them back into the application factory that creates the model or request configuration.
-
+Next, [choose a provider](/sdk/providers/choose-a-provider).

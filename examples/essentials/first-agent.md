@@ -1,37 +1,29 @@
 # First agent
 
-**Type:** Recipe
+An agent combines a completion model with stable identity and behavior. Use it when instructions or runtime features should be configured once and reused across requests.
 
-## Outcome
+## 1. Create the agent
 
-Create a reusable agent with a stable identity and instructions, then run one request. Use an agent
-when behavior should be configured once and reused across prompts; use a direct completion for an
-isolated model call with no agent lifecycle.
-
-## Prerequisites
-
-- Node.js 22 or newer and pnpm
-- `@anvia/core`, `@anvia/openai`, and `tsx`
-- A server-side `OPENAI_API_KEY`
-
-## Implementation
-
-Save as `first-agent.ts`:
+Save this as `first-agent.ts`:
 
 ```ts
-import { Agent } from '@anvia/core/agent'
+import { Agent } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 
 const apiKey = process.env.OPENAI_API_KEY
 if (!apiKey) throw new Error('Set OPENAI_API_KEY.')
 
-const model = new OpenAIClient({ apiKey }).completionModel('gpt-5')
+const model = new OpenAIClient({ apiKey })
+    .completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
+})
 
 const reviewer = new Agent({
   id: 'release-reviewer',
-  model: model,
+  model,
   name: 'Release reviewer',
-  description: 'Reviews release notes for clarity and missing operational detail.',
+  description: 'Reviews release notes for clarity and operational gaps.',
   instructions: [
     'Review only the text supplied by the user.',
     'Identify unclear claims and missing upgrade steps.',
@@ -39,36 +31,38 @@ const reviewer = new Agent({
   ].join('\n'),
 })
 
-const response = await reviewer
-  .prompt('Added streaming support and changed the retry defaults.')
-  .send()
+const result = await reviewer.generate({
+    prompt: 'Added streaming support and changed the retry defaults.'
+})
 
-console.log(response.output)
+if (result.status === 'approval_required') {
+  throw new Error(`Approval required for ${result.approval.toolName}`)
+}
+if (result.status === 'blocked') throw new Error(`Agent blocked at ${result.stage}`)
+
+console.log(result.output)
 ```
 
-## Run and expected behavior
+## 2. Run it
 
-```bash
+```sh
 pnpm tsx first-agent.ts
 ```
 
-The agent returns a short review. `Agent` stores stable configuration; `prompt(...)` creates a
-single-use request where per-run controls such as maximum turns, retries, hooks, middleware, and
-tracing can be added before `send()` or `stream()`.
+`Agent` snapshots stable configuration. `generate(input, options?)` creates and runs a fresh execution. Its result is either `completed` with final `output`, or `approval_required` when a guarded tool pauses the run.
 
-## Boundaries
+## Stream the same agent
 
-Instructions guide a model but do not enforce authorization, truthfulness, or output safety. Keep
-secrets out of prompts, validate important outputs, and use tools or application code for facts and
-side effects. A production service should reuse configured agents, but create a new prompt request
-for every run and isolate tenant-specific context.
+```ts
+for await (const event of reviewer.stream({
+    prompt: releaseNotes
+})) {
+  if (event.type === 'text_delta') {
+    process.stdout.write(event.delta)
+  }
+}
+```
 
-## Source and extensions
+Instructions guide the model but do not enforce truth, authorization, or output safety. Put facts and side effects behind authorized tools, validate important outputs, and keep secrets out of prompts.
 
-The runnable baseline is the
-[text-call cookbook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/01_basics/01-text-call.ts).
-Next, add [conversation memory](./conversation-memory), [tools](./agent-with-tools), or structured
-agent output.
-
-- [Build agents](/sdk/agents/build)
-- [Runtime lifecycle](/sdk/agents/runtime-lifecycle)
+Continue with [Agent with tools](./agent-with-tools) or [Conversation memory](./conversation-memory).

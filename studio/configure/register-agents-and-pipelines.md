@@ -24,12 +24,15 @@ import { OpenAIClient } from '@anvia/openai'
 import { Studio } from '@anvia/studio'
 
 const openai = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 
 const supportAgent = new Agent({
   id: 'support-operations',
-  model: openai.completionModel('gpt-5.6-luna'),
+  model: openai.completionModel({
+      modelId: 'gpt-5.6-luna',
+      api: "responses"
+  }),
   name: 'Support operations',
   description: 'Investigates tickets and recommends the next action.',
   instructions: 'Use available evidence and keep recommendations concise.',
@@ -39,7 +42,7 @@ const supportAgent = new Agent({
 new Studio([supportAgent]).start()
 ```
 
-Studio uses the agent's `id` as its runtime identifier. The name and description become browser labels. Studio also derives inspection metadata from the live agent, including context, dynamic tool, observer, approval-tool, hook, output-schema, and turn-limit information.
+Studio uses the agent's `id` as its runtime identifier. The name and description become browser labels. Studio also derives inspection metadata from the live agent, including context, dynamic-tool, observer, approval-tool, lifecycle, output-schema, and turn-limit information.
 
 That derived metadata describes the registered runtime. It does not contain the agent's instructions, provider credentials, or business data.
 
@@ -64,31 +67,34 @@ Use [quick prompts](/studio/configure/quick-prompts) when each agent needs its o
 Pass a built pipeline in the same target list:
 
 ```ts
-import { PipelineBuilder } from '@anvia/core/pipeline'
-import { Studio } from '@anvia/studio'
-import { z } from 'zod'
-
-const ticketPipeline = new PipelineBuilder(z.string(), {
-  id: 'ticket-triage-pipeline',
-  name: 'Ticket triage',
-  description: 'Normalizes a ticket and prepares a routing decision.',
-  metadata: {
-    owner: 'support-operations',
-    sampleInput: 'Enterprise customer reports a checkout outage.',
-  },
+import { Pipeline } from '@anvia/core/pipeline';
+import { Studio } from '@anvia/studio';
+import { z } from 'zod';
+const ticketPipeline = new Pipeline({
+    id: 'ticket-triage-pipeline',
+    name: 'Ticket triage',
+    description: 'Normalizes a ticket and prepares a routing decision.',
+    inputSchema: z.string(),
+    metadata: {
+        owner: 'support-operations',
+        sampleInput: 'Enterprise customer reports a checkout outage.',
+    },
 })
-  .step((ticket) => ticket.trim(), {
+    .step({
+    id: "step-1",
     name: 'Normalize ticket',
-  })
-  .step((ticket) => ({
-    ticket,
-    priority: ticket.toLowerCase().includes('outage') ? 'high' : 'normal',
-  }), {
+    run: ({ input: ticket }) => ticket.trim()
+})
+    .step({
+    id: "step-2",
     name: 'Classify priority',
-  })
-  .build()
+    run: ({ input: ticket }) => ({
+        ticket,
+        priority: ticket.toLowerCase().includes('outage') ? 'high' : 'normal',
+    })
+});
+new Studio([supportAgent, ticketPipeline]).start();
 
-new Studio([supportAgent, ticketPipeline]).start()
 ```
 
 Studio preserves the pipeline's name, description, and JSON-compatible metadata. Its stable ID is used by the graph, run, log, and replay routes. Pipeline metadata such as an owner or sample input is useful for explaining the workflow in the inspector.

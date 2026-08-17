@@ -1,58 +1,47 @@
 # Production guidance
 
-Treat hooks as part of the runtime policy boundary: deterministic, fast, observable, and covered by direct tests.
+Treat lifecycle, guardrails, approvals, and middleware as separate runtime boundaries. Keep each deterministic, fast, observable, and directly tested.
 
-## Resolve external state before the run
+## Resolve trusted state before the run
 
-Load permissions, feature flags, and environment policy in the route or worker. Close over a small immutable policy object instead of making repeated network calls from callbacks.
+Load permissions, feature flags, and environment policy in the route or worker. Close over a small immutable policy object in guardrails, approval requirements, or middleware.
 
-```ts
-const policy = await policies.forUser(user.id)
+Tool handlers must still load or re-check security-critical state immediately before a private read or side effect. Approval can become stale while a run is suspended.
 
-const hook = createHook({
-  onToolCall({ toolName, tool }) {
-    if (toolName === 'request_refund' && !policy.canRefund) {
-      return tool.skip('Refund access is not available.')
-    }
-  },
-})
+## Keep callbacks focused
 
-return agent
-  .prompt(message)
-  .withHook(hook)
-  .send()
-```
+Lifecycle and middleware callbacks are awaited and add latency to the run. Avoid repeated network reads across callbacks. Batch or pre-resolve non-critical state where appropriate.
 
-Long hook calls add latency to the runtime and make the decision harder to reproduce.
+Lifecycle failures fail the run. Use that only when recording the event is part of correctness. Choose observers for best-effort telemetry and configure their failure behavior deliberately.
 
-## Keep reasons explicit
+## Keep reasons and telemetry safe
 
-Give cancellation, skip, and approval actions stable internal reasons. They help tests, audit records, and debugging even when the product returns a more generic message to the user.
+Use stable internal reason codes for guardrail blocks and approval requests. They help tests and audit records.
 
-Do not place secrets, raw credentials, or private service responses in a reason that may reach a model, trace, log, or UI.
+Do not place secrets, credentials, private service responses, or unnecessary model content in a reason, trace, lifecycle record, or public error.
 
-## Preserve the real error
+## Preserve original failures
 
-Use hook cancellation for intentional policy decisions. Let provider failures, tool failures, validation errors, and timeouts keep their original error types so the runner can retry or map them correctly.
+Let provider failures, tool failures, validation errors, maximum-turn errors, and timeouts retain their original types. Use guardrail decisions for intentional policy blocks and approval results for reviewer decisions.
 
-## Test without a provider
+## Test each boundary
 
-Hook policy can be tested by calling a fake agent model or by exercising the callback through a small agent harness. Cover the decision boundaries:
+Test that lifecycle callbacks receive the expected run, step, tool, finish, and error snapshots.
 
-- allowed calls continue
-- rejected calls never execute the tool
-- skipped calls return a safe reason
-- cancelled runs raise `PromptCancelledError`
-- approval-required calls reach the configured handler
+Test enforced and observe-only guardrail behavior separately.
 
-Also test tool authorization independently. A passing hook test does not prove that the handler is safe.
+Test that protected tools never execute before approval, rejected calls do not execute, approved calls use the same parsed input, and authorization is rechecked inside the handler.
+
+Test middleware ordering and both the original and transformed values.
+
+Finally, test stream aborts and partial side effects. Stopping a run must not be treated as rollback.
 
 ## Before shipping
 
-- Keep callbacks deterministic and short.
-- Resolve request-local state before the run.
-- Use explicit, non-sensitive action reasons.
-- Keep tool authorization and validation in handlers.
-- Catch cancellation only at the runner boundary.
+- Keep callbacks short and deterministic.
+- Resolve request-local policy at the runner boundary.
+- Re-check authorization inside tools.
+- Use non-sensitive reasons and telemetry.
+- Make write tools idempotent or transactionally guarded.
+- Handle approval persistence if suspension must survive process loss.
 - Observe decisions without logging private payloads.
-- Make completed side effects idempotent or auditable.

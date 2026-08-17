@@ -6,7 +6,7 @@ Use several layers. TypeScript and unit tests verify deterministic contracts; ev
 
 Test tools, middleware, authorization, retrieval filters, pipeline steps, error translation, and persistence adapters as ordinary application code. Use a test implementation of the completion-model contract when the test is about orchestration rather than provider behavior.
 
-Also test the negative paths: denied tools, missing approval handlers, turn limits, cancellation hooks, partial streaming failures, retry classification, duplicate job delivery, and unauthorized session or resume cursors.
+Also test the negative paths: denied tools, approval-required continuations, rejected approval decisions, turn limits, iterator cancellation, partial streaming failures, retry classification, duplicate job delivery, and unauthorized session or resume cursors.
 
 ## Evaluation suites
 

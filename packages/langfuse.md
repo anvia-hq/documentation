@@ -10,32 +10,31 @@ pnpm add @anvia/core @anvia/langfuse
 
 ```ts
 import { Agent } from '@anvia/core'
-import { langfuse } from '@anvia/langfuse'
+import { LangfuseClient } from '@anvia/langfuse'
 
-const tracing = langfuse.create({
+const langfuse = new LangfuseClient({
   publicKey: process.env.LANGFUSE_PUBLIC_KEY,
   secretKey: process.env.LANGFUSE_SECRET_KEY,
   baseUrl: process.env.LANGFUSE_BASE_URL,
   environment: 'production',
-  captureMode: 'safe',
 })
+const tracing = langfuse.observer({ captureMode: 'safe' })
 
 const agent = new Agent({
   id: 'support',
   model: model,
-  observers: [tracing],
+  observability: { observers: { tracing } },
 })
 ```
 
-Call `flush()` before a short-lived worker exits and `shutdown()` during service termination so queued traces and scores have time to reach Langfuse.
+Call `langfuse.flush()` before a short-lived worker exits and `langfuse.close()` during service termination so queued traces and scores have time to reach Langfuse.
 
 ## Beyond tracing
 
-- Publish Anvia evaluation results with `createLangfuseEvalReporter`.
-- Read and update datasets with `createLangfuseDatasetClient`.
-- Run an Anvia evaluation suite as a Langfuse experiment with `runEvalAsExperiment`.
-- Resolve versioned text or chat prompts with `createLangfusePromptClient`.
-- Submit scores through the tracing handle.
+- Publish Anvia evaluation results with `langfuse.evalReporter()`.
+- Read and update datasets with `langfuse.datasetClient()`.
+- Run an Anvia evaluation suite as a Langfuse experiment with `langfuse.runEvalExperiment()`.
+- Resolve versioned text or chat prompts with `langfuse.promptClient()`.
 - Redact common and application-specific PII before capture.
 
 ## Capture and reliability

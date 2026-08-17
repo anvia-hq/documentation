@@ -48,22 +48,25 @@ Create the observer once, then reuse it across agents in the process:
 
 ```ts
 import { Agent } from '@anvia/core'
-import { lens } from '@anvia/lens'
+import { LensClient } from '@anvia/lens'
 
-const tracing = lens.create()
+const lens = new LensClient()
+const tracing = lens.observer()
 
 const supportAgent = new Agent({
   id: 'support',
   model: model,
   name: 'Support agent',
-  observers: [tracing],
+  observability: { observers: { tracing } },
 })
 
-const response = await supportAgent
-  .prompt('Summarize the latest support request.')
-  .send()
+const response = await supportAgent.generate({
+    prompt: 'Summarize the latest support request.'
+})
 
-console.log(response.trace?.traceId)
+if (response.status === 'completed') {
+  console.log(response.trace?.traceId)
+}
 ```
 
 The request succeeds independently of when the batch exporter delivers its trace. Flush pending telemetry at the appropriate process boundary; see [Flush and shutdown](/lens/connect/anvia/flush-and-shutdown).
@@ -78,4 +81,3 @@ The request succeeds independently of when the batch exporter delivers its trace
 | Deliver buffered telemetry reliably | [Flush and shutdown](/lens/connect/anvia/flush-and-shutdown) |
 
 Evaluation reporting and managed datasets use the same project connection, but they have their own workflow. Continue to [Evaluations](/lens/evaluations) when the goal is measuring quality rather than observing live traffic.
-

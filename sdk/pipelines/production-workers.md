@@ -1,54 +1,54 @@
 # Production workers
 
-Move pipelines into a background worker when they include several provider calls, slow media processing, external writes, or retries that should outlive an HTTP request.
+Move a pipeline into a background worker when it includes several provider calls, slow media processing, external writes, or retries that should outlive an HTTP request.
 
-## Split request and execution
+Anvia executes the typed workflow. Your job system remains responsible for durable delivery, scheduling, worker concurrency, retries, cancellation, and run retention.
 
-| Boundary | Responsibility |
-| --- | --- |
-| API route | Authenticate, validate input, enqueue a job, return its ID. |
-| Worker | Load the job, run the pipeline, persist status and output. |
-| Pipeline | Execute the typed workflow and emit stage events. |
-| Product store | Own durable job state, idempotency, and user-visible results. |
+## 1. Separate request handling from execution
 
-## Choose a job runner
+The API route should authenticate the caller, validate request-specific input, enqueue a job, and return the job ID.
 
-Production applications typically run these workers with an existing job system instead of building a queue from scratch.
+The worker should load trusted job state, construct scoped dependencies, run the pipeline, and persist its status and result.
 
-| Runner | Use when |
-| --- | --- |
-| [BullMQ](https://docs.bullmq.io/guide/introduction) | The application already operates Redis and wants to own its queues, workers, concurrency, and deployment. |
-| [Trigger.dev](https://trigger.dev/docs/tasks/overview) | The application wants managed background tasks with built-in retries, queues, concurrency controls, and run visibility. |
+The product store should own authorization for later status reads, idempotency keys, timestamps, public failure messages, and references to durable outputs.
 
-Anvia pipelines do not depend on either runner. Define the pipeline in application code, call `pipeline.run(...)` inside the BullMQ worker or Trigger.dev task, and let that system own scheduling and delivery.
-
-## Run from a worker
+## 2. Run a pipeline from a worker
 
 ```ts
 export async function runResearchWorker(job: ResearchJob) {
-  await researchJobs.markRunning(job.id)
-
-  try {
-    const pipeline = createResearchPipeline(workerScope)
-    const result = await pipeline.run({
-      jobId: job.id,
-      tenantId: job.tenantId,
-      requestedBy: job.requestedBy,
-      topic: job.topic,
-    })
-
-    await researchJobs.markComplete(job.id, result)
-  } catch (error) {
-    await researchJobs.markFailed(job.id, publicWorkerError(error))
-    throw error
-  }
+    await researchJobs.markRunning(job.id);
+    try {
+        const pipeline = createResearchPipeline({
+            tenantId: job.tenantId,
+            requestedBy: job.requestedBy,
+        });
+        const result = await pipeline.run({
+            input: {
+                jobId: job.id,
+                topic: job.topic,
+            },
+            observer: createJobObserver(job.id)
+        });
+        await researchJobs.markComplete(job.id, result);
+    }
+    catch (error) {
+        await researchJobs.markFailed(job.id, publicWorkerError(error));
+        throw error;
+    }
 }
+
 ```
 
-Store job status explicitly instead of inferring it from logs. Persist tenant, requester, source, trace, and result references needed to authorize later reads.
+Store status explicitly instead of inferring it from logs. Persist the tenant, requester, source, trace, and result references needed to authorize later reads.
 
-## Make retries safe
+## 3. Make retries safe
 
-Retry provider or extractor calls at their narrow boundary. Retry a whole job only when completed writes are idempotent, guarded by a job key, or protected by a transaction.
+Retry provider or extractor calls at their narrow boundary. Retry a whole job only when completed writes are idempotent, guarded by the job ID, or protected by a transaction.
 
-Do not blindly retry a batch after partial external writes.
+Assume a worker can stop after an external write but before recording completion. A repeated job must either detect that write or safely replace it.
+
+Do not blindly retry a batch after partial writes. Track item-level state when each input needs its own success or failure result.
+
+## 4. Control deployment concurrency
+
+Pipeline `.runBatch()` limits concurrency inside one process. Worker concurrency, queue delivery, database connections, and provider rate limits are separate controls. Set limits at every layer and monitor active work, queue delay, provider errors, and job age.

@@ -17,7 +17,7 @@ contract tests.
 ## Client boundary
 
 ```ts
-import { createCompletion } from '@anvia/core/completion'
+import { generateCompletion } from '@anvia/core/completion'
 import { OpenAIClient } from '@anvia/openai'
 
 const apiKey = process.env.COMPATIBLE_API_KEY
@@ -29,12 +29,15 @@ if (!apiKey || !baseUrl || !modelId) throw new Error('Set compatible endpoint co
 const client = new OpenAIClient({
   apiKey,
   baseUrl,
-  completionApi: 'chat',
 })
 
-const result = await createCompletion(client.completionModel(modelId), {
-  instructions: 'Reply with exactly the requested word.',
-  input: 'Reply with: compatible',
+const result = await generateCompletion({
+    prompt: 'Reply with: compatible',
+    model: client.completionModel({
+        modelId: modelId,
+        api: "chat"
+    }),
+    instructions: 'Reply with exactly the requested word.'
 })
 
 if (!result.text.toLowerCase().includes('compatible')) {
@@ -64,7 +67,7 @@ schema validity before shifting traffic.
 ## Source and extensions
 
 The behavior is grounded in the
-[`OpenAIClient` adapter](https://github.com/anvia-hq/anvia/blob/main/packages/provider-openai/src/openai/client.ts)
+[`OpenAIClient` adapter](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-openai/src/openai/client.ts)
 and its package tests. Next, add streaming, one tool round trip, and one schema test to the probe.
 
 - [Compatible APIs](/sdk/providers/compatible)

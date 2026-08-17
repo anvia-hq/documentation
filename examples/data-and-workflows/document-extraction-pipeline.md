@@ -24,7 +24,7 @@ separate ingestion steps and are not implied by this pipeline.
 
 ## Packages
 
-- `@anvia/core` provides `ExtractorBuilder`, `ExtractionError`, and `PipelineBuilder`.
+- `@anvia/core` provides `extract`, `ExtractionError`, and `Pipeline`.
 - `@anvia/openai` provides the OpenAI completion model adapter.
 - `zod` defines both the pipeline input contract and the structured extraction result.
 - `tsx`, `typescript`, and `@types/node` run and type-check the example locally.
@@ -36,14 +36,13 @@ CLI path
   -> Zod input validation
   -> deterministic file/type/size checks
   -> UTF-8 read and empty-document check
-  -> ExtractorBuilder submit tool + Zod result validation
+  -> extract() submit tool + Zod result validation
   -> typed invoice object
   -> JSON output
 ```
 
-`PipelineBuilder` owns the workflow order and input type. Ordinary TypeScript owns file-system
-policy. `ExtractorBuilder` owns the model call, required structured submission, retries, and final
-schema validation.
+`Pipeline` owns the workflow order and input type. Ordinary TypeScript owns file-system policy.
+`extract()` owns the model call, required structured submission, and final schema validation.
 
 ## Project structure
 
@@ -51,7 +50,7 @@ schema validation.
 src/
   schema.ts    # external input and validated invoice contracts
   load.ts      # deterministic file policy
-  pipeline.ts  # model, extractor, and pipeline composition
+  pipeline.ts  # model and pipeline composition
   cli.ts       # process arguments, observer, and error mapping
 invoice.txt
 ```
@@ -123,8 +122,7 @@ export async function loadDocument(input: DocumentInputType): Promise<string> {
 ```
 
 ```ts [src/pipeline.ts]
-import { ExtractorBuilder } from "@anvia/core/extractor";
-import { PipelineBuilder } from "@anvia/core/pipeline";
+import { Pipeline } from "@anvia/core/pipeline";
 import { OpenAIClient } from "@anvia/openai";
 import { loadDocument } from "./load.js";
 import { DocumentInput, Invoice } from "./schema.js";
@@ -133,21 +131,28 @@ const apiKey = process.env.OPENAI_API_KEY;
 if (!apiKey) throw new Error("Set OPENAI_API_KEY before running this example.");
 
 const openai = new OpenAIClient({ apiKey });
-const extractor = new ExtractorBuilder(openai.completionModel("gpt-5"), Invoice)
-  .instructions(
-    "Extract stated facts only. Use null for missing scalar fields and " +
-      "an empty array when no line items are present.",
-  )
-  .retries(2)
-  .build();
+const model = openai.completionModel({ modelId: "gpt-5.5", api: "responses" });
 
-export const invoicePipeline = new PipelineBuilder(DocumentInput, {
+export const invoicePipeline = new Pipeline({
   id: "invoice-extraction",
   name: "Invoice extraction",
+  inputSchema: DocumentInput,
 })
-  .step(loadDocument, { id: "read-document", name: "Read document" })
-  .extract(extractor, { id: "extract-invoice", name: "Extract invoice fields" })
-  .build();
+  .step({
+    id: "read-document",
+    name: "Read document",
+    run: ({ input }) => loadDocument(input),
+  })
+  .extract({
+    id: "extract-invoice",
+    name: "Extract invoice fields",
+    model,
+    outputSchema: Invoice,
+    instructions:
+      "Extract stated facts only. Use null for missing scalar fields and " +
+      "an empty array when no line items are present.",
+    text: ({ input }) => input,
+  });
 ```
 
 ```ts [src/cli.ts]
@@ -164,8 +169,8 @@ const observer: PipelineRunObserver = {
 };
 
 invoicePipeline
-  .run({ path: process.argv[2] ?? "" }, { observer })
-  .then((result) => console.log(JSON.stringify(result, null, 2)))
+  .run({ input: { path: process.argv[2] ?? "" }, observer })
+  .then((result) => console.log(JSON.stringify(result.output, null, 2)))
   .catch((error: unknown) => {
     if (error instanceof z.ZodError) {
       console.error("Invalid pipeline input:", error.issues);
@@ -230,17 +235,18 @@ the result cannot reach `console.log` unless the extractor's Zod validation succ
 An empty path fails the pipeline's initial Zod parse. Unsupported extensions, missing files,
 directories, oversized files, and empty files fail in the read stage before any model request.
 If the model omits the required structured submission or submits invalid fields, the extractor
-retries up to two times and then throws `ExtractionError`.
+throws `ExtractionError`. Add an explicit retry policy only after deciding the operation is safe to
+repeat.
 
 ## How it works
 
-Constructing `PipelineBuilder` with `DocumentInput` makes runtime validation the pipeline's first
+Constructing `Pipeline` with `DocumentInput` makes runtime validation the pipeline's first
 operation. The `loadDocument` step is deterministic application code, so file access policy is
 not delegated to the model.
 
-`ExtractorBuilder(model, Invoice)` creates an extractor with a required generated `submit` tool
-whose input is the Zod schema. `.extract(invoiceExtractor)` passes the preceding text to that
-extractor and changes the inferred pipeline output type to the validated invoice type. This is a
+The `.extract({ model, outputSchema: Invoice, text })` stage creates a required generated `submit`
+tool whose input is the Zod schema. It maps the preceding text through `text` and changes the
+inferred pipeline output type to the validated invoice type. This is a
 supported structured-output path for extracting facts that already exist in text; there is no
 manual `JSON.parse` and no use of unvalidated model text.
 
@@ -282,6 +288,6 @@ inputs. Use a fake completion model to exercise valid extraction, invalid submis
 exhaustion. Keep a small adversarial document corpus and verify the final object against business
 rules before persistence or action.
 
-- Cookbook source: [`05_pipelines/07-extractor-pipeline.ts`](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/05_pipelines/07-extractor-pipeline.ts)
-- Structured extraction source: [`03_structured_output`](https://github.com/anvia-hq/anvia/tree/main/examples/cookbook/03_structured_output)
+- Cookbook source: [`05_pipelines/07-extractor-pipeline.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/05_pipelines/07-extractor-pipeline.ts)
+- Structured extraction source: [`03_structured_output`](https://github.com/anvia-hq/anvia/tree/v1-rc3/examples/cookbook/03_structured_output)
 - Extend the ingestion boundary with OCR, malware scanning, human review, and immutable source hashes.

@@ -36,14 +36,15 @@ ANVIA_LENS_RELEASE=2026.08.11
 Explicit options take precedence over environment variables:
 
 ```ts
-import { lens } from '@anvia/lens'
+import { LensClient } from '@anvia/lens'
 
-export const tracing = lens.create({
+export const lens = new LensClient({
   serviceName: 'support-api',
   environment: 'production',
   release: process.env.GIT_SHA,
   timeoutMs: 15_000,
 })
+export const tracing = lens.observer()
 ```
 
 Prefer environment variables for credentials and explicit options for application-owned settings. This keeps secrets outside the source while making service identity visible in code.
@@ -62,13 +63,13 @@ One tracing instance can observe multiple agents in the same process:
 const supportAgent = new Agent({
   id: 'support',
   model: supportModel,
-  observers: [tracing],
+  observability: { observers: { tracing } },
 })
 
 const triageAgent = new Agent({
   id: 'triage',
   model: triageModel,
-  observers: [tracing],
+  observability: { observers: { tracing } },
 })
 ```
 
@@ -76,30 +77,35 @@ The agent id and name distinguish their traces. Sharing the observer also gives 
 
 ## Make Lens optional in local environments
 
-Use `createFromEnv()` when the integration is optional outside deployed environments:
+Use `optional: true` when the integration is optional outside deployed environments:
 
 ```ts
-const tracing = lens.createFromEnv({
+const lens = new LensClient({
   optional: true,
   serviceName: 'support-api',
 })
+const tracing = lens.observer()
 
-console.log(tracing.enabled)
+console.log(lens.enabled)
 ```
 
 When all three connection variables—base URL, public key, and secret key—are absent, `optional: true` returns a disabled no-op observer. Partial connection configuration still throws, which prevents a mistyped deployment from silently losing telemetry.
 
-Use `tracing.enabled` only for diagnostics or optional UI behavior. The disabled observer is safe to include in `observers` directly.
+Use `lens.enabled` only for diagnostics or optional UI behavior. The disabled observer is safe to include in `observers` directly.
 
 ## Verify the connection
 
 Run one agent request, flush the observer, then open **Traces** with the 24-hour range and no filters:
 
 ```ts
-const response = await supportAgent.prompt('Connection check').send()
-await tracing.flush()
+const response = await supportAgent.generate({
+    prompt: 'Connection check'
+})
+await lens.flush()
 
-console.log(response.trace?.traceId)
+if (response.status === 'completed') {
+  console.log(response.trace?.traceId)
+}
 ```
 
 The printed trace id should match the trace detail in Lens. If nothing appears, check that the key pair is active and belongs to the intended project, the base URL has no extra path, and the application can reach Lens over the network.

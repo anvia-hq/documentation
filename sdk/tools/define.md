@@ -11,10 +11,10 @@ import { z } from 'zod'
 const getInvoice = createTool({
   name: 'get_invoice',
   description: 'Look up one invoice available to the current user.',
-  input: z.object({
+  inputSchema: z.object({
     invoiceId: z.string().min(1).describe('The invoice ID to inspect.'),
   }),
-  output: z.object({
+  outputSchema: z.object({
     id: z.string(),
     status: z.enum(['draft', 'open', 'paid', 'void']),
     totalCents: z.number().int(),
@@ -50,7 +50,7 @@ export function createGetInvoiceTool(scope: BillingScope) {
   return createTool({
     name: 'get_invoice',
     description: 'Look up one invoice available to the current user.',
-    input: z.object({ invoiceId: z.string().min(1) }),
+    inputSchema: z.object({ invoiceId: z.string().min(1) }),
     async execute({ invoiceId }) {
       await scope.auth.requireInvoiceAccess(scope.user.id, invoiceId)
       return scope.billing.getInvoice(invoiceId)

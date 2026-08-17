@@ -1,39 +1,67 @@
 # Image generation models
 
-Image generation models return image bytes from a provider-neutral request. Run them in server routes, workers, or internal tools so credentials remain private.
+Image generation models create image bytes from a text prompt through a provider-neutral Anvia request. Run generation on a server, worker, or internal tool so provider credentials remain private.
 
-## Create an image model
+## 1. Create an image model
+
+The provider client owns the provider-specific model implementation.
 
 ```ts
-import { GPT_IMAGE_1, OpenAIClient } from '@anvia/openai'
+import { OpenAIClient } from '@anvia/openai'
 
-const openai = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+const client = new OpenAIClient({ apiKey })
 
-export const imageModel = openai.imageGenerationModel(GPT_IMAGE_1)
+export const imageModel = client.imageGenerationModel({ modelId: 'gpt-image-1' })
 ```
 
-OpenAI, Gemini, and Grok currently provide image-generation adapters.
+OpenAI, Gemini, and Grok provide v1 RC image-generation adapters. Each provider may support different dimensions, formats, and additional parameters.
 
-## Generate an image
+## 2. Generate an image
+
+Pass the model, prompt, dimensions, and provider options in one object.
 
 ```ts
 import { writeFile } from 'node:fs/promises'
-import { imageGenerationRequest } from '@anvia/core/image-generation'
+import { generateImage } from '@anvia/core/image-generation'
+import { imageModel } from './models'
 
-const response = await imageGenerationRequest(imageModel)
-  .prompt('A clean illustration of a document ingestion pipeline')
-  .width(1024)
-  .height(1024)
-  .additionalParams({ output_format: 'png' })
-  .send()
+const response = await generateImage({
+    prompt: 'A clean product illustration of a document ingestion pipeline',
+    model: imageModel,
+    width: 1024,
+    height: 1024,
+    providerOptions: {
+        output_format: 'png',
+    }
+})
 
-await writeFile('document-pipeline.png', response.image)
+await writeFile('document-pipeline.png', response.images[0].data)
 ```
 
-`response.image` contains the first image as a `Uint8Array`; `response.images` contains every returned image.
+Width and height default to `1024` and must be positive integers. Provider-specific options remain explicit in `providerOptions`.
 
-## Production boundary
+## 3. Read the normalized response
 
-Validate prompts and dimensions before generation. Store output in object or media storage with its provider, model, format, and safe prompt metadata. Use a worker when generation is too slow or expensive for the request path.
+The response exposes the first image directly and preserves every returned image.
+
+```ts
+console.log({
+  firstImageBytes: response.images[0].data.byteLength,
+  imageCount: response.images.length,
+  mediaType: response.images[0].mediaType,
+})
+
+for (const image of response.images) {
+  console.log(image.data.byteLength, image.mediaType)
+}
+```
+
+`rawResponse` remains available when application code needs provider-specific metadata, but avoid returning it directly to clients.
+
+## 4. Design the production boundary
+
+Validate prompts, dimensions, formats, and account-specific limits before invoking the model. Generated media can be slow and expensive, so long-running or bulk work usually belongs in a queue.
+
+Store output in application-owned object or media storage with the provider, model, format, safe prompt metadata, and ownership scope. Do not place raw image bytes in agent memory or routine logs.
+
+Continue with [Audio generation models](/sdk/models/speech-generation).

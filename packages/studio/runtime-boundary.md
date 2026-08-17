@@ -30,7 +30,7 @@ await studio.serve({
   port: 4021,
   signal: shutdown.signal,
   onShutdown: async () => {
-    await sandboxSession.destroy()
+    await sandbox.destroy()
     await mcpClient.close()
   },
 })
@@ -38,6 +38,6 @@ await studio.serve({
 
 `serve()` waits for shutdown, closes Studio, then awaits `onShutdown`, including when startup fails. `start()` installs its own `SIGINT` behavior unless `handleSignals: false`; application-owned lifecycles must then call `close()`.
 
-Studio discovers sandbox sessions but does not own or destroy them. It also does not close provider clients, database pools, MCP connections, or custom observers. Clean those up at the same process boundary.
+Studio exposes only sandbox inspectors registered through `StudioOptions.sandboxes`; it does not own or destroy their sandboxes. It also does not close provider clients, database pools, MCP connections, or custom observers. Clean those up at the same process boundary.
 
 See [Studio security boundaries](/studio/configure/security-boundaries) and [lifecycle and cleanup](/studio/configure/lifecycle-and-cleanup).

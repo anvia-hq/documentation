@@ -1,6 +1,6 @@
 # Tables and indexing
 
-With `createIfMissing: true`, the adapter creates an empty table containing Anvia's reserved document, ID, and vector columns. With `false`, the named table must already exist.
+`ensure()` creates an empty table containing Anvia's reserved document, ID, and vector columns when missing. `validate()` requires the named table to exist.
 
 The adapter adds rows through `table.add()` and does not create a LanceDB scalar or vector index. For a growing production corpus:
 

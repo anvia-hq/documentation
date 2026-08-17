@@ -1,31 +1,70 @@
 # Save policies
 
-A save policy controls when messages created during a run are appended to the memory store.
+A save policy controls when messages created during an agent run are appended to the memory store. It changes failure durability, not the model-and-tool behavior of the run.
 
-## Choose a policy
+## 1. Save each completed message batch
 
-| Policy | Behavior | Use when |
-| --- | --- | --- |
-| `'message'` | Saves each completed user, assistant, and tool-result message. | Incremental durability matters most. |
-| `'turn'` | Saves completed messages after each model-and-tool turn. | Product chat should preserve complete turns. |
-| `'run'` | Saves only after a successful final response. | Partial runs must not enter future context. |
-
-`'message'` is the default. Choose the policy explicitly so the intended failure behavior is visible in agent configuration.
+`'message'` is the default:
 
 ```ts
 const agent = new Agent({
   id: 'support',
-  model: model,
-  memory: { store: memoryStore, savePolicy: 'turn' },
+  model,
+  memory: {
+    store: memoryStore,
+    savePolicy: 'message',
+  },
 })
 ```
 
-## Failed runs
+The accepted user input is appended before the model loop. Final assistant output is appended when it completes. An assistant tool call and its tool-result message are appended together after tool execution.
 
-Messages already saved by `'message'` or `'turn'` may remain when a later step fails. With `'run'`, normal messages are written only after the run completes successfully.
+Choose this policy when the greatest amount of completed progress should survive a later failure.
 
-A store may implement `recordError(...)` to retain failed-run diagnostics separately. Those records are operational data and should not be loaded as normal conversation context.
+## 2. Save complete model-and-tool turns
 
-## Match the policy to side effects
+```ts
+const agent = new Agent({
+  id: 'support',
+  model,
+  memory: {
+    store: memoryStore,
+    savePolicy: 'turn',
+  },
+})
+```
 
-Save policy controls transcript persistence, not tool execution. A failed run may already have called a tool, so side-effect tools should remain idempotent or independently auditable.
+`'turn'` buffers the active prompt, assistant message, and tool results until that model-and-tool turn completes. A multi-turn agent can therefore preserve earlier completed turns even if a later turn fails.
+
+Choose this policy when the stored transcript should not contain a half-finished turn.
+
+## 3. Save only a completed run
+
+```ts
+const agent = new Agent({
+  id: 'support',
+  model,
+  memory: {
+    store: memoryStore,
+    savePolicy: 'run',
+  },
+})
+```
+
+`'run'` appends all new runtime messages only after the agent produces a successful final result. A failed or cancelled run contributes no normal conversation messages.
+
+Choose this policy when future model context must contain only fully completed runs.
+
+## 4. Understand failure records
+
+For any policy, the runtime calls the store's optional `recordError()` after a run failure. Official adapters store those diagnostics separately by default; they do not load them into normal message history.
+
+Messages already committed by `'message'` or `'turn'` remain after a later failure. With `'run'`, only the separate error record can describe the failed work.
+
+## 5. Separate persistence from side effects
+
+Save policy does not roll back tools. A failed run may already have sent an email, changed a plan, or written to another service even when no memory messages were saved.
+
+Make side-effect tools idempotent, require approval where appropriate, and keep their own domain audit records. Choose memory policy based on the transcript needed by the next model turn, not as a substitute for transaction design.
+
+Continue with [Compaction](/sdk/memory/compaction).

@@ -1,44 +1,74 @@
 # Documents
 
-Documents provide model-readable text or files alongside a request. Use them for small, relevant inputs—not as a replacement for retrieval over a large corpus.
+Anvia supports two different document paths: provider-neutral text context on the request, and provider-native file attachments inside a user message. Choose based on whether the application already has readable text or needs the model to inspect a file.
 
-## Add text documents to a completion
+## 1. Attach text context to a completion
+
+Use the `documents` option when application code already has the relevant text:
 
 ```ts
-const result = await createCompletion(model, {
-  input: 'What changed in this release?',
-  documents: [
-    {
-      id: 'release-notes',
-      text: releaseNotes,
-    },
-  ],
+import { generateCompletion } from '@anvia/core'
+
+const result = await generateCompletion({
+    prompt: 'What changed in this release?',
+    model,
+    documents: [
+        {
+            id: 'release-notes',
+            text: releaseNotes,
+            additionalProps: {
+                version: '1.0.0-rc.2',
+                source: 'release-process',
+            },
+        },
+    ]
 })
 ```
 
-This form is useful when application code already has the text and wants to name the document for one request.
+Anvia formats request documents into one tagged text message before the provider call. `id` labels each document and `additionalProps` adds string metadata in stable key order. Because this path is text, it does not require the model's file-document capability.
 
-## Add a file to a user message
+Use the same `Document` objects in an agent's static `context` array when the text should be available on every agent turn.
+
+## 2. Attach a file to a user message
+
+Use user document content when the provider should receive the actual file:
 
 ```ts
-import { Message, UserContent } from '@anvia/core'
+import type { UserMessage } from '@anvia/core'
 
-const message = Message.user([
-  UserContent.text('Summarize this report.'),
-  UserContent.documentBase64(pdfBase64, 'application/pdf', {
-    filename: 'incident-report.pdf',
-  }),
-])
+const prompt: UserMessage = {
+  role: 'user',
+  content: [
+    { type: 'text', text: 'Summarize this incident report.' },
+    {
+      type: 'file',
+      data: { type: 'data', data: pdfBase64 },
+      mediaType: 'application/pdf',
+      filename: 'incident-report.pdf',
+    },
+  ],
+}
+
+const result = await generateCompletion({
+  messages: [prompt],
+  model,
+})
 ```
 
-Use `documentUrl(...)` for an accessible URL or `documentBase64(...)` for in-memory file content. Provider limits and supported media types vary.
+Use `{ type: 'url', url }` when the provider can access the URL. Use `{ type: 'data', data }` for bounded in-memory base64 content.
 
-## Choose documents or retrieval
+File attachments require `model.capabilities.documentInput`. Anvia checks the declared adapter capability, while the provider still decides which model IDs, media types, file sizes, and URL sources are accepted.
 
-| Source | Use |
-| --- | --- |
-| One small document already selected by the application | Request document |
-| Many files requiring parsing or chunking | Loader and ingestion flow |
-| A large or changing knowledge collection | [Knowledge retrieval](/sdk/knowledges) |
+## 3. Choose documents or retrieval
 
-Validate file type, size, ownership, and access before content reaches the model. Do not rely on prompt instructions to hide unauthorized documents.
+Use request documents for a few small text inputs already selected by the application.
+
+Use message file attachments when the provider must parse a PDF or another supported file directly.
+
+Use extraction, chunking, embeddings, and [knowledge retrieval](/sdk/knowledges) for a large or changing collection. Retrieval selects relevant text instead of sending the entire corpus on every request.
+
+## 4. Enforce the application boundary
+
+Validate file ownership, URL access, MIME type, size, and tenant permissions before content reaches Anvia. Apply redaction and retention rules to extracted text and raw bytes separately. Prompt instructions cannot hide an unauthorized document after it has been sent to the model.
+
+Continue with [Tool call](/sdk/messages/tools).

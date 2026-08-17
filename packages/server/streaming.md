@@ -1,46 +1,39 @@
 # Streaming
 
-The encoder pulls one item at a time from the source async iterator. This preserves backpressure at the response stream boundary instead of first collecting an entire agent run.
+The encoders pull one item at a time from the source async iterator, preserving backpressure instead of collecting a whole run first.
 
-## Cancellation
+Canceling the response body calls `return()` on the source iterator when available. Whether that stops model or tool work depends on the source implementation; test cancellation through the complete route and hosting platform.
 
-Canceling the returned `ReadableStream` calls `return()` on the source iterator when it exists. Whether that stops model or tool work depends on the source iterator's cancellation implementation. Keep generation ownership visible and test cancellation through the complete route and hosting platform.
-
-## Error events
-
-If source iteration throws, JSONL and SSE emit one terminal error event and close:
-
-```json
-{"type":"error","error":{"name":"Error","message":"Provider unavailable"}}
-```
-
-Stacks are intentionally omitted for native `Error` values. Unknown thrown values pass through to the serializer, so application code should avoid throwing sensitive objects.
-
-## Resumable flow
+## Client-protocol resume
 
 ```ts
-const store = createMemoryResumableStreamStore<UIStreamEvent>()
+import type { ClientResumableEvent } from '@anvia/server'
+import {
+  createClientStreamResponse,
+  createMemoryResumableStreamStore,
+  resumeClientStreamResponse,
+} from '@anvia/server'
 
-return createUIStreamResponse(events, {
-  resumable: {
-    id: runId,
-    store,
-  },
+const store = createMemoryResumableStreamStore<ClientResumableEvent>()
+
+return createClientStreamResponse({
+  events: agentToClientStream({ events }),
+  format: 'jsonl',
+  resumable: { streamId, store },
 })
 ```
 
-The resumable wrapper opens the stream, drains the producer in the background, persists numbered records, and yields `stream_start`, `stream_event`, and `stream_end` envelopes. If the response subscriber disconnects, the producer can continue writing to the store so another request can resume.
+For a resume request:
 
 ```ts
-return createUIStreamResponse({
-  resume: {
-    streamId: body.resume.streamId,
-    after: body.resume.after,
-    store,
-  },
+return resumeClientStreamResponse({
+  streamId: body.resume.streamId,
+  after: body.resume.after,
+  store,
+  format: 'jsonl',
 })
 ```
 
-Use unique IDs. Opening an existing ID resets the in-memory implementation. Production stores must allocate event IDs consistently, replay records after the requested cursor, keep subscribers informed while running, and expose a terminal status.
+The in-memory store is for tests and one-process development. Production stores must allocate event IDs consistently, replay after the requested cursor, tail running streams, and expose terminal status through shared durable storage.
 
 See [resumable streams](/sdk/streaming/resumable-streams) and [deployment](/packages/server/deployment).

@@ -1,85 +1,75 @@
-# Create a hook
+# Configure lifecycle
 
-Create a runtime hook with `createHook(...)`, then attach it to an agent or one prompt request.
+An `AgentLifecycle` observes important runtime boundaries without changing their data or control flow.
 
-## Define the callbacks you need
+## 1. Define the callbacks you need
 
 ```ts
-import { createHook } from '@anvia/core'
+import type { AgentLifecycle } from '@anvia/core'
 
-const supportPolicy = createHook({
-  onRunStart({ maxTurns, run }) {
-    if (maxTurns > 8) {
-      return run.cancel('This workflow allows at most 8 turns.')
-    }
+const supportLifecycle: AgentLifecycle = {
+  async onStart({ runId, input, history, maxTurns }) {
+    await runs.started({
+      runId,
+      inputRole: input.role,
+      historyLength: history.length,
+      maxTurns,
+    })
   },
-  onToolCall({ toolName, tool }) {
-    if (toolName === 'delete_account') {
-      return tool.requestApproval({
-        reason: 'Deleting an account requires reviewer approval.',
-      })
+
+  async onFinish(event) {
+    if (event.status !== 'completed') {
+      await runs.blocked({ runId: event.runId, stage: event.stage })
+      return
     }
+    await runs.completed({
+      runId: event.runId,
+      outputLength: event.output.length,
+      totalTokens: event.usage.totalTokens,
+    })
   },
-  onToolResult({ result, run }) {
-    if (result.includes('POLICY_BLOCKED')) {
-      return run.cancel('A downstream policy blocked the request.')
-    }
+
+  async onError({ runId, error, usage }) {
+    await runs.failed({ runId, error, usage })
   },
-})
+}
 ```
 
-`createHook(...)` preserves type inference for each callback. Add only the lifecycle points the policy needs.
+Add only the callbacks the integration needs. Avoid logging the full input, history, output, or tool payload unless the product has explicitly approved that data collection.
 
-## Attach a default hook
-
-Use `.hook(...)` for behavior that should apply to every run of the agent:
+## 2. Attach stable lifecycle behavior
 
 ```ts
 const agent = new Agent({
   id: 'support',
-  model: model,
-  hook: supportPolicy,
+  model,
+  lifecycle: supportLifecycle,
 })
 ```
 
-Stable environment policy and rules shared by every caller belong here.
+The agent lifecycle runs for every `generate()` and `stream()` call, including calls through a memory session.
 
-## Set a hook for one request
+## 3. Attach request-local lifecycle behavior
 
-Use `.withHook(...)` when the runner owns request-local policy:
-
-```ts
-const result = await agent
-  .prompt(message)
-  .withHook(supportPolicy)
-  .send()
-```
-
-This keeps authentication and request scope near the route or worker that resolved them.
-
-## Close over trusted state
-
-Load external state before starting the run, then capture only the small policy object the hook needs:
+Both generation modes accept a lifecycle in their run options:
 
 ```ts
-const permissions = await policy.permissionsFor(user.id)
-
-const requestHook = createHook({
-  onToolCall({ toolName, tool }) {
-    if (toolName === 'request_refund' && !permissions.canRefund) {
-      return tool.skip('Refund access is not available.')
+const result = await agent.generate({
+    prompt: message,
+    lifecycle: {
+        onFinish({ runId, usage }) {
+            requestMetrics.record({ runId, usage });
+        },
     }
-  },
 })
-
-return agent
-  .prompt(message)
-  .withHook(requestHook)
-  .send()
 ```
 
-Avoid loading the same user or policy record from several hook callbacks. Resolve it once at the runner boundary.
+When both scopes are present, Anvia composes the agent lifecycle first and the run lifecycle second. Each callback receives an isolated snapshot.
 
-## Return an action only when needed
+## 4. Know the failure behavior
 
-A callback that returns `undefined` continues the run. Use the provided `run` or `tool` control object when the callback must make an explicit decision; do not construct action objects by hand.
+Lifecycle callbacks are awaited. If one throws, the agent run fails and proceeds through error cleanup. Use this when recording the lifecycle event is required for correctness.
+
+Use an observer with non-failing behavior for best-effort telemetry that should not stop the run. The [agent runtime lifecycle](/sdk/agents/runtime-lifecycle) explains the distinction.
+
+Next, choose the right [lifecycle event](/sdk/advanced/hooks/hook-points).

@@ -1,8 +1,8 @@
 # Schema design
 
-Treat the schema as the contract product code will trust after validation.
+The schema is the contract product code will trust after validation. Design it for the application decision, not as a transcript of everything the model could say.
 
-## Define a narrow schema
+## 1. Define a narrow schema
 
 ```sh
 pnpm add zod
@@ -14,32 +14,54 @@ import { z } from 'zod'
 export const ticketSchema = z.object({
   category: z.enum(['billing', 'technical', 'account']),
   priority: z.enum(['low', 'normal', 'high']),
-  summary: z.string().min(1),
+  summary: z.string().min(1).max(500),
   needsHumanReview: z.boolean(),
 })
 
 export type Ticket = z.infer<typeof ticketSchema>
 ```
 
-Prefer enums, booleans, bounded numbers, and required strings over vague fields or deeply nested objects. Narrow schemas are easier for models to produce and applications to test.
+Prefer enums over open-ended labels, booleans over ambiguous status text, and bounded strings or numbers when the product has a real limit. Required fields are usually easier to handle than many optional branches.
 
-## Describe ambiguous fields
+## 2. Describe domain meaning
+
+Descriptions become JSON Schema metadata and can help a provider distinguish fields with similar names:
 
 ```ts
-const escalationSchema = z.object({
-  reason: z.string().describe(
-    'Short reason the ticket should be escalated.',
-  ),
-  severity: z.enum(['normal', 'urgent']),
-})
+const escalationSchema = z
+  .object({
+    reason: z.string().describe(
+      'One sentence explaining why a human must review the ticket.',
+    ),
+    severity: z.enum(['normal', 'urgent']),
+  })
+  .meta({ title: 'support_escalation' })
 ```
 
-`.describe(...)` becomes JSON Schema description metadata and can guide provider generation. It does not replace validation or product rules.
+Use `.describe()` for field meaning and `.meta({ title })` when a stable root schema name is useful. Descriptions guide generation; they do not replace validation or business rules.
 
-Use `.meta({ title: 'Escalation' })` on a root schema when a stable schema name is useful. Do not rely on a `.metadata(...)` method or arbitrary provider-specific metadata.
+## 3. Separate model output from application state
 
-## Keep schemas portable
+Do not ask the model to generate fields that the application already knows, such as the authenticated tenant ID, database primary key, billing amount, or permission level. Merge trusted application state after validation:
 
-Provider adapters translate Zod into provider output schemas. Check that the selected [completion model](/sdk/models/completion) supports output schemas, and smoke-test advanced Zod features on the exact provider path.
+```ts
+const classified = ticketSchema.parse(modelValue)
 
-Local Zod parsing remains the final boundary even when the provider accepts the schema.
+const ticket = {
+  ...classified,
+  tenantId: request.auth.tenantId,
+  createdBy: request.auth.userId,
+}
+```
+
+This keeps authorization and identity outside the model-controlled payload.
+
+## 4. Keep provider schemas portable
+
+Anvia converts Zod to JSON Schema before sending it to a provider. The selected [completion model](/sdk/models/completion) must report `capabilities.outputSchema: true` for parsed completions and agent output schemas.
+
+Providers can differ in the JSON Schema features they accept. Smoke-test unions, recursive types, transforms, refinements, defaults, and deeply nested schemas on the exact provider and model used in production.
+
+Local Zod parsing remains the final trust boundary even when the provider accepts the schema.
+
+Next, use the schema in a [parsed completion](/sdk/structured-output/parsed-completion).

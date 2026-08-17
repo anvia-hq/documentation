@@ -1,11 +1,11 @@
 # Extractors
 
-Extractors convert existing text into validated records. They use a required generated `submit` tool and can retry missing or invalid submissions.
+`extract()` converts existing text into Zod-validated data. It creates a required `submit` tool from the output schema and validates the model's submitted arguments locally.
 
-## Build an extractor
+## 1. Define the schema
 
 ```ts
-import { ExtractorBuilder } from '@anvia/core/extractor'
+import { extract } from '@anvia/core/extractor'
 import { z } from 'zod'
 
 const invoiceSchema = z.object({
@@ -14,41 +14,67 @@ const invoiceSchema = z.object({
   dueDate: z.string().nullable(),
 })
 
-const invoiceExtractor = new ExtractorBuilder(
+```
+
+The model must support tools and required tool choice. Unlike provider-native output schemas, extraction succeeds through a generated tool call named `submit`.
+
+## 2. Extract validated data
+
+```ts
+const result = await extract({
   model,
-  invoiceSchema,
-)
-  .instructions('Extract invoice fields from the supplied text.')
-  .temperature(0)
-  .retries(1)
-  .build()
+  text: `
+    Invoice: INV-123
+    Amount due: 49.00
+    Due date: 2026-08-31
+  `,
+  outputSchema: invoiceSchema,
+  instructions: 'Dates must use YYYY-MM-DD format.',
+})
+
+console.log(result.output.invoiceNumber)
+console.log(result.output.amountDue)
 ```
 
-Extra instructions should clarify domain rules rather than restating the schema.
+`result.output` contains the schema output after Zod parsing, including any schema defaults, refinements, or transforms.
 
-## Extract data
+## 3. Keep usage and normalized content
 
-```ts
-const invoice = await invoiceExtractor.extract(`
-  Invoice: INV-123
-  Amount due: 49.00
-  Due date: 2026-08-31
-`)
-
-console.log(invoice.invoiceNumber)
-```
-
-`extract(...)` returns schema-validated data. After configured retries are exhausted, a missing submit call or invalid submitted data throws `ExtractionError`.
-
-## Retain usage when needed
+The extraction result includes cumulative usage and the successful assistant content:
 
 ```ts
-const extraction = await invoiceExtractor.extractWithUsage(invoiceText)
+const extraction = await extract({
+  model,
+  text: invoiceText,
+  outputSchema: invoiceSchema,
+  temperature: 0,
+  maxTokens: 300,
+})
 
-console.log(extraction.data)
+console.log(extraction.output)
 console.log(extraction.usage.totalTokens)
+console.log(extraction.content)
 ```
 
-The returned messages are useful for audit, debugging, or evaluation of the extraction call. They are not normal conversation [memory](/sdk/memory).
+`rawResponse` remains available for provider-specific diagnostics. Do not expose it directly to clients or treat extraction as conversation [memory](/sdk/memory).
 
-Use extractors for invoices, tickets, resumes, transcripts, notes, and other content whose fields already exist. Use [parsed completion](/sdk/structured-output/parsed-completion) when the model is creating a new structured answer.
+## 4. Retry failed extraction attempts
+
+Extraction does not retry unless retries are configured:
+
+```ts
+const invoice = await extract({
+  model,
+  text: invoiceText,
+  outputSchema: invoiceSchema,
+  retries: {
+    maxAttempts: 2,
+    initialDelayMs: 100,
+    maxDelayMs: 1_000,
+  },
+})
+```
+
+Each retry is a complete extraction attempt. Missing `submit` calls, invalid submitted data, and retryable provider failures can be tried again. Capability errors are never retried.
+
+After attempts are exhausted, `extract()` throws `ExtractionError`. See [Validation errors](/sdk/structured-output/validation-errors) for a safe handling pattern.

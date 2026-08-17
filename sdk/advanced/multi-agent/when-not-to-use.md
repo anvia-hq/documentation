@@ -1,40 +1,37 @@
 # When not to use multiple agents
 
-Keep one agent when a task is one workflow with the same instructions, tools, model, and policy.
+Keep one agent when a task is one workflow with the same instructions, tools, model, knowledge, and policy.
 
-## The cost of another agent
+## 1. Count the real cost
 
-Every specialist adds another prompt, model call, context window, turn budget, trace, latency source, and failure path. Those costs are worthwhile only when the child creates a useful boundary.
+Every child adds another prompt, model call, context window, turn budget, trace, latency source, and failure path. Those costs are useful only when the child creates a meaningful boundary.
 
-## Choose the smallest runtime
+Use a direct completion for one model request with application-owned control flow.
 
-| Situation | Prefer |
-| --- | --- |
-| One model call with application-owned control flow | Direct completion |
-| One role using one tool and policy set | One agent |
-| One deterministic reusable action | A tool |
-| Known sequence of typed steps | A pipeline |
-| Distinct specialist chosen through model judgment | Multi-agent coordination |
+Use one agent for one role and one tool or policy set.
 
-Do not create a specialist merely to wrap one ordinary tool call or to split a short instruction into separate prompts.
+Use an ordinary tool for one deterministic reusable action.
 
-## Add a child only for a boundary
+Use a pipeline for a known sequence of typed steps.
 
-A child agent is justified when at least one of these is distinct:
+Use multi-agent coordination when model judgment should choose among distinct specialists.
 
-- role and instructions
-- allowed tool set
-- completion model
-- knowledge or permission scope
-- output expectation
-- independent testing and evaluation
+## 2. Add a child for a boundary
 
-If none applies, keep the work in the coordinator.
+A child is justified when its role, instructions, allowed tools, model, knowledge scope, permission scope, output expectation, or independent evaluation differs.
 
-## Prefer deterministic composition
+If none of those differ, keep the work in the coordinator.
 
-If every request must call the same two specialists, the application can call them directly or use a pipeline and then pass their results to one synthesis step. A coordinator is useful when the model must decide whether, when, or which specialist to invoke.
+## 3. Prefer deterministic composition
 
-## Review the result
+If every request must call the same specialists in the same order, call them from application code or a [Pipeline](/sdk/pipelines), then pass their outputs to one synthesis step.
 
-After implementing a multi-agent flow, measure whether it improves task quality enough to justify its extra latency and usage. If the child repeats the parent's work, receives the full parent context, or rarely changes the result, remove it.
+A coordinator adds value when the model must decide whether, when, or which specialist to invoke.
+
+## 4. Compare against the simpler system
+
+Measure task quality, latency, usage, failure rate, and operator clarity against a single-agent baseline.
+
+Remove a child when it repeats the parent's work, receives nearly the full parent context, rarely changes the result, or adds more failures than useful isolation.
+
+Finish with the [production checklist](/sdk/advanced/multi-agent/production-checklist).

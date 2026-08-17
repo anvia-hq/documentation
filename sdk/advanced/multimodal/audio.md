@@ -1,58 +1,61 @@
 # Audio generation
 
-Audio generation turns text into audio bytes through an `AudioGenerationModel`. Use it for narration, accessibility, spoken summaries, and media previews.
+`generateSpeech()` turns text into audio bytes through an `SpeechGenerationModel`.
 
-Create the provider model as shown in [Audio generation models](/sdk/models/audio-generation), then pass it into the server-side workflow that owns voice and format policy.
-
-## Generate speech
+## 1. Generate speech
 
 ```ts
-import { audioGenerationRequest } from '@anvia/core/audio-generation'
+import { generateSpeech } from '@anvia/core/speech-generation'
 
-const response = await audioGenerationRequest(audioModel)
-  .text('Your incident summary is ready for review.')
-  .voice('alloy')
-  .speed(1)
-  .additionalParams({ response_format: 'mp3' })
-  .send()
+const speech = await generateSpeech({
+    text: 'Your incident summary is ready for review.',
+    model: audioModel,
+    voice: 'alloy',
+    speed: 1,
+    providerOptions: {
+        response_format: 'mp3',
+    },
+    retries: {
+        maxAttempts: 3,
+    }
+})
 ```
 
-The normalized response contains `audio` as a `Uint8Array`, an optional `mediaType`, and the raw provider response. Set a voice explicitly in production; the core builder cannot choose a product-appropriate voice for you.
+`voice` is required. `speed` defaults to 1 and must be a positive finite number. Provider voice names, formats, and speed ranges may be narrower than the core contract.
 
-Provider-specific formats and synthesis settings belong in `additionalParams(...)`. Validate those settings against an allow-list before they reach the request builder.
+The response contains `audio` as a `Uint8Array`, optional `mediaType`, and `rawResponse`.
 
-## Control generated scripts
-
-Do not send unbounded model output directly into speech generation. Validate the final script after any completion or agent stage:
+## 2. Validate the final script
 
 ```ts
 import { z } from 'zod'
 
-const SpeechRequest = z.object({
+const SpeechInput = z.object({
   text: z.string().min(1).max(3_000),
   voice: z.enum(['alloy', 'verse', 'aria']),
 })
 
-const input = SpeechRequest.parse(requestedSpeech)
+const input = SpeechInput.parse(requestedSpeech)
 
-const speech = await audioGenerationRequest(audioModel)
-  .text(input.text)
-  .voice(input.voice)
-  .speed(1)
-  .additionalParams({ response_format: 'mp3' })
-  .send()
+const speech = await generateSpeech({
+    text: input.text,
+    model: audioModel,
+    voice: input.voice,
+    speed: 1,
+    providerOptions: {
+        response_format: 'mp3',
+    }
+})
 ```
 
-The allow-list is application policy, not a universal provider list. Use only voices supported by the configured model and approved for your product.
+The voice allow-list is application policy, not a universal provider list. Do not send unbounded agent output directly into synthesis.
 
-## Store and serve the result
-
-Persist the audio in object storage or a media service, then return an asset ID or short-lived URL:
+## 3. Store and serve the result
 
 ```ts
 const asset = await mediaStore.put({
-  bytes: speech.audio,
-  mediaType: speech.mediaType ?? 'audio/mpeg',
+  bytes: speech.audio.data,
+  mediaType: speech.audio.mediaType ?? 'audio/mpeg',
   metadata: {
     voice: input.voice,
     model: audioModel.defaultModel ?? 'unknown',
@@ -60,4 +63,6 @@ const asset = await mediaStore.put({
 })
 ```
 
-Keep raw audio out of sessions, traces, and event logs. Use a durable worker for long scripts, bulk generation, or workflows that need progress and retries. When a product imitates or represents a real person, add the required consent, disclosure, and review controls outside the model request.
+Keep raw audio out of sessions, traces, and event logs. Use a worker for long scripts and batch generation. Add consent, disclosure, and review controls when synthetic audio represents a real person.
+
+Next, process existing audio with [transcription](/sdk/advanced/multimodal/transcription).

@@ -1,70 +1,72 @@
 # Add context
 
-Attach a prepared vector index to an agent with the `dynamicContexts` option.
+Wrap a prepared `VectorStore` and its embedding model with `createVectorContext()` and add it to the agent's `context` array.
 
-## Prepare the index first
+## 1. Prepare the index before requests
 
-Dynamic context searches an existing `VectorSearchIndex`. Load, chunk, embed, and store documents before serving agent requests.
+Load, chunk, embed, and store documents in an ingestion job:
 
 ```ts
-import { embedDocuments } from '@anvia/core/embeddings'
-import { InMemoryVectorStore } from '@anvia/core/vector-store'
-
-const embedded = await embedDocuments(embeddingModel, articles, {
-  id: (article) => article.slug,
-  content: (article) => `${article.title}\n${article.body}`,
-  metadata: (article) => ({
-    product: article.product,
-    published: article.published,
-  }),
-})
-
-const docsIndex = InMemoryVectorStore
-  .fromDocuments(embedded)
-  .index(embeddingModel)
+import { embedDocuments } from '@anvia/core/embeddings';
+import { InMemoryVectorStore } from '@anvia/core/vector-store';
+const { documents: embedded } = await embedDocuments({
+    model: embeddingModel,
+    documents: articles,
+    id: (article) => article.slug,
+    content: (article) => `${article.title}\n\n${article.body}`,
+    metadata: (article) => ({
+        product: article.product,
+        published: article.published,
+    })
+});
+const docsStore = InMemoryVectorStore.fromDocuments({ documents: embedded });
 ```
 
-The in-memory store is useful for local development and small fixed corpora. Use a persistent vector-store adapter when the corpus must survive restarts or grow independently of the application process.
+The in-memory store is useful for tests and small process-local corpora. Use a persistent vector-store adapter when the collection must survive restarts or scale independently.
 
-Do not rebuild the index for every message. Run ingestion during startup, in an admin workflow, or in a background worker.
+Do not rebuild or re-embed the corpus for every message.
 
-## Attach it to an agent
+## 2. Create the retrieval entry
 
 ```ts
-import { Agent } from '@anvia/core'
-
+import { Agent, createVectorContext } from '@anvia/core';
+const docsContext = createVectorContext({
+    store: docsStore,
+    model: embeddingModel,
+    topK: 4,
+    minScore: 0.74
+});
 const agent = new Agent({
-  id: 'docs-support',
-  model: model,
-  instructions: 'Answer from retrieved documentation. Say when the documentation does not contain the answer.',
-  dynamicContexts: [{ index: docsIndex, topK: 4, threshold: 0.74 }],
-})
+    id: 'docs-support',
+    model,
+    instructions: [
+        'Answer from retrieved documentation.',
+        'Say when the documentation does not contain the answer.',
+    ].join('\n'),
+    context: [docsContext],
+});
 ```
 
-`topK` limits how many results may be included. `threshold` rejects matches below the configured similarity score.
+`topK` is required and must be a positive safe integer. `minScore` is optional and must be finite. Tune it against real results from that store and embedding model.
 
-## Run the agent normally
+## 3. Run the agent normally
 
 ```ts
-const result = await agent
-  .prompt('How long does a password reset link remain valid?')
-  .send()
+const result = await agent.generate({
+    prompt: 'How long does a password reset link remain valid?'
+})
 
-console.log(result.output)
+if (result.status === 'completed') {
+  console.log(result.output)
+}
 ```
 
-No retrieval call is needed in the route or prompt handler. Anvia searches the index before each model turn.
+The route does not make a separate retrieval call. Anvia searches the context index before each model turn with non-empty retrieval text.
 
-## What happens during a turn
+## 4. Start with a small context budget
 
-1. Anvia derives retrieval text from the current prompt.
-2. The index searches for similar documents.
-3. The configured threshold and metadata filter narrow the results.
-4. Results are converted into model documents.
-5. Up to `topK` documents are sent with the completion request.
+Begin with three to five focused chunks. Increase `topK` only when answers consistently need evidence from more passages.
 
-If the model calls a tool and continues, the next turn performs a new search using the updated runtime prompt.
+Raise `minScore` when unrelated documents appear. Revisit chunking when the right facts exist but are split across poor boundaries or bundled with unrelated content.
 
-## Start with conservative limits
-
-Begin with three to five short chunks. Increase `topK` only when answers consistently require evidence from more passages. Raise `threshold` when unrelated documents appear; revisit chunking when the right facts are split across poor boundaries.
+Next, control the exact model document with [formatting](/sdk/advanced/dynamic-context/formatting).

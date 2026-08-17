@@ -18,14 +18,15 @@ Create the client with explicit project and location values:
 import { GeminiClient } from '@anvia/gemini'
 
 export const vertexGemini = new GeminiClient({
-  vertexai: true,
-  project: process.env.GOOGLE_CLOUD_PROJECT,
-  location: process.env.GOOGLE_VERTEX_LOCATION ?? 'us-central1',
+  vertexAi: {
+    projectId: process.env.GOOGLE_CLOUD_PROJECT!,
+    location: process.env.GOOGLE_VERTEX_LOCATION ?? 'us-central1',
+  },
 })
 
-export const model = vertexGemini.completionModel(
-  'gemini-2.5-flash',
-)
+export const model = vertexGemini.completionModel({
+    modelId: 'gemini-2.5-flash'
+})
 ```
 
 When `googleAuthOptions` is omitted, the official Google SDK uses Application Default Credentials. In Google-hosted environments, prefer the workload's attached service identity over a long-lived JSON key.
@@ -38,11 +39,12 @@ Pass the Google SDK's `googleAuthOptions` when the application owns a trusted cr
 
 ```ts
 const vertexGemini = new GeminiClient({
-  vertexai: true,
-  project: 'my-gcp-project',
-  location: 'us-central1',
-  googleAuthOptions: {
-    credentials: serviceAccountJson,
+  vertexAi: {
+    projectId: 'my-gcp-project',
+    location: 'us-central1',
+    googleAuthOptions: {
+      credentials: serviceAccountJson,
+    },
   },
 })
 ```
@@ -55,7 +57,9 @@ Validate externally supplied credential configuration and never commit service-a
 import type { CompletionModel } from '@anvia/core'
 
 export function createSupportModel(): CompletionModel {
-  return vertexGemini.completionModel('gemini-2.5-flash')
+  return vertexGemini.completionModel({
+      modelId: 'gemini-2.5-flash'
+  })
 }
 ```
 

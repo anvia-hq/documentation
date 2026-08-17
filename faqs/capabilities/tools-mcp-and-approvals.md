@@ -6,7 +6,7 @@ Use a tool to expose an application capability to an agent. Use MCP when that ca
 | --- | --- |
 | Call an app-owned service with a typed contract | [Local tool](/sdk/tools) |
 | Discover tools from an external protocol server | [MCP](/sdk/advanced/mcp) |
-| Pause a sensitive proposed action before execution | [Approval through a hook](/sdk/advanced/hooks/tool-control) |
+| Pause a sensitive proposed action before execution | [Tool approval](/sdk/advanced/hooks/tool-control) |
 
 These choices compose: an MCP-adapted tool participates in the normal agent tool loop, and a local or dynamic tool can require approval.
 
@@ -16,7 +16,7 @@ No. Schemas validate model-facing input and output shapes. The handler must stil
 
 ## Does approval replace authorization?
 
-No. Approval answers whether this proposed action may continue. It does not prove identity, grant database access, make a command safe, or undo an action that already happened. The request needs a configured approval handler; without one, an approval-required call fails.
+No. Approval answers whether this proposed action may continue. It does not prove identity, grant database access, make a command safe, or undo an action that already happened. When a run returns `approval_required`, persist that pending result only for the lifetime and process supported by your application, collect an authorized decision, and continue it with `agent.resume(pending, decision)`.
 
 Use [Studio approvals](/studio/playground/approvals-and-questions) to exercise the flow locally.
 

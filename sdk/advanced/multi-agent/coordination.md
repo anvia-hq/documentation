@@ -2,77 +2,74 @@
 
 The coordinator owns delegation, conflict resolution, the final response, and the product-facing run boundary.
 
-## Give every agent one job
+## 1. Give every agent one job
 
-| Agent | Responsibility |
-| --- | --- |
-| Coordinator | Frame tasks, call specialists, resolve conflicts, and write the final answer. |
-| Policy specialist | Return applicable constraints and risks. |
-| Technical specialist | Return implementation facts or runbook evidence. |
-| Research specialist | Return focused findings and sources. |
+The coordinator frames tasks, chooses specialists, resolves conflicts, and writes the final answer.
 
-Specialists should return evidence, summaries, or recommendations—not independent final answers to the user.
+Specialists return focused evidence, analysis, constraints, or recommendations. They should not independently send competing user-facing replies or persist final product records.
 
-## Make delegation explicit
+## 2. Make routing explicit
 
 ```ts
-const coordinatorInstructions = [
-  'Classify the incident.',
-  'Use log_analysis for logs.',
-  'Use policy_review for customer-facing statements.',
-  'Summarize disagreements and uncertainty.',
-  'Write one final answer yourself after the tools return.',
-].join('\n')
-
 const coordinator = new Agent({
   id: 'incident-coordinator',
   model: coordinatorModel,
-  instructions: coordinatorInstructions,
+  instructions: [
+    'Classify the incident.',
+    'Use log_analysis for supplied logs.',
+    'Use policy_review for customer-facing statements.',
+    'Preserve disagreements and uncertainty.',
+    'Write one final answer after the tools return.',
+  ].join('\n'),
   maxTurns: 6,
-  tools: [logAgent.asTool({
+  tools: [
+    logAgent.asTool({
       name: 'log_analysis',
       description: 'Analyze supplied logs and return likely causes.',
       maxTurns: 3,
-    }), policyAgent.asTool({
+    }),
+    policyAgent.asTool({
       name: 'policy_review',
       description: 'Review a proposed response for policy risk.',
       maxTurns: 2,
-    })],
+    }),
+  ],
 })
 ```
 
-Tool names and descriptions define the routing surface. Keep them distinct enough that the coordinator can choose the correct specialist.
+Distinct tool names and descriptions form the routing surface. The instructions define how specialist results contribute to the final response.
 
-## Keep product ownership in the parent
-
-Run tracing, final persistence, and product response mapping around the coordinator:
+## 3. Keep product ownership in the parent
 
 ```ts
-const response = await coordinator
-  .prompt(input.question)
-  .withTrace({
-    name: 'incident-coordination',
-    userId: input.user.id,
-    metadata: {
-      tenantId: input.user.tenantId,
-      incidentId: input.incidentId,
-    },
-  })
-  .send()
-
-await incidents.saveDraft({
-  incidentId: input.incidentId,
-  output: response.output,
-  traceId: response.trace?.traceId,
+const response = await coordinator.generate({
+    prompt: input.question,
+    trace: {
+        name: 'incident-coordination',
+        userId: input.user.id,
+        metadata: {
+            tenantId: input.user.tenantId,
+            incidentId: input.incidentId,
+        },
+    }
 })
+
+if (response.status === 'completed') {
+  await incidents.saveDraft({
+    incidentId: input.incidentId,
+    output: response.output,
+  })
+}
 ```
 
-Do not let child agents independently send replies or persist competing final records.
+Persist one product result from the coordinator boundary. Keep child output as supporting runtime evidence.
 
-## Handle disagreement visibly
+## 4. Preserve disagreement
 
-Tell the coordinator to retain uncertainty and summarize conflicting specialist findings. A coordinator that silently chooses one result can make a multi-agent answer look more certain than its evidence.
+Tell the coordinator to state uncertainty and summarize conflicting specialist results. Silently choosing one answer can make the final response look more certain than its evidence.
 
-## Use deterministic orchestration when possible
+## 5. Prefer deterministic orchestration when possible
 
-If the application already knows which steps must run and in what order, use a [Pipeline](/sdk/pipelines) or direct application code. Use an agent coordinator only when model judgment is genuinely needed to select or sequence specialists.
+If the application already knows which steps must run and in what order, use a [Pipeline](/sdk/pipelines) or ordinary TypeScript. Use an agent coordinator only when model judgment is genuinely needed to choose or sequence specialists.
+
+Next, bound [failures and limits](/sdk/advanced/multi-agent/failures).

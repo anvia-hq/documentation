@@ -6,15 +6,19 @@
 const models = await mistral.listModels()
 
 for (const model of models.data) {
-  console.log(model.id, model.contextLength)
+  console.log(model.id)
+  console.log(model.name)
+  console.log(model.contextLength)
 }
 ```
 
-Use listing for administration, inventory, or deployment diagnostics. A listed ID is not proof that it supports the workflow's tools, schemas, context size, OCR, or embedding configuration.
+Every normalized entry has an `id`. When supplied by Mistral, it can also include a name, description, type, creation time, owner, and context length.
+
+Use model listing for administration, inventory, or deployment diagnostics. A listed ID is not proof that it supports a workflow's tools, schemas, context size, OCR, or embedding configuration.
 
 ## Keep selection controlled
 
-Do not expose the complete provider inventory as an unrestricted user-controlled model selector. Keep a reviewed application allow-list:
+Do not turn the complete provider inventory into an unrestricted user-controlled selector. Keep a reviewed application allow-list:
 
 ```ts
 const allowedModels = new Set([
@@ -27,14 +31,16 @@ export function selectCompletionModel(modelId: string) {
     throw new Error('Unsupported model selection')
   }
 
-  return mistral.completionModel(modelId)
+  return mistral.completionModel({
+      modelId: modelId
+  })
 }
 ```
 
-These IDs illustrate application policy, not a universal recommendation. Select and test model IDs for the deployment's quality, latency, cost, account, and endpoint requirements.
+These IDs illustrate application policy, not a universal recommendation. Select and test models for the deployment's quality, latency, cost, account, and endpoint requirements.
 
 ## Treat inventory as fallible
 
-Provider listing can fail, change independently of the application, or include models inappropriate for a given workflow. `listModels()` converts provider failures to an Anvia model-listing error with provider and available status information.
+Listing can fail, change independently of the application, or include models inappropriate for the current workflow. Provider failures are converted to an Anvia `ModelListingError` that includes the provider name and an available status code.
 
-Avoid making every user request depend on a fresh listing call. Cache inventory for administrative views and keep production selection in reviewed configuration.
+Avoid making every user request depend on a fresh listing call. Cache inventory for administrative views and keep production model selection in reviewed configuration.

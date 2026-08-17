@@ -14,30 +14,39 @@ import { Studio } from '@anvia/studio'
 
 const openai = new OpenAIClient({
   baseUrl: process.env.OPENAI_BASEURL,
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 
 const anthropic = new AnthropicClient({
   baseUrl: process.env.ANTHROPIC_BASEURL,
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
 const agent = new Agent({
   id: 'model-router',
-  model: openai.completionModel('gpt-5.6-luna'),
+  model: openai.completionModel({
+      modelId: 'gpt-5.6-luna',
+      api: "chat"
+  }),
   name: 'Model Router',
   instructions: 'Answer clearly and concisely.',
 })
 
 new Studio([agent], {
   models: {
-    default: 'openai:gpt-5.6-luna',
+    defaultModelRef: {
+      providerId: 'openai',
+      modelId: 'gpt-5.6-luna',
+    },
     providers: [
       {
         id: 'openai',
         name: 'OpenAI',
-        defaultModel: 'gpt-5.6-luna',
-        createCompletionModel: (model) => openai.completionModel(model),
+        defaultModelId: 'gpt-5.6-luna',
+        createCompletionModel: ({ modelId }) => openai.completionModel({
+            modelId,
+            api: 'chat',
+        }),
         listModels: () => openai.listModels(),
         models: [
           {
@@ -58,17 +67,22 @@ new Studio([agent], {
       {
         id: 'anthropic',
         name: 'Anthropic',
-        defaultModel: 'claude-opus-4-8',
-        createCompletionModel: (model) => anthropic.completionModel(model),
+        defaultModelId: 'claude-opus-4-8',
+        createCompletionModel: ({ modelId }) => anthropic.completionModel({
+            modelId,
+        }),
         listModels: () => anthropic.listModels(),
       },
     ],
     agents: {
       'model-router': {
-        default: 'openai:gpt-5.6-luna',
+        defaultModelRef: {
+          providerId: 'openai',
+          modelId: 'gpt-5.6-luna',
+        },
         allowed: [
-          'openai:gpt-5.6-luna',
-          'anthropic:claude-opus-4-8',
+          { providerId: 'openai', modelId: 'gpt-5.6-luna' },
+          { providerId: 'anthropic', modelId: 'claude-opus-4-8' },
         ],
       },
     },
@@ -76,7 +90,7 @@ new Studio([agent], {
 }).start({ port: 4021 })
 ```
 
-A model reference uses `provider:model` format. Provider IDs cannot contain `:`; model IDs may contain it.
+A configuration model reference uses `{ providerId, modelId }`. The HTTP runtime and session metadata serialize it in `provider:model` format. Provider IDs cannot contain `:`; model IDs may contain it.
 
 ## Control model access per agent
 
@@ -84,8 +98,8 @@ The `agents` policy controls what appears in the Playground selector:
 
 | Option | Effect |
 | --- | --- |
-| `default` | Selects the initial model for that agent. |
-| `allowed` | Limits the catalog to exact model references or provider wildcards such as `openai:*`. |
+| `defaultModelRef` | Selects the initial model for that agent. |
+| `allowed` | Limits the catalog to exact `{ providerId, modelId }` references or provider wildcards such as `openai:*`. |
 
 Without `allowed`, the agent can select any model exposed by the registered providers. An unknown or disallowed model is rejected at the run boundary rather than silently falling back.
 
@@ -127,4 +141,3 @@ The Playground validates the file type, not the provider’s payload-size, file-
 :::
 
 Return to the [Playground overview](/studio/playground), or learn how to pause sensitive tool calls with [approvals and questions](/studio/playground/approvals-and-questions).
-

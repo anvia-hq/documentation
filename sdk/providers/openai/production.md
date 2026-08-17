@@ -6,14 +6,14 @@ Treat the provider client as infrastructure and the selected model as a tested a
 
 - Keep API keys and provider clients in server-only modules.
 - Require either `apiKey` or a preconfigured SDK `client` at startup.
-- Make `completionApi` explicit when a deployment depends on Responses or Chat behavior.
+- Make the model factory's `api` explicit when a deployment depends on Responses or Chat behavior.
 - Keep custom `baseUrl` and headers in trusted deployment configuration.
 - Use an application allow-list for selectable model IDs.
 
 ## Capability tests
 
 - Smoke test the exact endpoint, adapter, and model ID.
-- Test both `.send()` and `.stream()` when the UI streams output.
+- Test both `agent.generate()` and `agent.stream()` when the product uses both paths.
 - Exercise required tool calls and complete streamed tool arguments.
 - Validate output-schema behavior before relying on parsed product data.
 - Test image, document, embedding, speech, or transcription requests with representative media.

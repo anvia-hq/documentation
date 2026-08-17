@@ -1,8 +1,8 @@
 # Agent output
 
-Use the `outputSchema` option when an agent may use tools or runtime context before returning a structured final answer.
+Use an agent `outputSchema` when tools, retrieval, memory, or multiple turns are needed before the final response should follow a structured shape.
 
-## Configure the final shape
+## 1. Configure the final shape
 
 ```ts
 import { Agent } from '@anvia/core'
@@ -16,34 +16,56 @@ const supportResultSchema = z.object({
 
 const agent = new Agent({
   id: 'support',
-  model: model,
-  instructions: 'Use tools when account state is needed. Return the requested object.',
+  model,
+  instructions: 'Use tools when account state is needed.',
   outputSchema: supportResultSchema,
   maxTurns: 4,
-  tools: [...createSupportTools(scope)],
+  tools: createSupportTools(scope),
 })
 ```
 
-The schema is sent with the agent's model requests so the final response follows that shape.
+Anvia converts the Zod schema to provider JSON Schema and includes it in the agent's model requests. The model must support both the agent capabilities used by the run and output schemas.
 
-## Parse the final response
+## 2. Parse the completed response
 
-An agent response still exposes its final output as text. Parse it locally before product code reads its fields.
+`outputSchema` makes the agent generic output type match the schema. A completed result exposes the validated value directly:
 
 ```ts
-const response = await agent
-  .prompt('Resolve the customer billing question.')
-  .send()
+const response = await agent.generate({
+    prompt: 'Resolve the customer billing question.'
+})
 
-const result = supportResultSchema.parse(
-  JSON.parse(response.output),
-)
+if (response.status === 'approval_required') {
+  return handleApproval(response)
+}
 
-console.log(result.needsHuman)
+if (response.status === 'blocked') {
+  return handleBlocked(response)
+}
+
+console.log(response.output.needsHuman)
 ```
 
-## Check model support
+Anvia validates the provider output with the supplied schema before returning a completed response. Invalid structured output rejects the run.
 
-The selected model path must support output schemas. If `model.capabilities.outputSchema` is false, use a compatible model or an extractor-style tool submission pattern instead of relying on prompt text to produce valid JSON.
+## 3. Validate streamed output at the end
 
-Use parsed completion for one direct call. Agent output is useful only when the runtime capabilities before the final answer are actually needed.
+Text deltas are incomplete JSON and must not be parsed as they arrive. Accumulate UI text if needed, then validate the `output` on the final event:
+
+```ts
+for await (const event of agent.stream({
+    prompt: input
+})) {
+  if (event.type === 'text_delta') {
+    renderDelta(event.delta)
+  }
+
+  if (event.type === 'final') {
+    if (event.result.status === 'completed') {
+      await saveValidatedResult(event.result.output)
+    }
+  }
+}
+```
+
+Use [parsed completion](/sdk/structured-output/parsed-completion) when one direct request is enough. Agent output is valuable only when the run genuinely needs agent runtime features before producing the object.

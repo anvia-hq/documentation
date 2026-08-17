@@ -1,70 +1,74 @@
 # Parallel agents
 
-**Type:** Pattern
+A pipeline can run independent specialists concurrently and then synthesize their outputs. Use this when every branch must run and no branch depends on another.
 
-## Outcome
-
-Run independent specialist pipelines concurrently, then synthesize their outputs. Use deterministic
-parallelism when every specialist must run and none depends on another specialist's result.
-
-## Prerequisites
-
-- Specialist agents with focused instructions
-- `PipelineBuilder` from `@anvia/core/pipeline`
-- A Zod schema for the shared input
-
-## Parallel pipeline
+## Build the branches
 
 ```ts
-import { PipelineBuilder } from '@anvia/core/pipeline'
-import { z } from 'zod'
+import { Pipeline } from '@anvia/core/pipeline';
+import { z } from 'zod';
+const supportNotes = new Pipeline({
+  id: 'support-notes',
+  inputSchema: z.string(),
+}).step({
+  id: 'build-support-request',
+  run: ({ input: incident }) => `Triage for support:\n${incident}`,
+}).agent({
+  id: 'ask-support-agent',
+  agent: supportAgent,
+  approval: 'reject',
+  request: ({ input }) => ({ prompt: input }),
+});
+const engineeringNotes = new Pipeline({
+  id: 'engineering-notes',
+  inputSchema: z.string(),
+}).step({
+  id: 'build-engineering-request',
+  run: ({ input: incident }) => `Triage for engineering:\n${incident}`,
+}).agent({
+  id: 'ask-engineering-agent',
+  agent: engineeringAgent,
+  approval: 'reject',
+  request: ({ input }) => ({ prompt: input }),
+});
 
-const supportNotes = new PipelineBuilder(z.string())
-  .step((incident) => `Triage for support:\n${incident}`)
-  .prompt(supportAgent)
-  .build()
+```
 
-const engineeringNotes = new PipelineBuilder(z.string())
-  .step((incident) => `Triage for engineering:\n${incident}`)
-  .prompt(engineeringAgent)
-  .build()
+## Merge and synthesize
 
-const brief = new PipelineBuilder(z.string())
-  .parallel({ support: supportNotes, engineering: engineeringNotes })
-  .step(({ support, engineering }) => [
+```ts
+const incidentBrief = new Pipeline({
+  id: 'incident-brief',
+  inputSchema: z.string(),
+}).parallel({
+  id: 'collect-specialist-notes',
+  branches: {
+    support: supportNotes,
+    engineering: engineeringNotes,
+  },
+}).step({
+  id: 'build-synthesis-request',
+  run: ({ input: { support, engineering } }) => [
     'Synthesize these notes into one incident brief.',
     `Support:\n${support}`,
     `Engineering:\n${engineering}`,
-  ].join('\n\n'))
-  .prompt(synthesizerAgent)
-  .build()
+  ].join('\n\n'),
+}).agent({
+  id: 'ask-synthesizer',
+  agent: synthesizerAgent,
+  approval: 'reject',
+  request: ({ input }) => ({ prompt: input }),
+});
 
-console.log(await brief.run(incident))
+const { output: brief } = await incidentBrief.run({
+  input: incident,
+});
+console.log(brief);
+
 ```
 
-The agent and `incident` definitions are separate application files; the complete linked cookbook
-shows all four agents and safe fallback text.
+Both branches receive the same validated input and execute concurrently. Their named outputs enter the merge step before the synthesizer runs. Unlike agent-as-tool delegation, the pipeline—not a model—decides that both specialists execute.
 
-## Run and expected behavior
+Parallel work multiplies rate pressure and cost. A rejected branch can fail the composed run, so define retry, timeout, and partial-result behavior explicitly. Do not send data to a branch that is not authorized to see it.
 
-Both branches receive the same validated string and can execute concurrently. The named result
-object is passed to the merge step, then the synthesizer returns the final brief. This differs from
-concurrent tool calls: the pipeline, not a model, decides that every branch runs.
-
-## Boundaries
-
-Parallel calls can multiply cost and rate pressure. One rejected branch may fail the composed run,
-so choose explicit retry, timeout, and partial-result policies rather than silently omitting a
-specialist. Do not pass data to a branch that is not authorized to see it.
-
-In production, cap concurrency outside a single request, trace branch names, make retries safe,
-record branch outputs for diagnosis, and use durable workers for long-running or high-volume jobs.
-
-## Source and extensions
-
-Run the
-[parallel-specialists cookbook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/07_multi_agent/02-parallel-specialists.ts).
-Next, add a third branch, per-branch schemas, and deliberate failure recovery.
-
-- [Parallel pipelines](/sdk/advanced/parallel-and-batch/parallel)
-- [Parallel failures](/sdk/advanced/parallel-and-batch/failures)
+Continue with [parallel pipelines](/sdk/advanced/parallel-and-batch/parallel) and [failure behavior](/sdk/advanced/parallel-and-batch/failures).

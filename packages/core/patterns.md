@@ -5,9 +5,10 @@ Use the smallest composition that preserves clear ownership.
 ## One model call
 
 ```ts
-const result = await createCompletion(model, {
-  instructions: 'Answer in one sentence.',
-  input: 'What does this service do?',
+const result = await generateCompletion({
+    prompt: 'What does this service do?',
+    model,
+    instructions: 'Answer in one sentence.'
 })
 ```
 
@@ -24,7 +25,7 @@ export function createSupportAgent(deps: SupportDependencies) {
     model: deps.model,
     memory: { store: deps.memory },
     tools: [createAccountTool(deps.accounts)],
-    observers: [deps.observer],
+    observability: { observers: { default: deps.observer } },
   })
 }
 ```
@@ -35,7 +36,7 @@ A Zod schema validates the model's arguments. The tool must still derive or rece
 
 ## Deterministic outer workflow
 
-Use `PipelineBuilder` or ordinary application code to own branching, retries, queueing, and idempotency. Put an agent inside a stage when model reasoning is useful; do not ask a model to coordinate steps that the application can express deterministically.
+Use `Pipeline` or ordinary application code to own branching, retries, queueing, and idempotency. Put an agent inside a stage when model reasoning is useful; do not ask a model to coordinate steps that the application can express deterministically.
 
 ## Adapter boundaries
 

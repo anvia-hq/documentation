@@ -1,61 +1,96 @@
 # Build applications
 
-Anvia keeps provider credentials and agent execution on the server while sending normalized runtime events to product clients.
+Anvia applications keep provider credentials and agent execution on the server, then send normalized runtime events to the client. The client owns interaction state; the server remains the trusted runtime boundary.
 
-## Expose an agent stream
+## 1. Install the application packages
 
-Install the server integration:
+Keep every Anvia package on the same release-candidate channel:
 
 ```bash
-pnpm add @anvia/server
+pnpm add @anvia/core@rc @anvia/client@rc @anvia/openai@rc @anvia/server@rc @anvia/react@rc
 ```
 
+`@anvia/client` defines the public protocol and transport, `@anvia/server` returns its HTTP stream, and `@anvia/react` maintains UI state.
+
+## 2. Construct the agent on the server
+
+Provider credentials must never enter the browser bundle. Create the client, model, and agent in a server-only module.
+
 ```ts
-import type { UIStreamRequest } from '@anvia/core'
-import { createEventStream } from '@anvia/server'
+import { Agent } from '@anvia/core'
+import { OpenAIClient } from '@anvia/openai'
+
+const client = new OpenAIClient({
+  apiKey: process.env.OPENAI_API_KEY!,
+})
+
+const model = client.completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
+})
+
+export const supportAgent = new Agent({
+  id: 'support',
+  model,
+  instructions: 'Answer support questions clearly and concisely.',
+  maxTurns: 4,
+})
+```
+
+In production, validate required environment values during startup so a missing credential fails before the first request.
+
+## 3. Expose an agent stream
+
+The default React request contains normalized core messages. Pass those messages directly to `agent.stream()` and return the events as JSONL.
+
+```ts
+import { agentToClientStream, parseClientStreamRequest } from '@anvia/client'
+import { createClientStreamResponse } from '@anvia/server'
+import { supportAgent } from './support-agent'
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as UIStreamRequest
+  const user = await authenticate(request)
 
-  return createEventStream(agent.prompt(body.messages).stream(), {
+  if (!user) {
+    return new Response('Unauthorized', { status: 401 })
+  }
+
+  const body = parseClientStreamRequest(await request.json())
+
+  return createClientStreamResponse({
+    events: agentToClientStream({
+      events: supportAgent.stream({ messages: body.messages }),
+      ...(body.metadata === undefined ? {} : { metadata: body.metadata }),
+    }),
     format: 'jsonl',
   })
 }
 ```
 
-JSONL is the default and works with Anvia React transports. Use `{ format: 'sse' }` when an existing client requires server-sent events.
+Authenticate before running the agent. If tools read private data or perform actions, capture the authenticated user in request-scoped tool handlers and enforce permissions there as well.
 
-The default React request shape is:
+JSONL is the default format and works with Anvia's React transport. Use `{ format: 'sse' }` when an existing client requires server-sent events.
 
-```ts
-type UIStreamRequest = {
-  messages: Message[]
-  stream: true
-  metadata?: JsonValue
-}
-```
+## 4. Consume the stream in React
 
-Read `body.messages` at the server boundary rather than assuming a single `{ message }` string.
-
-## Consume the stream in React
-
-```bash
-pnpm add @anvia/react
-```
+`useChat()` converts local UI messages into core messages, sends the request, consumes runtime events, and updates the current assistant message.
 
 ```tsx
 import { useChat } from '@anvia/react'
+import { createHttpClientTransport } from '@anvia/client'
 import { useState } from 'react'
 
+const transport = createHttpClientTransport({ endpoint: '/api/chat', format: 'jsonl' })
+
 export function Chat() {
-  const chat = useChat({ endpoint: '/api/chat' })
+  const chat = useChat({ transport })
   const [input, setInput] = useState('')
 
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault()
-        void chat.sendMessage(input)
+        void chat.sendMessage({ text: input })
         setInput('')
       }}
     >
@@ -68,15 +103,37 @@ export function Chat() {
         </p>
       ))}
 
-      <input value={input} onChange={(event) => setInput(event.target.value)} />
-      <button type="submit">Send</button>
+      <input
+        value={input}
+        onChange={(event) => setInput(event.target.value)}
+      />
+      <button disabled={chat.status === 'streaming'} type="submit">
+        Send
+      </button>
     </form>
   )
 }
 ```
 
-`useChat` converts local UI messages to core messages, sends them to the endpoint, reads JSONL by default, and updates state from runtime events.
+The hook also exposes `stop()`, `regenerate()`, `reset()`, stream events, context usage, errors, and optional approval or question state.
 
-## Add product actions
+## 5. Understand the wire boundary
 
-Register narrow, schema-validated tools for private data and actions. Authenticate the request and enforce authorization inside the application boundary before a tool reads or changes data.
+The default request shape is intentionally small:
+
+```ts
+type ClientStreamRequest = {
+  messages: readonly Message[]
+  metadata?: JsonObject
+  resume?: {
+    streamId: string
+    after: number
+  }
+}
+```
+
+Read `body.messages` at the server boundary rather than assuming a single `{ message }` string. Use `metadata` only for non-sensitive request context, and validate any values before trusting them.
+
+## Next
+
+Add narrow application actions with [Tools](/sdk/tools), then review [Production operations](/use-cases/production) before exposing the runtime to real users.

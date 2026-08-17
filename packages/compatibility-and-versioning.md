@@ -1,6 +1,6 @@
 # Compatibility and versioning
 
-Anvia packages are versioned independently. An application can therefore upgrade an adapter without forcing every package onto the same version, provided its declared peer-dependency range still includes the installed `@anvia/core` version.
+The v1 release candidate is published as a synchronized package train. Install matching RC versions across Anvia packages so Core, providers, transports, UI, storage, and observability adapters share the same public contracts.
 
 ## Check three boundaries
 
@@ -12,15 +12,15 @@ Before upgrading, verify:
 
 Package pages summarize these boundaries, while the package manifest remains the source of truth for exact dependency ranges.
 
-## Pre-1.0 releases
+## Release-candidate versions
 
-Current Anvia packages use pre-1.0 versions. Minor releases can therefore contain meaningful API changes. Pin versions in production applications, review release notes, and test agent behavior as well as TypeScript compilation before deployment.
+Current Anvia packages use the `1.0.0-rc.x` prerelease line. Pin the exact RC in production-like environments because a later candidate may still include migration work before the stable `1.0.0` release.
 
 ```json
 {
   "dependencies": {
-    "@anvia/core": "0.25.1",
-    "@anvia/openai": "0.5.1"
+    "@anvia/core": "1.0.0-rc.2",
+    "@anvia/openai": "1.0.0-rc.2"
   }
 }
 ```
@@ -50,19 +50,16 @@ import type { Message } from '@anvia/core/completion'
 // import { something } from '@anvia/core/dist/internal-file.js'
 ```
 
-## Agent builder compatibility
+## v0 to v1 migration boundary
 
-`AgentBuilder` remains supported for applications created before the declarative `new Agent({...})`
-API. New code should use `Agent`; the compatibility builder is planned for removal when Anvia
-prepares the 1.0 release.
+The v1 API uses declarative `new Agent({...})` construction and direct `agent.generate(...)` or `agent.stream(...)` runs. Builder-era APIs such as `AgentBuilder`, prompt requests, and `.send()` are not part of the v1 public surface.
 
-The builder's singular `tool()` and `middleware()` methods are deprecated in favor of their plural
-forms. `eventStore()` is also deprecated; use observers with Logger, Lens, Langfuse, or
-OpenTelemetry for run inspection.
+Keep an application on the v0 documentation and package line until its migration is complete. When moving to v1, update Core and every Anvia adapter together, then follow the [v1 Core API reference](/packages/core/api-reference) and provider-specific configuration pages.
 
 ## Upgrade checklist
 
 - Read the relevant entry in [Changelog](/packages/changelog).
+- Keep all Anvia packages on the same `1.0.0-rc.x` candidate.
 - Compare public types used by your application.
 - Run TypeScript, unit, integration, and evaluation suites.
 - Test migrations against a copy of production data.

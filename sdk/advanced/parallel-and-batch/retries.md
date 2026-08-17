@@ -1,22 +1,60 @@
 # Retries and idempotency
 
-Retry only at a boundary where repeated execution has a defined outcome. A retry strategy is incomplete until side effects are idempotent or transactionally protected.
+Retry only at a boundary where repeated execution has a defined outcome. A retry policy is incomplete until side effects are idempotent or transactionally protected.
 
-## Choose the smallest safe boundary
+## 1. Choose the smallest safe boundary
 
-| Failure | Prefer |
-| --- | --- |
-| Temporary model invocation error | Use request-scoped `.withCompletionRetries(...)`. |
-| Extractor returns invalid data | Use the extractor's bounded `.retries(...)`. |
-| One independent batch item fails | Retry that item by stable ID. |
-| Worker loses its process before a write | Redeliver the job with an idempotency key. |
-| Whole batch partially completes | Resume failed or missing items; do not rerun everything blindly. |
+Prefer the narrowest owner:
 
-Whole-pipeline retries are safe only when every completed side effect can be repeated or detected.
+- retry a transient completion request with agent run options
+- retry a failed structured extraction with extractor options
+- retry one independent batch item by stable ID
+- let a queue redeliver a durable job with operation-level idempotency
+- resume failed or missing items instead of rerunning a partially completed batch
 
-## Make writes idempotent
+`Pipeline` has no built-in whole-run retry option. Wrap it at an application boundary only when replay is safe.
 
-Derive an idempotency key from product identity and operation identity—not from a random retry attempt:
+## 2. Retry model requests, not completed tools
+
+```ts
+const result = await agent.generate({
+    prompt: ticketPrompt,
+    trace: {
+        metadata: {
+            jobId: job.id,
+            jobAttempt: job.attempt,
+        },
+    },
+    retries: {
+        maxAttempts: 3,
+        initialDelayMs: 200,
+        maxDelayMs: 2000,
+    }
+})
+```
+
+Agent retries repeat a failed completion invocation within the current turn. They do not restart the complete agent run or repeat already completed tool calls.
+
+Retry delays use capped exponential backoff with full jitter. The default classifier retries common timeout, connection, rate-limit, and server failures while excluding aborts.
+
+## 3. Configure extraction retries separately
+
+```ts
+const data = await extract({
+  model,
+  text: sourceText,
+  outputSchema,
+  retries: {
+    maxAttempts: 2,
+  },
+})
+```
+
+Extraction retry policy belongs to that extraction call. Use `shouldRetry` when invalid model output and infrastructure failure need different treatment.
+
+## 4. Make writes idempotent
+
+Derive a key from stable product and operation identity:
 
 ```ts
 const idempotencyKey = [
@@ -32,41 +70,12 @@ await ticketService.saveEnrichment({
 })
 ```
 
-If the worker retries the same ticket, the service can return the existing result instead of applying the write twice.
+A later attempt can then return or update the existing operation instead of applying the write twice.
 
-## Keep retry state outside the prompt
+## 5. Keep job retry state outside prompts
 
-The queue or runner should own job attempt count, delay, backoff, and terminal status. Attach useful correlation data to the agent trace:
+The runner or queue owns attempt count, delay, backoff, and terminal status. Treat validation and authorization failures as terminal. Bound transient retries and preserve the same operation-level idempotency keys across attempts.
 
-```ts
-await agent
-  .prompt(ticketPrompt)
-  .withTrace({
-    metadata: {
-      jobId: job.id,
-      jobAttempt: job.attempt,
-    },
-  })
-  .withCompletionRetries({
-    maxAttempts: 3,
-    initialDelayMs: 200,
-    maxDelayMs: 2_000,
-  })
-  .send()
-```
+A retry executes work again. Inspecting a stored result or trace does not. Keep those product operations distinct.
 
-Completion retries repeat only a failed model invocation within the current turn. They do not restart the agent run or repeat completed tool calls. Do not ask the model to decide whether infrastructure failures deserve another attempt.
-
-## Use backoff for transient failures
-
-Retries should be bounded and delayed. Anvia completion retries use exponential backoff with full jitter and conservative transient-error classification. They use their configured local timing rather than interpreting provider `Retry-After` headers.
-
-At service and queue boundaries, respect downstream retry guidance when the integration exposes it. Stop retrying validation, authorization, and permanent input errors.
-
-Classify errors at the adapter or runner boundary so the job system can distinguish retryable failures from terminal ones.
-
-## Do not confuse retry with replay
-
-A retry executes work again and may create side effects. Reopening a stored result or trace only inspects what already happened.
-
-When operators manually retry a failed job, create a new attempt linked to the original job while preserving the same operation-level idempotency keys.
+Next, review the [production checklist](/sdk/advanced/parallel-and-batch/checklist).

@@ -1,64 +1,38 @@
 # Chat or Responses
 
-`OpenAIClient` has two completion adapters. They normalize either Chat Completions or Responses into the same Anvia completion contract, but the upstream HTTP endpoints are not interchangeable.
+`OpenAIClient` can normalize Chat Completions or Responses into the same Anvia completion contract. Choose the API your compatible endpoint actually implements when creating the model.
 
-## Default with a custom endpoint
-
-A custom `baseUrl` makes Chat the default because it is the more common compatibility surface:
+## Select Chat explicitly
 
 ```ts
-const client = new OpenAIClient({
-  apiKey,
-  baseUrl,
-})
+import { OpenAIClient } from '@anvia/openai'
 
-const model = client.completionModel(modelId)
-```
-
-Set the choice explicitly in production configuration so a future refactor cannot change the selected surface accidentally:
-
-```ts
-const chatClient = new OpenAIClient({
-  apiKey,
-  baseUrl,
-  completionApi: 'chat',
+const client = new OpenAIClient({ apiKey, baseUrl })
+const model = client.completionModel({
+  modelId,
+  api: 'chat',
 })
 ```
 
-## Choose Responses deliberately
+The Chat adapter declares streaming, local tools, tool choice, image input, output schemas, and reasoning content. It does not declare document input or provider-executed tools.
 
-Use Responses only when the endpoint documents and implements an OpenAI-compatible `/responses` API:
+## Select Responses deliberately
+
+Use Responses only when the server documents and implements an OpenAI-compatible `/responses` API:
 
 ```ts
-const responsesClient = new OpenAIClient({
-  apiKey,
-  baseUrl,
-  completionApi: 'responses',
+const model = client.completionModel({
+  modelId,
+  api: 'responses',
 })
-
-const model = responsesClient.completionModel(modelId)
 ```
 
-An endpoint supporting `/chat/completions` does not imply that `/responses` exists. A similarly named proprietary response API is not necessarily compatible either.
+The Responses adapter additionally declares document input and provider-executed tools. A server that implements `/chat/completions` does not automatically implement `/responses`.
 
-## What the adapters declare
+## Match the API to the workflow
 
-At the Anvia adapter level, both paths support streaming, tools, tool choice, image input, output schemas, and reasoning content. The Responses adapter also declares document input.
+Use Chat as the initial choice for ordinary compatible completions. Use Responses when the workflow needs document files or provider tools and the endpoint supports them. Either adapter can represent streaming, local tools, structured output, images, and reasoning, but the remote server and selected model must still prove those features.
 
-Those declarations describe what the adapter can represent—not what a compatible server, account, or model supports. Use them to reject impossible application configuration, then use live tests to prove the endpoint.
+Test complete behavior: streamed deltas and termination, tool argument assembly and replay, schema acceptance and local validation, representative media, reasoning replay, normalized usage, and failure shapes.
 
-| Workflow need | Initial choice | Still verify |
-| --- | --- | --- |
-| Ordinary compatible completion | Chat | Message mapping and final output |
-| Streaming UI | Either implemented surface | Text deltas, finish event, errors, usage |
-| Local tools | Either implemented surface | Tool choice and complete streamed arguments |
-| Structured output | Either implemented surface | Accepted schema shape and valid output |
-| Document-file input | Responses | File types, size limits, and model access |
-| Reasoning metadata | Either implemented surface | Provider field shape and replay across tool turns |
-
-## Do not silently fall back
-
-Avoid retrying a failed Responses request through Chat or changing model IDs inside a generic error handler. The second request can have different content support, tool behavior, and output semantics.
-
-If the product supports both surfaces, configure two tested model boundaries and choose between them before the run. Record the chosen endpoint, adapter, and model in traces so failures can be reproduced.
-
+Avoid retrying a failed Responses request through Chat or swapping model IDs in a generic error handler. If the product supports both APIs, create separately tested model handles and choose one before the run. Record the endpoint, API, and model so failures can be reproduced.

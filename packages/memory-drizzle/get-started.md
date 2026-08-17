@@ -17,9 +17,9 @@ npx drizzle-kit migrate
 
 ```ts
 import { Agent } from '@anvia/core/agent'
-import { createDrizzleMemoryStore } from '@anvia/memory-drizzle'
+import { DrizzleMemoryStore } from '@anvia/memory-drizzle'
 
-const memory = createDrizzleMemoryStore(db)
+const memory = new DrizzleMemoryStore({ db })
 
 const agent = new Agent({
   id: 'support',

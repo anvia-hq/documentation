@@ -1,15 +1,60 @@
-import { defineConfig } from 'vitepress'
+import { defineConfig, type HeadConfig } from 'vitepress'
+
+const docsChannel = process.env.DOCS_CHANNEL === 'rc' ? 'rc' : 'current'
+const isReleaseCandidate = docsChannel === 'rc'
+const docsBase = normalizeBase(process.env.DOCS_BASE ?? (isReleaseCandidate ? '/v1-rc/' : '/'))
+const currentDocsUrl = process.env.DOCS_CURRENT_URL ?? '/'
+const releaseCandidateDocsUrl = process.env.DOCS_RC_URL ?? '/v1-rc/'
+const releaseCandidateDevProxy = process.env.DOCS_RC_DEV_PROXY
+
+const channelHead: HeadConfig[] = isReleaseCandidate
+  ? [['style', {}, ':root { --vp-layout-top-height: 44px; }']]
+  : []
+
+function normalizeBase(base: string) {
+  return `/${base.replace(/^\/+|\/+$/g, '')}${base === '/' ? '' : '/'}`
+}
+
+function withDocsBase(path: string) {
+  return `${docsBase}${path.replace(/^\/+/, '')}`
+}
 
 export default defineConfig({
+  base: docsBase,
   title: 'Anvia',
-  description: 'Documentation for Anvia',
+  description: isReleaseCandidate
+    ? 'Release-candidate documentation for Anvia Core v1'
+    : 'Documentation for Anvia Core v0.x',
   head: [
-    ['link', { rel: 'icon', href: '/logo.svg' }],
+    ['link', { rel: 'icon', href: `${docsBase}logo.svg` }],
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
     ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap' }],
-    ['meta', { name: 'theme-color', content: '#050505' }]
+    ['meta', { name: 'theme-color', content: '#050505' }],
+    ...channelHead
   ],
+  vite: {
+    define: {
+      __DOCS_VERSION_CONFIG__: JSON.stringify({
+        channel: docsChannel,
+        currentUrl: currentDocsUrl,
+        releaseCandidateUrl: releaseCandidateDocsUrl
+      })
+    },
+    ...(releaseCandidateDevProxy && !isReleaseCandidate
+      ? {
+          server: {
+            proxy: {
+              '/v1-rc': {
+                target: releaseCandidateDevProxy,
+                changeOrigin: true,
+                ws: true
+              }
+            }
+          }
+        }
+      : {})
+  },
   themeConfig: {
     logo: '/logo.svg',
     nav: [
@@ -42,7 +87,7 @@ export default defineConfig({
                 { text: 'Completion', link: '/sdk/models/completion' },
                 { text: 'Embeddings', link: '/sdk/models/embeddings' },
                 { text: 'Image generation', link: '/sdk/models/image-generation' },
-                { text: 'Audio generation', link: '/sdk/models/audio-generation' },
+                { text: 'Audio generation', link: '/sdk/models/speech-generation' },
                 { text: 'Transcription', link: '/sdk/models/transcription' },
                 { text: 'OCR', link: '/sdk/models/ocr' }
               ]
@@ -180,15 +225,15 @@ export default defineConfig({
               ]
             },
             {
-              text: 'Hooks and run control',
+              text: 'Lifecycle and run control',
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/sdk/advanced/hooks' },
-                { text: 'Create a hook', link: '/sdk/advanced/hooks/create' },
-                { text: 'Hook points', link: '/sdk/advanced/hooks/hook-points' },
+                { text: 'Configure lifecycle', link: '/sdk/advanced/hooks/create' },
+                { text: 'Lifecycle events', link: '/sdk/advanced/hooks/hook-points' },
                 { text: 'Cancellation', link: '/sdk/advanced/hooks/cancellation' },
-                { text: 'Tool control', link: '/sdk/advanced/hooks/tool-control' },
-                { text: 'Hooks and middleware', link: '/sdk/advanced/hooks/middleware' },
+                { text: 'Tool approval', link: '/sdk/advanced/hooks/tool-control' },
+                { text: 'Lifecycle and middleware', link: '/sdk/advanced/hooks/middleware' },
                 { text: 'Production guidance', link: '/sdk/advanced/hooks/production-guidance' }
               ]
             },
@@ -239,7 +284,7 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { text: 'Overview', link: '/sdk/advanced/dynamic-tools' },
-                { text: 'Tool sets', link: '/sdk/advanced/dynamic-tools/tool-sets' },
+                { text: 'Tool catalog', link: '/sdk/advanced/dynamic-tools/tool-sets' },
                 { text: 'Tool index', link: '/sdk/advanced/dynamic-tools/index' },
                 { text: 'Embedding text', link: '/sdk/advanced/dynamic-tools/embedding-text' },
                 { text: 'Static and dynamic', link: '/sdk/advanced/dynamic-tools/static-and-dynamic' },
@@ -1251,11 +1296,11 @@ export default defineConfig({
         {
           text: 'For agents',
           items: [
-            { text: 'LLMs.txt', link: '/llms.txt' },
-            { text: 'Agents, tools, and MCP', link: '/llms-agents.txt' },
-            { text: 'Full-stack applications', link: '/llms-apps.txt' },
-            { text: 'Evaluations and observability', link: '/llms-evals.txt' },
-            { text: 'RAG and retrieval', link: '/llms-rag.txt' }
+            { text: 'LLMs.txt', link: withDocsBase('/llms.txt') },
+            { text: 'Agents, tools, and MCP', link: withDocsBase('/llms-agents.txt') },
+            { text: 'Full-stack applications', link: withDocsBase('/llms-apps.txt') },
+            { text: 'Evaluations and observability', link: withDocsBase('/llms-evals.txt') },
+            { text: 'RAG and retrieval', link: withDocsBase('/llms-rag.txt') }
           ]
         }
       ]

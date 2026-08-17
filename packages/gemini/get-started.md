@@ -13,24 +13,32 @@ import { Agent } from '@anvia/core'
 import { GeminiClient } from '@anvia/gemini'
 
 const gemini = new GeminiClient({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY!,
 })
 
 const agent = new Agent({
   id: 'assistant',
-  model: gemini.completionModel('gemini-2.5-flash'),
+  model: gemini.completionModel({
+      modelId: 'gemini-2.5-flash'
+  }),
 })
 
-const result = await agent.prompt('Summarize this document.').send()
-console.log(result.output)
+const result = await agent.generate({
+    prompt: 'Summarize this document.'
+})
+
+if (result.status === 'completed') {
+  console.log(result.output)
+}
 ```
 
 ## Add embeddings
 
 ```ts
-const documents = gemini.embeddingModel('gemini-embedding-001', {
-  taskType: 'RETRIEVAL_DOCUMENT',
-  dimensions: 768,
+const documents = gemini.embeddingModel({
+    modelId: 'gemini-embedding-001',
+    taskType: 'RETRIEVAL_DOCUMENT',
+    dimensions: 768
 })
 
 const vectors = await documents.embedTexts([
@@ -44,9 +52,10 @@ Create a second model configured with `RETRIEVAL_QUERY` for queries while keepin
 
 ```ts
 const vertex = new GeminiClient({
-  vertexai: true,
-  project: 'my-gcp-project',
-  location: 'us-central1',
+  vertexAi: {
+    projectId: 'my-gcp-project',
+    location: 'us-central1',
+  },
 })
 ```
 

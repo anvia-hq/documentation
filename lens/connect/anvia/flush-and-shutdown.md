@@ -1,107 +1,58 @@
-# Flush and shutdown
+# Flush and close
 
-`@anvia/lens` batches traces and evaluation logs before export. Your application must give the exporter time to deliver buffered telemetry when a short-lived process exits or a server shuts down.
-
-## `flush()` and `shutdown()` are different
-
-| Method | What it does | Can the observer be used afterward? |
-| --- | --- | --- |
-| `flush()` | Waits for currently buffered traces and logs to be exported. | Yes |
-| `shutdown()` | Performs final provider shutdown and releases exporter resources. | No new work should use it |
-
-`shutdown()` is idempotent: repeated calls share the same shutdown operation.
-
-Neither method closes your Lens deployment or stops an agent request. They manage only the local tracing providers created by `lens.create()`.
+`LensClient` buffers trace and evaluation telemetry. Agent completion and telemetry delivery are separate boundaries, so short-lived processes must flush before exiting.
 
 ## Short-lived scripts
 
-Flush after the last successful request when the script needs the trace immediately, and always shut down in `finally`:
-
 ```ts
-const tracing = lens.create()
-const agent = new Agent({
-  id: 'support-check',
-  model: model,
-  observers: [tracing],
-})
+import { LensClient } from '@anvia/lens'
+
+const lens = new LensClient()
+const tracing = lens.observer()
 
 try {
-  const response = await agent.prompt('Run the support smoke test.').send()
-  await tracing.flush()
-
-  console.log(response.trace?.traceId)
+  const agent = createAgent({ observability: { observers: { tracing } } })
+  const result = await agent.generate({ prompt: 'Run the smoke test.' })
+  await lens.flush()
+  console.log(result.status)
 } finally {
-  await tracing.shutdown()
+  await lens.close()
 }
 ```
 
-Calling only `.send()` is not enough for a command-line script. The agent response means the run completed; it does not mean the batch exporter has finished its network request.
+`flush()` waits for current trace and log batches while leaving the client usable. `close()` shuts down the client's isolated providers and is idempotent. New observer operations after close fail.
 
-## Long-running servers
+## Long-running services
 
-Do not flush after every web request. That defeats batching and adds export latency to the request path. Register shutdown once at the process boundary instead:
+Create one client during application startup. During graceful termination:
 
-```ts
-const tracing = lens.create()
-let stopping = false
+1. Stop accepting new requests or jobs.
+2. Wait for active agent runs to settle.
+3. Call and await `lens.close()` within the platform's termination grace period.
 
-async function stop(signal: string) {
-  if (stopping) return
-  stopping = true
+Do not close the client after every request. If a framework owns signal handling, register cleanup through its lifecycle instead of installing competing process handlers.
 
-  applicationLogger.info({ signal }, 'shutting down')
-
-  await stopApplicationServer()
-  await tracing.shutdown()
-}
-
-process.once('SIGTERM', () => {
-  void stop('SIGTERM')
-})
-
-process.once('SIGINT', () => {
-  void stop('SIGINT')
-})
-```
-
-Here, `stopApplicationServer()` represents your framework's graceful close function: it stops accepting work and waits for active requests to finish. Complete that step before shutting tracing down.
-
-The export timeout defaults to 30 seconds and can be adjusted with `timeoutMs` when creating tracing:
+## Optional local tracing
 
 ```ts
-const tracing = lens.create({ timeoutMs: 10_000 })
+const lens = new LensClient({ optional: true })
+const tracing = lens.observer()
+
+console.log(lens.enabled)
 ```
 
-Choose a value that fits inside the platform's termination grace period.
+With no Lens connection variables, optional mode returns a disabled client whose observer is a no-op and whose `flush()` and `close()` are safe. Partial credentials still fail validation.
 
-## Background jobs and serverless handlers
+## Evaluations
 
-For a worker process that handles many jobs, keep one observer alive across jobs and shut it down with the worker. For a truly short-lived invocation, flush before returning only when delivery cannot wait for a later invocation:
+An evaluation reporter is created from the same client:
 
 ```ts
-export async function runJob(input: JobInput) {
-  const response = await agent.prompt(input.message).send()
-  await tracing.flush()
-  return response.output
-}
+const reporter = lens.evalReporter({ includePayloads: true })
+await runEvalSuite({ ...options, reporters: [reporter] })
+await lens.flush()
 ```
 
-Avoid creating and shutting down a new observer for every request in a normal server. Initialize it at module or application startup so batching and connection resources are shared.
+The reporter does not own a separate lifecycle. Close the shared client once all observed runs and evaluation reports are complete.
 
-## Evaluation scripts
-
-`lens.evals()` packages an observer and reporter together and enables run-end flushing by default. It also exposes `flush()` and `shutdown()` for the script lifecycle. The lower-level evaluation reporter can use `flushOnRunEnd: true` when tracing is already configured.
-
-See [Evaluations](/lens/evaluations) for the complete reporter, observed-agent, and dataset setup.
-
-## Diagnose missing final traces
-
-When the newest traces are consistently absent but older traffic appears:
-
-1. Confirm the shutdown handler actually awaits `tracing.shutdown()`.
-2. Ensure the platform gives the process enough termination time.
-3. Stop accepting work before shutting down tracing.
-4. Check application logs for an exporter timeout or network failure.
-5. Run one controlled request followed by `await tracing.flush()` and search its returned trace id.
-
-For normal investigation after delivery, continue to [Traces](/lens/observability/traces).
+If delivery is missing, confirm the shutdown path is awaited, active work finishes before close, credentials match the project, the Lens origin is reachable, and `timeoutMs` fits the deployment grace period.

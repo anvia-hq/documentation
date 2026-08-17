@@ -8,51 +8,57 @@
 pnpm add @anvia/weaviate @anvia/core @anvia/openai weaviate-client
 ```
 
-The ESM package includes `weaviate-client` and peers with `@anvia/core >=0.7.1 <1.0.0`.
+The ESM package includes `weaviate-client` and should be installed with the matching `@anvia/core` release candidate.
 
 ## Store and search documents
 
 ```ts
-import { embedDocuments } from '@anvia/core/embeddings'
-import { WeaviateVectorStore } from '@anvia/weaviate'
-import { OpenAIClient } from '@anvia/openai'
-
+import { retrieveDocuments } from "@anvia/core/vector-store";
+import { embedDocuments } from '@anvia/core/embeddings';
+import { WeaviateVectorClient } from '@anvia/weaviate';
+import { OpenAIClient } from '@anvia/openai';
 const openai = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-const embeddings = openai.embeddingModel('text-embedding-3-small')
+    apiKey: process.env.OPENAI_API_KEY!,
+});
+const embeddings = openai.embeddingModel({
+    modelId: 'text-embedding-3-small'
+});
 const sourceDocuments = [
-  {
-    id: 'password-reset',
-    text: 'Password reset links expire after 30 minutes.',
-  },
-]
-
-const documents = await embedDocuments(embeddings, sourceDocuments, {
-  id: (document) => document.id,
-  content: (document) => document.text,
-})
-
-const store = await WeaviateVectorStore.connect({
-  className: 'SupportDocs',
-  vectorSize: 1536,
-})
-
-await store.upsertDocuments(documents)
-
-const results = await store.index(embeddings).search({
-  query: 'How do I reset a password?',
-  topK: 5,
-})
+    {
+        id: 'password-reset',
+        text: 'Password reset links expire after 30 minutes.',
+    },
+];
+const { documents } = await embedDocuments({
+    model: embeddings,
+    documents: sourceDocuments,
+    id: (document) => document.id,
+    content: (document) => document.text
+});
+const storeClient = new WeaviateVectorClient({});
+const store = storeClient.vectorStore({
+    collectionName: 'SupportDocs',
+    dimensions: 1536
+});
+await store.ensure();
+await store.upsert({
+    documents: documents
+});
+const results = await retrieveDocuments({
+    store: store,
+    model: embeddings,
+    query: 'How do I reset a password?',
+    topK: 5
+});
 ```
 
 The default client uses `WEAVIATE_HOST` or `localhost:8080` and `WEAVIATE_GRPC_HOST` or `localhost:50051`, with insecure HTTP and gRPC connections. Inject a configured client for any remote or protected deployment.
 
 ## Collection ownership
 
-Unless `createIfMissing: false`, `connect()` creates a missing collection with no vectorizer, the selected distance, and Anvia's document ID/document properties. The default distance is `cosine`.
+`ensure()` creates a missing collection with no vectorizer, the selected distance, and Anvia's document ID/document properties. The default distance is `cosine`.
 
-Because Anvia supplies vectors, keep the collection vectorizer disabled. Production infrastructure should own collection creation, replication, vector-index tuning, and property schema; start the adapter with `createIfMissing: false` afterward.
+Because Anvia supplies vectors, keep the collection vectorizer disabled. Production infrastructure should own collection creation, replication, vector-index tuning, and property schema; call `validate()` afterward.
 
 Metadata keys beginning with `__anvia_` are reserved. If metadata properties need an explicit Weaviate schema or indexes, provision them before ingestion.
 
@@ -69,5 +75,5 @@ Metadata keys beginning with `__anvia_` are reserved. If metadata properties nee
 - [API reference](/packages/weaviate/api-reference)
 - [Vector stores](/sdk/knowledges/vector-stores)
 - [Automatic retrieval](/sdk/knowledges/automatic-retrieval)
-- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/vector-weaviate)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-weaviate/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/vector-weaviate)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/vector-weaviate/CHANGELOG.md)

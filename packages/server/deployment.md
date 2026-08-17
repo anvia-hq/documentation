@@ -4,7 +4,7 @@ Deploy `@anvia/server` only where Fetch-compatible `Response`, `ReadableStream`,
 
 ## Route boundary
 
-Authenticate and authorize before starting model work. Validate the requested session, user, and tenant, apply request-size and rate limits, then construct the prompt request. Once a streaming status is sent, HTTP status can no longer represent later model or tool failures; those arrive as stream events.
+Authenticate and authorize before starting model work. Validate the requested session, user, and tenant, apply request-size and rate limits, then start the agent or completion stream. Once a streaming status is sent, HTTP status can no longer represent later model or tool failures; those arrive as stream events.
 
 ## Proxy behavior
 

@@ -17,15 +17,15 @@ Application composition
 
 ## Contracts at the edges
 
-Provider packages implement `CompletionModel`, `EmbeddingModel`, and media model interfaces. Infrastructure packages implement contracts such as `MemoryStore` and `VectorSearchIndex`. Observability adapters implement agent observer contracts.
+Provider packages implement `CompletionModel`, `EmbeddingModel`, and media model interfaces. Infrastructure packages implement contracts such as `MemoryStore` and `VectorStore`. Observability adapters implement agent observer contracts.
 
 This keeps credentials, storage clients, and vendor configuration in application composition code. Core receives already-constructed dependencies and coordinates them.
 
 ## Agent construction and execution
 
-`Agent` records reusable configuration and produces an `Agent`. Calling `agent.prompt(...)` creates a one-shot `PromptRequest`; it does not execute until `send()`, `stream()`, or `readableStream()` is consumed.
+`Agent` records reusable configuration. Calling `agent.generate(...)` creates a run and resolves its terminal result. Calling `agent.stream(...)` creates a run exposed as a semantic async iterable, which advances while it is consumed.
 
-The prompt request owns one run. It applies request-level overrides, retrieves dynamic context and tools, performs model turns, executes application tools, records memory and events, calls observers, and enforces the turn limit. An `AgentSession` adds a stable memory context around repeated prompt requests.
+The run applies request-level overrides, retrieves indexed context and tools, performs model turns, executes application tools, records memory and events, calls observers, and enforces the turn limit. Passing a stable `session` scope adds durable memory context to a run.
 
 ## Message and event boundaries
 

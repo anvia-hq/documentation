@@ -1,35 +1,21 @@
-# Agent as tool
+# Agent as a tool
 
-**Type:** Pattern
-
-## Outcome
-
-Let a coordinator delegate a bounded task to a specialist agent through an ordinary tool call. Use
-this when specialists need distinct instructions or capabilities and a coordinator must decide when
-to invoke them.
-
-## Prerequisites
-
-- A provider completion model
-- Clear specialist responsibilities with non-overlapping descriptions
-- A bounded turn and tool policy for both parent and child agents
-
-## Specialist and coordinator
+A coordinator can delegate a bounded task to a specialist through an ordinary tool call. Use this when the coordinator should decide which expertise a request needs.
 
 ```ts
-import { Agent } from '@anvia/core/agent'
+import { Agent } from '@anvia/core'
 
 const support = new Agent({
   id: 'support',
-  model: model,
+  model,
   name: 'Support specialist',
   description: 'Analyze customer impact and the next support action.',
-  instructions: 'Use only supplied facts. Return concise bullets.',
+  instructions: 'Use supplied facts only. Return concise bullets.',
 })
 
 const engineering = new Agent({
   id: 'engineering',
-  model: model,
+  model,
   name: 'Engineering specialist',
   description: 'Propose diagnostics and the safest technical next step.',
   instructions: 'Separate facts from hypotheses. Return concise bullets.',
@@ -37,40 +23,27 @@ const engineering = new Agent({
 
 const coordinator = new Agent({
   id: 'coordinator',
-  model: model,
-  instructions: 'Delegate when specialist analysis is needed, then synthesize one incident brief.',
+  model,
+  instructions: 'Delegate specialist analysis, then synthesize one incident brief.',
   maxTurns: 4,
-  tools: [support.asTool({ name: 'ask_support' }), engineering.asTool({ name: 'ask_engineering' })],
+  tools: [
+    support.asTool({ name: 'ask_support' }),
+    engineering.asTool({ name: 'ask_engineering' }),
+  ],
 })
 
-const response = await coordinator
-  .prompt('Webhook retries failed for large payloads. Prepare an incident brief.')
-  .send()
+const result = await coordinator.generate({
+    prompt: 'Webhook retries failed for large payloads. Prepare an incident brief.',
+    toolConcurrency: 2
+})
 
-console.log(response.output)
+if (result.status === 'completed') {
+  console.log(result.output)
+}
 ```
 
-## Run and expected behavior
+Each generated tool accepts a delegated prompt. The child agent's completed output becomes its tool result, and the coordinator can synthesize that result on a later turn. Delegation is model-driven, so the exact specialists called can vary.
 
-The coordinator can call one or both specialist tools. Each tool input contains a `prompt`; the
-child agent's final visible output becomes the tool result, and the coordinator synthesizes it on a
-later turn. Delegation is model-driven, so exact calls can vary.
+Agent-as-tool increases latency, token use, and failure surface. It does not create a security boundary: give each specialist only the context and tools it needs, validate tenant propagation, and prevent recursive delegation with strict limits.
 
-## Boundaries
-
-An agent-as-tool increases latency, tokens, and failure surface. It does not create a security
-boundary: give each child only the tools and context it needs, validate delegated prompts, and avoid
-recursive delegation without strict limits. A child result is still model output, not verified fact.
-
-In production, trace parent/child identity, cap turns and concurrency, propagate tenant context
-deliberately, define partial-failure behavior, and prefer a deterministic pipeline when every
-specialist must always run.
-
-## Source and extensions
-
-Run the full
-[agent-as-tool cookbook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/07_multi_agent/01-agent-as-tool.ts).
-Next, stream child events or compare deterministic parallel specialists.
-
-- [Agent as tool](/sdk/advanced/multi-agent/agent-as-tool)
-- [Multi-agent failures](/sdk/advanced/multi-agent/failures)
+Use a [parallel pipeline](./parallel-agents) when every specialist must run deterministically.

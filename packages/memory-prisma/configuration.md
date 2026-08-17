@@ -1,13 +1,14 @@
 # Configuration
 
 ```ts
-const memory = createPrismaMemoryStore(prisma, {
-  errors: 'store',
+const memory = new PrismaMemoryStore({
+  client: prisma,
+  errorPolicy: 'store',
   validateMessages: true,
   transaction: {
     isolationLevel: 'Serializable',
   },
-  scope: {
+  scopeKey: {
     metadataKeys: ['tenantId'],
   },
 })
@@ -18,15 +19,15 @@ const memory = createPrismaMemoryStore(prisma, {
 For renamed or wrapped delegates:
 
 ```ts
-const memory = PrismaMemoryStore.fromDelegates(
-  {
+const memory = new PrismaMemoryStore({
+  delegates: {
     sessions,
     messages,
     errors,
     transaction,
   },
-  { errors: 'store' },
-)
+  errorPolicy: 'store',
+})
 ```
 
-When `errors: 'store'`, an error delegate is required. Optional inspection and compaction support depends on the methods described in [Capabilities](/packages/memory-prisma/capabilities).
+When `errorPolicy: 'store'`, an error delegate is required. Optional inspection and compaction support depends on the methods described in [Capabilities](/packages/memory-prisma/capabilities).

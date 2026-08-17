@@ -23,7 +23,9 @@ export function selectCompletionModel(modelId: string) {
     throw new Error('Unsupported model selection')
   }
 
-  return openai.completionModel(modelId)
+  return openai.completionModel({
+      modelId: modelId
+  })
 }
 ```
 

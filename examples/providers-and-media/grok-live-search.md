@@ -25,17 +25,21 @@ if (!apiKey) throw new Error('Set XAI_API_KEY.')
 const grok = new GrokClient({ apiKey })
 const researcher = new Agent({
   id: 'researcher',
-  model: grok.completionModel(),
+  model: grok.completionModel({ modelId: 'grok-4.5', api: 'responses' }),
   instructions: 'Research current information and cite every factual update.',
-  additionalParams: { max_turns: 5 },
+  providerOptions: { max_turns: 5 },
   tools: [grokTools.webSearch({ allowedDomains: ['x.ai'] }), grokTools.xSearch({ allowedHandles: ['xai'] })],
 })
 
-const response = await researcher.prompt('What are the latest xAI product updates?').send()
+const response = await researcher.generate({
+    prompt: 'What are the latest xAI product updates?'
+})
 
-console.log(response.output)
-console.log(response.sources)
-console.log(response.providerToolCalls)
+if (response.status === 'completed') {
+  console.log(response.output)
+  console.log(response.sources)
+  console.log(response.providerToolCalls)
+}
 ```
 
 ## Run and expected behavior
@@ -58,7 +62,7 @@ answer faithfulness on time-stamped queries.
 ## Source and extensions
 
 Run the
-[Grok live-search cookbook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/04_providers_and_multimodal/13-grok-live-search.ts).
+[Grok live-search cookbook](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/13-grok-live-search.ts).
 Next, add a source-quality gate, freshness display, or compare live results with a curated knowledge
 index.
 

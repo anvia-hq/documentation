@@ -1,10 +1,8 @@
 # Failures and limits
 
-Bound every child and decide how the coordinator should handle partial or complete failure.
+Bound every child and define how the coordinator should use failed or missing specialist work.
 
-## Set child turn limits
-
-Child agents should have smaller limits than the coordinator:
+## 1. Set child limits
 
 ```ts
 const research = researchAgent.asTool({
@@ -15,54 +13,53 @@ const research = researchAgent.asTool({
 
 const coordinator = new Agent({
   id: 'research-coordinator',
-  model: model,
+  model,
   maxTurns: 6,
   tools: [research],
 })
 ```
 
-A child that can call tools or other agents can otherwise consume a large amount of latency and model usage inside one parent tool call.
+A child can contain its own tool loop, so use a smaller limit than the coordinator and give each delegation one focused task.
 
-## Understand failure propagation
+## 2. Understand child failure propagation
 
-When a child agent fails, the parent sees a tool failure. Hooks, middleware, or application-owned tool error handling may map that failure into a safe result; otherwise handle it at the parent runner boundary.
+If a child agent throws, its generated tool call is marked failed. By default, the error text becomes a tool result and the coordinator may continue to another model turn.
+
+This does not guarantee a safe partial answer. Tell the coordinator how to react, and use lifecycle or observer data to distinguish successful and failed specialist tools.
 
 ```ts
-try {
-  return await coordinator
-    .prompt(question)
-    .send()
-} catch (error) {
-  await logger.error('Coordinated run failed', { error })
-  throw error
-}
+const coordinator = new Agent({
+  id: 'policy-coordinator',
+  model,
+  instructions: [
+    'A successful policy_review is required.',
+    'If that tool fails, do not present the draft as approved.',
+    'Return the request for human review.',
+  ].join('\n'),
+  tools: [policyReview],
+})
 ```
 
-Do not report a partial answer as complete unless the coordinator is explicitly instructed and tested to proceed without the failed specialist.
+The application should own safety-critical fallback policy rather than relying only on the coordinator's interpretation of an error string.
 
-## Choose a partial-failure policy
+## 3. Prevent runaway delegation
 
-| Specialist role | Typical policy |
-| --- | --- |
-| Optional background research | Continue and disclose missing evidence. |
-| Required policy review | Stop or return for human review. |
-| Duplicate source checker | Continue if another trusted source succeeded. |
-| Side-effect executor | Fail closed and inspect whether the action completed. |
-
-The application should decide which specialists are optional. Do not leave safety-critical fallback policy implicit in the coordinator prompt.
-
-## Prevent runaway delegation
-
-- Keep parent and child `maxTurns` explicit.
+- Set explicit parent and child turn limits.
 - Avoid cycles where agents expose each other as tools.
-- Keep specialist tool sets narrow.
-- Give each delegation one focused task.
-- Prefer shallow parent-to-child structures.
+- Keep child tool sets narrow.
+- Prefer one coordinator-to-specialist level.
+- Account for combined model usage and latency.
 
-Add another nesting level only when it creates a real policy or capability boundary.
+Add another nesting level only when it creates a real capability or policy boundary.
 
-## Protect side effects
+## 4. Handle approval deliberately
 
-A failed parent run does not undo a child tool that already completed. Any child with write tools still needs authorization, idempotency, audit, and a way to reconcile uncertain outcomes.
+An `asTool()` child cannot suspend for approval. A child approval request becomes an agent-tool failure. Put resumable approval at the parent or application boundary instead.
 
-Trace parent and child work together so operators can tell whether failure happened before, during, or after a side effect.
+## 5. Protect side effects
+
+A failed parent run does not undo a child tool that already completed. Write tools need authorization, idempotency, audit, and reconciliation for uncertain outcomes.
+
+Trace parent and child work together so operators can identify whether a failure happened before, during, or after a side effect.
+
+Next, decide [when not to use multiple agents](/sdk/advanced/multi-agent/when-not-to-use).

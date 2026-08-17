@@ -1,16 +1,20 @@
 # OCR
 
-Mistral OCR extracts text and document structure from scanned PDFs and images. It is a separate provider model, not an input mode on `completionModel(...)`.
+Mistral OCR extracts Markdown and page structure from PDFs and images. It is a separate provider model, not an input mode on `completionModel(...)`.
 
 ```ts
 import { MistralClient } from '@anvia/mistral'
 
 const mistral = new MistralClient({
-  apiKey: process.env.MISTRAL_API_KEY,
+  apiKey: process.env.MISTRAL_API_KEY!,
 })
 
-const ocr = mistral.ocrModel()
+const ocr = mistral.ocrModel({
+    modelId: 'mistral-ocr-latest'
+})
 ```
+
+`ocrModel({ modelId })` requires an explicit OCR model ID.
 
 ## Process a document URL
 
@@ -28,7 +32,18 @@ const result = await ocr.ocr({
 console.log(result.markdown)
 ```
 
-The URL must be reachable by the provider for the duration of the request. Prefer a short-lived signed URL over making a private document permanently public.
+The provider must be able to reach the URL for the duration of the request. Prefer a short-lived signed URL over making a private document permanently public.
+
+For an image URL, change the source shape:
+
+```ts
+const result = await ocr.ocr({
+  source: {
+    type: 'image_url',
+    url: signedImageUrl,
+  },
+})
+```
 
 ## Process local bytes
 
@@ -48,20 +63,30 @@ const result = await ocr.ocr({
 })
 ```
 
-For byte sources, the adapter uploads the file to Mistral with the `ocr` purpose and then processes its returned file ID. `result.uploadedFile` exposes normalized upload metadata. The adapter does not make provider retention decisions for the application, so configure expiry and cleanup according to the document's sensitivity.
+For byte sources, the adapter first uploads the file with the `ocr` purpose, then processes the returned file ID. Empty bytes and an empty filename are rejected. `result.uploadedFile` contains the upload ID and available metadata.
 
-OCR also accepts an `image_url` or an existing Mistral `file_id` source. Reject empty byte sources and empty filenames before they reach the provider.
+The adapter does not delete the provider file. Choose `expiry` and `visibility`, and implement any required cleanup according to the document's sensitivity.
+
+To reuse an existing Mistral file, pass its ID directly:
+
+```ts
+const result = await ocr.ocr({
+  source: {
+    type: 'file_id',
+    fileId: 'file_123',
+  },
+})
+```
 
 ## Use the normalized result
 
-| Field | Meaning |
-| --- | --- |
-| `text` / `markdown` | Combined page Markdown, suitable for display or the next processing step. |
-| `pages` | Normalized page entries with indexes, Markdown, images, and available structural metadata. |
-| `documentAnnotation` | Optional provider annotation when requested. |
-| `usageInfo` | Provider usage details when returned. |
-| `uploadedFile` | Upload metadata for a byte source. |
-| `rawResponse` | Original provider response for narrow diagnostics. |
+The result provides:
+
+- `text` and `markdown`, both containing the page Markdown joined with blank lines
+- `pages`, with each page's index, Markdown, images, and available structural metadata
+- optional `model`, `usageInfo`, and `documentAnnotation`
+- optional `uploadedFile` for a byte upload
+- `rawResponse` for narrow diagnostics
 
 Preserve page boundaries when downstream citations or review need provenance:
 
@@ -73,10 +98,8 @@ const pages = result.pages.map((page) => ({
 }))
 ```
 
-Leave `includeImageBase64` disabled unless a later step actually needs extracted images. Base64 images can substantially increase response, memory, and trace sizes.
+Available request controls include page selection, extracted-image limits, minimum image size, bounding-box and document annotations, header and footer extraction, table format, and confidence-score granularity. Use `providerOptions` only for provider fields not represented by the normalized request. It cannot replace the adapter's `model` or `document`.
 
-## Validate before use
+Leave `includeImageBase64` disabled unless a later step needs extracted images; base64 content can significantly increase response, memory, and trace sizes.
 
-OCR output can contain recognition errors. Validate totals, dates, identifiers, and other critical values before product writes, and never treat OCR as proof that a document is authentic or that a user may access it.
-
-For deciding when to use OCR, loaders, or model-visible media, continue to the broader [OCR guide](/sdk/advanced/multimodal/ocr).
+OCR can contain recognition errors. Validate totals, dates, identifiers, and other critical values before product writes. Continue to the broader [OCR guide](/sdk/advanced/multimodal/ocr) for choosing between OCR, text extraction, and model-visible media.

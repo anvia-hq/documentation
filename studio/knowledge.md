@@ -24,19 +24,26 @@ The first three views inspect configuration or browseable source contents. They 
 ## A complete inspectable agent
 
 ```ts
+import { createVectorContext } from '@anvia/core/agent';
 const agent = new Agent({
-  id: 'knowledge-ops',
-  model: model,
-  instructions: 'Use the available operational knowledge and tools.',
-  dynamicContexts: [{ index: knowledgeIndex, topK: 3, threshold: 0.7 }],
-  dynamicTools: [{ index: toolIndex, topK: 2, threshold: 0.75 }],
-  context: [{ id: 'enterprise-escalation', text: 'Escalate blocked enterprise orders to the support lead.' }],
-})
-
-new Studio([agent]).start({ port: 4021 })
+    id: 'knowledge-ops',
+    model: model,
+    instructions: 'Use the available operational knowledge and tools.',
+    context: [
+        { id: 'enterprise-escalation', text: 'Escalate blocked enterprise orders to the support lead.' },
+        createVectorContext({
+            store: knowledgeIndex,
+            model: embeddingModel,
+            topK: 3,
+            minScore: 0.7
+        }),
+    ],
+    tools: [toolIndex],
+});
+new Studio([agent]).start({ port: 4021 });
 ```
 
-Studio enables the Knowledge workspace when at least one registered agent has static context, dynamic context, or dynamic tools. If several agents or indexes are present, source selectors keep their contents separate.
+Configure a tool index's `topK` and `minScore` when calling `createToolIndex({ ... })`. Studio enables the Knowledge workspace when at least one registered agent has static context, a vector context, or a tool index. If several agents or stores are present, source selectors keep their contents separate.
 
 For document ingestion, embeddings, and vector stores, start with [Anvia SDK Knowledges](/sdk/knowledges). For retrieval behavior and policy, see [Dynamic context](/sdk/advanced/dynamic-context) and [Dynamic tools](/sdk/advanced/dynamic-tools).
 
@@ -48,4 +55,4 @@ For document ingestion, embeddings, and vector stores, start with [Anvia SDK Kno
 4. Compare its documents and tool names with the expected source contents.
 5. Open the linked trace when you need the complete generation input, output, timing, and metadata.
 
-If an item exists in the source but is absent from the generation, investigate the query text, embeddings, `topK`, threshold, and metadata filter. If the correct item reached the generation but the answer is wrong, inspect the prompt and model response rather than changing ingestion first.
+If an item exists in the source but is absent from the generation, investigate the query text, embeddings, `topK`, `minScore`, and metadata filter. If the correct item reached the generation but the answer is wrong, inspect the prompt and model response rather than changing ingestion first.

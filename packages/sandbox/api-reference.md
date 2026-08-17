@@ -2,124 +2,93 @@
 
 All public runtime symbols are exported from `@anvia/sandbox`.
 
-## `DockerSandbox`
+## Client and lifecycle
 
 ```ts
-class DockerSandbox implements Sandbox {
-  readonly provider: 'docker'
-  constructor(options?: DockerSandboxOptions)
-  static node(options?: DockerSandboxOptions): DockerSandbox
-  static python(options?: DockerSandboxOptions): DockerSandbox
-  static deno(options?: DockerSandboxOptions): DockerSandbox
-  createSession(options?: DockerSandboxCreateSessionOptions): Promise<DockerSandboxSession>
-}
-```
-
-```ts
-interface DockerSandboxOptions {
-  image?: string
-  pull?: 'missing' | 'always' | 'never'
-  workdir?: string
-  workspace?: SandboxWorkspaceOptions
-  lifecycle?: SandboxLifecycleOptions
-  network?: SandboxNetworkMode | DockerSandboxNetworkOptions
-  user?: string
-  dockerPath?: string
-  labels?: Record<string, string>
-  limits?: SandboxLimits
-  security?: DockerSandboxSecurityOptions
-  hooks?: SandboxHooks
-}
-```
-
-`DockerSandboxCreateSessionOptions` extends the common session options with a `ports` array.
-
-## Session contracts
-
-```ts
-interface Sandbox {
-  readonly provider: string
-  createSession(options?: SandboxCreateSessionOptions): Promise<SandboxSession>
+class DockerSandboxClient {
+  constructor(options?: { dockerPath?: string })
+  pullImage(options: PullDockerImageOptions): Promise<void>
+  createSandbox(options: CreateDockerSandboxOptions): Promise<DockerSandbox>
+  resumeSandbox(options: ResumeDockerSandboxOptions): Promise<DockerSandbox>
 }
 
-interface SandboxSession {
+interface DockerSandbox extends AsyncDisposable {
   readonly id: string
-  readonly provider: string
-  readonly workdir: string
-  exec(options: SandboxExecOptions): Promise<SandboxExecResult>
-  execStream(options: SandboxExecOptions): AsyncIterable<SandboxExecStreamEvent>
-  readFile(path: string): Promise<Uint8Array>
-  readTextFile(path: string): Promise<string>
-  readTextFilePage?(path: string, options?: SandboxTextFileReadOptions): Promise<SandboxTextFileReadResult>
-  writeFile(path: string, data: string | Uint8Array): Promise<void>
-  writeTextFile(path: string, content: string): Promise<void>
-  listFiles(path?: string): Promise<SandboxFileEntry[]>
+  readonly runtime: DockerSandboxRuntime
+  readonly state: DockerSandboxState
+  inspector(options: DockerSandboxInspectionOptions): DockerSandboxInspector
+  stop(options?: StopDockerSandboxOptions): Promise<void>
   destroy(): Promise<void>
+  [Symbol.asyncDispose](): Promise<void>
 }
 ```
 
-`SandboxPortSession` adds `publishedPorts` and `waitForPort()`. `SandboxProcessSession` adds process start, list, log, and stop operations. `DockerSandboxSession` implements both.
-
-Use the runtime guards when working through the generic interface:
+`DockerSandbox` is a public handle interface, not a constructable export. Create handles through `DockerSandboxClient`.
 
 ```ts
-function isSandboxPortSession(session: SandboxSession): session is SandboxPortSession
-function isSandboxProcessSession(session: SandboxSession): session is SandboxProcessSession
+type CreateDockerSandboxOptions = {
+  id?: string
+  image: string
+  workdir?: string
+  workspace: { type: 'ephemeral' } | { type: 'docker-volume'; name: string }
+  network: { mode: 'none' } | { mode: 'bridge'; ports?: readonly number[] }
+  files?: Readonly<Record<string, string | Uint8Array>>
+  directories?: readonly string[]
+  env?: Readonly<Record<string, string>>
+  user?: string
+  labels?: Readonly<Record<string, string>>
+  resources?: DockerSandboxResources
+  runtime?: DockerSandboxRuntimeLimits
+  security?: DockerSandboxSecurity
+  abortSignal?: AbortSignal
+}
 ```
 
-## Commands and files
+Images and named volumes must already exist. `pullImage()` is the explicit image acquisition operation.
 
-`SandboxExecOptions` configures command, arguments, working directory, environment, timeout, stdin, abort signal, and output callbacks. `SandboxExecResult` reports stdout, stderr, exit code, duration, timeout/abort state, and truncation flags. `SandboxExecStreamEvent` yields stdout, stderr, and final exit events.
+## Runtime
 
-File APIs use `SandboxFileEntry`, `SandboxFileType`, `SandboxTextFileReadOptions`, and `SandboxTextFileReadResult`. The paged text result reports line bounds and whether a line or byte limit truncated the response.
+`DockerSandboxRuntime` exposes:
 
-## Processes and ports
+- `exec()` and `execStream()` for commands;
+- `readFile()`, `readTextFile()`, `readTextFilePage()`, `writeFile()`, `writeTextFile()`, and `listFiles()`;
+- `startProcess()`, `listProcesses()`, `readProcessLogs()`, and `stopProcess()`;
+- `publishedPorts` and `waitForPort()`.
 
-| Area | Public types |
-| --- | --- |
-| Ports | `SandboxPublishedPort`, `SandboxWaitForPortOptions`, `SandboxPortSession`, `DockerSandboxNetworkOptions`, `SandboxNetworkMode` |
-| Processes | `SandboxProcessSession`, `SandboxProcessStartOptions`, `SandboxProcessInfo`, `SandboxProcessStatus`, `SandboxProcessLogs`, `SandboxProcessLogsOptions`, `SandboxProcessStopOptions` |
+Every method receives one options object. Binary command output and process logs are `Uint8Array`. `DockerSandboxExecResult` is discriminated by `status: 'exited' | 'timed_out'`; only the exited form has `exitCode`.
 
-Published ports bind to `127.0.0.1` and report the container and assigned host ports.
+The related public type families are `DockerSandboxExec*`, `DockerSandboxRead*`, `DockerSandboxWrite*`, `DockerSandboxFile*`, `DockerSandboxProcess*`, `DockerSandboxPublishedPort`, and `DockerSandboxWaitForPortOptions`.
+
+## Read-only inspection
+
+```ts
+const inspector = sandbox.inspector({
+  files: true,
+  ports: true,
+  processes: true,
+})
+```
+
+At least one capability must be enabled. The returned `DockerSandboxInspector` exposes only the requested read surfaces and can be registered with development tooling such as Studio.
 
 ## Agent tools
 
 ```ts
-function createSandboxTools(
-  session: SandboxSession,
-  options?: SandboxToolsOptions,
-): import('@anvia/core/tool').AnyTool[]
-
-type SandboxToolsFactory = (
-  session: SandboxSession,
-  options?: SandboxToolsOptions,
-) => AnyTool[]
+function createDockerSandboxTools(
+  options: CreateDockerSandboxToolsOptions,
+): readonly import('@anvia/core/tool').AnyTool[]
 ```
 
-`SandboxToolsOptions` selects tools with `allow` or `include` and applies execution, read-file, write-file, and process policies. `SandboxToolName` includes command, file, port, and process operations. Policy types are `SandboxExecToolPolicy`, `SandboxReadFileToolPolicy`, `SandboxFileToolPolicy`, and `SandboxProcessToolPolicy`.
+`options.tools` is a required, ordered, non-empty tuple of `DockerSandboxToolName`. Supported names are command, file, port, and process operations. The policy families are `DockerSandboxExecToolPolicy`, `DockerSandboxReadFileToolPolicy`, `DockerSandboxFileToolPolicy`, and `DockerSandboxProcessToolPolicy`.
 
-## Isolation and lifecycle types
+Command policies are discriminated allow or block lists:
 
-- `SandboxManifest` seeds files, directories, and environment values.
-- `SandboxWorkspaceOptions` selects ephemeral or named persistent workspaces.
-- `SandboxLifecycleOptions` controls TTL, idle timeout, and automatic destruction.
-- `SandboxLimits` controls execution time, output/file sizes, memory, CPU, PIDs, and process count.
-- `DockerSandboxSecurityOptions` controls read-only root filesystems, no-new-privileges, and dropped capabilities.
-- `SandboxHooks` observes session creation, execution, file writes, and destruction through `SandboxSessionEvent`, `SandboxExecEvent`, `SandboxExecEndEvent`, and `SandboxFileWriteEvent`.
+```ts
+type DockerSandboxCommandPolicy =
+  | { mode: 'allow'; values: readonly string[] }
+  | { mode: 'block'; values: readonly string[] }
+```
 
 ## Errors
 
-All specific errors extend `SandboxError`:
-
-| Error | Meaning |
-| --- | --- |
-| `SandboxDockerUnavailableError` | Docker cannot be invoked. |
-| `SandboxDockerCommandError` | A Docker command failed; exposes stdout, stderr, and exit code. |
-| `SandboxSessionDestroyedError` | An operation targeted a destroyed session. |
-| `SandboxPathError` | A requested path violates workspace rules. |
-| `SandboxTimeoutError` | An operation exceeded its deadline. |
-| `SandboxFileSizeError` | File policy rejected the requested size. |
-| `SandboxToolPolicyError` | A generated agent tool violated policy. |
-| `SandboxPortError` | Port publication or readiness failed. |
-| `SandboxProcessError` | A managed-process operation failed. |
-
+`DockerSandboxError` exposes a `code` and optional `details`. `DockerSandboxErrorCode` includes Docker availability and command failures, missing images or volumes, missing or invalid sandbox state, invalid paths, timeouts, oversized files, tool-policy failures, ports, and processes.

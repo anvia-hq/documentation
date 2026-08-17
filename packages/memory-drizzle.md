@@ -8,7 +8,7 @@
 pnpm add @anvia/memory-drizzle @anvia/core drizzle-orm
 ```
 
-The package is ESM-only and peers with `@anvia/core >=0.13.0 <1.0.0` and `drizzle-orm >=0.45.2 <1.0.0`. Supply a PostgreSQL Drizzle database instance; the exported tables use `drizzle-orm/pg-core`.
+The package is ESM-only and should be installed with the matching `@anvia/core` release candidate and `drizzle-orm >=0.45.2 <1.0.0`. Supply a PostgreSQL Drizzle database instance; the exported tables use `drizzle-orm/pg-core`.
 
 ## Add the schema
 
@@ -27,10 +27,11 @@ Generate and apply the resulting migration with your normal Drizzle tooling. The
 
 ```ts
 import { Agent } from '@anvia/core/agent'
-import { createDrizzleMemoryStore } from '@anvia/memory-drizzle'
+import { DrizzleMemoryStore } from '@anvia/memory-drizzle'
 
-const memory = createDrizzleMemoryStore(db, {
-  scope: {
+const memory = new DrizzleMemoryStore({
+  db,
+  scopeKey: {
     metadataKeys: ['tenantId'],
   },
 })
@@ -49,7 +50,8 @@ The default schema uses `agent_memory_sessions`, `agent_memory_messages`, and `a
 Pass a `schema` object with the same three roles when your application aliases the exported tables:
 
 ```ts
-const memory = createDrizzleMemoryStore(db, {
+const memory = new DrizzleMemoryStore({
+  db,
   schema: {
     agentMemorySessions,
     agentMemoryMessages,
@@ -84,5 +86,5 @@ Read [Configure memory](/sdk/memory/configure) and [Memory compaction](/sdk/memo
 
 - [API reference](/packages/memory-drizzle/api-reference)
 - [Memory store adapters](/sdk/memory/store-adapters)
-- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/memory-drizzle)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-drizzle/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/memory-drizzle)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/memory-drizzle/CHANGELOG.md)

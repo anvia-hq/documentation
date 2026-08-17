@@ -4,91 +4,41 @@ All public symbols are exported from `@anvia/pinecone`.
 
 ```ts
 import {
-  filterToPineconeFilter,
-  PineconeVectorIndex,
+  PineconeVectorClient,
   PineconeVectorStore,
+  filterToPineconeFilter,
   type PineconeClientLike,
   type PineconeIndexLike,
   type PineconeMetric,
   type PineconeNamespaceLike,
-  type PineconeVectorStoreConnectOptions,
+  type PineconeVectorClientOptions,
+  type PineconeVectorStoreOptions,
 } from '@anvia/pinecone'
 ```
 
-## filterToPineconeFilter
+## PineconeVectorClient
 
 ```ts
-function filterToPineconeFilter(
-  filter: VectorFilter | undefined,
-): unknown
+class PineconeVectorClient {
+  constructor(options?: PineconeVectorClientOptions)
+  vectorStore<T, Metadata extends VectorMetadata = VectorMetadata>(
+    options: PineconeVectorStoreOptions,
+  ): PineconeVectorStore<T, Metadata>
+  close(): Promise<void>
+}
 ```
 
-Converts an Anvia vector filter into Pinecone filter syntax.
+`PineconeVectorClientOptions` accepts an injected `client?: PineconeClientLike` or `apiKey?: string`. `PineconeVectorStoreOptions` contains `indexName`, `dimensions`, and optional `namespace`, `metric`, and `spec`. Native `PineconeMetric` values are `'cosine' | 'euclidean' | 'dotproduct'`.
 
 ## PineconeVectorStore
 
 ```ts
-class PineconeVectorStore<
-  T,
-  Metadata extends VectorMetadata = VectorMetadata,
-> {
-  static connect<T, Metadata extends VectorMetadata = VectorMetadata>(
-    options: PineconeVectorStoreConnectOptions,
-  ): Promise<PineconeVectorStore<T, Metadata>>
-
-  upsertDocuments(
-    documents: Array<EmbeddedDocument<T, Metadata>>,
-  ): Promise<void>
-
-  index(model: EmbeddingModel): PineconeVectorIndex<T, Metadata>
-}
+await store.ensure()
+await store.validate()
+await store.upsert({ documents, providerOptions })
+const results = await store.search({ vector, topK, minScore, filter, providerOptions, abortSignal })
 ```
 
-## PineconeVectorIndex
-
-```ts
-class PineconeVectorIndex<
-  T,
-  Metadata extends VectorMetadata = VectorMetadata,
-> implements VectorSearchIndex<T, Metadata> {
-  constructor(
-    model: EmbeddingModel,
-    namespace: PineconeNamespaceLike,
-  )
-
-  search(request: VectorSearchRequest): Promise<Array<VectorSearchResult<T, Metadata>>>
-  searchIds(request: VectorSearchRequest): Promise<Array<{ score: number; id: string }>>
-  asTool(options: VectorSearchToolOptions): Tool<{ query: string; topK?: number }, unknown>
-}
-```
-
-## Types
-
-```ts
-type PineconeMetric = 'cosine' | 'euclidean' | 'dotproduct'
-
-type PineconeClientLike = {
-  listIndexes(): Promise<unknown>
-  createIndex(options: Record<string, unknown>): Promise<unknown>
-  index(indexName: string): PineconeIndexLike
-}
-
-type PineconeIndexLike = {
-  namespace(namespace: string): PineconeNamespaceLike
-}
-
-type PineconeNamespaceLike = {
-  upsert(vectors: Array<Record<string, unknown>>): Promise<unknown>
-  query(options: Record<string, unknown>): Promise<unknown>
-}
-
-type PineconeVectorStoreConnectOptions = {
-  client?: PineconeClientLike
-  indexName: string
-  namespace?: string
-  createIfMissing?: boolean
-  metric?: PineconeMetric
-}
-```
+`filterToPineconeFilter(filter)` converts an Anvia `VectorFilter` for direct Pinecone queries.
 
 Return to the [package guide](/packages/pinecone).

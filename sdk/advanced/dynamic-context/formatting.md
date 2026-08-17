@@ -1,73 +1,63 @@
 # Formatting
 
-Format search results into concise, source-aware documents before they reach the model.
+Formatting converts a vector search result into the `Document` sent to the completion model.
 
-## Default formatting
+## 1. Understand the default format
 
-Without a `format` function, Anvia maps each vector result into a `Document`:
+Without `format()`, Anvia uses the result ID as the document ID. A string document becomes the text directly; any other document is serialized as indented JSON.
 
-- `id` comes from the search-result ID.
-- String documents become document text.
-- Non-string documents are serialized as JSON.
-- Search metadata becomes string document properties.
+Search metadata is converted to string-valued `additionalProps`. The default is useful when the index stores plain text or a small object whose JSON representation is already clear.
 
-The default is enough when the index stores plain text. Use custom formatting when it stores objects or when titles, dates, or sources need a clearer shape.
+## 2. Format structured records
 
-## Format structured documents
+Use `format()` when titles, dates, sources, or a selected body field need a clearer shape:
 
 ```ts
-import { Agent } from '@anvia/core'
-
+import { Agent, createVectorContext } from '@anvia/core';
 type PolicyDocument = {
-  title: string
-  body: string
-  updatedAt: string
-}
-
-const policyContext = {
-  topK: 3,
-  threshold: 0.76,
-  format(result) {
-    const policy = result.document as PolicyDocument
-
-    return {
-      id: `policy:${result.id}`,
-      text: [
-        `Title: ${policy.title}`,
-        `Updated: ${policy.updatedAt}`,
-        `Source: ${result.metadata?.source ?? 'unknown'}`,
-        '',
-        policy.body,
-      ].join('\n'),
-    }
-  },
-}
-
+    title: string;
+    body: string;
+    updatedAt: string;
+};
+const policyContext = createVectorContext<PolicyDocument>({
+    store: policyIndex,
+    model: embeddingModel,
+    topK: 3,
+    minScore: 0.76,
+    format: (result) => ({
+        id: `policy:${result.id}`,
+        text: [
+            `Title: ${result.document.title}`,
+            `Updated: ${result.document.updatedAt}`,
+            `Source: ${result.metadata?.source ?? 'unknown'}`,
+            '',
+            result.document.body,
+        ].join('\n'),
+        additionalProps: {
+            source: String(result.metadata?.source ?? 'unknown'),
+        },
+    })
+});
 const agent = new Agent({
-  id: 'policy-support',
-  model: model,
-  instructions: 'Prefer the newest applicable policy and name its source.',
-  dynamicContexts: [{ index: policyIndex, ...policyContext }],
-})
+    id: 'policy-support',
+    model,
+    instructions: 'Prefer the newest applicable policy and name its source.',
+    context: [policyContext],
+});
 ```
 
-The formatter runs after search and before the model request. It changes what the model sees; it does not change the stored vector or similarity score.
+The formatter runs after search and before the model request. It changes what the model sees, not the stored vector, metadata, or similarity score.
 
-## Include useful evidence
+## 3. Include only useful evidence
 
-A good document usually contains:
+A useful model document normally has a stable ID, a recognizable source, relevant version or date information, and the smallest passage containing the evidence.
 
-- a stable ID for debugging
-- a short title or source name
-- dates or version information when freshness matters
-- the smallest passage that contains the answer
+Avoid repeated navigation, large metadata dumps, unrelated object fields, and boilerplate copied into every result. They consume context and can hide the strongest evidence.
 
-Avoid repeating large metadata objects, navigation text, or the same boilerplate in every result. That consumes context without improving the answer.
+## 4. Keep authorization before formatting
 
-## Keep authorization outside formatting
+Formatting can omit private fields as defense in depth, but it must not decide whether a result is allowed. Apply permission filters during vector search so an unauthorized record never reaches the formatter.
 
-Formatting can remove private fields as a final safeguard, but it should not decide whether a result is allowed. Apply permission filters during search so unauthorized documents never reach the formatter.
+Test formatters with missing metadata, long bodies, stale revisions, and unexpected stored records. Inspect the exact resulting `Document` when the model ignores or misreads retrieved evidence.
 
-## Check the final shape
-
-Test the formatter with missing metadata, non-string documents, long bodies, and stale records. If the model ignores retrieved evidence, inspect the exact formatted text before changing the agent instruction.
+Next, enforce [filters and permissions](/sdk/advanced/dynamic-context/filters).

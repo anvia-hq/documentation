@@ -20,12 +20,12 @@ Create the client in a server-only module:
 import { AnthropicClient } from '@anvia/anthropic'
 
 export const anthropic = new AnthropicClient({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
-export const completionModel = anthropic.completionModel(
-  'claude-sonnet-4-20250514',
-)
+export const completionModel = anthropic.completionModel({
+    modelId: 'claude-sonnet-4-20250514'
+})
 ```
 
 The constructor fails when neither `apiKey` nor an existing Anthropic SDK `client` is supplied. Fail during application startup instead of waiting for the first user request.
@@ -52,11 +52,13 @@ Pass a custom `baseUrl` when a gateway exposes an Anthropic-compatible Messages 
 
 ```ts
 const client = new AnthropicClient({
-  apiKey: process.env.PROVIDER_API_KEY,
+  apiKey: process.env.PROVIDER_API_KEY!,
   baseUrl: process.env.PROVIDER_BASE_URL,
 })
 
-const model = client.completionModel('provider/model-name')
+const model = client.completionModel({
+    modelId: 'provider/model-name'
+})
 ```
 
 Compatibility labels do not guarantee identical behavior. Smoke test streaming, required tool calls, media blocks, usage reporting, and error responses against the exact endpoint.

@@ -1,8 +1,10 @@
 # Tools and schemas
 
-Mistral completion models support Anvia tools, tool choice, and output schemas. These are completion capabilities: the application still executes tools and validates their permissions.
+Mistral completion models support normal Anvia tools, tool choice, and output schemas. The model can request a tool, but your application executes it and remains responsible for authorization.
 
 ## Add a tool to an agent
+
+Define the tool boundary with Zod schemas:
 
 ```ts
 import { Agent, createTool } from '@anvia/core'
@@ -11,10 +13,10 @@ import { z } from 'zod'
 const getOrder = createTool({
   name: 'get_order',
   description: 'Look up one order available to the current user.',
-  input: z.object({
+  inputSchema: z.object({
     orderId: z.string().min(1),
   }),
-  output: z.object({
+  outputSchema: z.object({
     id: z.string(),
     status: z.string(),
   }),
@@ -26,38 +28,46 @@ const getOrder = createTool({
 
 const agent = new Agent({
   id: 'order-support',
-  model: model,
+  model,
   instructions: 'Use get_order for account-specific status. Never guess order data.',
   maxTurns: 4,
   tools: [getOrder],
 })
 ```
 
-The runtime validates model-supplied arguments, executes the application handler, returns the result to the model, and continues until a final answer or the turn limit. Authorization belongs inside the tool boundary; model arguments are never proof of access.
+The runtime validates the model-supplied input, calls `execute`, validates the returned value when `outputSchema` is present, and gives the result back to the model. Authorization belongs inside the tool boundary; model arguments are not proof of access.
 
 ## Control tool choice
 
-Keep automatic selection for ordinary agents. Use a required choice only when every valid run must call a tool:
+Automatic selection is appropriate for ordinary agents. Require a tool only when every valid run must call one:
 
 ```ts
 const agent = new Agent({
   id: 'order-status',
-  model: model,
+  model,
   instructions: 'Look up the order before answering.',
   toolChoice: 'required',
   maxTurns: 3,
   tools: [getOrder],
 })
+
+const result = await agent.generate({
+    prompt: 'Where is order ord_123?'
+})
+
+if (result.status === 'completed') {
+  console.log(result.output)
+}
 ```
 
-Test the selected Mistral model with required tool choice and streaming tool arguments before depending on it in production.
+Test required tool choice and streamed tool arguments with the exact Mistral model selected for production.
 
-## Return structured output
+## Parse a structured result
 
-For a single schema-validated generation, use `createParsedCompletion(...)`:
+Use `generateCompletion(...)` for one schema-validated model call:
 
 ```ts
-import { createParsedCompletion } from '@anvia/core'
+import { generateCompletion } from '@anvia/core'
 import { z } from 'zod'
 
 const incidentSchema = z.object({
@@ -66,16 +76,35 @@ const incidentSchema = z.object({
   needsFollowUp: z.boolean(),
 })
 
-const result = await createParsedCompletion(model, {
-  input: 'Checkout requests timed out for 12 minutes.',
-  schema: incidentSchema,
+const result = await generateCompletion({
+    prompt: 'Checkout requests timed out for 12 minutes.',
+    model,
+    outputSchema: incidentSchema
 })
 
-console.log(result.data.severity)
+console.log(result.output.severity)
 ```
 
-Use the agent `outputSchema` option when tools or runtime context must run before the final structured answer. A schema validates shape, not truth: validate identifiers, permissions, and business rules before any product write.
+Use an agent `outputSchema` when tools or runtime context must run before the final structured answer:
 
-## Know the boundary
+```ts
+const triageAgent = new Agent({
+  id: 'incident-triage',
+  model,
+  instructions: 'Classify the incident from the available evidence.',
+  outputSchema: incidentSchema,
+})
 
-Mistral tools here are normal Anvia application tools. The current adapter does not expose provider-executed tools. Keep tool handlers observable, bounded, idempotent where practical, and explicit about side effects.
+const result = await triageAgent.generate({
+    prompt: incidentText
+})
+
+if (result.status === 'completed') {
+  const incident = incidentSchema.parse(JSON.parse(result.output))
+  console.log(incident.severity)
+}
+```
+
+A schema validates structure, not truth. Validate identifiers, permissions, and business rules before any product write.
+
+The current Mistral adapter does not expose provider-executed tools. Keep application tool handlers bounded, observable, and idempotent where practical.

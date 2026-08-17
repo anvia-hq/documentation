@@ -1,62 +1,120 @@
 # Your first agent
 
-Turn a provider model into a reusable agent with a clear identity, instructions, and a bounded model loop.
+This tutorial turns a working provider model into a reusable agent with a stable identity, instructions, bounded execution, and normalized runtime results.
 
-## Before you start
+Complete [Install and setup](/sdk/install-and-setup) first. You should already have a provider model that can perform a direct completion.
 
-Complete [Install and setup](/sdk/install-and-setup) first. You should already have `@anvia/core`, a provider package, and a working API key.
+## 1. Construct the agent
 
-## Construct the agent
-
-Create the provider model, then pass it in the `Agent` options.
+Pass the provider model and reusable behavior directly to the v1 `Agent` constructor.
 
 ```ts
 import { Agent } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 
-const client = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
+const apiKey = process.env.OPENAI_API_KEY
+
+if (!apiKey) {
+  throw new Error('OPENAI_API_KEY is required')
+}
+
+const client = new OpenAIClient({ apiKey })
+const model = client.completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
 })
 
-const model = client.completionModel('gpt-5')
-
-const agent = new Agent({
+const supportAgent = new Agent({
   id: 'support',
-  model: model,
-  instructions: 'Answer support questions clearly and ask for missing details.',
+  model,
+  instructions: 'Answer support questions clearly. Ask for missing details.',
   maxTurns: 4,
 })
 ```
 
-The agent setup has four parts:
+Each option has a distinct responsibility:
 
-| Part | Purpose |
-| --- | --- |
-| `id: 'support'` | Gives the agent a stable identity. |
-| `model` | Supplies the provider-backed completion model. |
-| `instructions` | Defines the agent's reusable behavior. |
-| `maxTurns: 4` | Bounds the model and tool loop for each run. |
+- `id` gives runs, sessions, Studio, and observability a stable agent identity.
+- `model` supplies the provider-backed completion implementation.
+- `instructions` define behavior reused across runs.
+- `maxTurns` bounds the default model and tool loop.
 
-## Send a prompt
+Tools, memory, context, guardrails, middleware, and observers can be added to the same options object later.
 
-Create a run with `prompt()`, then execute it with `send()`.
+## 2. Generate the first answer
+
+`generate()` starts a run and resolves when it completes or pauses for tool approval.
 
 ```ts
-const response = await agent
-  .prompt('What information do you need to investigate a failed checkout?')
-  .send()
+const response = await supportAgent.generate({
+    prompt: 'What information do you need to investigate a failed checkout?'
+})
+
+if (response.status === 'approval_required') {
+  throw new Error(`Approval required for ${response.approval.toolName}`)
+}
 
 console.log(response.output)
 ```
 
-The exact response can vary, but it should follow the support instructions and ask for any details it needs.
+This agent has no approval-gated tools, so the expected status is `completed`. The check keeps the code correct when tools are added later.
 
-## Agent or direct completion?
+## 3. Read the run result
 
-| Use a direct completion when | Use an agent when |
-| --- | --- |
-| The task is a single model call. | Behavior should be reusable across requests. |
-| Your application owns all orchestration. | The task needs instructions, tools, memory, or multiple turns. |
+A completed response includes more than the visible answer:
 
-Your agent is now ready for capabilities such as [tools](/sdk/tools), [memory](/sdk/memory), and
-[streaming](/sdk/streaming).
+```ts
+if (response.status === 'completed') {
+  console.log({
+    runId: response.runId,
+    output: response.output,
+    messages: response.messages,
+    usage: response.usage,
+    contextUsage: response.contextUsage,
+  })
+}
+```
+
+Store or expose only the fields the application needs. Messages and model output may contain sensitive user or product data.
+
+## 4. Override a limit for one run
+
+Agent options define reusable defaults. Per-run options can tighten behavior without mutating the agent.
+
+```ts
+const shortResponse = await supportAgent.generate({
+    prompt: 'Give the first troubleshooting step only.',
+    maxTurns: 1
+})
+```
+
+Use conservative defaults in production and increase limits only for flows that demonstrate a need for additional turns.
+
+## 5. Stream an answer
+
+Use `stream()` when a terminal or interface should update as the run progresses.
+
+```ts
+for await (const event of supportAgent.stream({
+    prompt: 'Draft a short customer reply.'
+})) {
+  if (event.type === 'text_delta') {
+    process.stdout.write(event.delta)
+  }
+
+  if (event.type === 'final') {
+    process.stdout.write('\n')
+    console.log(event.result.runId, event.result.usage)
+  }
+}
+```
+
+The same stream may later include reasoning, tool calls, tool results, approval requests, turn boundaries, and errors.
+
+## Choose the next capability
+
+- Add application actions with [Tools](/sdk/tools).
+- Preserve conversation history with [Memory](/sdk/memory).
+- Attach stable documents through [Context](/sdk/agents/context).
+- Send runtime events to an interface with [Streaming](/sdk/streaming).
+- Learn the full execution sequence in [Runtime lifecycle](/sdk/agents/runtime-lifecycle).

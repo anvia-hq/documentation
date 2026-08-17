@@ -9,9 +9,9 @@ pnpm add @anvia/core @anvia/transformers
 Initialize a local Transformers.js feature-extraction pipeline:
 
 ```ts
-import { createTransformersEmbeddingModel } from '@anvia/transformers'
+import { DEFAULT_TRANSFORMERS_EMBEDDING_MODEL, loadTransformersEmbeddingModel } from '@anvia/transformers'
 
-const embeddings = await createTransformersEmbeddingModel()
+const embeddings = await loadTransformersEmbeddingModel({ modelId: DEFAULT_TRANSFORMERS_EMBEDDING_MODEL })
 const vectors = await embeddings.embedTexts([
   'Password reset links expire after thirty minutes.',
   'Enterprise customers receive priority support.',
@@ -23,16 +23,21 @@ The default is `Xenova/all-MiniLM-L6-v2` with mean pooling, normalization, and a
 ## Use with a vector store
 
 ```ts
-import { embedDocuments } from '@anvia/core/embeddings'
-import { InMemoryVectorStore } from '@anvia/core/vector-store'
-
-const embedded = await embedDocuments(embeddings, documents, {
-  id: (document) => document.id,
-  content: (document) => document.text,
-})
-
-const index = InMemoryVectorStore.fromDocuments(embedded).index(embeddings)
-const results = await index.search({ query: 'priority support', topK: 5 })
+import { embedDocuments } from '@anvia/core/embeddings';
+import { InMemoryVectorStore, retrieveDocuments } from '@anvia/core/vector-store';
+const { documents: embedded } = await embedDocuments({
+    model: embeddings,
+    documents: documents,
+    id: (document) => document.id,
+    content: (document) => document.text
+});
+const store = InMemoryVectorStore.fromDocuments({ documents: embedded });
+const results = await retrieveDocuments({
+    store,
+    model: embeddings,
+    query: 'priority support',
+    topK: 5
+});
 ```
 
 ## Before production

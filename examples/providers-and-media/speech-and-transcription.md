@@ -17,27 +17,31 @@ requests. Use this pair to learn both contracts; a real application can adopt ei
 
 ```ts
 import { readFile, writeFile } from 'node:fs/promises'
-import { audioGenerationRequest } from '@anvia/core/audio-generation'
-import { transcriptionRequest } from '@anvia/core/transcription'
+import { generateSpeech } from '@anvia/core/speech-generation'
+import { transcribe } from '@anvia/core/transcription'
 import { OpenAIClient } from '@anvia/openai'
 
-const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY })
+const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! })
 
-const speech = await audioGenerationRequest(client.audioGenerationModel())
-  .text('Anvia provides provider-neutral audio and transcription contracts.')
-  .voice('alloy')
-  .speed(1)
-  .additionalParams({ response_format: 'mp3' })
-  .send()
+const speech = await generateSpeech({
+    text: 'Anvia provides provider-neutral audio and transcription contracts.',
+    model: client.speechGenerationModel({ modelId: 'tts-1' }),
+    voice: 'alloy',
+    speed: 1,
+    providerOptions: { response_format: 'mp3' }
+})
 
-await writeFile('speech.mp3', speech.audio)
+await writeFile('speech.mp3', speech.audio.data)
 
-const transcript = await transcriptionRequest(client.transcriptionModel())
-  .data(await readFile('speech.mp3'))
-  .filename('speech.mp3')
-  .prompt('Transcribe the audio exactly.')
-  .temperature(0)
-  .send()
+const transcript = await transcribe({
+    audio: {
+        data: await readFile('speech.mp3'),
+        filename: 'speech.mp3'
+    },
+    model: client.transcriptionModel({ modelId: 'whisper-1' }),
+    prompt: 'Transcribe the audio exactly.',
+    temperature: 0
+})
 
 console.log(transcript.text)
 ```
@@ -60,9 +64,9 @@ multilingual, accented, and domain-specific audio.
 ## Source and extensions
 
 Run the
-[OpenAI audio cookbook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/04_providers_and_multimodal/08-openai-audio-and-transcription.ts).
+[OpenAI audio cookbook](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/08-openai-audio-and-transcription.ts).
 Next, transcribe an uploaded file, add timestamps at the provider boundary if supported, or stream
 job progress to a UI.
 
-- [Audio generation](/sdk/models/audio-generation)
+- [Audio generation](/sdk/models/speech-generation)
 - [Transcription](/sdk/models/transcription)

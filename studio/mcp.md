@@ -10,16 +10,18 @@ Studio does not establish MCP connections from the browser. Your application con
 
 ```ts
 import { Agent } from '@anvia/core/agent'
-import { connectMcp, mcp } from '@anvia/core/mcp'
+import { McpClient } from '@anvia/core/mcp'
 import { Studio } from '@anvia/studio'
 
-const counterServer = await connectMcp(
-  mcp.stdio({
-    name: 'counter',
+const counterClient = new McpClient({
+  name: 'counter',
+  transport: {
+    type: 'stdio',
     command: 'tsx',
     args: ['mcp-counter-server.ts'],
-  }),
-)
+  },
+})
+const counterServer = await counterClient.connect()
 
 const agent = new Agent({
   id: 'counter-agent',
@@ -31,7 +33,7 @@ const agent = new Agent({
 new Studio([agent]).start({ port: 4021 })
 ```
 
-`connectMcp(...)` starts or connects to the server, lists its tools, and adapts them into Anvia tools. Studio reads the resulting tool metadata from the registered agent. For transport selection, allow-listing, credentials, and connection cleanup, use the [Anvia SDK MCP documentation](/sdk/advanced/mcp).
+`counterClient.connect()` starts or connects to the server, lists its tools, and adapts them into Anvia tools. Studio reads the resulting tool metadata from the registered agent. The application must close `counterClient` during shutdown. For transport selection, allow-listing, credentials, and connection cleanup, use the [Anvia SDK MCP documentation](/sdk/advanced/mcp).
 
 ## Read the inventory
 

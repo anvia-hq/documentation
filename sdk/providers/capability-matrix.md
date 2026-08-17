@@ -1,85 +1,84 @@
-# Capability matrix
+# Provider capabilities
 
-This matrix describes what the current Anvia provider adapters can represent. A **Yes** means the adapter implements the Core capability; it does not mean every upstream model ID, account, region, or endpoint supports it.
+This page describes the contracts declared by the current Anvia adapters. A declared capability does not guarantee that every upstream model ID, account, region, or compatible endpoint enables it.
 
-Always test the exact production model and configuration, including provider-specific `additionalParams`.
+## 1. OpenAI
 
-## Completion capabilities
+The default Responses adapter declares streaming, tools, tool choice, image input, file-document input, output schemas, reasoning content, and provider-executed tools.
 
-| Capability | OpenAI | Anthropic | Gemini | Mistral | Grok |
-| --- | --- | --- | --- | --- | --- |
-| Text completion | Yes | Yes | Yes | Yes | Yes |
-| Streaming | Yes | Yes | Yes | Yes | Yes |
-| Tools | Yes | Yes | Yes | Yes | Yes |
-| Tool choice | Yes | Yes | Yes | Yes | Yes |
-| Structured output schema | Yes | No | Yes | Yes | Yes |
-| Image input | Yes | Yes | Yes | No | Yes |
-| Document-file input | Responses only | Yes | Yes | No | Responses only |
-| Reasoning content | Yes | Yes | Yes | No | Yes |
-| Provider-executed tools | Responses only | No | No | No | Responses only |
-| Normalized citations and provider-tool events | Responses only | No | No | No | Responses only |
+The Chat Completions adapter declares streaming, tools, tool choice, image input, output schemas, and reasoning. It does not declare file-document input or provider-executed tools.
 
-OpenAI and Grok expose Responses and Chat completion adapters. Responses is the default for their normal first-party clients. Their Chat adapters do not declare document-file input or provider-executed tools.
+The package also exposes embeddings, image generation, audio generation, transcription, and model listing.
 
-Document-file input means a provider-native file or URL attachment. Text extracted from a document can still be included as normal text with any completion provider.
+## 2. Anthropic
 
-## Other model capabilities
+The completion adapter declares streaming, tools, tool choice, image input, file-document input, and reasoning. It does not declare Core output schemas or provider-executed tools.
 
-| Capability | OpenAI | Anthropic | Gemini | Mistral | Grok |
-| --- | --- | --- | --- | --- | --- |
-| Embeddings | Yes | No | Yes | Yes | No |
-| Image generation | Yes | No | Yes | No | Yes |
-| Audio generation | Yes | No | No | No | Yes |
-| Transcription | Yes | No | Yes | No | Yes |
-| OCR | No | No | No | Yes | No |
-| Model listing | Yes | Yes\* | Yes | Yes | Yes |
+The direct Anthropic client supports model listing. The Vertex client does not expose Anthropic's model-listing API. The package has no embedding, image-generation, speech-generation, transcription, or OCR model factory.
 
-\* Direct `AnthropicClient` can list models. `AnthropicVertexClient` cannot because Vertex AI does not expose Anthropic's Models API.
+## 3. Gemini
 
-These capabilities use separate Core interfaces and provider factories. Support for completion does not imply support for embeddings, transcription, or media generation.
+The completion adapter declares streaming, tools, tool choice, image input, file-document input, output schemas, and reasoning. It does not declare provider-executed tools.
 
-## Read a completion model declaration
+The package also exposes embeddings, image generation, transcription, and model listing. It has no speech-generation or OCR model factory.
 
-Anvia completion models expose adapter capabilities on the model object:
+## 4. Mistral
+
+The completion adapter declares streaming, tools, tool choice, and output schemas. It does not declare image input, file-document input, reasoning, or provider-executed tools.
+
+The package also exposes embeddings, OCR, and model listing. It has no image-generation, speech-generation, or transcription model factory.
+
+## 5. Grok
+
+The Responses adapter mirrors the OpenAI Responses surface and enables xAI provider-executed tools such as live search. The Chat adapter mirrors the OpenAI Chat surface and omits file documents and provider tools.
+
+The package also exposes image generation, audio generation, transcription, and model listing. It has no embedding or OCR model factory.
+
+## 6. Read the declaration in code
 
 ```ts
-const model = client.completionModel(config.model)
+const model = client.completionModel({
+    modelId: config.model,
+    api: config.api,
+})
 
 console.log(model.provider)
 console.log(model.defaultModel)
 console.log(model.capabilities)
 ```
 
-A typical guard can reject an invalid application configuration at startup:
+Reject incompatible application configuration at startup:
 
 ```ts
-if (config.attachments && !model.capabilities.documentInput) {
-  throw new Error('Configured completion model does not accept document files')
+if (
+  config.attachments &&
+  !model.capabilities.documentInput
+) {
+  throw new Error(
+    'Configured model does not accept document files.',
+  )
 }
 
-if (config.structuredOutput && !model.capabilities.outputSchema) {
-  throw new Error('Configured completion model does not expose output schemas')
+if (
+  config.structuredOutput &&
+  !model.capabilities.outputSchema
+) {
+  throw new Error(
+    'Configured model does not expose output schemas.',
+  )
 }
 ```
 
-This is contract validation, not a network capability probe. The provider may still reject an unsupported model, account, region, parameter, file type, or feature combination.
+## 7. Treat compatible endpoints separately
 
-## Compatible endpoints
+[Compatible APIs](/sdk/providers/compatible) reuse an OpenAI or Anthropic HTTP shape. Streaming chunks, tool arguments, schemas, reasoning fields, and media commonly differ.
 
-[Compatible APIs](/sdk/providers/compatible) share an OpenAI or Anthropic HTTP shape, but that does not guarantee feature parity. Streaming chunks, tool arguments, tool choice, structured output, reasoning fields, and media inputs commonly differ.
+For a custom `baseUrl`, select `api: 'chat'` or `api: 'responses'` explicitly according to the endpoint surface.
 
-When `OpenAIClient` receives a custom `baseUrl`, it defaults to the Chat adapter. Set `completionApi` explicitly only when the endpoint actually implements the selected surface.
+## 8. Run minimum live verification
 
-## Minimum verification
+Test one direct completion, one complete stream, the tool-choice modes you use, parsed output when required, every representative media or embedding path, and one error case for retry behavior.
 
-After using this table to make a shortlist, run the smallest request that proves every required path:
+Record provider, model ID, endpoint, region, and relevant parameters with the result. Repeat when any of them changes.
 
-- a direct completion for credentials and request mapping
-- a streamed completion consumed through the final event
-- a forced or required tool call when the workflow depends on tool choice
-- a parsed completion for structured output
-- representative image, document, audio, embedding, transcription, or OCR input
-- an error case to confirm retry and fallback behavior
-
-Record the provider, exact model ID, endpoint, region, and relevant parameters with the test result. Repeat these tests when any of them changes.
-
+Next, open the guide for the selected provider from [Providers](/sdk/providers).

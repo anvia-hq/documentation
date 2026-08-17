@@ -22,7 +22,9 @@ const logger = createConsoleLogger({
 const agent = new Agent({
   id: 'support',
   model: model,
-  observers: [createLoggerObserver(logger)],
+  observability: {
+    observers: { logger: createLoggerObserver({ logger }) },
+  },
 })
 ```
 
@@ -52,4 +54,4 @@ The package is a server-side logging adapter and declares `@anvia/core` as a pee
 - [Production](/packages/logger/production)
 - [Public API](/packages/logger/api-reference)
 - [Releases](/packages/logger/releases)
-- [Hooks and run control](/sdk/advanced/hooks)
+- [Lifecycle and run control](/sdk/advanced/hooks)

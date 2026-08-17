@@ -23,7 +23,7 @@ This table identifies a sensible first evaluation, not a winner. A product can l
 
 ### What is the smallest abstraction you need?
 
-For a single provider request, a direct SDK may be enough. For a streamed chat interface, an AI SDK Core and UI combination may fit better than adopting an entire agent runtime. Anvia becomes useful when the application needs reusable agents, typed tools, memory, retrieval, hooks, pipelines, normalized events, or provider changes behind shared contracts.
+For a single provider request, a direct SDK may be enough. For a streamed chat interface, an AI SDK Core and UI combination may fit better than adopting an entire agent runtime. Anvia becomes useful when the application needs reusable agents, typed tools, memory, retrieval, lifecycle policy, pipelines, normalized events, or provider changes behind shared contracts.
 
 ### Where should application state live?
 

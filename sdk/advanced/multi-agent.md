@@ -1,66 +1,75 @@
 # Multi-agent systems
 
-Multi-agent systems let one agent delegate focused work to specialist agents. In Anvia, the simplest pattern is to expose each specialist with `agent.asTool(...)` and give those tools to one coordinator.
-
-## Explore multi-agent systems
-
-| Page | Learn how to |
-| --- | --- |
-| [Agent as a tool](/sdk/advanced/multi-agent/agent-as-tool) | Expose a specialist agent to a coordinator. |
-| [Child events](/sdk/advanced/multi-agent/child-events) | Stream nested work without leaking private runtime data. |
-| [Memory boundaries](/sdk/advanced/multi-agent/memory) | Keep children stateless or give them an explicit session. |
-| [Coordination](/sdk/advanced/multi-agent/coordination) | Make one parent own delegation and the final answer. |
-| [Failures and limits](/sdk/advanced/multi-agent/failures) | Bound child turns and handle nested failures. |
-| [When not to use](/sdk/advanced/multi-agent/when-not-to-use) | Avoid unnecessary agents and model calls. |
-| [Production checklist](/sdk/advanced/multi-agent/production-checklist) | Verify permissions, observability, and product ownership. |
-
-## The basic shape
+A multi-agent system lets one coordinator delegate focused work to specialist agents. The simplest Anvia pattern exposes each specialist with `agent.asTool()`.
 
 ```text
 User request
-    ↓
-Coordinator ──→ policy specialist
-    │          technical specialist
-    │          research specialist
-    ↓
-One final answer
+    -> coordinator
+         -> policy specialist
+         -> technical specialist
+         -> research specialist
+    -> one coordinator response
 ```
 
-The coordinator decides whether to delegate, supplies a focused task, receives each child output as a tool result, and writes the final user-facing response.
+The coordinator chooses whether to delegate, writes a focused child prompt, receives the child output as a tool result, and owns the final response.
 
-## Create one specialist
+## 1. Create a specialist tool
 
 ```ts
 import { Agent } from '@anvia/core'
 
 const policyAgent = new Agent({
   id: 'policy-review',
-  model: model,
-  instructions: 'Review the supplied draft for policy risk. Return concise findings, not a user-facing answer.',
+  model: policyModel,
+  instructions: [
+    'Review the supplied draft for policy risk.',
+    'Return concise findings and recommended changes.',
+    'Do not write the final customer response.',
+  ].join('\n'),
   maxTurns: 2,
 })
 
 const policyReview = policyAgent.asTool({
   name: 'policy_review',
-  description: 'Review a draft support answer for policy risk.',
+  description: 'Review a draft support response for policy risk.',
   maxTurns: 2,
 })
 ```
 
-Add the specialist tool to the coordinator:
+## 2. Give it to the coordinator
 
 ```ts
 const supportAgent = new Agent({
   id: 'support',
-  model: model,
-  instructions: 'Answer support questions. Use policy_review for high-risk answers, then write the final response yourself.',
+  model: coordinatorModel,
+  instructions: [
+    'Answer support questions.',
+    'Use policy_review for high-risk responses.',
+    'Use its findings as evidence, then write the final response yourself.',
+  ].join('\n'),
   maxTurns: 6,
   tools: [policyReview, ...supportTools],
 })
+
+const result = await supportAgent.generate({
+    prompt: question
+})
 ```
 
-## Use meaningful boundaries
+The generated tool accepts `{ prompt: string }` and returns the child's final output string.
 
-Split out a specialist when it has a distinct role, tool set, model, output contract, or reason to be tested independently. Keep one agent when the work uses the same instructions, tools, and policy throughout.
+## 3. Use a meaningful boundary
 
-More agents create more model calls, latency, traces, and failure modes. The boundary should make the system easier to control—not merely look more sophisticated.
+Create a specialist when it has a distinct role, tool set, model, knowledge scope, output expectation, or reason to be evaluated independently.
+
+Keep one agent when the work shares the same instructions, tools, and policy. Each child adds model calls, latency, usage, traces, and failure paths.
+
+## 4. Continue through the section
+
+- [Expose an agent as a tool](/sdk/advanced/multi-agent/agent-as-tool)
+- [Stream child events](/sdk/advanced/multi-agent/child-events)
+- [Define memory boundaries](/sdk/advanced/multi-agent/memory)
+- [Coordinate specialist work](/sdk/advanced/multi-agent/coordination)
+- [Handle failures and limits](/sdk/advanced/multi-agent/failures)
+- [Know when not to use multiple agents](/sdk/advanced/multi-agent/when-not-to-use)
+- [Review the production checklist](/sdk/advanced/multi-agent/production-checklist)

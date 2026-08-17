@@ -1,62 +1,73 @@
 # Failures and results
 
-Choose whether one failed input should reject the batch or become an explicit result. The right behavior depends on whether callers need all-or-nothing control flow or per-item reporting.
+Choose whether one failed input should reject the batch or become an explicit item result.
 
-## Default batch behavior
-
-`pipeline.batch(...)` rejects when an item throws. This is useful when any missing output means the caller cannot continue safely.
+## 1. Use default fail-fast scheduling
 
 ```ts
 try {
-  const results = await enrichmentPipeline.batch(inputs, {
-    concurrency: 3,
-  })
-
-  await publish(results)
-} catch (error) {
-  await batchRuns.markFailed(batchId, toPublicError(error))
+    const results = await enrichmentPipeline.runBatch({
+        inputs: inputs,
+        concurrency: 3
+    });
+    await publish(results);
 }
+catch (error) {
+    await batchRuns.markFailed(batchId, toPublicError(error));
+}
+
 ```
 
-Do not interpret rejection as rollback. Other inputs or parallel branches may already have completed external work.
+After the first failure, workers stop starting new items. Items already in flight finish, and the batch then rejects with the first error.
 
-## Return per-item outcomes
+Rejection is not rollback. Completed items and external side effects remain completed, and the batch does not return their successful values.
 
-When every input needs a status, catch the item-level failure inside the pipeline and return a discriminated result:
+## 2. Return explicit per-item outcomes
+
+When every input needs a status, convert the failure inside the pipeline:
 
 ```ts
-const safeEnrichment = new PipelineBuilder(ticketSchema)
-  .step(async (ticket) => {
-    try {
-      const value = await enrichTicket(ticket)
-
-      return {
-        ok: true as const,
-        id: ticket.id,
-        value,
-      }
-    } catch (error) {
-      return {
-        ok: false as const,
-        id: ticket.id,
-        error: toPublicError(error),
-      }
+const safeEnrichment = new Pipeline({
+    id: 'safe-ticket-enrichment',
+    inputSchema: ticketSchema,
+}).step({
+    id: "step-1",
+    run: async ({ input: ticket }) => {
+        try {
+            return {
+                ok: true as const,
+                id: ticket.id,
+                value: await enrichTicket(ticket),
+            };
+        }
+        catch (error) {
+            return {
+                ok: false as const,
+                id: ticket.id,
+                error: toPublicError(error),
+            };
+        }
     }
-  })
-  .build()
+});
+const outcomes = await safeEnrichment.runBatch({
+    inputs: tickets,
+    concurrency: 3
+});
+const failed = outcomes.filter((outcome) => !outcome.ok);
 
-const outcomes = await safeEnrichment.batch(tickets, {
-  concurrency: 3,
-})
-
-const failed = outcomes.filter((outcome) => !outcome.ok)
 ```
 
-Keep the original stable ID in both variants. The returned array preserves input order, but the ID remains necessary for storage and targeted retries.
+This prevents expected item failures from rejecting the outer batch. Do not catch process-level cancellation or errors that should stop the worker.
 
-## Avoid leaking raw errors
+## 3. Handle parallel branch failure
 
-Thrown provider and service errors can contain request data, internal paths, or credentials. Convert them into an application-owned error shape before persistence or display:
+A parallel stage rejects when any branch rejects. Other branch operations were already started and are not cancelled automatically.
+
+Gather evidence in parallel, then write in a controlled sequential stage. When parallel writes are unavoidable, use idempotency keys and model partial completion explicitly.
+
+## 4. Store safe error shapes
+
+Provider and service errors may include request data, paths, or credentials. Convert them before persistence or display:
 
 ```ts
 type PublicJobError = {
@@ -66,15 +77,12 @@ type PublicJobError = {
 }
 ```
 
-Send raw failures to restricted observability when policy allows; store a safe summary with the product job.
+Send raw failures only to restricted observability when policy allows.
 
-## Decide where to stop
+## 5. Choose the product behavior
 
-| Requirement | Behavior |
-| --- | --- |
-| Downstream step requires every result | Let the batch reject. |
-| Operator needs success and failure counts | Return per-item outcomes. |
-| Failed items should retry later | Persist IDs and enqueue only failures. |
-| Writes must be atomic across all inputs | Use a product transaction or redesign the boundary. |
+Let the batch reject when downstream work requires every result. Return item outcomes when operators need success and failure counts. Persist stable IDs and enqueue only failed items for later retry.
 
-Pipeline parallelism does not provide distributed transactions. Make partial completion an explicit product state when it is possible.
+If writes must be atomic across every input, use a product transaction or redesign the boundary. Pipeline parallelism does not provide distributed transactions.
+
+Next, move restart-sensitive work into [long-running jobs](/sdk/advanced/parallel-and-batch/jobs).

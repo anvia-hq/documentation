@@ -10,12 +10,12 @@ Create one client per runtime boundary or request scope rather than rebuilding t
 import { GeminiClient } from '@anvia/gemini'
 
 const gemini = new GeminiClient({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY!,
 })
 
-export const supportModel = gemini.completionModel(
-  process.env.GEMINI_MODEL ?? 'gemini-2.5-flash',
-)
+export const supportModel = gemini.completionModel({
+    modelId: process.env.GEMINI_MODEL ?? 'gemini-2.5-flash'
+})
 ```
 
 Validate required environment values at startup. Keep model selection in reviewed configuration so a rollout or rollback does not require rewriting agents.

@@ -23,13 +23,13 @@ versioned cases -> agentEvalTarget(agent) -> outputs/traces
 
 ```ts
 import { Agent } from "@anvia/core/agent";
+import type { AgentResponse } from "@anvia/core/agent";
 import {
   agentEvalTarget,
   contains,
   exactMatch,
   runEvalSuite,
 } from "@anvia/core/evals";
-import type { PromptResponse } from "@anvia/core/request";
 
 const cases = [
   { id: "refund-window", input: "When can I request a refund?", expected: "30 days" },
@@ -39,12 +39,15 @@ const cases = [
 const result = await runEvalSuite({
   name: "support-policy-v3",
   cases,
-  target: agentEvalTarget<string>(supportAgent),
+  target: agentEvalTarget<string>({
+    agent: supportAgent,
+    request: ({ input }) => ({ prompt: input }),
+  }),
   metrics: [
-    contains<string, PromptResponse, string>({
+    contains<string, AgentResponse<string>, string>({
       actual: ({ output }) => output.output,
     }),
-    exactMatch<string, PromptResponse, string>({
+    exactMatch<string, AgentResponse<string>, string>({
       name: "not_blank",
       actual: ({ output }) => output.output.trim().length > 0,
       expected: true,
@@ -81,6 +84,6 @@ model-judged cases and manually review a sample of disagreements.
 
 ## Source and extensions
 
-- Sources: [`08_evals`](https://github.com/anvia-hq/anvia/tree/main/examples/cookbook/08_evals)
+- Sources: [`08_evals`](https://github.com/anvia-hq/anvia/tree/v1-rc3/examples/cookbook/08_evals)
 - Continue to [quality gates](/examples/production/quality-gates) and [testing agents](/examples/production/testing-agents).
 - Extend with Lens, Langfuse, or OTel reporters; slice results by capability and risk level.

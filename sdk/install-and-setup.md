@@ -1,65 +1,109 @@
 # Install and setup
 
-Install Anvia's core runtime and the provider package your application needs. This guide uses OpenAI, but the runtime stays provider-neutral.
+This guide installs the v1 release candidate, creates a provider model, and verifies one direct completion before an agent is introduced.
 
 ## Before you start
 
-You need an ESM TypeScript project, pnpm, and an API key for your chosen model provider.
+You need:
 
-## Install the packages
+- an ESM-compatible TypeScript project;
+- `pnpm` or another Node.js package manager;
+- an API key for the provider you plan to use; and
+- server-side code where the provider credential can remain private.
 
-Start with the smallest useful stack: the core runtime and one provider.
+## 1. Install core and one provider
 
-```bash
-pnpm add @anvia/core @anvia/openai
-```
-
-Add other packages only when the application needs them.
-
-| Package | Use it for |
-| --- | --- |
-| `@anvia/server` | Exposing agent runs and streams over HTTP. |
-| `@anvia/react` | Consuming agent state and streams in React. |
-| `@anvia/logger` | Structured runtime logging. |
-| `@anvia/sandbox` | Running code in an isolated sandbox. |
-| `@anvia/studio` | Inspecting agents during development. |
-| `zod` | Defining schemas for tools and structured output. |
-
-## Configure your API key
-
-Set the provider key in the server environment. Keep it out of browser code and source control.
+Start with the provider-neutral runtime and a single provider adapter. During the release-candidate period, keep every Anvia package on the `rc` tag.
 
 ```bash
-OPENAI_API_KEY=your_api_key
+pnpm add @anvia/core@rc @anvia/openai@rc
 ```
 
-## Create a model
+Other provider adapters use the same runtime boundary:
 
-Provider clients create models that can be passed to Anvia's runtime primitives.
+```bash
+pnpm add @anvia/anthropic@rc
+pnpm add @anvia/gemini@rc
+pnpm add @anvia/mistral@rc
+```
+
+Add packages such as `@anvia/server`, `@anvia/react`, memory adapters, or observability integrations only when the application needs those capabilities.
+
+## 2. Configure the credential
+
+Keep provider credentials in the server environment and out of browser code, committed files, and client-visible errors.
+
+```bash
+export OPENAI_API_KEY=...
+```
+
+Validate required values when the application starts:
+
+```ts
+const apiKey = process.env.OPENAI_API_KEY
+
+if (!apiKey) {
+  throw new Error('OPENAI_API_KEY is required')
+}
+```
+
+Failing during startup is easier to diagnose than discovering a missing credential during a user request.
+
+## 3. Create the provider model
+
+The provider client owns provider-specific configuration. `completionModel()` returns the model object consumed by the core runtime.
 
 ```ts
 import { OpenAIClient } from '@anvia/openai'
 
-const client = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+const client = new OpenAIClient({ apiKey })
 
-export const model = client.completionModel('gpt-5')
+export const model = client.completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
+})
 ```
 
-## Verify the setup
+The client does not read `OPENAI_API_KEY` automatically. Passing the value explicitly keeps configuration inside your application's existing dependency and secret-management layer.
 
-Run one direct completion before adding an agent. This confirms that the package, credential, and provider model are wired correctly.
+## 4. Verify a direct completion
+
+Test one model call before adding an agent. This isolates installation, credentials, endpoint access, and model selection from agent behavior.
 
 ```ts
-import { createCompletion } from '@anvia/core'
+import { generateCompletion } from '@anvia/core'
 import { model } from './model'
 
-const result = await createCompletion(model, {
-  input: 'Reply with: Anvia is ready.',
+const result = await generateCompletion({
+    prompt: 'Reply with exactly: Anvia is ready.',
+    model,
+    instructions: 'Follow the requested output exactly.'
 })
 
 console.log(result.text)
+console.log(result.usage)
 ```
 
-If the request returns a response, the setup is ready. Continue with [Your first agent](/sdk/your-first-agent).
+The v1 completion API receives the input first and runtime options second. A successful result contains visible `text`, normalized `content`, token `usage`, and the normalized provider `response`.
+
+## 5. Keep packages aligned
+
+Do not mix stable v0 packages with v1 release-candidate packages. When adding another Anvia package, install its `rc` release as well:
+
+```bash
+pnpm add @anvia/server@rc @anvia/react@rc
+```
+
+Package alignment matters because the provider, core runtime, server transport, and UI packages share TypeScript contracts.
+
+## Troubleshooting the first call
+
+If verification fails, check the boundary in this order:
+
+1. Confirm the API key exists in the server process.
+2. Confirm the selected model is available to the provider account.
+3. Confirm a custom base URL implements the expected OpenAI-compatible API.
+4. Confirm all `@anvia/*` packages use the same release channel.
+5. Log the error type and status without logging credentials or sensitive prompts.
+
+Once the direct completion works, continue to [Your first agent](/sdk/your-first-agent).

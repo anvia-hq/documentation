@@ -15,7 +15,7 @@ Studio discovers capabilities from the agents and pipelines you register. The br
 | Surface | What it helps you do |
 | --- | --- |
 | Playground | Stream a real agent run and keep related prompts in a session. |
-| Agents | Verify identity, model, tools, context, memory, hooks, and runtime limits. |
+| Agents | Verify identity, model, tools, context, memory, lifecycle configuration, and runtime limits. |
 | Tools | Inspect schemas and invoke a tool directly with validated arguments. |
 | Traces | Follow model generations and tool calls for a Studio session. |
 | Pipelines | Read a pipeline graph, run it, inspect logs, and replay saved input. |

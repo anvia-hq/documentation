@@ -1,41 +1,41 @@
 # Add the think tool
 
-Create the built-in tool and register it with the other tools available to the agent.
+Create the built-in tool and register it with the concrete tools available to the agent.
 
-## Basic setup
+## 1. Use the default tool
 
 ```ts
 import { Agent, createThinkTool } from '@anvia/core'
 
 const agent = new Agent({
   id: 'support-investigator',
-  model: model,
-  instructions: 'Use think when you need to compare multiple tool results before answering.',
+  model,
+  instructions:
+    'Use think when you must compare multiple tool results before answering.',
+  tools: [
+    createThinkTool(),
+    searchTicketsTool,
+    getAccountTool,
+  ],
   maxTurns: 6,
-  tools: [createThinkTool(), searchTicketsTool, getAccountTool],
 })
 ```
 
-The model decides whether to call the tool. Registering it does not make every request use it, so pair it with a specific instruction.
+Registration makes the definition available to the model. The model still decides whether to call it, so give a specific instruction describing the useful decision boundary.
 
-## Customize the definition
-
-The default name is `think`. Change it if that name already exists or a more precise capability name will guide the model better:
+## 2. Customize its definition
 
 ```ts
-const evidenceCheckTool = createThinkTool({
+const evidenceCheck = createThinkTool({
   name: 'review_evidence',
   description:
     'Record a concise assessment of the evidence before choosing the next action.',
 })
 ```
 
-| Option | Default | Purpose |
-| --- | --- | --- |
-| `name` | `think` | Model-facing tool name. |
-| `description` | Built-in description | Explains when the model should call it. |
+`name` defaults to `think`. `description` defaults to a built-in explanation that the tool records a thought without retrieval, memory storage, or external state changes.
 
-The input and output contract does not change when the tool is renamed:
+Changing either option does not change the input and output contract:
 
 ```ts
 type ThinkInput = {
@@ -45,19 +45,23 @@ type ThinkInput = {
 type ThinkOutput = string
 ```
 
-## Add it to the right agents
-
-Do not add think globally merely because an agent can call tools. Attach it to agents whose work actually involves investigation, comparison, or multi-step decisions.
-
-For a large dynamically retrieved catalog, keep think static so it is always available during the run:
+## 3. Keep it static when needed
 
 ```ts
 const agent = new Agent({
   id: 'operations',
-  model: model,
-  dynamicTools: [{ index: operationsToolIndex, topK: 5, threshold: 0.72 }],
-  tools: [createThinkTool()],
+  model,
+  tools: [
+    createThinkTool(),
+    operationsToolIndex,
+  ],
 })
 ```
 
-Static registration makes the checkpoint available on every turn while operational tools are selected from the index.
+A normal tool is visible on every turn. A `ToolIndex` contributes only dynamically selected definitions, so this arrangement keeps the checkpoint available while retrieving operational tools.
+
+## 4. Add it selectively
+
+Use think for agents that genuinely compare evidence or make multi-step decisions. Adding it to every tool-capable agent increases prompt surface and may encourage unnecessary turns.
+
+Next, understand [how it works](/sdk/advanced/think-tool/how-it-works).

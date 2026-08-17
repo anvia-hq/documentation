@@ -66,11 +66,15 @@ Studio discovers sandbox sessions from registered tools so it can inspect their 
 Keep creation and cleanup in the same entry point:
 
 ```ts
-import { DockerSandbox } from '@anvia/sandbox'
+import { DockerSandboxClient } from '@anvia/sandbox'
 import { Studio } from '@anvia/studio'
 
-const sandbox = DockerSandbox.node()
-const session = await sandbox.createSession()
+const client = new DockerSandboxClient()
+const sandbox = await client.createSandbox({
+  image: 'node:22-bookworm',
+  workspace: { type: 'ephemeral' },
+  network: { mode: 'none' },
+})
 const studio = new Studio()
 
 try {
@@ -78,11 +82,11 @@ try {
     hostname: '127.0.0.1',
     port: 4021,
     onShutdown: async () => {
-      await session.destroy()
+      await sandbox.destroy()
     },
   })
 } catch (error) {
-  await session.destroy().catch(() => undefined)
+  await sandbox.destroy().catch(() => undefined)
   throw error
 }
 ```
@@ -90,4 +94,3 @@ try {
 The `catch` covers failures that happen outside the normal serving lifecycle. Apply the same ownership pattern to MCP clients, worker processes, temporary directories, and any resource created for the Studio process.
 
 See [Sandboxes](/studio/sandboxes) for the inspection surface and [Storage and persistence](/studio/configure/storage-and-persistence) for state that should survive a restart.
-

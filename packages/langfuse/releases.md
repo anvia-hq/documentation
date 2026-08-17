@@ -1,6 +1,6 @@
 # Releases
 
-Current package version: `0.6.1`.
+Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 history.
 
 ## Notable history
 
@@ -12,6 +12,6 @@ Current package version: `0.6.1`.
 | `0.4.0` | Added full nested tracing, safe capture, redaction, streaming deltas, and reliable score flushing. |
 | `0.3.0` | Added environment configuration, dataset experiments, prompt management, PII helpers, score queues, and trace handles. |
 
-This release peers with `@anvia/core >=0.25.0 <1.0.0`.
+Install it with the matching `@anvia/core` release candidate.
 
-Read the [complete source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/observability-langfuse/CHANGELOG.md) for every patch and dependency-only release.
+Read the [complete source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/observability-langfuse/CHANGELOG.md) for every patch and dependency-only release.

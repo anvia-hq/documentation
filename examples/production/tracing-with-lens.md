@@ -86,19 +86,19 @@ ANVIA_LENS_RELEASE=local-smoke-test
 ```
 
 ```ts [src/observability.ts]
-import { lens } from "@anvia/lens";
+import { LensClient } from "@anvia/lens";
 
-// Create one observer for the process and reuse it across agents and requests.
-export const tracing = lens.createFromEnv({
-  captureMode: "safe",
+// Create one client for the process and reuse its observer.
+export const lens = new LensClient({
   timeoutMs: 10_000,
 });
+export const tracing = lens.observer({ captureMode: "safe" });
 ```
 
 ```ts [src/agent.ts]
 import { Agent } from "@anvia/core/agent";
 import { OpenAIClient } from "@anvia/openai";
-import { tracing } from "./observability.js";
+import { lens } from "./observability.js";
 
 const apiKey = process.env.OPENAI_API_KEY?.trim();
 if (!apiKey) throw new Error("Missing OPENAI_API_KEY.");
@@ -107,11 +107,14 @@ const openai = new OpenAIClient({ apiKey });
 
 export const supportAgent = new Agent({
   id: "support-summary",
-  model: openai.completionModel("gpt-5"),
+  model: openai.completionModel({
+      modelId: "gpt-5.5",
+      api: "responses"
+  }),
   name: "Support summary agent",
   instructions: "Answer clearly and concisely. Do not include secrets in the response.",
   maxTurns: 4,
-  observers: [tracing],
+  observability: { observers: { tracing } },
 });
 ```
 
@@ -120,25 +123,27 @@ import { supportAgent } from "./agent.js";
 import { tracing } from "./observability.js";
 
 try {
-  const response = await supportAgent
-    .prompt("In two sentences, explain why production agents need tracing.")
-    .withTrace({
-      name: "support-observability-smoke-test",
-      userId: "user_demo_42",
-      sessionId: "session_demo_2026_08",
-      tags: ["support", "smoke-test"],
-      version: "prompt-v1",
-      metadata: { channel: "operations", purpose: "lens-connection-check" },
-    })
-    .send();
+  const response = await supportAgent.generate({
+      prompt: "In two sentences, explain why production agents need tracing.",
+      trace: {
+          name: "support-observability-smoke-test",
+          userId: "user_demo_42",
+          sessionId: "session_demo_2026_08",
+          tags: ["support", "smoke-test"],
+          version: "prompt-v1",
+          metadata: { channel: "operations", purpose: "lens-connection-check" },
+      }
+  });
 
   // The run can finish before asynchronous batch export.
-  await tracing.flush();
-  console.log(response.output);
-  console.log(`Lens trace ID: ${response.trace?.traceId ?? "unavailable"}`);
+  await lens.flush();
+  if (response.status === "completed") {
+    console.log(response.output);
+    console.log(`Lens trace ID: ${response.trace?.traceId ?? "unavailable"}`);
+  }
 } finally {
   // Final delivery plus release of this observer's providers.
-  await tracing.shutdown();
+  await lens.close();
 }
 ```
 
@@ -190,28 +195,28 @@ the explicit `flush()` is what makes this short-lived check deterministic.
 
 If no trace arrives, verify that the Lens origin is reachable from the application host, the two
 keys are active and belong to the selected project, the base URL contains no extra path, and the
-process reaches `await tracing.flush()` without an exporter timeout.
+process reaches `await lens.flush()` without an exporter timeout.
 
 ## How it works
 
-- `lens.createFromEnv()` validates the Lens configuration and creates isolated trace and log
+- `new LensClient()` validates the Lens configuration and lazily creates isolated trace and log
   providers. It does not make a startup request to verify the URL or credentials; connectivity and
   authentication errors surface when telemetry is exported or flushed. Unlike
-  `createFromEnv({ optional: true })`, this production-oriented setup fails fast when Lens
+  `new LensClient({ optional: true })`, this production-oriented setup fails fast when Lens
   configuration is absent or partial.
-- `observers: [tracing]` registers the Lens observer when the agent is constructed, allowing it to record
+- `observability: { observers: { tracing } }` registers the Lens observer when the agent is constructed, allowing it to record
   the run, each generation, tool calls when present, usage, and failures.
-- `.withTrace()` supplies searchable operational context for this request. The service,
+- The `trace` run option supplies searchable operational context for this request. The service,
   environment, and release describe the process; the name, user, session, tags, version, and
   metadata describe one run.
 - `captureMode: 'safe'` omits traced input and output bodies. It does not hide tags, metadata,
   identifiers, exception messages, or any other values the application explicitly exports.
-- `flush()` exports buffered data while leaving the observer usable. `shutdown()` performs final
+- `lens.flush()` exports buffered data while leaving the observer usable. `lens.close()` performs final
   delivery, releases its providers, and is idempotent; do not start new observed work afterward.
 
 For a long-running server, create the observer once at application startup and do not flush after
 every request. During graceful termination, first stop accepting work and wait for active requests,
-then await `tracing.shutdown()` within the platform's termination grace period. Set `timeoutMs` so
+then await `lens.close()` within the platform's termination grace period. Set `timeoutMs` so
 that exporter shutdown can finish inside that period, and integrate this cleanup with the server
 framework's existing signal handling rather than registering competing handlers in multiple
 modules.
@@ -269,5 +274,5 @@ run/generation correlation, error recording, `flush()` in a short-lived job, and
 `shutdown()`. Keep the deployment smoke test synthetic and verify its trace ID in the expected Lens
 project after key or network changes.
 
-- Cookbook source: [`10_integrations/08-lens-native.ts`](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/10_integrations/08-lens-native.ts)
-- Adapter tests: [`packages/observability-lens/test`](https://github.com/anvia-hq/anvia/tree/main/packages/observability-lens/test)
+- Cookbook source: [`10_integrations/08-lens-native.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/10_integrations/08-lens-native.ts)
+- Adapter tests: [`packages/observability-lens/test`](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/observability-lens/test)

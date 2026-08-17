@@ -1,23 +1,16 @@
 # Result mapping
 
-Anvia converts MCP call results into the same tool-result flow used by local tools.
+Anvia maps MCP responses to the string result used by ordinary tools.
 
-## Content mapping
+## 1. Map returned content
 
-| MCP result | Anvia tool result |
-| --- | --- |
-| Text content | Text tool content. |
-| Image content | A data URL with the supplied media type. |
-| Text resource | Serialized resource URI, media type, and text. |
-| Binary resource | Serialized resource URI, media type, and blob. |
-| `{ toolResult }` | The string value, or a serialized non-string value. |
-| `isError: true` | A thrown error using returned text when available. |
+Text content is returned directly. Multiple content items are concatenated in server order.
 
-This normalization lets agents consume MCP tools without provider-specific result handling.
+Image content becomes a `data:<media-type>;base64,...` URL.
 
-## Text results
+Text and binary resources retain their media type, URI, and text or blob in a serialized string.
 
-An MCP response such as:
+A response containing `{ toolResult }` returns the string directly or JSON-serializes a non-string value when possible.
 
 ```ts
 {
@@ -27,26 +20,24 @@ An MCP response such as:
 }
 ```
 
-becomes text that the agent receives as a normal tool result.
+The adapted tool returns `The deployment is healthy.`
 
-## Images and resources
+## 2. Handle MCP error results
 
-Image bytes become data URLs so the runtime can preserve their media type. Resources retain their URI and content when serialized.
+When `isError: true`, the adapted tool throws. Text content becomes the error message; without text, the message is `MCP tool returned an error`.
 
-Treat remote content as untrusted input. A resource may be large, private, stale, or contain instructions that should not override the agent's application policy.
+A direct `tool.call()` therefore rejects. Inside an agent run, normal tool execution catches the failure, records a failed tool event, and returns the error text to the model as a tool result unless another runtime boundary fails the run.
 
-## Error results
+Do not expose raw MCP error text to a browser. It may include server names, paths, arguments, or upstream details.
 
-When an MCP server returns `isError: true`, Anvia raises an error. If text accompanies the error, it is used to describe the failure.
+## 3. Validate arguments
 
-Map remote failures at the server or runner boundary before returning them to users. Raw MCP errors may contain internal server names, paths, arguments, or upstream details.
+MCP tool calls accept a JSON object. `null` or `undefined` omits the `arguments` field. Arrays, primitives, and other non-object values reject before the remote call.
 
-## Tool arguments
+The remote server must still validate arguments and authorize the action. A model-facing input schema guides generation; it is not server-side enforcement.
 
-MCP calls require JSON-object arguments. Invalid `null`, `undefined`, or non-object payloads are normalized where possible or rejected before the remote server is called.
+## 4. Bound untrusted output
 
-The remote server must still validate its input. The model-facing schema helps construct arguments; it does not replace server-side validation or authorization.
+Remote text, images, and resources may be private, stale, malicious, or oversized. Use [middleware](/sdk/advanced/hooks/middleware) or an app-owned wrapper to truncate, redact, store large artifacts, or create a smaller model-facing result.
 
-## Limit result exposure
-
-Review the maximum size and sensitivity of every result type. Use middleware or an app-owned wrapper when remote output needs truncation, redaction, artifact storage, or conversion into a smaller product-safe result before returning to the model or browser.
+Next, enforce MCP [trust boundaries](/sdk/advanced/mcp/security).

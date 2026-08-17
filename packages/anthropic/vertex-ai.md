@@ -10,7 +10,9 @@ const vertex = new AnthropicVertexClient({
   region: 'global',
 })
 
-const model = vertex.completionModel('claude-sonnet-5')
+const model = vertex.completionModel({
+    modelId: 'claude-sonnet-5'
+})
 ```
 
 ## Authentication
@@ -39,7 +41,7 @@ The option type also permits an already configured `AnthropicVertex` client.
 
 ## Behavioral differences
 
-- `completionModel()` defaults to `claude-sonnet-5`, not the standard client’s older default.
+- `completionModel({ modelId })` requires an explicit model ID.
 - The returned completion model has the same Anvia request and stream contracts.
 - `AnthropicVertexClient` does not implement `listModels()` because Vertex does not expose Anthropic’s Models API through this client.
 - Available IDs, regions, quotas, and authentication failures are governed by the Vertex deployment.

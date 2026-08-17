@@ -1,49 +1,72 @@
 # Metadata filters
 
-Metadata filters constrain search before documents reach the model. Use them for tenant boundaries, product scopes, visibility, status, and freshness.
+Metadata filters restrict which documents may participate in a vector search. Use them for tenant boundaries, visibility, publication state, product scope, language, and numeric ranges.
 
-## Store filterable metadata
+## 1. Store filterable fields
+
+Add the required fields when creating embeddings:
 
 ```ts
-const embedded = await embedDocuments(embeddingModel, documents, {
-  id: (document) => document.id,
-  content: (document) => document.text,
-  metadata: (document) => ({
-    tenantId: document.tenantId,
-    product: document.product,
-    visibility: document.visibility,
-    published: document.status === 'published',
-  }),
-})
+const { documents: embedded } = await embedDocuments({
+    model: embeddingModel,
+    documents: documents,
+    id: (document) => document.id,
+    content: (document) => document.text,
+    metadata: (document) => ({
+        tenantId: document.tenantId,
+        product: document.product,
+        visibility: document.visibility,
+        revision: document.revision,
+        published: document.status === 'published',
+    })
+});
 ```
 
-Keep metadata flat and explicit. Store IDs and flags rather than large nested records.
+Metadata values must be flat strings, numbers, booleans, or `null`. Store stable identifiers and flags rather than entire nested records.
 
-## Filter a search
+## 2. Build a filter
+
+`vectorFilter` provides equality, greater-than, less-than, AND, and OR expressions:
 
 ```ts
-import { vectorFilter } from '@anvia/core/vector-store'
+import { retrieveDocuments, vectorFilter } from '@anvia/core/vector-store'
 
 const filter = vectorFilter.and(
-  vectorFilter.eq('tenantId', tenant.id),
-  vectorFilter.eq('product', 'billing'),
-  vectorFilter.eq('published', true),
+  vectorFilter.eq('tenantId', request.auth.tenantId),
+  vectorFilter.and(
+    vectorFilter.eq('product', 'billing'),
+    vectorFilter.eq('published', true),
+  ),
 )
 
-const results = await index.search({
+const results = await retrieveDocuments({
+  store,
+  model: embeddingModel,
   query: 'invoice settings',
   topK: 5,
-  threshold: 0.72,
+  minScore: 0.72,
   filter,
 })
 ```
 
-Use `or(...)` for allowed alternatives and `gt(...)` or `lt(...)` for numeric ranges supported by the selected adapter.
+Filters are binary expressions, so combine more than two conditions by nesting `and()` or `or()` calls. Use `gt()` and `lt()` only with comparable values of the same type.
 
-## Build filters from trusted state
+## 3. Treat filters as authorization boundaries
 
-Create tenant and visibility filters from the authenticated request—not model output. Apply the same filter to automatic retrieval and search tools.
+Build tenant and visibility filters from authenticated application state. Never let the model choose its tenant ID, workspace, role, or visibility scope.
 
-Prompt instructions may explain how to use retrieved facts, but they must not decide which documents the model is allowed to receive.
+Apply the same trusted filter wherever the index is exposed:
 
-Test filters with private cross-tenant requests, public documents, and draft or archived sources before shipping.
+- direct calls through `retrieveDocuments()`;
+- `createVectorContext()` for automatic retrieval; and
+- `createVectorSearchTool()` for model-controlled search.
+
+Prompt instructions can tell a model how to use retrieved facts, but they cannot prevent an unauthorized document from entering its context.
+
+## 4. Verify adapter behavior
+
+Persistent adapters translate Anvia filters into their database query language. Test the operators and value types used by your application against the chosen adapter.
+
+Before shipping, test cross-tenant queries, public and private documents, drafts, archived records, missing metadata, and boundary values for numeric comparisons.
+
+Next, choose [automatic retrieval](/sdk/knowledges/automatic-retrieval) or a [search tool](/sdk/knowledges/search-tools).

@@ -5,9 +5,9 @@ Grok’s provider adapter connects Anvia to xAI completions, provider-executed s
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `0.4.1` |
+| Version | `1.0.0-rc.2` |
 | Runtime | ESM, server-side JavaScript with `fetch` |
-| Peer | `@anvia/core >=0.7.1 <1.0.0` |
+| Peer | Matching `@anvia/core` release candidate |
 
 ## Install
 
@@ -22,28 +22,33 @@ import { Agent } from '@anvia/core'
 import { GrokClient, tools as grokTools } from '@anvia/grok'
 
 const grok = new GrokClient({
-  apiKey: process.env.XAI_API_KEY,
+  apiKey: process.env.XAI_API_KEY!,
 })
 
 const agent = new Agent({
   id: 'researcher',
-  model: grok.completionModel(),
+  model: grok.completionModel({ modelId: 'grok-4.5', api: 'responses' }),
   tools: [grokTools.webSearch({ allowedDomains: ['x.ai'] })],
 })
 
-const result = await agent.prompt('Summarize the latest xAI product updates.').send()
-console.log(result.output)
-console.log(result.sources)
+const result = await agent.generate({
+    prompt: 'Summarize the latest xAI product updates.'
+})
+
+if (result.status === 'completed') {
+  console.log(result.output)
+  console.log(result.sources)
+}
 ```
 
 ## Capabilities
 
 | Capability | Factory or export | Default |
 | --- | --- | --- |
-| Streaming completion | `completionModel()` | `grok-4.5` |
+| Streaming completion | `completionModel({ modelId, api })` | Explicit model and API |
 | Server tools | `tools.*` | Responses API only |
-| Image generation | `imageGenerationModel()` | `grok-imagine-image` |
-| Text-to-speech | `audioGenerationModel()` | Provider-selected |
+| Image generation | `imageGenerationModel({ modelId })` | Explicit model |
+| Text-to-speech | `speechGenerationModel()` | Provider-selected |
 | Transcription | `transcriptionModel()` | Provider-selected |
 | Model inventory | `listModels()` | Provider model list |
 
@@ -55,26 +60,28 @@ The typed provider tools include web search, X search, code interpreter, xAI fil
 
 ```ts
 const chat = new GrokClient({
-  apiKey: process.env.XAI_API_KEY,
-  completionApi: 'chat',
+  apiKey: process.env.XAI_API_KEY!,
+}).completionModel({
+  modelId: 'grok-4.5',
+  api: 'chat',
 })
 ```
 
-Responses is the default. Use Chat only when the workflow specifically requires that API and does not depend on Grok provider tools.
+Use Chat only when the workflow specifically requires that API and does not depend on Grok provider tools.
 
 ### Generate an image
 
 ```ts
-const image = await grok.imageGenerationModel().imageGeneration({
+const image = await grok.imageGenerationModel({ modelId: 'grok-imagine-image' }).imageGeneration({
   prompt: 'A robot sketching a distributed system on glass',
   width: 1024,
   height: 1024,
 })
 
-console.log(image.image.byteLength)
+console.log(image.images[0].data.byteLength)
 ```
 
-Supported width/height ratios map to xAI aspect ratios; unsupported ratios become `auto`. An explicit `additionalParams.aspect_ratio` takes precedence.
+Supported width/height ratios map to xAI aspect ratios; unsupported ratios become `auto`. An explicit `providerOptions.aspect_ratio` takes precedence.
 
 ## Compatibility
 
@@ -92,4 +99,4 @@ The package does not expose embeddings, video generation, realtime voice, stream
 - [API reference](/packages/grok/api-reference)
 - [Releases](/packages/grok/releases)
 - [Provider capability matrix](/sdk/providers/capability-matrix)
-- [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-grok/CHANGELOG.md)
+- [Source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-grok/CHANGELOG.md)

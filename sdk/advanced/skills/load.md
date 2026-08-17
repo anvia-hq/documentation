@@ -1,8 +1,8 @@
 # Load skills
 
-Use `loadSkills(...)` to merge trusted skill sources into one `SkillSet`, then attach it with the `skills` option.
+`loadSkills()` merges one or more trusted loaders into a `SkillSet` that can be attached to an agent.
 
-## Load local skills
+## 1. Load local skills
 
 ```ts
 import { Agent } from '@anvia/core'
@@ -14,28 +14,18 @@ const productSkills = await loadSkills(
 
 const agent = new Agent({
   id: 'release-assistant',
-  model: model,
-  instructions: 'Use a skill when it matches the task.',
+  model,
+  instructions: 'Use a matching skill when the task needs it.',
   skills: productSkills,
   maxTurns: 4,
 })
 ```
 
-If the path points to one skill directory, the loader returns that skill. If it points to a directory containing skills, it loads each child with a `SKILL.md`.
+The returned `SkillSet` contains loaded `skills`, generated `tools`, and compact catalog `instructions`. The agent appends those instructions to its own instructions and registers the generated tools.
 
-## Understand the result
+An empty loader result produces empty instructions and no skill tools.
 
-`loadSkills(...)` returns a `SkillSet` containing:
-
-| Member | Contains |
-| --- | --- |
-| `skills` | Loaded skill metadata, instructions, references, and scripts. |
-| `tools` | Generated tools for loading and running skill content. |
-| `instructions` | Compact catalog instructions added to the agent. |
-
-`skills: skillSet` attaches the generated instruction block and tools together.
-
-## Load multiple sources
+## 2. Merge multiple sources
 
 ```ts
 const skillSet = await loadSkills([
@@ -44,11 +34,9 @@ const skillSet = await loadSkills([
 ])
 ```
 
-When sources contain the same skill name, the later loader wins. Use overrides deliberately and keep the source order visible in application setup.
+Skills are keyed by name. A later loader replaces an earlier skill with the same name and moves that replacement to the later position. Keep override order explicit and reviewed.
 
-## Implement another trusted source
-
-`SkillLoader` is intentionally small:
+## 3. Implement a custom loader
 
 ```ts
 import type { SkillLoader } from '@anvia/core/skills'
@@ -58,14 +46,14 @@ const managedSkills: SkillLoader = {
     return skillRepository.loadApprovedSkills()
   },
 }
-
-const skillSet = await loadSkills(managedSkills)
 ```
 
-The loader must return valid `Skill` objects. It also owns authentication, caching, version selection, and trust for the external source.
+`loadSkills()` trusts `Skill` objects returned by a custom loader; it does not run the local directory validator over them. The loader owns authentication, authorization, caching, version selection, asset paths, field validity, and trust.
 
-## Load before serving requests
+## 4. Load at the correct lifecycle
 
-Load and validate stable skills during application startup or worker initialization. Do not read the same directories for every prompt.
+Load stable skills during startup or worker initialization rather than for every prompt.
 
-For tenant- or request-specific skill sets, resolve the allowed source before building the scoped agent and ensure one tenant cannot load another tenant's instructions or scripts.
+For request- or tenant-specific sets, resolve the allowed loaders before constructing the scoped agent. Ensure one tenant cannot select another tenant's instructions or executable assets.
+
+Next, understand the generated [skill tools](/sdk/advanced/skills/tools).

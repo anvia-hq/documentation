@@ -35,19 +35,21 @@ The graph is generated from the current in-process pipeline definition. Restart 
 Add stage metadata when constructing the pipeline:
 
 ```ts
-const pipeline = new PipelineBuilder(z.string(), {
-  id: 'ticket-triage',
-  name: 'Ticket triage',
-  description: 'Routes incoming support tickets.',
-  metadata: { owner: 'support-operations' },
+const pipeline = new Pipeline({
+    id: 'ticket-triage',
+    name: 'Ticket triage',
+    description: 'Routes incoming support tickets.',
+    metadata: { owner: 'support-operations' },
+    inputSchema: z.string(),
 })
-  .step((text) => text.trim(), {
+    .step({
     id: 'normalize-ticket',
     name: 'Normalize ticket',
     description: 'Remove surrounding whitespace before classification.',
     metadata: { dataClass: 'support-ticket' },
-  })
-  .build()
+    run: ({ input: text }) => text.trim()
+});
+
 ```
 
 Select a node in Studio and open **Metadata**. The inspector can show:
@@ -76,23 +78,24 @@ Entering `ORDER 11001` without quotes is not valid JSON, so Studio stops before 
 For a typed object pipeline:
 
 ```ts
-const pipeline = new PipelineBuilder(
-  z.object({
-    ticket: z.string(),
-    accountId: z.string(),
-    urgent: z.boolean().default(false),
-  }),
-  {
+const pipeline = new Pipeline({
+    inputSchema: z.object({
+        ticket: z.string(),
+        accountId: z.string(),
+        urgent: z.boolean().default(false),
+    }),
     id: 'account-ticket-triage',
     name: 'Account ticket triage',
-  },
-)
-  .step(({ ticket, accountId, urgent }) => ({
-    accountId,
-    ticket: ticket.trim(),
-    priority: urgent ? 'high' : 'normal',
-  }))
-  .build()
+})
+    .step({
+    id: "step-1",
+    run: ({ input: input }) => (({ ticket, accountId, urgent }) => ({
+        accountId,
+        ticket: ticket.trim(),
+        priority: urgent ? 'high' : 'normal',
+    }))(input)
+});
+
 ```
 
 Enter the matching object:
@@ -110,7 +113,7 @@ There are two separate validation boundaries:
 1. Studio parses the editor text as JSON. Invalid JSON never starts a run.
 2. The pipeline validates the parsed value with its input schema. A valid JSON value of the wrong shape starts a run that ends in an error.
 
-Studio submits the parsed value without converting an object into text or a string into an object. Keep the editor value aligned with the schema passed to `PipelineBuilder`.
+Studio submits the parsed value without converting an object into text or a string into an object. Keep the editor value aligned with the pipeline's `inputSchema`.
 
 ## Watch stage state
 

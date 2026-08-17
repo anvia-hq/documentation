@@ -61,11 +61,11 @@ For an execution failure, Studio shows **Tool error** and preserves a raw envelo
 
 ## What direct invocation bypasses
 
-Selecting **Run** calls the tool through `agent.callTool(...)`; it does not create a prompt request. Therefore the direct runner does not exercise:
+Selecting **Run** calls the tool through `agent.callTool(...)`; it does not start an agent run. Therefore the direct runner does not exercise:
 
 - model tool selection or argument generation;
 - instructions, context retrieval, or multi-turn behavior;
-- prompt hooks and the Playground transcript lifecycle;
+- lifecycle callbacks, guardrails, and the Playground transcript lifecycle;
 - the interactive approval flow;
 - the model's recovery after a tool result or error.
 

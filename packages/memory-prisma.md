@@ -8,7 +8,7 @@
 pnpm add @anvia/memory-prisma @anvia/core @prisma/client
 ```
 
-The package is ESM-only and peers with `@anvia/core >=0.13.0 <1.0.0` and `@prisma/client >=7.9.1 <8.0.0`.
+The package is ESM-only and should be installed with the matching `@anvia/core` release candidate and `@prisma/client >=7.9.1 <8.0.0`.
 
 ## Generate the model file
 
@@ -44,11 +44,12 @@ The command is a dry run unless `--write` is present. Review generated changes b
 
 ```ts
 import { Agent } from '@anvia/core/agent'
-import { createPrismaMemoryStore } from '@anvia/memory-prisma'
+import { PrismaMemoryStore } from '@anvia/memory-prisma'
 import { prisma } from './db.js'
 
-const memory = createPrismaMemoryStore(prisma, {
-  scope: {
+const memory = new PrismaMemoryStore({
+  client: prisma,
+  scopeKey: {
     metadataKeys: ['tenantId'],
   },
 })
@@ -64,7 +65,7 @@ The conventional client path expects delegates named `agentMemorySession`, `agen
 
 ## Custom model names
 
-Use `PrismaMemoryStore.fromDelegates(...)` when generated delegate names differ. Supply session and message delegates plus a transaction function; supply the errors delegate unless `errors: 'ignore'` is configured.
+Pass `{ delegates }` to `new PrismaMemoryStore(...)` when generated delegate names differ. Supply session and message delegates plus a transaction function; supply the errors delegate unless `errorPolicy: 'ignore'` is configured.
 
 Inspection requires the session delegate's optional `findMany` and `findUnique` methods. Compaction additionally requires `messages.deleteMany`. The basic memory methods continue to work when those optional interfaces are unavailable.
 
@@ -93,5 +94,5 @@ Read [Memory save policies](/sdk/memory/save-policies) and [Memory sessions](/sd
 
 - [API reference](/packages/memory-prisma/api-reference)
 - [Memory store adapters](/sdk/memory/store-adapters)
-- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/memory-prisma)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-prisma/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/memory-prisma)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/memory-prisma/CHANGELOG.md)

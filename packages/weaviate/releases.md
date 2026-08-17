@@ -1,5 +1,7 @@
 # Releases
 
+Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 history.
+
 Notable releases include:
 
 - `0.2.5` refreshed runtime dependencies across provider, vector, observability, UI, and Studio packages.
@@ -8,4 +10,4 @@ Notable releases include:
 - `0.2.2` moved `@anvia/core` to peer dependencies.
 - `0.2.0` introduced the Weaviate v3 collections adapter and near-vector queries.
 
-See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-weaviate/CHANGELOG.md).
+See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/vector-weaviate/CHANGELOG.md).

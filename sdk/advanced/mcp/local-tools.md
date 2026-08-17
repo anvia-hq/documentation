@@ -1,37 +1,27 @@
 # Local tools
 
-Combine reviewed MCP capabilities with local tools when the application must retain product-specific permissions and side effects.
+Combine reviewed MCP tools with local tools when application-owned permissions, transactions, approval, or side effects must remain inside the product boundary.
 
-## Register both sources
+## 1. Register both sources
 
 ```ts
 const agent = new Agent({
   id: 'operations',
-  model: model,
+  model,
   mcpServers: [runbookServer, monitoringServer],
+  tools: [
+    createIncidentTool(scope),
+    createApprovalStatusTool(scope),
+  ],
   maxTurns: 6,
-  tools: [createIncidentTool(scope), createApprovalStatusTool(scope)],
 })
 ```
 
-Local and MCP tools appear in the same model-facing tool set and run through the normal agent tool loop.
+Both sources appear in the same model-facing tool set and use the normal agent loop.
 
-## Choose the owner by responsibility
+Use MCP tools for reviewed remote lookup or constrained remote capability. Use local tools for product authorization, database writes, application approval, idempotency, and transactions.
 
-| Capability | Prefer |
-| --- | --- |
-| Search an external documentation server | MCP tool |
-| Query an existing remote capability service | MCP tool |
-| Enforce product user and tenant permissions | Local tool or scoped wrapper |
-| Perform a product database write | Local tool |
-| Require application approval or idempotency | Local tool |
-| Access a constrained external system already exposed through MCP | Reviewed MCP tool |
-
-Use local tools for behavior that must remain coupled to your product's authorization, transaction, and audit path.
-
-## Combine an allow-listed subset
-
-When a server exposes more than the agent needs, add selected MCP tools through `.tools(...)`:
+## 2. Register an allow-listed subset
 
 ```ts
 const docsTools = await allowMcpTools(
@@ -41,21 +31,27 @@ const docsTools = await allowMcpTools(
 
 const agent = new Agent({
   id: 'support',
-  model: model,
-  tools: [...docsTools, createCustomerLookupTool(scope), createTicketTool(scope)],
+  model,
+  tools: [
+    ...docsTools,
+    createCustomerLookupTool(scope),
+    createTicketTool(scope),
+  ],
 })
 ```
 
 This avoids registering the full server through `mcpServers`.
 
-## Keep names and descriptions distinct
+## 3. Keep routing distinct
 
-The model should be able to tell external lookup from product action. Prefer names such as `search_runbooks` and `create_incident` over two tools both described as “handle incidents.”
+Names and descriptions should distinguish external lookup from product action. Prefer `search_runbooks` and `create_incident` over two tools described as “handle incidents.”
 
-Check tool names across every local and MCP source before constructing the agent.
+Check collisions across every local, MCP, and skill source before constructing the agent.
 
-## Close every connected server
+## 4. Keep lifecycle ownership outside the agent
 
-The agent does not own MCP lifecycle. The application that connected `runbookServer` and `monitoringServer` must close them during shutdown or job cleanup, even when the agent run fails.
+The agent does not close MCP servers. The application that connected them must close them during shutdown or job cleanup, even when an agent run fails.
 
-Local tools do not change that ownership: they are ordinary application objects and require their own service cleanup only when their dependencies do.
+Local tool dependencies have their own application lifecycle and do not change MCP connection ownership.
+
+Next, add [observability](/sdk/advanced/mcp/observability).

@@ -16,23 +16,23 @@ LANGFUSE_SERVICE_NAME=support-api
 
 ```ts
 import { Agent } from '@anvia/core'
-import { langfuse } from '@anvia/langfuse'
+import { LangfuseClient } from '@anvia/langfuse'
 
-const tracing = langfuse.create({
-  captureMode: 'safe',
+const langfuse = new LangfuseClient({
   release: process.env.APP_RELEASE,
 })
+const tracing = langfuse.observer({ captureMode: 'safe' })
 
 const agent = new Agent({
   id: 'support',
   model: model,
-  observers: [tracing],
+  observability: { observers: { tracing } },
 })
 ```
 
 Explicit options override environment variables. The base URL defaults to Langfuse Cloud and request timeout defaults to 30 seconds.
 
-Call `flush()` in short-lived work and `shutdown()` when the integration will no longer be used.
+Call `langfuse.flush()` in short-lived work and `langfuse.close()` when the integration will no longer be used.
 
 ## Next
 

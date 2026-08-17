@@ -1,6 +1,6 @@
 # Releases
 
-Current package version: `0.8.0`.
+Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 history.
 
 ## Notable history
 
@@ -13,6 +13,6 @@ Current package version: `0.8.0`.
 | `0.4.0` | Added safe bounded capture, richer attributes, run events, and stable evaluation identifiers. |
 | `0.3.0` | Added correlated OpenTelemetry evaluation-result events. |
 
-This release peers with `@anvia/core >=0.25.0 <1.0.0`.
+Install it with the matching `@anvia/core` release candidate.
 
-Read the [complete source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/observability-otel/CHANGELOG.md) for patch-level and dependency-only releases.
+Read the [complete source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/observability-otel/CHANGELOG.md) for patch-level and dependency-only releases.

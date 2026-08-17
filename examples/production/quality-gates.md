@@ -84,6 +84,6 @@ verify they fail before trusting the gate.
 
 ## Source and extensions
 
-- Start with [`08_evals/01-basic-metrics.ts`](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/08_evals/01-basic-metrics.ts).
+- Start with [`08_evals/01-basic-metrics.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/08_evals/01-basic-metrics.ts).
 - Use [Lens quality gates](/lens/evaluations/quality-gates) when Lens manages the reporting workflow.
 - Extend with baseline comparison, confidence intervals, cost ceilings, and manual override audit logs.

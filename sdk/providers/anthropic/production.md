@@ -10,12 +10,12 @@ Create one client per runtime boundary or request scope. Avoid constructing a ne
 import { AnthropicClient } from '@anvia/anthropic'
 
 const anthropic = new AnthropicClient({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
-export const supportModel = anthropic.completionModel(
-  process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-20250514',
-)
+export const supportModel = anthropic.completionModel({
+    modelId: process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-20250514'
+})
 ```
 
 Validate required environment variables at startup. Keep model selection in configuration so a rollout or rollback does not require rewriting agents.

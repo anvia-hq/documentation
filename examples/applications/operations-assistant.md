@@ -36,34 +36,47 @@ pnpm add @anvia/core @anvia/openai @anvia/pgvector zod
 ## Make action policy executable
 
 ```ts
-import { createHook } from "@anvia/core/hooks";
+import { createTool } from "@anvia/core/tool";
+import { z } from "zod";
 
-export function permissionHook(can: (name: string) => boolean) {
-  return createHook({
-    onToolCall({ toolName, tool }) {
-      if (!can(toolName)) return tool.skip("The operator is not allowed to run this action.");
-      if (toolName === "restart_service") {
-        return tool.requestApproval({
-          reason: "Restarting a service requires operator approval.",
-          rejectMessage: "The restart was not approved.",
-        });
-      }
-      return tool.run();
+type Operator = { id: string; tenantId: string; canRestart: boolean };
+
+export function createOperationsTools(operator: Operator) {
+  const restartService = createTool({
+    name: "restart_service",
+    description: "Restart one service during an active incident.",
+    inputSchema: z.object({
+      service: z.string(),
+      incidentId: z.string(),
+    }),
+    outputSchema: z.object({
+      operationId: z.string(),
+      status: z.literal("requested"),
+    }),
+    requiresApproval: ({ service, incidentId }) => ({
+      reason: `Review restart of ${service} for incident ${incidentId}.`,
+    }),
+    async execute(input) {
+      if (!operator.canRestart) throw new Error("Restart access denied");
+      return executor.requestRestart({ ...input, tenantId: operator.tenantId });
     },
   });
+
+  return [restartService];
 }
 ```
 
-Without Studio or another approval handler, `requestApproval` cancels clearly. Your approval system
-must bind the approval to the authenticated principal, exact normalized arguments, incident, and
-expiry—not merely the tool name.
+The authenticated operator is captured by trusted server code. `requiresApproval` pauses the exact
+tool call, and the caller resumes it through `agent.resume(...)`. The approval system must bind its
+decision to the principal, normalized input, incident, and expiry—not merely the tool name.
 
 ## Compose specialists
 
 Create support, engineering, and communications agents, expose each with
 `specialist.asTool({ name: "ask_engineering_agent" })`, and attach them to a coordinator with the
-`tools` and `maxTurns: 4` options. Stream with `.withToolConcurrency(3)` when the tasks are
-independent. Keep remediation tools out of specialist agents.
+`tools` and `maxTurns: 4` options. Stream with
+`coordinator.stream({ prompt: message, toolConcurrency: 3 })` when tasks are independent. Keep remediation
+tools out of specialist agents.
 
 ## Run and expected behavior
 
@@ -95,9 +108,9 @@ idempotency, cancellation, and secret redaction.
 
 ## Runnable references
 
-- [Agent as tool](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/07_multi_agent/01-agent-as-tool.ts)
-- [Tool permission hook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/02_tools/08-tool-permission-hook.ts)
-- [RAG search tool](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/05-rag-search-tool.ts)
+- [Agent as tool](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/07_multi_agent/01-agent-as-tool.ts)
+- [Guarded tools](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/02_tools/08-tool-permission-hook.ts)
+- [RAG search tool](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/05-rag-search-tool.ts)
 
 These examples demonstrate primitives separately; the complete operations service is a suggested
 architecture, not a published runnable project.

@@ -4,119 +4,41 @@ All public symbols are exported from `@anvia/weaviate`.
 
 ```ts
 import {
-  filterToWeaviateWhere,
-  WeaviateVectorIndex,
+  WeaviateVectorClient,
   WeaviateVectorStore,
-  type WeaviateBatcherLike,
-  type WeaviateBatchLike,
+  filterToWeaviateWhere,
   type WeaviateClientLike,
   type WeaviateCollectionLike,
   type WeaviateCollectionsLike,
   type WeaviateDistance,
-  type WeaviateVectorStoreConnectOptions,
+  type WeaviateVectorClientOptions,
+  type WeaviateVectorStoreOptions,
 } from '@anvia/weaviate'
 ```
 
-## filterToWeaviateWhere
+## WeaviateVectorClient
 
 ```ts
-function filterToWeaviateWhere(
-  filter: VectorFilter | undefined,
-): unknown
+class WeaviateVectorClient {
+  constructor(options?: WeaviateVectorClientOptions)
+  vectorStore<T, Metadata extends VectorMetadata = VectorMetadata>(
+    options: WeaviateVectorStoreOptions,
+  ): WeaviateVectorStore<T, Metadata>
+  close(): Promise<void>
+}
 ```
 
-Converts an Anvia vector filter into a Weaviate filter value.
+`WeaviateVectorClientOptions` accepts an injected `client?: WeaviateClientLike` or connection fields `httpHost`, `httpPort`, `grpcHost`, `grpcPort`, `httpSecure`, and `grpcSecure`. `WeaviateVectorStoreOptions` contains `collectionName`, `dimensions`, and optional `metric`. Native distance values are `'cosine' | 'dot' | 'l2-squared'`.
 
 ## WeaviateVectorStore
 
 ```ts
-class WeaviateVectorStore<
-  T,
-  Metadata extends VectorMetadata = VectorMetadata,
-> {
-  static connect<T, Metadata extends VectorMetadata = VectorMetadata>(
-    options: WeaviateVectorStoreConnectOptions,
-  ): Promise<WeaviateVectorStore<T, Metadata>>
-
-  upsertDocuments(
-    documents: Array<EmbeddedDocument<T, Metadata>>,
-  ): Promise<void>
-
-  index(model: EmbeddingModel): WeaviateVectorIndex<T, Metadata>
-}
+await store.ensure()
+await store.validate()
+await store.upsert({ documents, providerOptions })
+const results = await store.search({ vector, topK, minScore, filter, providerOptions, abortSignal })
 ```
 
-## WeaviateVectorIndex
-
-```ts
-class WeaviateVectorIndex<
-  T,
-  Metadata extends VectorMetadata = VectorMetadata,
-> implements VectorSearchIndex<T, Metadata> {
-  constructor(
-    model: EmbeddingModel,
-    client: WeaviateClientLike,
-    className: string,
-  )
-
-  search(request: VectorSearchRequest): Promise<Array<VectorSearchResult<T, Metadata>>>
-  searchIds(request: VectorSearchRequest): Promise<Array<{ score: number; id: string }>>
-  asTool(options: VectorSearchToolOptions): Tool<{ query: string; topK?: number }, unknown>
-}
-```
-
-## Types
-
-```ts
-type WeaviateDistance =
-  | 'cosine'
-  | 'dot'
-  | 'l2'
-  | 'manhattan'
-  | 'hamming'
-
-type WeaviateCollectionLike = {
-  query: {
-    nearVector(params: {
-      vector: number[]
-      limit?: number
-      filters?: unknown
-      returnMetadata?: string[]
-      returnProperties?: string[]
-    }): Promise<Array<Record<string, unknown>>>
-  }
-}
-
-type WeaviateCollectionsLike = {
-  create(config: Record<string, unknown>): Promise<unknown>
-  get(name: string): WeaviateCollectionLike
-  delete(name: string): Promise<unknown>
-  exists(name: string): Promise<boolean>
-}
-
-type WeaviateBatcherLike = {
-  withObject(obj: Record<string, unknown>): WeaviateBatcherLike
-  do(): Promise<unknown>
-}
-
-type WeaviateBatchLike = {
-  objectsBatcher(): WeaviateBatcherLike
-}
-
-type WeaviateClientLike = {
-  collections: WeaviateCollectionsLike
-  batch: WeaviateBatchLike
-}
-
-type WeaviateVectorStoreConnectOptions = {
-  client?: WeaviateClientLike
-  className: string
-  vectorSize: number
-  createIfMissing?: boolean
-  distance?: WeaviateDistance
-}
-```
-
-The inline `nearVector` parameter object is emitted internally as `NearVectorParams`; that name is not exported from the package barrel.
+`filterToWeaviateWhere(filter)` converts an Anvia `VectorFilter` for direct Weaviate calls.
 
 Return to the [package guide](/packages/weaviate).

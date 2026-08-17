@@ -8,9 +8,9 @@ pnpm add @anvia/core @anvia/otel @opentelemetry/api @opentelemetry/api-logs
 
 ```ts
 import { Agent } from '@anvia/core'
-import { otel } from '@anvia/otel'
+import { createOtelObserver } from '@anvia/otel'
 
-const tracing = otel.create({
+const tracing = createOtelObserver({
   serviceName: 'support-api',
   captureMode: 'safe',
 })
@@ -18,11 +18,11 @@ const tracing = otel.create({
 const agent = new Agent({
   id: 'support',
   model: model,
-  observers: [tracing],
+  observability: { observers: { tracing } },
 })
 ```
 
-`otel.create()` uses an explicitly supplied `Tracer` or the active global tracer provider. It does not initialize exporters, register global providers, flush processors, or shut them down.
+`createOtelObserver()` uses an explicitly supplied `Tracer` or the active global tracer provider. It does not initialize exporters, register global providers, flush processors, or shut them down.
 
 Use an OpenTelemetry Node SDK, a platform integration, or another runtime-specific provider in the application entrypoint. Initialize it before constructing or invoking agents.
 

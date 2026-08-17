@@ -8,59 +8,66 @@
 pnpm add @anvia/pgvector @anvia/core @anvia/openai pg pgvector
 ```
 
-The ESM package includes `pg` and `pgvector` and peers with `@anvia/core >=0.7.1 <1.0.0`.
+The ESM package includes `pg` and `pgvector` and should be installed with the matching `@anvia/core` release candidate.
 
 ## Store and search documents
 
 ```ts
-import { embedDocuments } from '@anvia/core/embeddings'
-import { PgVectorStore } from '@anvia/pgvector'
-import { OpenAIClient } from '@anvia/openai'
-
+import { retrieveDocuments } from "@anvia/core/vector-store";
+import { embedDocuments } from '@anvia/core/embeddings';
+import { PgVectorClient } from '@anvia/pgvector';
+import { OpenAIClient } from '@anvia/openai';
 const openai = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-const embeddings = openai.embeddingModel('text-embedding-3-small')
+    apiKey: process.env.OPENAI_API_KEY!,
+});
+const embeddings = openai.embeddingModel({
+    modelId: 'text-embedding-3-small'
+});
 const sourceDocuments = [
-  {
-    id: 'password-reset',
-    text: 'Password reset links expire after 30 minutes.',
-    tenantId: 'acme',
-  },
-]
-
-const documents = await embedDocuments(embeddings, sourceDocuments, {
-  id: (document) => document.id,
-  content: (document) => document.text,
-  metadata: (document) => ({ tenantId: document.tenantId }),
-})
-
-const store = await PgVectorStore.connect({
-  connectionString: process.env.DATABASE_URL,
-  tableName: 'support_docs',
-  vectorSize: 1536,
-})
-
-await store.upsertDocuments(documents)
-
-const results = await store.index(embeddings).search({
-  query: 'How do I reset a password?',
-  topK: 5,
-})
+    {
+        id: 'password-reset',
+        text: 'Password reset links expire after 30 minutes.',
+        tenantId: 'acme',
+    },
+];
+const { documents } = await embedDocuments({
+    model: embeddings,
+    documents: sourceDocuments,
+    id: (document) => document.id,
+    content: (document) => document.text,
+    metadata: (document) => ({ tenantId: document.tenantId })
+});
+const storeClient = new PgVectorClient({
+    connectionString: process.env.DATABASE_URL
+});
+const store = storeClient.vectorStore({
+    tableName: 'support_docs',
+    dimensions: 1536
+});
+await store.ensure();
+await store.upsert({
+    documents: documents
+});
+const results = await retrieveDocuments({
+    store: store,
+    model: embeddings,
+    query: 'How do I reset a password?',
+    topK: 5
+});
 ```
 
 You can inject any compatible `pg` client or pool instead of a connection string.
 
 ## Schema and index ownership
 
-The default `createIfMissing: true` creates the `vector` extension and a table with ID, logical document ID, JSONB document, JSONB metadata, and the configured vector column. `connect()` always validates the stored vector dimension.
+`ensure()` creates the `vector` extension and a table with ID, logical document ID, JSONB document, JSONB metadata, and the configured vector column, then validates its dimensions.
 
 The adapter does not create an HNSW or IVFFlat index. For production:
 
 1. Create the extension and table in a migration.
 2. Add the pgvector index appropriate for the selected distance and workload.
 3. Deploy the schema before the application.
-4. Set `createIfMissing: false` at runtime.
+4. Call `validate()` at runtime.
 
 Use `cosine`, `l2`, or `innerProduct` consistently between the adapter and the database index.
 
@@ -78,5 +85,5 @@ Read [Embeddings](/sdk/knowledges/embeddings) and [Metadata filters](/sdk/knowle
 
 - [API reference](/packages/pgvector/api-reference)
 - [Vector stores](/sdk/knowledges/vector-stores)
-- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/vector-pgvector)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-pgvector/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/vector-pgvector)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/vector-pgvector/CHANGELOG.md)

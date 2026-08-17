@@ -1,60 +1,59 @@
 # Skill tools
 
-When at least one skill is loaded, Anvia creates four tools that let the model progressively access skill content.
+When at least one skill is loaded, Anvia creates four tools for progressive disclosure.
 
-## Generated tools
+`get_skill_instructions` loads the complete instructions for one skill.
 
-| Tool | Purpose |
-| --- | --- |
-| `get_skill_instructions` | Load the complete `SKILL.md` instructions for one skill. |
-| `get_skill_reference` | Read one listed file under `references/`. |
-| `get_skill_script` | Read one listed file under `scripts/`. |
-| `run_skill_script` | Execute one listed skill script. |
+`get_skill_reference` reads one discovered reference path.
 
-These tools are included in the `SkillSet` and attached through the `skills` option.
+`get_skill_script` reads one discovered script as text.
 
-## What the agent sees first
+`run_skill_script` executes one discovered script with optional string arguments and timeout.
 
-The generated instruction block lists skill names, descriptions, reference paths, and script paths. The full bodies remain unloaded until the model calls the relevant tool.
+## 1. Understand the initial catalog
+
+The agent initially sees each skill's name, description, reference paths, and script paths, plus descriptions of the four generated tools. Full file bodies remain unloaded.
 
 ```text
-User task
-  → select skill by name and description
-  → get_skill_instructions
-  → get_skill_reference or get_skill_script when directed
-  → run_skill_script only when execution is needed
+Task
+  -> choose a skill from name and description
+  -> get_skill_instructions
+  -> read a directed reference or script
+  -> run a script only when execution is required
 ```
 
-This keeps unrelated skill content out of the model context.
-
-## Attach the complete skill set
+## 2. Attach the complete set
 
 ```ts
-const productSkills = await loadSkills(skill.local('skills'))
+import { Agent } from '@anvia/core'
+import { loadSkills, skill } from '@anvia/core/skills'
+
+const productSkills = await loadSkills(
+  skill.local('skills'),
+)
 
 const agent = new Agent({
   id: 'release-assistant',
-  model: model,
-  instructions: 'Use skills when they are relevant to the task.',
+  model,
   skills: productSkills,
   maxTurns: 4,
 })
 
-const response = await agent
-  .prompt(
-    'Draft release notes for the streaming and retrieval improvements.',
-  )
-  .send()
+const response = await agent.generate({
+    prompt: 'Draft release notes for the streaming improvements.'
+})
 ```
 
-The model may load the release-note instructions, then read a style guide or run a listed helper if the skill directs it to do so.
+`skills: productSkills` attaches catalog instructions and tools together. You may register `skillSet.tools` manually, but then you must also decide how the model learns the catalog.
 
-## Keep the catalog selective
+## 3. Keep the catalog selective
 
-Descriptions should make skill choice clear. Too many overlapping skills make selection ambiguous and add model-facing tool context.
+Load only skills appropriate for the agent role and environment. Too many overlapping descriptions add tool context and make selection ambiguous.
 
-Load only skills appropriate for the current agent role and environment. A loaded skill exposes its catalog entry and generated access paths to that agent.
+## 4. Treat generated tools as a privileged boundary
 
-## Treat script execution as a tool boundary
+Path containment prevents arbitrary requested paths, but listed scripts still execute with process permissions. Generated skill tools are specially marked and their outputs do not pass through ordinary `onToolOutput` middleware.
 
-Containment prevents arbitrary paths, but `run_skill_script` still executes reviewed code. Do not load executable skill packages into a runtime that should be read-only. Keep secrets out of script output and apply normal tool-event filtering to user-facing streams.
+Review all loaded content, restrict executable skill sources, avoid sensitive output, and filter runtime events before sending them to users.
+
+Next, verify package [validation](/sdk/advanced/skills/validation).

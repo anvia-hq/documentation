@@ -1,7 +1,7 @@
 # Production
 
 - Pre-provision the index with the correct dimension and metric.
-- Use `createIfMissing: false` so startup fails through actual provider operations.
+- Use `validate()` so startup fails when the provisioned index is missing or incompatible.
 - Inject a client when credentials, retries, and endpoint policy are centrally managed.
 - Version corpus namespaces deliberately and remove stale records.
 - Monitor vector count, metadata size, request units, and provider limits.

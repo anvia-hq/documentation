@@ -20,12 +20,12 @@ Create the client in a server-only module:
 import { GeminiClient } from '@anvia/gemini'
 
 export const gemini = new GeminiClient({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY!,
 })
 
-export const completionModel = gemini.completionModel(
-  'gemini-2.5-flash',
-)
+export const completionModel = gemini.completionModel({
+    modelId: 'gemini-2.5-flash'
+})
 ```
 
 Construction fails when the API key is missing or empty. Validate environment configuration at startup so the deployment fails before it accepts traffic.
@@ -55,7 +55,7 @@ import { GoogleGenAI } from '@google/genai'
 import { GeminiClient } from '@anvia/gemini'
 
 const google = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY!,
 })
 
 export const gemini = new GeminiClient({ client: google })

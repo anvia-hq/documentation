@@ -17,13 +17,13 @@
 
 ## Completion adapters
 
-`GrokResponsesCompletionModel` delegates normalized Responses behavior to the OpenAI adapter and adds Grok provider-tool and source normalization. `GrokChatCompletionModel` delegates Chat Completions behavior but does not accept provider-executed tools.
+The handle created with `api: 'responses'` delegates normalized Responses behavior to the OpenAI adapter and adds Grok provider-tool and source normalization. The `api: 'chat'` handle delegates Chat Completions behavior but does not accept provider-executed tools.
 
-Known Grok IDs expose context limits. Provider-specific request fields can pass through completion `additionalParams`.
+Known Grok IDs expose context limits. Provider-specific request fields can pass through completion `providerOptions`.
 
 ## Provider tools
 
-Web search, X search, code interpreter, file search, and remote MCP return Anvia `ProviderTool` values. They are sent to xAI and never executed by the local `ToolSet`. Local tools and provider tools can coexist in one agent.
+Web search, X search, code interpreter, file search, and remote MCP return Anvia `ProviderTool` values. They are sent to xAI and never executed by Anvia's local tool runtime. Local tools and provider tools can coexist in one agent.
 
 ## Images
 

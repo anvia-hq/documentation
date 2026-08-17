@@ -7,7 +7,7 @@ import { tools as grokTools } from '@anvia/grok'
 
 const agent = new Agent({
   id: 'researcher',
-  model: grok.completionModel(),
+  model: grok.completionModel({ modelId: 'grok-4.5', api: 'responses' }),
   tools: [localDatabaseTool, grokTools.webSearch({ allowedDomains: ['x.ai'] }), grokTools.xSearch({ allowedHandles: ['xai'] }), grokTools.codeInterpreter()],
 })
 ```

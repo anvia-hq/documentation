@@ -7,51 +7,25 @@ import {
   agentMemoryErrors,
   agentMemoryMessages,
   agentMemorySessions,
-  createDrizzleMemoryScopeKey,
-  createDrizzleMemoryStore,
   drizzleMemorySchema,
   DrizzleMemoryStore,
-  type DrizzleMemoryAppendInput,
-  type DrizzleMemoryContext,
   type DrizzleMemoryDatabaseLike,
-  type DrizzleMemoryErrorInput,
-  type DrizzleMemoryErrorMode,
+  type DrizzleMemoryErrorPolicy,
   type DrizzleMemoryLockMode,
   type DrizzleMemorySchema,
-  type DrizzleMemoryScopeOptions,
   type DrizzleMemoryStoreOptions,
 } from '@anvia/memory-drizzle'
 ```
 
 ## Schema exports
 
-The four schema values are Drizzle PostgreSQL table definitions:
-
-| Export | Database object |
-| --- | --- |
-| `agentMemorySessions` | `agent_memory_sessions` with UUID ID, unique scope key, session/user IDs, JSONB metadata, and timestamps. |
-| `agentMemoryMessages` | `agent_memory_messages` with its session relation, run, turn, ordered position, role, JSONB message, and timestamp. |
-| `agentMemoryErrors` | `agent_memory_errors` with its session relation, run, JSONB error/messages, and timestamp. |
-| `drizzleMemorySchema` | `{ agentMemorySessions, agentMemoryMessages, agentMemoryErrors }` as a readonly object. |
+- `agentMemorySessions` defines `agent_memory_sessions` and its unique scope key.
+- `agentMemoryMessages` defines ordered message rows with a unique session-position index.
+- `agentMemoryErrors` defines failed-run diagnostics.
+- `drizzleMemorySchema` contains all three tables for use in an application schema.
 
 ```ts
 type DrizzleMemorySchema = typeof drizzleMemorySchema
-```
-
-`agentMemoryMessages` has a unique `(memorySessionId, position)` index. Sessions have a unique scope-key index, and both child tables cascade on session deletion.
-
-## Functions
-
-```ts
-function createDrizzleMemoryStore(
-  db: DrizzleMemoryDatabaseLike,
-  options?: DrizzleMemoryStoreOptions,
-): DrizzleMemoryStore
-
-function createDrizzleMemoryScopeKey(
-  context: MemoryContext,
-  options?: DrizzleMemoryScopeOptions,
-): string
 ```
 
 ## DrizzleMemoryStore
@@ -60,57 +34,36 @@ function createDrizzleMemoryScopeKey(
 class DrizzleMemoryStore implements MemoryStore {
   readonly kind: 'drizzle'
   readonly inspector: MemoryInspector
-  readonly compaction: MemoryCompactionStore
+  readonly compaction: MemoryCompactionCapability
 
-  constructor(
-    db: DrizzleMemoryDatabaseLike,
-    schema: DrizzleMemorySchema,
-    options: {
-      errors: DrizzleMemoryErrorMode
-      lock: DrizzleMemoryLockMode
-      validateMessages: boolean
-      scope?: DrizzleMemoryStoreOptions['scope']
-    },
-  )
-
-  load(context: MemoryContext): Promise<Message[]>
-  append(input: MemoryAppendInput): Promise<void>
-  clear(context: MemoryContext): Promise<void>
-  recordError(input: MemoryErrorInput): Promise<void>
+  constructor(options: DrizzleMemoryStoreOptions)
+  validate(): Promise<void>
+  load(options: MemoryLoadOptions): Promise<Message[]>
+  append(options: MemoryAppendOptions): Promise<void>
+  clear(options: MemoryClearOptions): Promise<void>
+  recordError(options: MemoryErrorOptions): Promise<void>
 }
 ```
 
-Use `createDrizzleMemoryStore()` so the default schema and runtime options are resolved for you.
+The constructor requires a database with transactional writes. Advisory locking additionally requires the database's `execute` method.
 
 ## Options
 
 ```ts
 type DrizzleMemoryDatabaseLike = object
-type DrizzleMemoryErrorMode = 'store' | 'ignore'
+type DrizzleMemoryErrorPolicy = 'store' | 'ignore'
 type DrizzleMemoryLockMode = 'advisory' | 'none'
 
-type DrizzleMemoryScopeOptions = {
-  includeUserId?: boolean
-  metadataKeys?: string[]
-}
-
 type DrizzleMemoryStoreOptions = {
+  db: DrizzleMemoryDatabaseLike
   schema?: DrizzleMemorySchema
-  scope?: DrizzleMemoryScopeOptions | ((context: MemoryContext) => string)
-  errors?: DrizzleMemoryErrorMode
+  scopeKey?: MemoryScopeKeyResolver
+  errorPolicy?: DrizzleMemoryErrorPolicy
   validateMessages?: boolean
   lock?: DrizzleMemoryLockMode
 }
 ```
 
-Defaults are `includeUserId: true`, `metadataKeys: []`, `errors: 'store'`, `validateMessages: true`, and `lock: 'advisory'`.
-
-## Core aliases
-
-```ts
-type DrizzleMemoryAppendInput = MemoryAppendInput
-type DrizzleMemoryContext = MemoryContext
-type DrizzleMemoryErrorInput = MemoryErrorInput
-```
+`scopeKey` accepts either `{ includeUserId?, metadataKeys? }` or a function receiving `{ scope }` and returning a stable string.
 
 Return to the [package guide](/packages/memory-drizzle).

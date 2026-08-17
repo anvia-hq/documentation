@@ -1,121 +1,79 @@
 # `@anvia/fastembed` API reference
 
-Import every public symbol from `@anvia/fastembed`. The package has no public subpath exports.
-
-The model-name aliases and initialization options refer to types from the installed FastEmbed runtime:
+Import all public symbols from `@anvia/fastembed`.
 
 ```ts
 import {
-  EmbeddingModel,
+  adaptFastEmbedEmbeddingModel,
+  adaptFastEmbedSparseEmbeddingModel,
+  DEFAULT_FASTEMBED_EMBEDDING_MODEL,
+  DEFAULT_FASTEMBED_SPARSE_EMBEDDING_MODEL,
+  loadFastEmbedEmbeddingModel,
+  loadFastEmbedSparseEmbeddingModel,
+  type AdaptFastEmbedEmbeddingModelOptions,
+  type AdaptFastEmbedSparseEmbeddingModelOptions,
   type ExecutionProvider,
-  SparseEmbeddingModel,
-} from 'fastembed'
+  type FastEmbedEmbeddingModelHandle,
+  type FastEmbedEmbeddingModelId,
+  type FastEmbedRuntime,
+  type FastEmbedSparseEmbeddingModelHandle,
+  type FastEmbedSparseEmbeddingModelId,
+  type FastEmbedSparseRuntime,
+  type LoadFastEmbedEmbeddingModelOptions,
+  type LoadFastEmbedSparseEmbeddingModelOptions,
+} from '@anvia/fastembed'
 ```
 
-Those three supporting symbols are not re-exported by `@anvia/fastembed`.
-
-## Dense embeddings
+## Load models
 
 ```ts
-type FastEmbedEmbeddingModelName =
-  `${Exclude<EmbeddingModel, EmbeddingModel.CUSTOM>}`
+function loadFastEmbedEmbeddingModel(
+  options: LoadFastEmbedEmbeddingModelOptions,
+): Promise<FastEmbedEmbeddingModelHandle>
 
+function loadFastEmbedSparseEmbeddingModel(
+  options: LoadFastEmbedSparseEmbeddingModelOptions,
+): Promise<FastEmbedSparseEmbeddingModelHandle>
+```
+
+Both option types require `modelId` and also accept `executionProviders`, `maxLength`, `cacheDir`, `showDownloadProgress`, and `maxBatchSize`.
+
+```ts
+const DEFAULT_FASTEMBED_EMBEDDING_MODEL: FastEmbedEmbeddingModelId
+const DEFAULT_FASTEMBED_SPARSE_EMBEDDING_MODEL: FastEmbedSparseEmbeddingModelId
+```
+
+## Adapt existing runtimes
+
+```ts
+function adaptFastEmbedEmbeddingModel(
+  options: {
+    runtime: FastEmbedRuntime
+    modelId: string
+    maxBatchSize?: number
+  },
+): FastEmbedEmbeddingModelHandle
+
+function adaptFastEmbedSparseEmbeddingModel(
+  options: {
+    runtime: FastEmbedSparseRuntime
+    modelId: string
+    maxBatchSize?: number
+  },
+): FastEmbedSparseEmbeddingModelHandle
+```
+
+## Runtime contracts
+
+```ts
 type FastEmbedRuntime = {
   embed(texts: string[], batchSize?: number): AsyncIterable<unknown>
 }
 
-type FastEmbedEmbeddingModelOptions = {
-  model?: FastEmbedEmbeddingModelName
-  maxBatchSize?: number
-  initOptions?: {
-    executionProviders?: ExecutionProvider[]
-    maxLength?: number
-    cacheDir?: string
-    showDownloadProgress?: boolean
-    modelName?: string
-  }
-}
-
-const DEFAULT_FASTEMBED_EMBEDDING_MODEL: FastEmbedEmbeddingModelName
-
-class FastEmbedEmbeddingModel implements EmbeddingModel {
-  readonly model: string
-  readonly maxBatchSize: number
-
-  constructor(
-    runtime: FastEmbedRuntime,
-    options?: FastEmbedEmbeddingModelOptions,
-  )
-
-  static create(
-    options?: FastEmbedEmbeddingModelOptions,
-  ): Promise<FastEmbedEmbeddingModel>
-
-  embedTexts(texts: string[]): Promise<Embedding[]>
-}
-
-function createFastEmbedEmbeddingModel(
-  options?: FastEmbedEmbeddingModelOptions,
-): Promise<FastEmbedEmbeddingModel>
-```
-
-At runtime, `DEFAULT_FASTEMBED_EMBEDDING_MODEL` is `fast-bge-small-en-v1.5`. The model-name type is derived from the installed FastEmbed `EmbeddingModel` enum rather than copied into this package.
-
-`FastEmbedEmbeddingModel.create()` initializes FastEmbed’s `TextEmbedding`; the standalone factory calls that static method. Direct construction accepts an already initialized compatible runtime. `embedTexts()` rejects invalid vectors or a count that differs from the input count.
-
-## Sparse embeddings
-
-```ts
-type FastEmbedSparseEmbeddingModelName =
-  `${Exclude<SparseEmbeddingModel, SparseEmbeddingModel.CUSTOM>}`
-
 type FastEmbedSparseRuntime = {
-  passageEmbed(
-    texts: string[],
-    batchSize?: number,
-  ): AsyncIterable<unknown>
-
+  passageEmbed(texts: string[], batchSize?: number): AsyncIterable<unknown>
   queryEmbed(query: string): Promise<unknown>
 }
-
-type FastEmbedSparseEmbeddingModelOptions = {
-  model?: FastEmbedSparseEmbeddingModelName
-  maxBatchSize?: number
-  initOptions?: {
-    executionProviders?: ExecutionProvider[]
-    maxLength?: number
-    cacheDir?: string
-    showDownloadProgress?: boolean
-    modelName?: string
-  }
-}
-
-const DEFAULT_FASTEMBED_SPARSE_EMBEDDING_MODEL: FastEmbedSparseEmbeddingModelName
-
-class FastEmbedSparseEmbeddingModel implements SparseEmbeddingModel {
-  readonly model: string
-  readonly maxBatchSize: number
-
-  constructor(
-    runtime: FastEmbedSparseRuntime,
-    options?: FastEmbedSparseEmbeddingModelOptions,
-  )
-
-  static create(
-    options?: FastEmbedSparseEmbeddingModelOptions,
-  ): Promise<FastEmbedSparseEmbeddingModel>
-
-  embedTexts(texts: string[]): Promise<SparseEmbedding[]>
-  embedQuery(query: string): Promise<SparseEmbedding>
-}
-
-function createFastEmbedSparseEmbeddingModel(
-  options?: FastEmbedSparseEmbeddingModelOptions,
-): Promise<FastEmbedSparseEmbeddingModel>
 ```
 
-At runtime, `DEFAULT_FASTEMBED_SPARSE_EMBEDDING_MODEL` is `prithivida/Splade_PP_en_v1`. The static and standalone factories initialize FastEmbed’s sparse runtime. `embedTexts()` uses passage encoding; `embedQuery()` uses query encoding.
-
-## Runtime output behavior
-
-Dense vectors normalize to Anvia `Embedding` values. Sparse vectors preserve the runtime’s parallel `indices` and `values` arrays in Anvia `SparseEmbedding` values. The adapters validate the returned container shapes, numeric entries, matching sparse-array lengths, and final embedding count.
+Dense handles implement `EmbeddingModel`. Sparse handles implement `SparseEmbeddingModel`, using passage encoding for `embedTexts()` and query encoding for `embedQuery()`.

@@ -1,15 +1,15 @@
 # Agent streams
 
-An agent stream covers the complete runtime loop: model turns, text, tools, nested agents, final output, usage, and errors.
+An agent stream exposes the complete runtime loop: turns, provider generation, tool calls, tool results, nested agents, final output, usage, approvals, and errors.
 
-## Consume a run
+## 1. Stream a stateless run
 
 ```ts
-const request = agent
-  .session('thread_123', { userId: 'user_456' })
-  .prompt('Has my latest invoice been paid?')
+const events = agent.stream({
+    prompt: 'Has the latest invoice been paid?'
+})
 
-for await (const event of request.stream()) {
+for await (const event of events) {
   switch (event.type) {
     case 'text_delta':
       process.stdout.write(event.delta)
@@ -24,29 +24,68 @@ for await (const event of request.stream()) {
       break
 
     case 'final':
-      console.log('\nRun:', event.runId)
-      console.log('Tokens:', event.usage.totalTokens)
+      console.log('\nRun:', event.result.runId)
+      console.log('Output:', event.result.status === 'completed' ? event.result.output : 'blocked')
+      console.log('Tokens:', event.result.usage.totalTokens)
       break
   }
 }
 ```
 
-The final event contains the completed output, cumulative usage, new runtime messages, run ID, and optional trace or provider artifacts.
+The `final` event contains a completed or blocked `result` with run ID, cumulative usage, messages, and optional context usage, trace, guardrail decisions, sources, or provider tool calls.
 
-## Tool-call deltas
+## 2. Stream through a memory session
 
-`tool_call_delta` events are provisional. Argument fragments may be incomplete, and `argumentsMode: 'replace'` means the fragment is a full snapshot rather than an append.
-
-Only the completed `tool_call` event is authoritative and executable. Tool-call deltas are enabled by default; disable them only for a strict legacy consumer:
+Use the session directly when the agent has configured [memory](/sdk/memory):
 
 ```ts
-for await (const event of request.stream({
-  includeToolCallDeltas: false,
+const session = { sessionId: 'thread_123', userId: 'user_456' };
+for await (const event of agent.stream({
+    prompt: 'Has my latest invoice been paid?',
+    session: session
 })) {
-  // No tool_call_delta events.
+    await handleEvent(event);
 }
 ```
 
-## Nested agents
+There is no intermediate prompt-request builder in v1. `agent.stream({ prompt, session })` returns the stream directly.
 
-When an agent tool is created with `asTool({ stream: true })`, its child events appear inside `agent_tool_event`. Collapse those events to a simple status for user-facing interfaces unless users need to inspect the sub-agent workflow.
+## 3. Treat tool-call deltas as provisional
+
+`tool_call_delta` events may contain partial names or argument fragments. When `argumentsMode` is `replace`, `argumentsDelta` is a full current snapshot rather than text to append.
+
+Only the completed `tool_call` event is authoritative. Anvia validates and executes the completed call, not the provisional fragments.
+
+Consumers that only understand completed calls should ignore `tool_call_delta`:
+
+```ts
+for await (const event of agent.stream({
+    prompt: input
+})) {
+  if (event.type === 'tool_call') handleCompleteToolCall(event)
+}
+```
+
+## 4. Handle nested agent events
+
+When an agent is exposed as a tool with `asTool({ stream: true })`, its child events are wrapped in `agent_tool_event` on the parent stream.
+
+Internal operator views may inspect the nested event. Public interfaces should usually collapse it to a safe status such as “Checking specialist guidance.”
+
+## 5. Steer an active stream
+
+An `AgentStream` also exposes `steer(input)`. It returns `true` when the message was accepted for a later turn and `false` when the run can no longer accept steering:
+
+```ts
+const stream = agent.stream({
+    prompt: 'Draft the incident update.'
+})
+
+const accepted = stream.steer(
+  'Also mention that mitigation is already in progress.',
+)
+```
+
+Steering does not replace cancellation or tool approval. Treat it as additional user input to the active run.
+
+Next, review the complete [event types](/sdk/streaming/event-types).

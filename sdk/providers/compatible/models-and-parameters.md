@@ -7,18 +7,17 @@ Model IDs and provider-specific parameters are part of the deployment contract. 
 Pass the exact identifier expected by the compatible endpoint:
 
 ```ts
-const model = compatible.completionModel(
-  'provider/model-name',
-)
+const model = compatible.completionModel({
+    modelId: 'provider/model-name',
+    api: 'chat',
+})
 ```
 
-Anvia's model-name type offers autocomplete for known OpenAI IDs while still accepting custom strings. This supports gateway aliases, namespaced IDs, local model names, and new releases without waiting for an Anvia package update.
+The model-name type recognizes known OpenAI IDs while allowing custom strings for gateway aliases, namespaced IDs, local models, and newer releases. TypeScript accepting the string does not prove that the remote endpoint knows it.
 
-TypeScript accepting a string does not prove that the remote endpoint knows it. Fail fast when the configured value is absent, then verify it with a real request.
+## Treat listing as inventory
 
-## Model listing is inventory
-
-When the endpoint implements the compatible `/models` route, `listModels()` returns a normalized model list:
+When the endpoint implements `/models`, `listModels()` returns a normalized list:
 
 ```ts
 const inventory = await compatible.listModels()
@@ -28,53 +27,56 @@ for (const available of inventory.data) {
 }
 ```
 
-Use this for diagnostics or an allow-list workflow. Do not infer tools, media, schemas, context limits, or Responses support from presence in the list. Some compatible services omit `/models` entirely or expose models that require different APIs.
+Use this for diagnostics or an allow-list workflow. Do not infer tools, media, schemas, context limits, or Responses support from presence in the list. Some compatible services omit `/models` or list models that require other APIs.
 
-## Prefer normalized request fields
+## Prefer normalized request options
 
-Keep portable settings on the Anvia completion request:
+Keep portable settings on the Anvia completion call:
 
 ```ts
-import { createCompletion } from '@anvia/core'
+import { generateCompletion } from '@anvia/core'
 
-const result = await createCompletion(model, {
-  instructions: 'Summarize the incident without speculation.',
-  input: incidentText,
-  temperature: 0.2,
-  maxTokens: 300,
+const result = await generateCompletion({
+    prompt: incidentText,
+    model,
+    instructions: 'Summarize the incident without speculation.',
+    temperature: 0.2,
+    maxTokens: 300
 })
 
 console.log(result.text)
 ```
 
-This keeps ordinary application code independent of the compatible provider.
+Ordinary application code then remains independent of the compatible provider.
 
-## Isolate provider parameters
+## Isolate provider-specific fields
 
-Use `params` for endpoint-specific request fields that have no normalized Anvia option:
+Use `providerOptions` for endpoint fields without a normalized Anvia option:
 
 ```ts
-const result = await createCompletion(model, {
-  input: 'Summarize this release note.',
-  params: {
-    thinking: { type: 'enabled', keep: 'all' },
-  },
+const result = await generateCompletion({
+    prompt: 'Summarize this release note.',
+    model,
+    providerOptions: {
+        thinking: { type: 'enabled', keep: 'all' },
+    }
 })
 ```
 
-The accepted fields belong to the target endpoint, not to OpenAI compatibility in general. Check its documentation and test the exact request. A parameter affecting reasoning, safety, latency, cost, or output format is product behavior; keep it in typed application configuration rather than scattering it through prompts.
+Those fields belong to the target endpoint, not to OpenAI compatibility in general. A parameter affecting reasoning, safety, latency, cost, or output format is product behavior; keep it in typed application configuration rather than scattering it through prompts.
 
-## Pin and promote configurations
+Because provider parameters are merged into the outgoing provider request, only pass trusted, reviewed values. Do not forward an arbitrary client-supplied object as `providerOptions`.
 
-Treat this tuple as one tested unit:
+## Promote a tested tuple
+
+Treat endpoint, adapter, and model as one unit:
 
 ```ts
 type CompatibleDeployment = {
   baseUrl: string
-  completionApi: 'chat' | 'responses'
+  api: 'chat' | 'responses'
   model: string
 }
 ```
 
-Promote a known tuple between environments. Re-run compatibility tests when the provider changes an alias, the gateway route changes, the model is upgraded, or the adapter selection changes. Avoid a silent fallback to another model because it makes output regressions and incident diagnosis harder.
-
+Promote a known tuple between environments. Re-run compatibility tests after a provider alias, gateway route, model, adapter, or important provider parameter changes. Avoid silent model fallback because it obscures output regressions and incidents.

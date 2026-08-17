@@ -1,7 +1,7 @@
 # Production
 
 - Inject an authenticated client, or pass `clientOptions`, with explicit endpoint and timeout settings.
-- Pre-create dense or hybrid collections and use `createIfMissing: false`.
+- Pre-create dense or hybrid collections and call `validate()` at startup.
 - Keep dense/sparse vector names stable across every workflow.
 - Add payload indexes for common filters.
 - Tune hybrid prefetch and fusion independently of final `topK`.

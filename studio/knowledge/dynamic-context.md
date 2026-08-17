@@ -7,19 +7,26 @@ Open `http://localhost:4021/ui/knowledge/dynamic-context`.
 ## Register an index
 
 ```ts
+import { createVectorContext } from '@anvia/core/agent';
 const agent = new Agent({
-  id: 'docs-support',
-  model: model,
-  instructions: 'Answer from relevant documentation.',
-  dynamicContexts: [{ index: docsIndex, topK: 4, threshold: 0.72, filter: vectorFilter.eq('product', 'platform'), format: (result) => ({
-      id: result.id,
-      text: result.document.text,
-      additionalProps: {
-        product: result.document.product,
-        score: result.score,
-      },
-    }) }],
-})
+    id: 'docs-support',
+    model: model,
+    instructions: 'Answer from relevant documentation.',
+    context: [createVectorContext({
+            store: docsIndex,
+            model: embeddingModel,
+            topK: 4,
+            minScore: 0.72,
+            filter: vectorFilter.eq('product', 'platform'), format: (result) => ({
+                id: result.id,
+                text: result.document.text,
+                additionalProps: {
+                    product: result.document.product,
+                    score: String(result.score),
+                },
+            })
+        })],
+});
 ```
 
 These options control runtime retrieval:
@@ -27,11 +34,11 @@ These options control runtime retrieval:
 | Option | Effect during an agent turn |
 | --- | --- |
 | `topK` | Maximum number of matching chunks selected for a generation. |
-| `threshold` | Rejects matches below the configured similarity score. |
+| `minScore` | Rejects matches below the configured similarity score. |
 | `filter` | Restricts the eligible index records before selection. |
 | `format` | Converts a search result into the document sent to the model. |
 
-Studio does not perform an arbitrary similarity search from this browser. It uses the optional index inspection contract to page through source items, applying the registration's filter. Runtime `topK` and threshold still govern prompt-time retrieval.
+Studio does not perform an arbitrary similarity search from this browser. It uses the optional store inspection contract to page through source items, applying the registration's filter. Runtime `topK` and `minScore` still govern prompt-time retrieval.
 
 ## Browse source items
 
@@ -46,7 +53,7 @@ Use **Load more** to follow the index cursor. When the inspector reports a total
 
 ## When chunks are not browseable
 
-Search and inspection are separate index capabilities. A custom `VectorSearchIndex` can support runtime search without implementing `inspect(...)`. In that case the agent can retrieve normally, but Studio reports that the source does not expose browseable chunks.
+Search and inspection are separate store capabilities. A custom `VectorStore` can support runtime search without implementing `inspect(...)`. In that case the agent can retrieve normally, but Studio reports that the source does not expose browseable chunks.
 
 This does not mean the index is empty or broken. Add an inspection adapter if browsing is useful, or validate actual runtime selection through [Retrieval evidence](/studio/knowledge/retrieval-evidence).
 

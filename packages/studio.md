@@ -60,4 +60,4 @@ Studio is a trusted local development surface. Binding to a public interface can
 - [Public API](/packages/studio/api-reference)
 - [Studio documentation](/studio/)
 - [Configuration and security](/studio/configure/security-boundaries)
-- [Package changelog](https://github.com/anvia-hq/anvia/blob/main/packages/tool-studio/CHANGELOG.md)
+- [Package changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/tool-studio/CHANGELOG.md)

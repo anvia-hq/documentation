@@ -1,32 +1,15 @@
 # Skills
 
-Skills package reusable instructions, references, and scripts so an agent can load procedural guidance only when a task needs it.
-
-## Explore skills
-
-| Page | Learn how to |
-| --- | --- |
-| [Directory structure](/sdk/advanced/skills/directory) | Organize a local skill package. |
-| [Write SKILL.md](/sdk/advanced/skills/content) | Define metadata and focused operating instructions. |
-| [References and scripts](/sdk/advanced/skills/assets) | Add supporting files and deterministic helpers safely. |
-| [Load skills](/sdk/advanced/skills/load) | Load one or more trusted skill sources. |
-| [Skill tools](/sdk/advanced/skills/tools) | Understand the generated tools available to the model. |
-| [Validation](/sdk/advanced/skills/validation) | Catch invalid packages before serving requests. |
-| [Skills and retrieval](/sdk/advanced/skills/skills-and-retrieval) | Choose procedural guidance or factual search. |
-
-## Progressive disclosure
+Skills package reusable procedures, references, and executable helpers. They let an agent load detailed guidance only when a task matches the skill.
 
 ```text
-Skill names and descriptions
-          ↓
-Load relevant SKILL.md instructions
-          ↓
-Read one reference or run one script if needed
+Compact catalog
+  -> load matching SKILL.md
+  -> read a listed reference or script
+  -> run a listed script only when needed
 ```
 
-The agent initially sees a compact catalog. It can load deeper content through generated skill tools instead of placing every instruction and reference in every prompt.
-
-## A minimal skill
+## 1. Create a minimal skill
 
 ```text
 skills/
@@ -41,30 +24,47 @@ skills/
 ```md
 ---
 name: release-notes
-description: Draft release notes from product changes.
+description: Draft customer-facing release notes from product changes.
 ---
-# Release Notes
+
+# Release notes
 
 Read `references/style-guide.md` before drafting.
-Use `scripts/collect-changes.sh` when change data is not supplied.
+Use `scripts/collect-changes.sh` only when change data is not supplied.
 ```
 
-Load the directory and attach the resulting `SkillSet`:
+## 2. Load and attach it
 
 ```ts
 import { Agent } from '@anvia/core'
 import { loadSkills, skill } from '@anvia/core/skills'
 
-const productSkills = await loadSkills(skill.local('skills'))
+const productSkills = await loadSkills(
+  skill.local('skills'),
+)
 
 const agent = new Agent({
   id: 'release-assistant',
-  model: model,
+  model,
   skills: productSkills,
   maxTurns: 4,
 })
 ```
 
-## Choose skills for procedures
+The agent receives compact catalog instructions and four generated tools for loading skill content or executing listed scripts.
 
-Skills answer “how should this task be performed?” Retrieval answers “which facts are relevant?” Use skills for workflows, rubrics, and operating procedures; use [Dynamic context](/sdk/advanced/dynamic-context) for a large or changing factual corpus.
+## 3. Use skills for procedures
+
+Skills answer “how should this task be performed?” Retrieval answers “which facts are relevant now?”
+
+Use skills for workflows, rubrics, small supporting references, and reviewed deterministic helpers. Use [dynamic context](/sdk/advanced/dynamic-context) for a large or frequently changing factual corpus.
+
+## 4. Continue through the section
+
+- [Organize the directory](/sdk/advanced/skills/directory)
+- [Write SKILL.md](/sdk/advanced/skills/content)
+- [Add references and scripts](/sdk/advanced/skills/assets)
+- [Load trusted skills](/sdk/advanced/skills/load)
+- [Understand generated tools](/sdk/advanced/skills/tools)
+- [Validate packages](/sdk/advanced/skills/validation)
+- [Combine skills and retrieval](/sdk/advanced/skills/skills-and-retrieval)

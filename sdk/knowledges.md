@@ -1,28 +1,90 @@
 # Knowledges
 
-Knowledge connects an agent to relevant source material without placing the entire corpus in every prompt.
-
-## Explore knowledge
-
-| Page | Learn how to |
-| --- | --- |
-| [Load documents](/sdk/knowledges/load-documents) | Read, normalize, and chunk source files. |
-| [Embeddings](/sdk/knowledges/embeddings) | Turn documents into searchable vectors. |
-| [Vector stores](/sdk/knowledges/vector-stores) | Build, query, update, and choose an index. |
-| [Metadata filters](/sdk/knowledges/metadata-filters) | Enforce tenant, visibility, and content boundaries. |
-| [Automatic retrieval](/sdk/knowledges/automatic-retrieval) | Add relevant documents to every agent turn. |
-| [Search tools](/sdk/knowledges/search-tools) | Let the model decide when and how to search. |
-
-## The retrieval flow
+Knowledge gives an agent access to a large document collection without sending the whole collection to the model. Anvia separates this into an ingestion path and a retrieval path:
 
 ```text
-Sources → load and chunk → embed → index → filter and search → model context
+Ingestion: source files -> documents -> embeddings -> vector store
+Runtime:   user prompt -> filtered search -> relevant documents -> model
 ```
 
-Ingestion prepares the index outside the request path. At runtime, the current prompt searches that prepared index and sends only relevant documents to the model.
+Ingestion normally runs in a script, worker, or deployment job. Runtime retrieval should only search an index that is already prepared.
 
-## Choose how retrieval runs
+## 1. Prepare searchable documents
 
-Use [automatic retrieval](/sdk/knowledges/automatic-retrieval) when most prompts need supporting knowledge. Use a [search tool](/sdk/knowledges/search-tools) when retrieval is optional or the model may need to refine its query.
+Load and chunk the source material, then create embeddings with stable IDs and filterable metadata:
 
-Use static agent [context](/sdk/agents/context) instead when the source set is small, stable, and safe to include in every run. Use [tools](/sdk/tools) for live account data, permissions, or actions rather than treating a vector index as an operational database.
+```ts
+import { readFile } from 'node:fs/promises';
+import { chunkText } from '@anvia/core/documents';
+import { embedDocuments } from '@anvia/core/embeddings';
+import { InMemoryVectorStore } from '@anvia/core/vector-store';
+const path = 'content/support/reset-links.md';
+const text = await readFile(path, 'utf8');
+const documents = chunkText({
+    text,
+    strategy: 'recursive',
+    maxSize: 1600,
+    overlap: 200,
+    separators: ['\n\n', '\n', '. ', ' '],
+}).map((chunk) => ({
+    id: `${path}#chunk=${chunk.index}`,
+    text: chunk.text,
+    metadata: { source: path, start: chunk.start, end: chunk.end },
+}));
+const { documents: embedded } = await embedDocuments({
+    model: embeddingModel,
+    documents: documents,
+    id: (document) => document.id,
+    content: (document) => document.text,
+    metadata: (document) => ({
+        source: document.metadata.source,
+        published: true,
+    })
+});
+const store = InMemoryVectorStore.fromDocuments({ documents: embedded });
+```
+
+The in-memory store is useful for learning and tests. Use a persistent [vector-store adapter](/sdk/knowledges/vector-stores) for production data.
+
+## 2. Connect retrieval to an agent
+
+Use `createVectorContext()` when the agent should retrieve relevant documents before each model turn:
+
+```ts
+import { Agent, createVectorContext } from '@anvia/core'
+import { vectorFilter } from '@anvia/core/vector-store'
+
+const agent = new Agent({
+  id: 'docs-support',
+  model,
+  instructions: 'Answer from the documentation. Say when the answer is not available.',
+  context: [
+    createVectorContext({
+      store,
+      model: embeddingModel,
+      topK: 4,
+      minScore: 0.72,
+      filter: vectorFilter.eq('published', true),
+    }),
+  ],
+})
+
+const result = await agent.generate({
+    prompt: 'How long does a reset link last?'
+})
+```
+
+The index uses the current prompt as its search query. Only matching documents are added to the model request.
+
+## 3. Choose the retrieval pattern
+
+Use [automatic retrieval](/sdk/knowledges/automatic-retrieval) when knowledge is useful for most prompts. Use a [search tool](/sdk/knowledges/search-tools) when search is optional or the model may need to refine the query.
+
+Use static agent [context](/sdk/agents/context) for a small set of facts that should be present on every turn. Use an application [tool](/sdk/tools) for live records, permission checks, and actions.
+
+Continue through the ingestion flow:
+
+- [Load and chunk documents](/sdk/knowledges/load-documents)
+- [Create embeddings](/sdk/knowledges/embeddings)
+- [Store and search vectors](/sdk/knowledges/vector-stores)
+- [Apply metadata filters](/sdk/knowledges/metadata-filters)

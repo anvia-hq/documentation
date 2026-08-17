@@ -9,7 +9,7 @@ const appLogger = createPinoLogger({
 })
 
 const tenantLogger = appLogger.child({ tenantId })
-const observer = createLoggerObserver(tenantLogger)
+const observer = createLoggerObserver({ logger: tenantLogger })
 ```
 
 ## Operational checklist

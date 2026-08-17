@@ -6,14 +6,14 @@ Core is split into focused package entry points. The root export contains common
 | --- | --- | --- |
 | Agents | `@anvia/core/agent` | Bounded model/tool loops, sessions, observability, dynamic context, agent-as-tool |
 | Completions | `@anvia/core/completion` | Provider-neutral requests, streams, messages, usage, documents, structured parsing |
-| Tools | `@anvia/core/tool` | Zod validation, approvals, middleware, tool sets, dynamic discovery, result normalization |
-| Hooks | `@anvia/core/hooks` | Typed run, turn, completion, and tool interception and control |
+| Tools | `@anvia/core/tool` | Zod validation, approvals, middleware, dynamic discovery, result normalization |
+| Lifecycle | `@anvia/core/agent` | Typed run, turn, generation, tool, finish, and error observation |
 | Guardrails | `@anvia/core/guardrails` | Input/final-output allow, block, and rewrite policies |
 | Memory | `@anvia/core/memory` | Conversation store, inspection, save policy, durable compaction contracts |
 | Retrieval | `@anvia/core/embeddings`, `@anvia/core/vector-store` | Dense/sparse embedding helpers, filters, in-memory search, search-tool contracts |
 | Pipelines | `@anvia/core/pipeline` | Typed composition, parallel branches, batch execution, graphs, run observers |
 | Extraction | `@anvia/core/extractor` | Agent-backed schema extraction with retry support |
-| Media | `@anvia/core/image-generation`, `audio-generation`, `transcription` | Provider-neutral request builders and model interfaces |
+| Media | `@anvia/core/image-generation`, `speech-generation`, `transcription` | Provider-neutral helpers and model interfaces |
 | MCP and skills | `@anvia/core/mcp`, `@anvia/core/skills` | MCP transports/tool discovery and validated local skill loading |
 | Observability | `@anvia/core/observability` | Run, generation, tool, trace, and streaming observer contracts |
 | Evaluations | `@anvia/core/evals` | Cases, metrics, suites, reporters, traces, CLI results, cost/usage totals |

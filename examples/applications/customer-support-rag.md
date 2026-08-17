@@ -12,7 +12,7 @@ You will have a JSON API that:
 - validates and embeds application-owned handbook records at startup;
 - authenticates support principals before parsing or retrieving;
 - constructs metadata filters from trusted principal state;
-- uses the agent `dynamicContexts` option for prompt-time retrieval; and
+- uses an agent `ContextIndex` for prompt-time retrieval; and
 - names the source or reports that the handbook is insufficient.
 
 The in-memory store keeps the example self-contained. It rebuilds embeddings on restart and is not
@@ -44,7 +44,7 @@ mkdir -p src knowledge
 
 1. Startup loads and validates the application-owned handbook.
 2. `embedDocuments` creates embeddings plus flat, filterable visibility metadata.
-3. `InMemoryVectorStore.fromDocuments(...).index(...)` creates the search index.
+3. `InMemoryVectorStore.fromDocuments({ documents })` creates the searchable store.
 4. The route authenticates the bearer token and checks `knowledge:read`.
 5. A server-owned role becomes a `vectorFilter`; question text cannot modify it.
 6. `dynamicContext` retrieves and formats only eligible documents for the model.
@@ -218,58 +218,58 @@ import { OpenAIClient } from "@anvia/openai";
 import { env } from "./config.js";
 import { knowledgeDocumentSchema, type KnowledgeDocument } from "./types.js";
 import { z } from "zod";
-
-const raw = JSON.parse(await readFile(
-  new URL("../knowledge/support-handbook.json", import.meta.url),
-  "utf8",
-));
+const raw = JSON.parse(await readFile(new URL("../knowledge/support-handbook.json", import.meta.url), "utf8"));
 export const documents = z.array(knowledgeDocumentSchema).min(1).parse(raw);
-
 const openai = new OpenAIClient({ apiKey: env.OPENAI_API_KEY });
-const embeddingModel = openai.embeddingModel("text-embedding-3-small");
-const embedded = await embedDocuments(embeddingModel, documents, {
-  id: (document) => document.id,
-  content: (document) => `${document.title}\n${document.text}`,
-  metadata: (document) => ({
-    source: document.source,
-    visibility: document.visibility,
-  }),
+export const embeddingModel = openai.embeddingModel({
+    modelId: "text-embedding-3-small"
 });
-
-export const completionModel = openai.completionModel("gpt-5.5");
-export const knowledgeIndex = InMemoryVectorStore
-  .fromDocuments<KnowledgeDocument>(embedded)
-  .index(embeddingModel);
+const { documents: embedded } = await embedDocuments({
+    model: embeddingModel,
+    documents: documents,
+    id: (document) => document.id,
+    content: (document) => `${document.title}\n${document.text}`,
+    metadata: (document) => ({
+        source: document.source,
+        visibility: document.visibility,
+    })
+});
+export const completionModel = openai.completionModel({
+    modelId: "gpt-5.5",
+    api: "responses"
+});
+export const knowledgeStore = InMemoryVectorStore.fromDocuments<KnowledgeDocument>({
+    documents: embedded
+});
 ```
 
 ```ts [agent.ts]
-import { Agent } from "@anvia/core/agent";
+import { Agent, createVectorContext } from "@anvia/core/agent";
 import { vectorFilter } from "@anvia/core/vector-store";
-import { completionModel, knowledgeIndex } from "./knowledge.js";
+import { completionModel, embeddingModel, knowledgeStore } from "./knowledge.js";
 import type { Principal } from "./types.js";
-
 export function createSupportAgent(principal: Principal) {
-  const filter = principal.role === "manager"
-    ? vectorFilter.or(
-        vectorFilter.eq("visibility", "agent"),
-        vectorFilter.eq("visibility", "manager"),
-      )
-    : vectorFilter.eq("visibility", "agent");
-
-  return new Agent({
-    id: "customer-support-rag",
-    model: completionModel,
-    instructions: [
-      "Answer only from the retrieved handbook documents.",
-      "If they are insufficient, say so; never invent policy or approval.",
-      "End handbook claims with the supplied Source value in parentheses.",
-    ].join("\n"),
-    dynamicContexts: [{ index: knowledgeIndex, topK: 4, filter, format: (result) => ({
-        id: result.id,
-        text: `Title: ${result.document.title}\nSource: ${result.document.source}`
-          + `\n\n${result.document.text}`,
-      }) }],
-  });
+    const filter = principal.role === "manager"
+        ? vectorFilter.or(vectorFilter.eq("visibility", "agent"), vectorFilter.eq("visibility", "manager"))
+        : vectorFilter.eq("visibility", "agent");
+    return new Agent({
+        id: "customer-support-rag",
+        model: completionModel,
+        instructions: [
+            "Answer only from the retrieved handbook documents.",
+            "If they are insufficient, say so; never invent policy or approval.",
+            "End handbook claims with the supplied Source value in parentheses.",
+        ].join("\n"),
+        context: [createVectorContext({
+                store: knowledgeStore,
+                model: embeddingModel,
+                topK: 4, filter, format: (result) => ({
+                    id: result.id,
+                    text: `Title: ${result.document.title}\nSource: ${result.document.source}`
+                        + `\n\n${result.document.text}`,
+                })
+            })],
+    });
 }
 ```
 
@@ -293,7 +293,12 @@ app.post("/answer", async (context) => {
 
   try {
     const question = await parseAnswerRequest(context.req);
-    const response = await createSupportAgent(principal).prompt(question).send();
+    const response = await createSupportAgent(principal).generate({
+        prompt: question
+    });
+    if (response.status !== "completed") {
+      return context.json({ error: "Unexpected approval request" }, 409);
+    }
     return context.json({ answer: response.output });
   } catch (error) {
     if (error instanceof AnswerRequestError) {
@@ -368,9 +373,9 @@ to inspect the exact context without network calls.
 
 ## Runnable references and extensions
 
-- [Embed and search](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/01-embed-and-search.ts)
-- [Filters and LSH](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/02-filters-and-lsh.ts)
-- [RAG search tool](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/06_retrieval/05-rag-search-tool.ts)
+- [Embed and search](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/01-embed-and-search.ts)
+- [Filters and LSH](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/02-filters-and-lsh.ts)
+- [RAG search tool](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/05-rag-search-tool.ts)
 
 Those files demonstrate the current primitives independently. This page provides a coherent
 application layout but intentionally omits deployment identity middleware, a durable ingestion

@@ -7,39 +7,42 @@ import { Agent } from '@anvia/core'
 import { GeminiClient } from '@anvia/gemini'
 
 const gemini = new GeminiClient({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY!,
 })
 
-const model = gemini.completionModel('gemini-2.5-flash')
+const model = gemini.completionModel({
+    modelId: 'gemini-2.5-flash'
+})
 
 export const supportAgent = new Agent({
   id: 'support',
-  model: model,
+  model,
   instructions: 'Answer support questions clearly and concisely.',
 })
 ```
 
-The returned `GeminiCompletionModel` implements Anvia's streaming completion contract, so the same model works for `.send()` and `.stream()` workflows.
+The returned streaming completion handle backs agent generation, agent streams, and direct completion helpers.
 
 ## Direct completion
 
 Use one direct request when the application owns the surrounding workflow:
 
 ```ts
-import { createCompletion } from '@anvia/core'
+import { generateCompletion } from '@anvia/core'
 
-const result = await createCompletion(model, {
-  instructions: 'Write one concise internal incident summary.',
-  input: 'Checkout requests timed out for 12 minutes.',
-  temperature: 0.2,
-  maxTokens: 180,
+const result = await generateCompletion({
+    prompt: 'Checkout requests timed out for 12 minutes.',
+    model,
+    instructions: 'Write one concise internal incident summary.',
+    temperature: 0.2,
+    maxTokens: 180
 })
 
 console.log(result.text)
 console.log(result.usage.totalTokens)
 ```
 
-Use an [agent](/sdk/agents) when the run needs tools, memory, dynamic context, hooks, or multiple turns.
+Use an [agent](/sdk/agents) when the run needs tools, memory, dynamic context, lifecycle policy, or multiple turns.
 
 ## Tools and tool choice
 
@@ -61,10 +64,10 @@ Direct completion streams expose tool-call events but do not execute a handler. 
 
 ## Structured output
 
-Gemini supports Anvia output schemas. Use `createParsedCompletion(...)` when a single call must return schema-validated data:
+Gemini supports Anvia output schemas. Use `generateCompletion(...)` when a single call must return schema-validated data:
 
 ```ts
-import { createParsedCompletion } from '@anvia/core'
+import { generateCompletion } from '@anvia/core'
 import { z } from 'zod'
 
 const incidentSchema = z.object({
@@ -72,13 +75,14 @@ const incidentSchema = z.object({
   summary: z.string().min(1),
 })
 
-const result = await createParsedCompletion(model, {
-  schema: incidentSchema,
-  instructions: 'Classify only the supplied incident.',
-  input: 'Checkout failed for all users for 12 minutes.',
+const result = await generateCompletion({
+    prompt: 'Checkout failed for all users for 12 minutes.',
+    model,
+    outputSchema: incidentSchema,
+    instructions: 'Classify only the supplied incident.'
 })
 
-console.log(result.data.severity)
+console.log(result.output.severity)
 ```
 
 The adapter sends a JSON response MIME type and the JSON schema to Google. Anvia still parses and validates the returned data; handle validation failures instead of trusting unvalidated text.
@@ -91,7 +95,7 @@ Provider-specific thinking configuration belongs at the Gemini model boundary:
 const reasoningAgent = new Agent({
   id: 'analyst',
   model: model,
-  additionalParams: {
+  providerOptions: {
     config: {
       thinkingConfig: {
         includeThoughts: true,
@@ -107,4 +111,4 @@ Reasoning is operational metadata, not normal assistant text. Do not render or r
 
 ## Capability boundary
 
-`GeminiCompletionModel` declares support for streaming, tools, tool choice, images, documents, output schemas, and reasoning. Test the exact model, endpoint, region, and request shape used by the product. A capability declared by the adapter is not a promise that every listed model supports it.
+The Gemini completion handle declares support for streaming, tools, tool choice, images, documents, output schemas, and reasoning. Test the exact model, endpoint, region, and request shape used by the product. A capability declared by the adapter is not a promise that every listed model supports it.

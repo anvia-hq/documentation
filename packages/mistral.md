@@ -5,9 +5,9 @@ Mistral’s provider adapter supplies completion, embeddings, OCR, and model lis
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `0.4.1` |
+| Version | `1.0.0-rc.2` |
 | Runtime | ESM, server-side JavaScript |
-| Peer | `@anvia/core >=0.7.1 <1.0.0` |
+| Peer | Matching `@anvia/core` release candidate |
 
 ## Install
 
@@ -22,25 +22,32 @@ import { Agent } from '@anvia/core'
 import { MistralClient } from '@anvia/mistral'
 
 const mistral = new MistralClient({
-  apiKey: process.env.MISTRAL_API_KEY,
+  apiKey: process.env.MISTRAL_API_KEY!,
 })
 
 const agent = new Agent({
   id: 'assistant',
-  model: mistral.completionModel('mistral-large-latest'),
+  model: mistral.completionModel({
+      modelId: 'mistral-large-latest'
+  }),
 })
 
-const result = await agent.prompt('Extract the launch risks from this report.').send()
-console.log(result.output)
+const result = await agent.generate({
+    prompt: 'Extract the launch risks from this report.'
+})
+
+if (result.status === 'completed') {
+  console.log(result.output)
+}
 ```
 
 ## Capabilities
 
-| Capability | Factory | Default |
+| Capability | Factory | Required selection |
 | --- | --- | --- |
-| Streaming completion | `completionModel()` | `mistral-large-latest` |
-| Dense embeddings | `embeddingModel()` | `mistral-embed` |
-| OCR | `ocrModel()` | `mistral-ocr-latest` |
+| Streaming completion | `completionModel({ modelId })` | Completion model ID |
+| Dense embeddings | `embeddingModel({ modelId })` | Embedding model ID |
+| OCR | `ocrModel({ modelId })` | OCR model ID |
 | Model inventory | `listModels()` | Provider model list |
 
 Completion supports text, streaming, tools, tool choice, and structured output. Chat image input, chat document input, transcription, audio generation, and image generation are not currently model factories in this package.
@@ -50,7 +57,7 @@ Completion supports text, streaming, tools, tool choice, and structured output. 
 ### Extract a remote document with OCR
 
 ```ts
-const ocr = mistral.ocrModel()
+const ocr = mistral.ocrModel({ modelId: 'mistral-ocr-latest' })
 
 const result = await ocr.ocr({
   source: {
@@ -70,8 +77,9 @@ Byte sources are uploaded before OCR and expose upload metadata in `uploadedFile
 ### Batch embeddings
 
 ```ts
-const embeddings = mistral.embeddingModel('mistral-embed', {
-  maxBatchSize: 32,
+const embeddings = mistral.embeddingModel({
+    modelId: 'mistral-embed',
+    maxBatchSize: 32
 })
 
 const vectors = await embeddings.embedTexts(['first document', 'second document'])
@@ -79,7 +87,7 @@ const vectors = await embeddings.embedTexts(['first document', 'second document'
 
 ## Compatibility
 
-`@anvia/mistral` is ESM and uses the official `@mistralai/mistralai` client. Supply `serverURL` for a custom service or inject a preconfigured `Mistral` client. Exported request/response mapping helpers are available for custom adapters, but they still expect the Anvia and Mistral data shapes documented in the API reference.
+`@anvia/mistral` is ESM and uses the official `@mistralai/mistralai` client. Supply `baseUrl` for a custom service or inject a preconfigured `Mistral` client. Exported request/response mapping helpers are available for custom adapters, but they still expect the Anvia and Mistral data shapes documented in the API reference.
 
 ## Continue
 
@@ -91,4 +99,4 @@ const vectors = await embeddings.embedTexts(['first document', 'second document'
 - [API reference](/packages/mistral/api-reference)
 - [Releases](/packages/mistral/releases)
 - [Mistral SDK guide](/sdk/providers/mistral)
-- [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-mistral/CHANGELOG.md)
+- [Source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-mistral/CHANGELOG.md)

@@ -1,68 +1,81 @@
 # `@anvia/transformers` API reference
 
-Import every public symbol from `@anvia/transformers`. The package has no public subpath exports.
-
-## Types
+Import all public symbols from `@anvia/transformers`.
 
 ```ts
-type TransformersPooling = 'mean' | 'cls'
+import {
+  adaptTransformersEmbeddingModel,
+  DEFAULT_TRANSFORMERS_EMBEDDING_MODEL,
+  loadTransformersEmbeddingModel,
+  type AdaptTransformersEmbeddingModelOptions,
+  type LoadedTransformersEmbeddingModel,
+  type LoadTransformersEmbeddingModelOptions,
+  type TransformersEmbeddingModelHandle,
+  type TransformersFeatureExtractionPipeline,
+  type TransformersPooling,
+  type TransformersTensor,
+} from '@anvia/transformers'
+```
 
-type TransformersFeatureExtractionPipeline = (
-  texts: string[],
-  options: {
-    pooling: TransformersPooling
-    normalize: boolean
-  },
-) => Promise<{
-  tolist(): unknown
-}>
+## Load a model
 
-type TransformersEmbeddingModelOptions = {
-  model?: string
-  pooling?: TransformersPooling
+```ts
+function loadTransformersEmbeddingModel(
+  options: LoadTransformersEmbeddingModelOptions,
+): Promise<LoadedTransformersEmbeddingModel>
+```
+
+```ts
+type LoadTransformersEmbeddingModelOptions = {
+  modelId: string
+  pooling?: 'mean' | 'cls'
+  normalize?: boolean
+  maxBatchSize?: number
+  device?: string | Record<string, string>
+  dtype?: string | Record<string, string>
+  cacheDir?: string
+  localFilesOnly?: boolean
+  revision?: string
+}
+```
+
+`LoadedTransformersEmbeddingModel` implements `EmbeddingModel` and `AsyncDisposable`; call `close()` or use `await using` to release the owned pipeline.
+
+## Adapt an existing pipeline
+
+```ts
+function adaptTransformersEmbeddingModel(
+  options: AdaptTransformersEmbeddingModelOptions,
+): TransformersEmbeddingModelHandle
+
+type AdaptTransformersEmbeddingModelOptions = {
+  runtime: TransformersFeatureExtractionPipeline
+  modelId: string
+  pooling?: 'mean' | 'cls'
   normalize?: boolean
   maxBatchSize?: number
 }
 ```
 
-`TransformersFeatureExtractionPipeline` is the minimum public contract accepted by direct model construction. It allows an official Transformers.js pipeline, wrapper, or test double to be injected.
+An adapted model does not own or dispose the supplied runtime.
 
-## Constant
+## Runtime contracts
+
+```ts
+type TransformersTensor = {
+  tolist(): unknown
+  dispose(): void
+}
+
+type TransformersFeatureExtractionPipeline = {
+  (
+    texts: string[],
+    options: { pooling: TransformersPooling; normalize: boolean },
+  ): Promise<TransformersTensor>
+  dispose(): Promise<void>
+}
+```
 
 ```ts
 const DEFAULT_TRANSFORMERS_EMBEDDING_MODEL = 'Xenova/all-MiniLM-L6-v2'
 ```
-
-## `TransformersEmbeddingModel`
-
-```ts
-class TransformersEmbeddingModel implements EmbeddingModel {
-  readonly model: string
-  readonly maxBatchSize: number
-
-  constructor(
-    extractor: TransformersFeatureExtractionPipeline,
-    options?: TransformersEmbeddingModelOptions,
-  )
-
-  static create(
-    options?: TransformersEmbeddingModelOptions,
-  ): Promise<TransformersEmbeddingModel>
-
-  embedTexts(texts: string[]): Promise<Embedding[]>
-}
-```
-
-`create()` loads a Transformers.js `feature-extraction` pipeline using `options.model` or the default. Pooling defaults to `mean`, normalization defaults to `true`, and the adapter batches according to `maxBatchSize`.
-
-Direct construction uses the supplied extractor without loading a model. `embedTexts()` converts `tolist()` output into Anvia embeddings and rejects malformed vectors or a vector count that differs from the input count.
-
-## Factory
-
-```ts
-function createTransformersEmbeddingModel(
-  options?: TransformersEmbeddingModelOptions,
-): Promise<TransformersEmbeddingModel>
-```
-
-The factory is a convenience wrapper around `TransformersEmbeddingModel.create(options)` and returns a fully initialized model.

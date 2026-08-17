@@ -5,7 +5,7 @@
 ## Outcome
 
 Extract page Markdown from a remote PDF with Mistral OCR. Use OCR for scans and images without
-reliable selectable text; use an ordinary loader for text-based documents when possible.
+reliable selectable text; use ordinary text or PDF extraction for text-based documents when possible.
 
 ## Prerequisites
 
@@ -21,7 +21,7 @@ import { MistralClient } from '@anvia/mistral'
 const apiKey = process.env.MISTRAL_API_KEY
 if (!apiKey) throw new Error('Set MISTRAL_API_KEY.')
 
-const ocr = new MistralClient({ apiKey }).ocrModel()
+const ocr = new MistralClient({ apiKey }).ocrModel({ modelId: 'mistral-ocr-latest' })
 const result = await ocr.ocr({
   source: {
     type: 'document_url',
@@ -60,8 +60,8 @@ review path for critical fields.
 ## Source and extensions
 
 The current source contract and tested sources are in
-[`MistralOcrModel`](https://github.com/anvia-hq/anvia/blob/main/packages/provider-mistral/src/mistral/ocr.ts)
-and its [OCR tests](https://github.com/anvia-hq/anvia/blob/main/packages/provider-mistral/test/ocr.test.ts).
+[`MistralOcrModel`](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-mistral/src/mistral/ocr.ts)
+and its [OCR tests](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-mistral/test/ocr.test.ts).
 Next, process selected pages, upload bytes, or feed reviewed Markdown into retrieval.
 
 - [Mistral OCR](/sdk/providers/mistral/ocr)

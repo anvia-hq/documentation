@@ -1,147 +1,46 @@
 # `@anvia/lens` API reference
 
-All public symbols are exported from `@anvia/lens`.
-
-## Lens lifecycle
-
 ```ts
-const lens: {
-  create(options?: LensTracingOptions): LensTracing
-  createFromEnv(options?: LensFromEnvOptions): LensTracing
-  evals<Input = unknown, Output = unknown, Expected = unknown>(
-    options?: LensEvalsOptions,
-  ): LensEvalIntegration<Input, Output, Expected>
-}
+import {
+  LensClient,
+  LensDatasetError,
+  resolveLensConfig,
+  createLensRedactor,
+  DEFAULT_PATTERNS,
+} from '@anvia/lens'
 ```
 
-```ts
-type LensTracing = AgentObserver & {
-  readonly enabled: boolean
-  flush(): Promise<void>
-  shutdown(): Promise<void>
-}
-
-type LensEvalIntegration<Input, Output, Expected> = {
-  readonly enabled: boolean
-  observer: LensTracing
-  reporter: LensEvalReporter<Input, Output, Expected>
-  flush(): Promise<void>
-  shutdown(): Promise<void>
-}
-```
-
-`createFromEnv()` can return a disabled observer when `optional` is enabled and required credentials are absent.
-
-## Configuration
+## `LensClient`
 
 ```ts
-type LensCaptureMode = 'safe' | 'full'
+const lens = new LensClient(options)
+const observer = lens.observer(observerOptions)
+const reporter = lens.evalReporter<Input, Output, Expected>(reporterOptions)
+const datasets = lens.datasetClient(datasetOptions)
 
-type LensTracingOptions = {
-  baseUrl?: string
-  publicKey?: string
-  secretKey?: string
-  serviceName?: string
-  environment?: string
-  release?: string
-  timeoutMs?: number
-  captureMode?: LensCaptureMode
-  captureMaxBytes?: number
-  redactInputs?: boolean
-  redactOutputs?: boolean
-  redaction?: LensRedactionOptions
-}
-
-type LensFromEnvOptions = Omit<
-  LensTracingOptions,
-  'baseUrl' | 'publicKey' | 'secretKey'
-> & { optional?: boolean }
-
-type LensEvalsOptions = LensFromEnvOptions & LensEvalReporterOptions
+await lens.flush()
+await lens.close()
 ```
 
-`resolveLensConfig(options?)` resolves explicit options and environment configuration into required connection values. It throws when required configuration is missing.
+Client options include `baseUrl`, `publicKey`, `secretKey`, `serviceName`, `environment`, `release`, `timeoutMs`, capture/redaction defaults, and `optional`. The readonly `enabled` flag is false only when optional mode has no configured connection.
 
-## Evaluation reporter
+`observer()` returns an `AgentObserver`. `evalReporter()` returns an Anvia `EvalReporter`; its options include `traceObserver`, `publishInvalid`, `includeMetadata`, `includePayloads`, and `onMissingTrace`.
+
+## Managed datasets
 
 ```ts
-function createLensEvalReporter<Input = unknown, Output = unknown, Expected = unknown>(
-  tracing: LensTracing,
-  options?: LensEvalReporterOptions,
-): LensEvalReporter<Input, Output, Expected>
-
-type LensEvalReporterOptions = {
-  publishInvalid?: boolean
-  includeMetadata?: boolean
-  includePayloads?: boolean
-  onMissingTrace?: 'emit' | 'ignore' | 'warn' | 'throw'
-  flushOnRunEnd?: boolean
-}
+const dataset = await lens.datasetClient({ pageSize: 50 }).getDataset<Input, Expected>({
+  name: 'support-cases',
+  version: 'v2',
+})
 ```
 
-`LensEvalReporter<Input, Output, Expected>` aliases the matching `EvalReporter` from `@anvia/core/evals`.
-
-## Dataset client
-
-```ts
-function createLensDatasetClient(
-  tracing: LensTracing,
-  options?: LensDatasetClientOptions,
-): LensDatasetClient
-
-interface LensDatasetClient {
-  getDataset<Input = unknown, Expected = unknown>(
-    name: string,
-    options?: { version?: string },
-  ): Promise<LensDataset<Input, Expected>>
-}
-```
-
-`LensDatasetClientOptions` can override `baseUrl`, credentials, `pageSize`, and `timeoutMs`. `LensDatasetError` exposes the HTTP `status` when present and a stable `code`.
-
-```ts
-type LensDataset<Input = unknown, Expected = unknown> = {
-  name: string
-  version: string
-  description?: string
-  metadata?: Record<string, JsonValue | undefined>
-  items: LensDatasetItem<Input, Expected>[]
-}
-
-type LensDatasetItem<Input = unknown, Expected = unknown> = {
-  id: string
-  input: Input
-  expected?: Expected
-  context?: string[]
-  retrievalContext?: string[]
-  metadata?: Record<string, JsonValue | undefined>
-}
-```
+The returned `LensDataset` contains `name`, `version`, optional description and metadata, and normalized items. `LensDatasetError` exposes `status` and a stable `code`.
 
 ## Redaction
 
-```ts
-function createLensRedactor(options?: LensRedactionOptions): {
-  redact(value: unknown): unknown
-}
+`createLensRedactor(options)` returns the package redactor. Supplying custom `patterns` replaces `DEFAULT_PATTERNS`; include the defaults explicitly when both sets are required.
 
-type LensRedactorPattern = { name: string; regex: RegExp }
-type LensRedactionOptions = {
-  patterns?: LensRedactorPattern[]
-  replacement?: string
-}
+## Public types
 
-const DEFAULT_PATTERNS: LensRedactorPattern[]
-```
-
-## Export inventory
-
-| Kind | Public exports |
-| --- | --- |
-| Values | `lens`, `resolveLensConfig`, `createLensDatasetClient`, `createLensEvalReporter`, `createLensRedactor`, `DEFAULT_PATTERNS` |
-| Classes | `LensDatasetError` |
-| Lifecycle types | `LensTracing`, `LensTracingOptions`, `LensFromEnvOptions`, `LensCaptureMode`, `LensEvalIntegration`, `LensEvalsOptions` |
-| Evaluation types | `LensEvalReporter`, `LensEvalReporterOptions` |
-| Dataset types | `LensDataset`, `LensDatasetItem`, `LensDatasetClient`, `LensDatasetClientOptions`, `LensDatasetGetOptions` |
-| Redaction types | `LensRedactionOptions`, `LensRedactorPattern` |
-
+The package exports client, observer, capture, redaction, evaluation-reporter, and dataset option/result types named with the `Lens*` prefix.

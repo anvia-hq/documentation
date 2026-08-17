@@ -1,50 +1,57 @@
-# Hook points
+# Lifecycle events
 
-Choose the narrowest lifecycle point that has the information and control your policy needs.
+Choose the narrowest lifecycle event that contains the operational information you need.
 
-## Run hooks
+## Run events
 
-| Hook | Runs when | Typical use |
-| --- | --- | --- |
-| `onRunStart` | The prompt run begins. | Validate limits or environment policy. |
-| `onRunEnd` | The run completes successfully. | Record a final audit annotation. |
-| `onRunError` | The run fails. | Correlate or classify the failure. |
+`onStart` runs once after the run ID and history are prepared. It receives the input message, history, and maximum turns.
 
-Run hooks can continue or cancel the run.
+`onFinish` runs once for a completed or guardrail-blocked run. Both forms include text, cumulative usage, and messages. Narrow `event.status`: the completed form has `output`, while the blocked form has `stage`.
 
-## Turn and completion hooks
+`onError` runs when the run fails or is cancelled. It receives the error, cumulative usage, and messages available at failure time.
 
-| Hook | Runs when | Typical use |
-| --- | --- | --- |
-| `onTurnStart` | An agent turn begins. | Track turn-level policy or state. |
-| `onTurnEnd` | An agent turn finishes. | Record turn completion. |
-| `onCompletionCall` | A model call is about to run. | Observe model-call intent or enforce a limit. |
-| `onCompletionResponse` | A model call returns. | Inspect normalized completion behavior. |
-| `onCompletionError` | A model call fails. | Record provider-call failure context. |
+```ts
+const lifecycle: AgentLifecycle = {
+  onStart(event) {
+    console.log('Started', event.runId)
+  },
+  onFinish(event) {
+    console.log('Finished', event.runId, event.usage.totalTokens)
+  },
+  onError(event) {
+    console.error('Failed', event.runId, event.error)
+  },
+}
+```
 
-A tool-using run can contain several turns and completion calls. Run-level callbacks happen once; turn and completion callbacks may happen repeatedly.
+## Step events
 
-## Tool hooks
+`onStepFinish` runs after a model turn finishes. It contains the one-based step number, normalized completion response, and cumulative usage.
 
-| Hook | Runs when | Typical use |
-| --- | --- | --- |
-| `onToolCall` | The model has selected a tool. | Run, skip, cancel, or request approval. |
-| `onToolResult` | A tool returns successfully. | Inspect the result or cancel future work. |
-| `onToolError` | Tool execution fails. | Record or classify the failure. |
+A tool-using run can have several steps. Use this event for turn-level accounting or diagnostics, not for rewriting the response.
 
-`onToolCall` has the broadest control surface because it runs before the selected tool executes.
+## Tool events
 
-## Control by phase
+`onToolStart` runs after tool input has been parsed and approval requirements have been satisfied. It receives the step, tool name, call ID, and parsed input.
 
-| Control | Run, turn, completion, and result hooks | `onToolCall` |
-| --- | --- | --- |
-| Continue | Yes | Yes, with `tool.run()` or no return value |
-| Cancel the run | Yes, with `run.cancel(reason)` | Yes, with `tool.cancel(reason)` |
-| Skip one tool | No | Yes, with `tool.skip(reason)` |
-| Request approval | No | Yes, with `tool.requestApproval(...)` |
+`onToolFinish` reports success or failure with duration. Successful events contain the tool output; failed events contain the error.
 
-Returning nothing means continue. Return a control action only when the hook changes what the runtime should do.
+```ts
+const lifecycle: AgentLifecycle = {
+  onToolFinish(event) {
+    toolMetrics.record({
+      toolName: event.toolName,
+      success: event.success,
+      durationMs: event.durationMs,
+    })
+  },
+}
+```
 
-## Follow the runtime boundary
+## Use the correct adjacent surface
 
-Use observers for passive telemetry that should never affect execution. Use middleware when request, response, input, or output data needs transformation. Hooks should remain reserved for lifecycle observation that belongs with a run decision.
+Lifecycle callbacks observe snapshots. Use middleware to transform completion requests, completion responses, tool inputs, or tool outputs.
+
+Use guardrails to allow, block, or rewrite model-facing input and output. Use tool approval to suspend before selected side effects. Use agent stream events when a client needs live progress.
+
+Next, understand [cancellation](/sdk/advanced/hooks/cancellation).

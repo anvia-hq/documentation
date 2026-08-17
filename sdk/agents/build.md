@@ -1,46 +1,97 @@
 # Build an agent
 
-Create an agent after a direct completion confirms that the provider model works.
+Build an agent after a [direct completion](/sdk/completions/create) confirms that the provider credential, endpoint, and model are working.
 
-## Create the agent
+## 1. Create the provider model
+
+Keep the credential in server-side configuration and validate it when the application starts:
+
+```ts
+import { OpenAIClient } from '@anvia/openai'
+
+const apiKey = process.env.OPENAI_API_KEY
+
+if (!apiKey) {
+  throw new Error('OPENAI_API_KEY is required')
+}
+
+const client = new OpenAIClient({ apiKey })
+const model = client.completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
+})
+```
+
+The agent depends on Anvia's provider-neutral completion-model contract. Changing providers later means supplying a different model at this boundary, not rewriting the agent loop.
+
+## 2. Construct the agent
 
 ```ts
 import { Agent } from '@anvia/core'
-import { OpenAIClient } from '@anvia/openai'
 
-const openai = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
-const model = openai.completionModel('gpt-5')
-
-export const agent = new Agent({
+export const supportAgent = new Agent({
   id: 'support',
-  model: model,
-  name: 'Support',
-  description: 'Answers customer support questions.',
-  instructions: 'Answer clearly and ask for any missing details.',
+  name: 'Support assistant',
+  description: 'Helps investigate customer support requests.',
+  model,
+  instructions: [
+    'Answer support questions clearly.',
+    'Ask for details when the report is incomplete.',
+    'Do not invent account-specific information.',
+  ].join('\n'),
   maxTurns: 4,
 })
 ```
 
-The agent depends on Anvia's completion-model contract, not the OpenAI API. Swap the provider model at the construction boundary without rewriting agent behavior.
+`id` is the stable runtime identity used by sessions, traces, evaluations, development tooling, and agent-as-tool integrations. Keep it predictable and do not derive it from a user prompt.
 
-## Send the first prompt
+`name` and `description` are optional human-readable metadata. `maxTurns` bounds the model-and-tool loop; when omitted, the runtime default is 20.
+
+## 3. Generate the first response
 
 ```ts
-const response = await agent
-  .prompt('What information do you need to investigate a failed checkout?')
-  .send()
+const result = await supportAgent.generate({
+    prompt: 'A customer cannot reset their password. What should I verify first?'
+})
 
-console.log(response.output)
+if (result.status === 'approval_required') {
+  throw new Error(`Approval required for ${result.approval.toolName}`)
+}
+
+console.log(result.output)
+console.log(result.runId)
+console.log(result.usage.totalTokens)
 ```
 
-`send()` returns the final output, accumulated usage, messages created during the run, and trace metadata when tracing is enabled.
+The status check is important even before tools are added. `generate()` returns an `approval_required` result when a configured tool suspends the run for a human decision.
 
-## Keep the identity stable
+## 4. Stream the same agent
 
-The `id` option is the stable agent ID. Keep it stable because sessions, traces, evaluations, and
-development tooling can use it as an identifier.
+Use `stream()` when an interface should update while the run is active:
 
-`maxTurns: 4` bounds the model-and-tool loop. A smaller request-level limit can override it for one run.
+```ts
+for await (const event of supportAgent.stream({
+    prompt: 'Draft a short password-reset troubleshooting reply.'
+})) {
+  if (event.type === 'text_delta') {
+    process.stdout.write(event.delta)
+  }
+
+  if (event.type === 'final') {
+    process.stdout.write('\n')
+    console.log(event.result.runId, event.result.usage)
+  }
+
+  if (event.type === 'approval_required') {
+    console.log('Approval required:', event.approval)
+  }
+}
+```
+
+The model must support streaming. Anvia emits normalized runtime events instead of exposing one provider's wire format.
+
+## 5. Add capabilities deliberately
+
+Start with the smallest agent that works. Add [tools](/sdk/tools), [context](/sdk/agents/context), [memory](/sdk/memory), guardrails, or observers when the product actually needs those boundaries.
+
+Continue with [Stable behavior](/sdk/agents/stable-behavior).

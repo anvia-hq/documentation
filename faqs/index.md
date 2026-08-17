@@ -43,7 +43,7 @@ No. Core depends on provider-neutral model contracts. Provider packages adapt Op
 
 ### Do I need an agent for every model call?
 
-No. Use a direct completion for one model request. Use an agent when reusable behavior needs tools, context, memory, hooks, or multiple bounded turns.
+No. Use a direct completion for one model request. Use an agent when reusable behavior needs tools, context, memory, lifecycle policy, or multiple bounded turns.
 
 ### Does a tool schema provide authorization?
 

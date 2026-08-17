@@ -6,11 +6,7 @@ Choose the connection at the application boundary. Agents, extractors, pipelines
 
 ## Choose a connection
 
-| Deployment | Client configuration | Authentication |
-| --- | --- | --- |
-| Gemini API | `apiKey` | `GEMINI_API_KEY` |
-| Vertex AI | `vertexai`, `project`, and `location` | Google Application Default Credentials or `googleAuthOptions` |
-| Existing Google SDK client | `client` | Owned by the application |
+Use `apiKey` for the Gemini API. Use `vertexAi: { projectId, location }` for Vertex AI. Use `client` to inject an existing `GoogleGenAI` instance owned by the application.
 
 Start with the Gemini API for a simple API-key integration. Use Vertex AI when the application already relies on Google Cloud IAM, project-level quotas, or regional deployment controls.
 
@@ -20,26 +16,19 @@ Start with the Gemini API for a simple API-key integration. Use Vertex AI when t
 import { GeminiClient } from '@anvia/gemini'
 
 const gemini = new GeminiClient({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY!,
 })
 
-export const model = gemini.completionModel(
-  'gemini-2.5-flash',
-)
+export const model = gemini.completionModel({
+    modelId: 'gemini-2.5-flash'
+})
 ```
 
 Pass `model` to an agent, direct completion, extractor, or pipeline. Keep the client and credentials in server-only code.
 
 ## Model factories
 
-| Workload | Factory | Anvia contract |
-| --- | --- | --- |
-| Text, tools, and multimodal understanding | `completionModel(...)` | Streaming completion model |
-| Vector embeddings | `embeddingModel(...)` | Embedding model |
-| Gemini-native image generation | `imageGenerationModel(...)` | Image-generation model |
-| Imagen generation | `imagenGenerationModel(...)` | Image-generation model |
-| Audio transcription | `transcriptionModel(...)` | Transcription model |
-| Provider inventory | `listModels()` | Normalized model list |
+Use `completionModel()` for text, tools, schemas, and multimodal understanding. Use `embeddingModel()` for vectors. Use `imageGenerationModel({ api: 'generateContent', ... })` for Gemini-native image models and `api: 'generateImages'` for Imagen. Use `transcriptionModel()` for audio-to-text and `listModels()` for normalized inventory.
 
 These factories share a client, but they are different model contracts. For example, a completion model that understands an image cannot be passed where an image-generation model is required.
 

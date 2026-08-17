@@ -6,22 +6,21 @@
 import { OpenAIClient } from '@anvia/openai'
 
 export const openai = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 ```
 
 ## Choose a model
 
-| Workflow | Factory | Continue with |
-| --- | --- | --- |
-| Agents, completions, tools, and structured output | `completionModel(...)` | [Completions](/sdk/providers/openai/completions) |
-| Retrieval and semantic search | `embeddingModel(...)` | [Embeddings](/sdk/providers/openai/embeddings) |
-| Image creation | `imageGenerationModel(...)` | [Media models](/sdk/providers/openai/media) |
-| Text-to-speech | `audioGenerationModel(...)` | [Media models](/sdk/providers/openai/media) |
-| Speech-to-text | `transcriptionModel(...)` | [Media models](/sdk/providers/openai/media) |
-| Provider inventory | `listModels()` | [Model listing](/sdk/providers/openai/model-listing) |
+Use `completionModel()` for agents, direct completions, tools, and structured output.
 
-OpenAI completion models use the Responses adapter by default when no custom `baseUrl` is configured. Choose the Chat adapter only when the target or workflow requires it; the differences are covered in [Responses and Chat](/sdk/providers/openai/responses-and-chat).
+Use `embeddingModel()` for retrieval and semantic search.
+
+Use `imageGenerationModel()`, `speechGenerationModel()`, and `transcriptionModel()` for their separate [media contracts](/sdk/providers/openai/media).
+
+Use `listModels()` for administrative [model inventory](/sdk/providers/openai/model-listing).
+
+OpenAI completion models require `api: 'responses' | 'chat'` on `completionModel({ modelId, api })`. `baseUrl` does not select the API; choose it explicitly for the target endpoint. The differences are covered in [Responses and Chat](/sdk/providers/openai/responses-and-chat).
 
 ## What the provider owns
 
@@ -33,6 +32,6 @@ Keep those boundaries visible in code. A provider model should be an injected de
 
 1. [Install and configure the client](/sdk/providers/openai/setup).
 2. [Create a completion model](/sdk/providers/openai/completions) for an agent or direct request.
-3. Add only the additional capability models the workflow uses.
-4. Review the [production checklist](/sdk/providers/openai/production) before shipping.
-
+3. Compare [Responses and Chat](/sdk/providers/openai/responses-and-chat).
+4. Add only the additional capability models the workflow uses.
+5. Review the [production checklist](/sdk/providers/openai/production).

@@ -15,7 +15,9 @@ const logger = createConsoleLogger({
 const agent = new Agent({
   id: 'support',
   model: model,
-  observers: [createLoggerObserver(logger)],
+  observability: {
+    observers: { logger: createLoggerObserver({ logger }) },
+  },
 })
 ```
 

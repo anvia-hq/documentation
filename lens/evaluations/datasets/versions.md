@@ -39,7 +39,7 @@ Before selecting **Publish version**, check:
 4. Critical categories have enough cases.
 5. The version label matches the release or dataset convention used by the team.
 
-Publishing records the publication time and makes the version available through `createLensDatasetClient`.
+Publishing records the publication time and makes the version available through `lens.datasetClient()`.
 
 ## Pin versions for reproducibility
 
@@ -70,4 +70,3 @@ Changing cases and changing the system under test answer different questions. Wh
 Lens permits comparison across different dataset names or versions, but warns about the mismatch. That comparison can be informative; it is weaker evidence of a release regression because both the system and test population changed.
 
 Continue to [Compare releases](/lens/evaluations/compare) once both variants have completed runs.
-

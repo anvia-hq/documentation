@@ -22,10 +22,11 @@ For the clearest result, keep everything except the intended release change cons
 Supply an immutable release identifier through the Lens tracing configuration:
 
 ```ts
-const tracing = lens.create({
+const lens = new LensClient({
   environment: 'staging',
   release: process.env.APP_RELEASE,
 })
+const tracing = lens.observer()
 ```
 
 ## Open a comparison

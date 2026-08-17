@@ -1,10 +1,8 @@
 # Multimodal tool results
 
-A tool can return text and image content together. The agent runtime preserves that structured result and sends it into the next model turn when the selected provider supports image tool results.
+A tool can return text and image file content together. Use this only when the next model turn genuinely needs the pixels.
 
-Use this when the model must inspect an image created or loaded by a tool—for example a rendered chart, a screenshot, or a cropped document region. Ordinary operational tools should continue returning small objects or text.
-
-## Return text and an image
+## 1. Return text and an image
 
 ```ts
 import { ToolOutput, createTool } from '@anvia/core/tool'
@@ -12,8 +10,9 @@ import { z } from 'zod'
 
 const renderChart = createTool({
   name: 'render_chart',
-  description: 'Render a chart for an authorized product metric.',
-  input: z.object({
+  description:
+    'Render a chart for an authorized product metric.',
+  inputSchema: z.object({
     metricId: z.string(),
   }),
   async execute({ metricId }) {
@@ -22,32 +21,41 @@ const renderChart = createTool({
     return ToolOutput.content([
       {
         type: 'text',
-        text: `Rendered the chart for ${metricId}.`,
+        text: `Rendered chart ${metricId}.`,
       },
       {
-        type: 'image',
-        data: chart.base64Png,
+        type: 'file',
+        data: { type: 'data', data: chart.base64Png },
         mediaType: 'image/png',
+        filename: `${metricId}.png`,
       },
     ])
   },
 })
 ```
 
-Image tool content uses raw base64 data, not a `data:` URL. `ToolOutput.content(...)` makes the structured result explicit while retaining a display-safe text representation for hooks, observers, stream events, and transcript surfaces.
+File content with `data.type: 'data'` uses raw base64 without a `data:` URL prefix. `ToolOutput.content()` marks the array as structured tool-result content instead of serializing it as an ordinary object.
 
-## Check the complete path
+## 2. Understand runtime representations
 
-Support is required at more than one layer:
+The next transcript message retains the structured text and file parts. Stream events expose a text display form such as `Rendered chart metric_1\n[file:image/png]` and may also include `structuredResult`.
+
+Middleware can inspect or replace ordinary tool output. Project only approved fields into product-facing events and traces.
+
+## 3. Verify the provider adapter
 
 ```text
-Tool result → agent runtime → provider adapter → selected model → product UI
+Tool result -> agent runtime -> provider adapter -> model
 ```
 
-If a provider path is text-only, the model receives a media-type placeholder instead of raw base64. Smoke test the exact provider adapter and model ID before depending on visual inspection. The UI must also decide whether the image is safe and useful to display; a model-readable result is not automatically user-visible.
+Some adapters preserve image tool results as model-readable image input. Text-only adapter paths replace an image with a media-type placeholder. Smoke test the exact adapter and model ID before depending on visual inspection.
 
-## Keep results bounded
+The model must also advertise image-input support or Anvia rejects the completion request with `CompletionCapabilityError`.
 
-Inline image content is copied through runtime and provider requests. Resize or crop an image to the smallest useful representation, reject unsupported media types, and avoid putting secrets into screenshots.
+## 4. Keep inline media bounded
 
-For large files, persist the asset in application-owned storage and return a concise text result with its stable asset ID. Only include image content when the next model turn genuinely needs the pixels. Authorization belongs in the tool or the service it calls, not in the tool description.
+Resize or crop to the smallest useful representation. Reject unsupported media types and keep secrets out of screenshots.
+
+For large files, store the asset and return a concise text result with its stable ID. Authorization belongs in the tool handler or called service, not in the description.
+
+Next, compose [multimodal pipelines](/sdk/advanced/multimodal/pipelines).

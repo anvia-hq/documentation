@@ -1,64 +1,70 @@
 # Batch runs
 
-Use `pipeline.batch(...)` when every input should pass through the same pipeline independently.
+Use `pipeline.runBatch()` when every input should pass through the same pipeline independently.
 
-## Process a collection
+## 1. Process a collection
 
 ```ts
-import { PipelineBuilder } from '@anvia/core/pipeline'
-import { z } from 'zod'
-
-const normalizeTicket = new PipelineBuilder(
-  z.object({
-    id: z.string(),
-    body: z.string().min(1),
-  }),
-)
-  .step(({ id, body }) => ({
+import { Pipeline } from '@anvia/core/pipeline';
+import { z } from 'zod';
+const normalizeTicket = new Pipeline({
+    id: 'normalize-ticket',
+    inputSchema: z.object({
+        id: z.string(),
+        body: z.string().min(1),
+    }),
+}).step({
+  id: 'normalize-body',
+  run: ({ input: { id, body } }) => ({
     id,
     body: body.trim().replace(/\s+/g, ' '),
-  }))
-  .build()
-
-const normalized = await normalizeTicket.batch(
-  [
+  }),
+});
+const normalized = await normalizeTicket.runBatch({
+  inputs: [
     { id: 'ticket_1', body: ' Checkout   failed ' },
     { id: 'ticket_2', body: ' Cannot update card ' },
     { id: 'ticket_3', body: ' Password reset issue ' },
   ],
-  { concurrency: 2 },
-)
+  concurrency: 2,
+});
+
 ```
 
-`batch(...)` returns an array in input order even when later items finish first:
+The returned settled-item array preserves input order:
 
 ```ts
-normalized[0].id === 'ticket_1'
-normalized[1].id === 'ticket_2'
-normalized[2].id === 'ticket_3'
+for (const item of normalized) {
+  if (item.status === 'completed') {
+    console.log(item.runId, item.output.id);
+  } else {
+    console.error(item.runId, item.error);
+  }
+}
 ```
 
-Order preservation makes it possible to pair outputs with input positions, but stable IDs should still travel through the pipeline. IDs are safer when results are persisted, retried, or handled outside the original process.
+Carry stable IDs through the output as well. Array positions are insufficient after persistence, partial retries, or distributed processing.
 
-## Validate every item
+## 2. Validate every item
 
-When a pipeline starts with a Zod schema, each batch item is parsed before its stages run. Invalid input rejects that item and therefore rejects the batch unless the workflow converts failures into explicit outcomes.
+Each item is parsed by the pipeline's `inputSchema` before its stages run. Invalid input follows the same failure path as any other thrown error.
 
-Do not validate only the outer array. Keep item validation at the pipeline boundary so the same rules apply to `.run(...)` and `.batch(...)`.
+Do not validate only the outer collection. Keeping validation at the pipeline boundary makes `.run()` and `.runBatch()` consistent.
 
-## Understand what batch owns
+## 3. Know the worker behavior
 
-Batch provides:
+`concurrency` is required and must be a positive safe integer. Anvia materializes the iterable, starts up to that many workers, and stores each settled result by original index.
 
-- one pipeline applied to an iterable of inputs
-- a required concurrency limit
-- ordered outputs
-- normal pipeline error propagation
+An item failure becomes `{ status: 'failed', runId, error }` while other workers continue. A successful item becomes `{ status: 'completed', runId, output }`. The batch itself rejects when its abort signal fires.
 
-Batch does not provide durable scheduling, progress storage, delayed retries, distributed workers, or per-item job status.
+## 4. Know what batch does not provide
 
-## Keep batches bounded
+Batch provides bounded in-process execution, ordered settled results, and the same observer options as `.run()`. It does not provide durable scheduling, progress storage, delayed retries, or distributed workers.
 
-Use in-process batch execution for a known, reasonably sized input set. A large customer backlog, media library, or ingestion corpus should usually be split into durable jobs so work can resume after a deployment or worker failure.
+If each item needs an observer, status record, or independent retry lifecycle, run it through an application worker boundary rather than treating one large batch as a durable job.
 
-For per-item error results, see [Failures and results](/sdk/advanced/parallel-and-batch/failures). For durable processing, see [Long-running jobs](/sdk/advanced/parallel-and-batch/jobs).
+## 5. Keep the input bounded
+
+Because the iterable is materialized before execution, avoid passing an unbounded generator or an enormous backlog. Split large corpora into durable jobs or bounded pages.
+
+Next, choose [concurrency limits](/sdk/advanced/parallel-and-batch/concurrency).

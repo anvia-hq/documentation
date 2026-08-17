@@ -1,11 +1,11 @@
 # Compatibility testing
 
-A compatible endpoint should pass a small live contract suite before it receives production traffic. Run the suite against the exact `baseUrl`, completion adapter, model ID, account, and provider parameters used by the deployment.
+Run a small live contract suite before a compatible endpoint receives production traffic. Use the exact `baseUrl`, completion adapter, model ID, account, and provider parameters that the deployment will use.
 
 ## Start with a smoke script
 
 ```ts
-import { createCompletion } from '@anvia/core'
+import { generateCompletion } from '@anvia/core'
 import { OpenAIClient } from '@anvia/openai'
 
 const apiKey = process.env.COMPATIBLE_API_KEY
@@ -19,13 +19,17 @@ if (!apiKey || !baseUrl || !modelId) {
 const client = new OpenAIClient({
   apiKey,
   baseUrl,
-  completionApi: 'chat',
 })
 
-const result = await createCompletion(client.completionModel(modelId), {
-  input: 'Reply with exactly: compatible',
-  temperature: 0,
-  maxTokens: 16,
+const model = client.completionModel({
+    modelId: modelId,
+    api: "chat"
+})
+const result = await generateCompletion({
+    prompt: 'Reply with exactly: compatible',
+    model,
+    temperature: 0,
+    maxTokens: 16
 })
 
 if (!result.text.toLowerCase().includes('compatible')) {
@@ -33,58 +37,50 @@ if (!result.text.toLowerCase().includes('compatible')) {
 }
 ```
 
-Gate this script behind deployment secrets and run it from a trusted environment. It proves credentials, URL construction, model routing, and basic normalization—not the rest of the product workflow.
+Run this with deployment secrets from a trusted environment. It proves credentials, URL construction, model routing, and basic normalization—not the complete product workflow.
 
 ## Add a streaming probe
 
 ```ts
-import { createCompletionStream } from '@anvia/core'
+import { streamCompletion } from '@anvia/core'
 
 let text = ''
 let completed = false
 
-for await (const event of createCompletionStream(model, {
-  input: 'Write one short greeting.',
-  maxTokens: 32,
+for await (const event of streamCompletion({
+    prompt: 'Write one short greeting.',
+    model,
+    maxTokens: 32
 })) {
   if (event.type === 'text_delta') text += event.delta
   if (event.type === 'final') completed = true
 }
 
 if (!text || !completed) {
-  throw new Error('Compatible stream did not produce text and a final event')
+  throw new Error('Compatible stream produced no text or final event')
 }
 ```
 
-Consume the stream completely. A server can return initial deltas correctly and still fail on finish events, tool arguments, usage, or error chunks.
+Consume the stream completely. A server can return initial deltas correctly and still fail on terminal events, tool arguments, usage, or error chunks.
 
-## Build a workflow matrix
+## Build workflow fixtures
 
-Keep one fixture for each feature the application depends on:
+Add one fixture for each feature the application depends on:
 
-- a required tool call whose handler validates complete arguments;
-- a multi-turn tool result sent back to the model;
-- a schema with the nesting and optional fields used in production;
-- a representative image or document, including real media type and size;
-- a batch of realistic embedding inputs if embeddings are enabled;
-- an intentional authentication or invalid-model failure;
-- timeout and rate-limit behavior at the application boundary.
+- a required tool call with complete validated arguments
+- a multi-turn tool result replayed to the model
+- a schema matching production nesting and optional fields
+- a representative image or document with its real media type and size
+- realistic embedding input batches when embeddings are enabled
+- intentional authentication and invalid-model failures
+- timeout and rate-limit behavior at the application boundary
 
 Assert normalized Anvia output and application behavior. A raw HTTP 200 is not enough.
 
 ## Record the tested contract
 
-Store these values with the result:
+Store the provider or gateway name, endpoint host and route version without credentials, selected adapter, exact model ID, important provider parameters, Anvia package versions, timestamp, and feature results.
 
-- provider and gateway name;
-- endpoint host and route version, without credentials;
-- `"chat"` or `"responses"`;
-- exact model ID;
-- important provider parameters;
-- Anvia package versions;
-- test timestamp and feature results.
+Repeat the suite whenever one of those values changes. For moving local aliases, run a lightweight periodic probe because the underlying model can change without an application deployment.
 
-Repeat the suite when any value changes. For endpoints backed by moving local aliases, schedule a lightweight periodic probe because the model can change without an application deployment.
-
-Use fake Anvia model contracts for ordinary unit tests. Reserve these live tests for provider integration and deployment validation so most of the test suite stays fast and deterministic.
-
+Use fake Anvia model contracts for ordinary unit tests. Reserve live tests for provider integration and deployment validation so the main suite remains fast and deterministic.

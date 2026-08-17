@@ -1,35 +1,46 @@
 # Mistral
 
-`@anvia/mistral` adapts Mistral APIs to Anvia's provider-neutral model contracts. Use one client to create completion, embedding, and OCR models without coupling agents or retrieval code to the Mistral SDK.
+`@anvia/mistral` connects Mistral to Anvia's provider-neutral model interfaces. The same client can create models for chat completions, embeddings, and OCR while the rest of the application stays on Anvia APIs.
 
 ```ts
 import { MistralClient } from '@anvia/mistral'
 
 export const mistral = new MistralClient({
-  apiKey: process.env.MISTRAL_API_KEY,
+  apiKey: process.env.MISTRAL_API_KEY!,
 })
 ```
 
-## Choose a capability
+## What the client provides
 
-| Workflow | Factory | Continue with |
-| --- | --- | --- |
-| Agents and direct completions | `completionModel(...)` | [Completions](/sdk/providers/mistral/completions) |
-| Tool use and structured results | `completionModel(...)` | [Tools and schemas](/sdk/providers/mistral/tools-and-schemas) |
-| Retrieval and semantic search | `embeddingModel(...)` | [Embeddings](/sdk/providers/mistral/embeddings) |
-| Scanned PDFs and document images | `ocrModel(...)` | [OCR](/sdk/providers/mistral/ocr) |
-| Provider inventory | `listModels()` | [Model listing](/sdk/providers/mistral/model-listing) |
+- `completionModel(...)` for agents, direct completions, tools, and structured output
+- `embeddingModel(...)` for retrieval and semantic-search vectors
+- `ocrModel(...)` for extracting Markdown and page data from documents
+- `listModels()` for administrative model inventory
 
-OCR is a separate document-processing capability. It does not make a Mistral completion model accept image or document attachments. Extract the document first, then decide whether its text should enter a prompt or a knowledge-ingestion pipeline.
+Start with [Setup](/sdk/providers/mistral/setup), then open the guide for the capability you need:
 
-## Completion capabilities
+- [Completions](/sdk/providers/mistral/completions)
+- [Tools and schemas](/sdk/providers/mistral/tools-and-schemas)
+- [Embeddings](/sdk/providers/mistral/embeddings)
+- [OCR](/sdk/providers/mistral/ocr)
+- [Model listing](/sdk/providers/mistral/model-listing)
 
-The current adapter declares streaming, tools, tool choice, and output-schema support. It does not declare chat image input, chat document input, or normalized reasoning content.
+## Completion boundary
 
-Capability declarations describe the adapter contract, not every upstream model. Test the exact model ID and request shape used in production.
+The current completion adapter declares support for streaming, tools, tool choice, and output schemas. It does not declare chat image input, chat document input, normalized reasoning content, or provider-executed tools.
 
-## Keep the boundary small
+OCR is therefore a separate document-processing path. Extract a document with `ocrModel(...)`, then decide whether its text should enter a prompt or a knowledge-ingestion pipeline.
 
-The provider package owns request mapping, stream normalization, usage normalization, embeddings, OCR, and model listing. The application still owns instructions, tool authorization, tenant scope, document retention, retry policy, and provider fallback.
+Capability declarations describe the adapter contract, not every upstream model ID. Test the exact model and request shape used by the deployment.
 
-Start with [Setup](/sdk/providers/mistral/setup), then add only the capability models the workflow needs. Review the [production checklist](/sdk/providers/mistral/production) before shipping.
+## Application responsibilities
+
+The provider package maps requests, normalizes streams and usage, creates embeddings, performs OCR, and lists models. Your application still owns:
+
+- instructions and model selection
+- tool authorization and side effects
+- tenant and document access
+- retries, timeouts, and fallback policy
+- retention and observability
+
+Review the [production checklist](/sdk/providers/mistral/production) before shipping.

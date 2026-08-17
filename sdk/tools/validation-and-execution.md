@@ -29,9 +29,9 @@ async execute({ orderId }) {
 }
 ```
 
-Throw for dependency failures, invalid service state, or rejected policy checks. During an agent run, Anvia reports the failure to `onToolError` and normally returns safe error text to the model. Cancel from the hook when the failure must stop the run.
+Throw for dependency failures, invalid service state, or rejected policy checks. During an agent run, Anvia normally converts the failure into safe model-visible tool output so the agent can respond or recover. Use lifecycle callbacks for observation; enforce a hard policy before or inside the handler.
 
-Lower-level integrations can distinguish `ToolJsonError`, `ToolCallError`, and `ToolNotFoundError` around `ToolSet.call(...)`.
+Application code can call a known tool directly through `tool.call(input)`. The agent runtime owns model-produced JSON parsing, tool lookup, and the corresponding tool-call errors.
 
 ## Test the handler first
 

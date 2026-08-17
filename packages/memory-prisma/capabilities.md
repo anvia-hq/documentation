@@ -5,7 +5,7 @@ The Prisma adapter provides durable ordered memory while keeping schema, migrati
 | Capability | Delegate requirement |
 | --- | --- |
 | Core load/append/clear | Session and message CRUD plus transaction |
-| Error recording | Error delegate, unless `errors: 'ignore'` |
+| Error recording | Error delegate, unless `errorPolicy: 'ignore'` |
 | Inspection | Session `findMany` and `findUnique` |
 | Compaction | Message `deleteMany` |
 

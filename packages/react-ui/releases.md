@@ -1,9 +1,10 @@
 # Releases
 
-The current source manifest is `@anvia/react-ui` **0.7.1**.
+The current source manifest is `@anvia/react-ui` **1.0.0-rc.2**. The entries below preserve notable v0 history.
 
 | Version | Summary |
 | --- | --- |
+| `1.0.0-rc.2` | Synchronized the package with the Anvia 1.0 release-candidate train. |
 | `0.7.1` | Published updated upstream runtime dependencies. |
 | `0.7.0` | Added the `ContextMeter` and model-aware active context usage display. |
 | `0.6.3` | Fixed streamed Markdown reveal state across pauses and honored reduced-motion opacity. |
@@ -22,4 +23,4 @@ The current source manifest is `@anvia/react-ui` **0.7.1**.
 - Keep reduced-motion behavior intact when overriding the stream stylesheet.
 - Snapshot or interaction-test design-system components used with `asChild`; forwarded refs and disabled state remain required.
 
-Read the complete [React UI changelog](https://github.com/anvia-hq/anvia/blob/main/packages/react-ui/CHANGELOG.md).
+Read the complete [React UI changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/react-ui/CHANGELOG.md).

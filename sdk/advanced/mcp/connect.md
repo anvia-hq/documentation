@@ -1,77 +1,74 @@
 # Connect a server
 
-Use `connectMcp(...)` with an MCP connection factory. The returned server contains adapted tools and owns the connected client lifecycle.
+`McpClient` owns one MCP transport. `connect()` returns an immutable server snapshot with adapted tools; the client owns cleanup.
 
-## Connect through stdio
+## 1. Connect through stdio
 
-Use stdio for a local MCP process launched by the application:
+Use stdio when the application starts and owns a local MCP process:
 
 ```ts
-import { connectMcp, mcp } from '@anvia/core/mcp'
+import { McpClient } from '@anvia/core/mcp'
 
-const filesystem = await connectMcp(
-  mcp.stdio({
-    name: 'filesystem',
+const filesystemClient = new McpClient({
+  name: 'docs-filesystem',
+  transport: {
+    type: 'stdio',
     command: 'npx',
     args: [
       '@modelcontextprotocol/server-filesystem',
       '/workspace/docs',
     ],
-  }),
-)
+  },
+})
+const filesystem = await filesystemClient.connect()
 ```
 
-The connection is lazy until `connectMcp(...)` runs. That call starts the process, connects the client, lists the available MCP tools, and adapts them into Anvia tools.
+Construction is lazy. `connect()` starts the process, connects the MCP client, lists tools, and adapts each definition.
 
-## Inspect the connected server
+If tool listing fails after connection, Anvia attempts to close the client before rethrowing the listing error.
+
+## 2. Inspect before registration
 
 ```ts
 console.log(filesystem.name)
-console.log(filesystem.tools.length)
+
+for (const tool of filesystem.tools) {
+  console.log(await tool.definition(''))
+}
 ```
 
-The returned `McpServer` has:
+The server exposes its stable `name`, readonly adapted `tools`, and server metadata. Review names, descriptions, and input schemas before exposing privileged tools.
 
-| Member | Purpose |
-| --- | --- |
-| `name` | Stable server identity supplied in the connection options. |
-| `tools` | MCP definitions adapted into runnable Anvia tools. |
-| `close()` | Closes the underlying MCP client or local process. |
-
-Connection and tool-listing failures reject from `connectMcp(...)`. Do not build the agent until the connection succeeds or the application has chosen a degraded tool set.
-
-## Register the server
+## 3. Register all or selected tools
 
 ```ts
 const agent = new Agent({
   id: 'docs-operator',
-  model: model,
+  model,
   mcpServers: [filesystem],
 })
 ```
 
-This registers every tool exposed by the server. Use an allow-listed subset through `.tools(...)` when the server exposes capabilities the agent should not receive.
+This registers every listed tool. Pass an allow-listed subset through `tools` when the server exposes more capability than the agent needs.
 
-## Close short-lived connections
-
-Jobs, scripts, and tests should close the server in `finally`:
+## 4. Own cleanup
 
 ```ts
-const server = await connectMcp(connection)
+const client = new McpClient(connectionOptions)
+const server = await client.connect()
 
 try {
-  return await createAgent(server)
-    .prompt(message)
-    .send()
+  const agent = createAgent(server)
+  return await agent.generate({
+      prompt: message
+  })
 } finally {
-  await server.close()
+  await client.close()
 }
 ```
 
-Closing only on success leaks a child process or remote transport when the prompt fails.
+Jobs, scripts, tests, and request-scoped connections should close in `finally`. Long-running applications should connect once during startup, reuse the server, and close it during shutdown.
 
-## Own long-running lifecycle at startup
+Do not reconnect and list tools for every message unless credentials or remote visibility are intentionally request-scoped.
 
-Long-running servers should connect once during application startup, reuse the connected `McpServer`, and close it during application shutdown. Do not connect and list tools for every user message unless the server is intentionally request-scoped.
-
-Keep the lifecycle owner beside the application bootstrap so a deploy, worker stop, or startup failure has one cleanup path.
+Next, choose an [HTTP or SSE transport](/sdk/advanced/mcp/transports).

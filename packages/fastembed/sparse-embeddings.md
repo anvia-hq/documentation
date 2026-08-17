@@ -5,7 +5,7 @@ Sparse models encode terms into parallel index/value arrays. Use them for lexica
 ## Index passages
 
 ```ts
-const sparse = await createFastEmbedSparseEmbeddingModel()
+const sparse = await loadFastEmbedSparseEmbeddingModel({ modelId: DEFAULT_FASTEMBED_SPARSE_EMBEDDING_MODEL })
 
 const passages = await sparse.embedTexts([
   'Password reset links expire after thirty minutes.',
@@ -27,8 +27,8 @@ Query encoding uses FastEmbed’s distinct query path. Do not index documents wi
 
 A typical hybrid collection stores:
 
-- one named dense vector from `FastEmbedEmbeddingModel`;
-- one named sparse vector from `FastEmbedSparseEmbeddingModel`;
+- one named dense vector from the loaded dense embedding handle;
+- one named sparse vector from the loaded sparse embedding handle;
 - source text and metadata for filtering/citations.
 
 The vector store owns fusion and ranking. The FastEmbed adapter only produces vectors. For Qdrant, configure a hybrid collection and an RRF search path through `@anvia/qdrant`.

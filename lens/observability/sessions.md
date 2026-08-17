@@ -11,14 +11,14 @@ Lens only groups traces that carry the same non-empty `sessionId`. It does not i
 Choose an opaque identifier from the application that owns the conversation, then reuse it for every related request:
 
 ```ts
-const reply = await supportAgent
-  .prompt(messages)
-  .withTrace({
-    name: 'support-reply',
-    sessionId: conversation.id,
-    userId: account.telemetryId,
-  })
-  .send()
+const reply = await supportAgent.generate({
+    messages: messages,
+    trace: {
+        name: 'support-reply',
+        sessionId: conversation.id,
+        userId: account.telemetryId,
+    }
+})
 ```
 
 `sessionId` creates the session. `userId` is optional, but supplying both lets you inspect one conversation from the session view and all of that user's conversations from the user view.

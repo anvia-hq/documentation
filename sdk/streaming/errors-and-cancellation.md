@@ -1,19 +1,24 @@
 # Errors and cancellation
 
-Wrap stream consumption at the runner boundary. An agent stream yields an `error` event and then throws the same failure on its next read.
+Handle stream failures at the consumer boundary and cancel work when its output is no longer needed.
 
-## Handle an agent failure once
+## 1. Handle an agent failure once
+
+An agent stream yields an `error` event with cumulative usage, then throws the same failure when the iterator advances:
 
 ```ts
 let failedUsage
 
 try {
-  for await (const event of promptRequest.stream()) {
+  for await (const event of agent.stream({
+      prompt: message
+  })) {
     if (event.type === 'error') {
       failedUsage = event.usage
-    } else {
-      await handleRuntimeEvent(event)
+      continue
     }
+
+    await handleRuntimeEvent(event)
   }
 } catch (error) {
   await logger.error('Agent stream failed', {
@@ -25,34 +30,35 @@ try {
 }
 ```
 
-Error usage is cumulative across completed turns and provider attempts that reported authoritative usage. It is empty when the runtime received no authoritative usage.
+Usage includes completed turns and provider attempts that reported authoritative usage. It is empty when no authoritative usage was received.
 
-## Retry only before output starts
+## 2. Configure safe streaming retries
+
+Pass retries with the stream run options:
 
 ```ts
-const request = agent
-  .prompt(message)
-  .withCompletionRetries({
-    maxAttempts: 3,
-    initialDelayMs: 100,
-    maxDelayMs: 1_000,
-  })
+const stream = agent.stream({
+    prompt: message,
+    retries: {
+        maxAttempts: 3,
+        initialDelayMs: 100,
+        maxDelayMs: 1000,
+    }
+})
 ```
 
-For streaming runs, Anvia retries a failed model invocation only before it emits any non-error provider event. This avoids duplicating output already observed by the caller.
+Anvia retries a failed model invocation only before that invocation exposes provider progress. Once a delta or other non-error provider event is visible, retrying could duplicate output and is disabled.
 
-## Who owns cancellation
+## 3. Stop from React
 
-In a normal web application, the client owns the Stop action. The server returns the stream and does not call `stream.cancel()` itself.
-
-## Stop from React
-
-`useChat` already owns an `AbortController`. Connect its `stop()` method to the UI:
+`useChat` owns an `AbortController`. Connect its `stop()` method to the interface:
 
 ```tsx
+import { createHttpClientTransport } from '@anvia/client'
 import { useChat } from '@anvia/react'
 
-const chat = useChat({ endpoint: '/api/chat' })
+const transport = createHttpClientTransport({ endpoint: '/api/chat', format: 'jsonl' })
+const chat = useChat({ transport })
 
 return (
   <button
@@ -65,11 +71,9 @@ return (
 )
 ```
 
-`chat.stop()` aborts the active HTTP request and returns the controller to the idle state.
+Stopping aborts the active HTTP request and returns the hook to its `ready` state.
 
-## Stop from a custom browser client
-
-When calling `fetch(...)` directly, keep its `AbortController` beside the code that owns the Stop button:
+## 4. Stop from a custom browser client
 
 ```ts
 const controller = new AbortController()
@@ -77,35 +81,18 @@ const controller = new AbortController()
 const response = await fetch('/api/chat', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ messages, stream: true }),
+  body: JSON.stringify({ messages }),
   signal: controller.signal,
 })
 
-// Run this from the Stop button handler.
+// Call this from the Stop button handler.
 controller.abort()
 ```
 
-Aborting the fetch cancels its response body even after the response headers have arrived.
+Aborting `fetch()` cancels the response body even after headers have arrived.
 
-## What the server does
+For a normal `createClientStreamResponse()` response, cancellation calls `return()` on the event iterator. Closing an active `AgentStream` cancels its run. There is no separate public `stream.cancel()` method.
 
-The route only creates and returns the response:
+Cancellation does not undo completed tool calls, writes, or external side effects. Long-running application work needs its own cancellation and cleanup design.
 
-```ts
-import type { UIStreamRequest } from '@anvia/core'
-import { createEventStream } from '@anvia/server'
-
-export async function POST(request: Request) {
-  const body = (await request.json()) as UIStreamRequest
-  const promptRequest = agent.prompt(body.messages)
-  const events = promptRequest.stream()
-
-  return createEventStream(events)
-}
-```
-
-For a normal stream, a browser abort or disconnect causes the server response body to be cancelled. `createEventStream(...)` then calls `return()` on the agent event iterator. There is no separate `stream.cancel()` line to add to this route.
-
-A [resumable stream](/sdk/streaming/resumable-streams) behaves differently: its server wrapper intentionally keeps consuming and storing events so the client can reconnect later.
-
-Cancellation stops stream consumption. It does not undo completed tool calls or product writes. Long-running application work needs its own cancellation and cleanup path.
+A [resumable stream](/sdk/streaming/resumable-streams) intentionally keeps draining and storing the original run after the response reader disconnects.

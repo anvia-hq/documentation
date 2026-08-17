@@ -5,17 +5,21 @@ Lens tracing uses safe capture by default. Start there, then opt into payload ca
 ## Safe capture is the default
 
 ```ts
-const tracing = lens.create()
+import { LensClient } from '@anvia/lens'
+
+const lens = new LensClient()
+const tracing = lens.observer()
 ```
 
 Safe capture records the operational shape of a run—its agent, generations, tools, timing, status, model details, and token usage—without traced prompt and response bodies.
 
-It is the right default for production applications that may process customer content, credentials, private documents, or regulated data. It still exports trace context you explicitly add through `.withTrace()`, so keep tags and metadata safe as well.
+It is the right default for production applications that may process customer content, credentials, private documents, or regulated data. It still exports context you explicitly add through the `trace` run option, so keep tags and metadata safe as well.
 
 ## Enable full capture deliberately
 
 ```ts
-const tracing = lens.create({
+const lens = new LensClient()
+const tracing = lens.observer({
   captureMode: 'full',
 })
 ```
@@ -29,7 +33,8 @@ Use it when seeing payloads is necessary for debugging or review and your retent
 Redaction is opt-in and directional:
 
 ```ts
-const tracing = lens.create({
+const lens = new LensClient()
+const tracing = lens.observer({
   captureMode: 'full',
   redactInputs: true,
   redactOutputs: true,
@@ -48,7 +53,8 @@ Redaction walks strings inside arrays and objects without mutating the original 
 Add application-specific patterns when the default set does not cover your identifiers:
 
 ```ts
-const tracing = lens.create({
+const lens = new LensClient()
+const tracing = lens.observer({
   captureMode: 'full',
   redactInputs: true,
   redactOutputs: true,
@@ -71,9 +77,10 @@ const tracing = lens.create({
 Providing `patterns` replaces the built-in pattern list. Include any default categories you still require, or import `DEFAULT_PATTERNS`:
 
 ```ts
-import { DEFAULT_PATTERNS, lens } from '@anvia/lens'
+import { DEFAULT_PATTERNS, LensClient } from '@anvia/lens'
 
-const tracing = lens.create({
+const lens = new LensClient()
+const tracing = lens.observer({
   captureMode: 'full',
   redactInputs: true,
   redactOutputs: true,
@@ -91,7 +98,8 @@ const tracing = lens.create({
 Each captured value is limited to 256 KiB by default. Lower the limit when large prompts, tool results, or documents would add unnecessary storage and network cost:
 
 ```ts
-const tracing = lens.create({
+const lens = new LensClient()
+const tracing = lens.observer({
   captureMode: 'full',
   captureMaxBytes: 64 * 1024,
   redactInputs: true,
@@ -108,7 +116,8 @@ Keep production safe unless full payload export has been approved. A common patt
 ```ts
 const isDevelopment = process.env.NODE_ENV === 'development'
 
-const tracing = lens.create({
+const lens = new LensClient()
+const tracing = lens.observer({
   captureMode: isDevelopment ? 'full' : 'safe',
   redactInputs: isDevelopment,
   redactOutputs: isDevelopment,
@@ -135,4 +144,3 @@ Before enabling full capture:
 5. Check that trace metadata and tags do not carry sensitive payloads around the capture policy.
 
 Once the capture policy is settled, make delivery reliable with [Flush and shutdown](/lens/connect/anvia/flush-and-shutdown).
-

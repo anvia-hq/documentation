@@ -1,18 +1,14 @@
 # Data and privacy
 
-Start with safe capture and enable payloads only after reviewing where traces are stored and who may access them.
-
 ```ts
-const tracing = langfuse.create({
-  captureMode: 'safe',
-  captureMaxBytes: 32_768,
+const tracing = langfuse.observer({
+  captureMode: 'full',
+  captureMaxBytes: 64 * 1024,
   redactInputs: 'deep',
   redactOutputs: 'deep',
 })
 ```
 
-`createPiiRedactor()` includes patterns for email addresses, Luhn-valid credit cards, phone numbers, IPv4 addresses, JWTs, and common API-key shapes. Add application-specific patterns when identifiers use custom formats.
+Safe capture omits prompt and response bodies. Full capture can include instructions, messages, documents, tool values, and model output. Shallow redaction handles direct strings; `'deep'` recursively processes arrays and objects.
 
-Shallow redaction covers direct string values; deep redaction recurses into nested arrays and objects. Redaction is pattern-based and cannot guarantee that every sensitive value is recognized.
-
-Also review trace metadata, tool arguments, exception messages, prompt variables, dataset cases, score comments, and prompt content. Keep secret keys server-only and configure project roles and retention in Langfuse.
+Redaction patterns reduce exposure but do not prove that all sensitive data is removed. Keep secrets out of trace metadata, apply access and retention policy in Langfuse, and test capture with synthetic sensitive fixtures.

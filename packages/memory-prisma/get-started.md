@@ -16,12 +16,12 @@ npx prisma generate
 ```
 
 ```ts
-import { createPrismaMemoryStore } from '@anvia/memory-prisma'
+import { PrismaMemoryStore } from '@anvia/memory-prisma'
 
-const memory = createPrismaMemoryStore(prisma)
+const memory = new PrismaMemoryStore({ client: prisma })
 ```
 
-The conventional factory expects `agentMemorySession`, `agentMemoryMessage`, `agentMemoryError`, and `$transaction` on the generated client. Use `PrismaMemoryStore.fromDelegates(...)` when models are exposed under different names.
+The conventional constructor expects `agentMemorySession`, `agentMemoryMessage`, `agentMemoryError`, and `$transaction` on the generated client. Pass `{ delegates }` instead when models are exposed under different names.
 
 ## Next
 

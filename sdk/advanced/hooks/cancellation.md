@@ -1,90 +1,84 @@
 # Cancellation
 
-Hook cancellation stops an agent run because application policy decided it must not continue.
+V1 uses different mechanisms for policy blocking, stream cancellation, approval rejection, and runtime failure. Keep them distinct so callers can handle each outcome correctly.
 
-## Cancel inside a hook
+## 1. Block model input with a guardrail
 
-`run.cancel(...)` is available inside hook callbacks. Return its action from the callback:
+Use an enforcing input guardrail when application policy should stop the request before a provider call:
 
 ```ts
-import { createHook } from '@anvia/core'
+import {
+  defineGuardrailPolicy,
+  defineInputGuardrail,
+} from '@anvia/core'
 
-const environmentGuard = createHook({
-  onRunStart({ run }) {
-    if (deployment.agentRunsDisabled) {
-      return run.cancel('Agent runs are disabled in this environment.')
-    }
-  },
+const environmentPolicy = defineGuardrailPolicy({
+  id: 'environment-policy',
+  input: [
+    defineInputGuardrail({
+      id: 'agent-runs-enabled',
+      check(_context, actions) {
+        if (deployment.agentRunsDisabled) {
+          return actions.block({
+            reason: 'agent_runs_disabled',
+            message: 'Agent requests are temporarily unavailable.',
+          })
+        }
+
+        return actions.allow()
+      },
+    }),
+  ],
+})
+
+const agent = new Agent({
+  id: 'support',
+  model,
+  guardrails: environmentPolicy,
 })
 ```
 
-Attach the hook before calling `.send()` or `.stream()`:
+An enforced input block completes with the safe block message and records guardrail decisions; it does not masquerade as a provider failure.
+
+## 2. Stop a normal stream
+
+When a browser aborts a normal `createClientStreamResponse()` response, the server closes the event iterator. Closing an active `AgentStream` cancels its run.
 
 ```ts
-const request = agent
-  .prompt(message)
-  .withHook(environmentGuard)
+const controller = new AbortController()
+
+fetch('/api/chat', {
+  method: 'POST',
+  body: JSON.stringify(requestBody),
+  signal: controller.signal,
+})
+
+controller.abort()
 ```
 
-You do not call `run.cancel(...)` from the route. The `run` control exists only while Anvia invokes the hook.
+With `useChat`, call `chat.stop()`. See [Streaming errors and cancellation](/sdk/streaming/errors-and-cancellation).
 
-## Catch cancellation at the runner
-
-Cancellation raises `PromptCancelledError`. Catch it around the code that consumes the request:
+## 3. Reject a pending tool approval
 
 ```ts
-import { PromptCancelledError } from '@anvia/core'
+const pending = await agent.generate({
+    prompt: message
+})
 
-export async function runSupportAgent(input: {
-  message: string
-}) {
-  try {
-    return await agent
-      .prompt(input.message)
-      .withHook(environmentGuard)
-      .send()
-  } catch (error) {
-    if (error instanceof PromptCancelledError) {
-      return {
-        output: 'This request cannot continue.',
-        cancelled: true,
-      }
-    }
-
-    throw error
-  }
+if (pending.status === 'approval_required') {
+  const result = await agent.resume(pending, {
+    approved: false,
+    reason: 'The reviewer rejected this operation.',
+  })
 }
 ```
 
-The hook owns the internal reason. The runner decides which user-facing response is safe to return.
+Rejection prevents that protected tool call from executing and lets the runtime continue with the rejection result.
 
-## Cancel from a tool hook
+## 4. Understand the limit
 
-Use `tool.cancel(...)` when one selected tool makes the entire run unsafe:
+Stopping a run prevents future model turns and tool calls. It cannot undo completed writes or external side effects. Write tools still need authorization, idempotency, transactions where appropriate, and audit records.
 
-```ts
-const policyHook = createHook({
-  onToolCall({ toolName, tool }) {
-    if (toolName === 'publish_release' && deployment.readOnly) {
-      return tool.cancel('Publishing is disabled in read-only mode.')
-    }
-  },
-})
-```
+Use original error types for provider, tool, validation, and timeout failures. Do not relabel operational failures as policy cancellation.
 
-Use `tool.skip(...)` instead when only that tool call should be rejected and the model may continue with another response.
-
-## Know what cancellation means
-
-Hook cancellation prevents future turns and tool calls. It does not undo a side effect completed before cancellation, so write tools still need idempotency, transactions where appropriate, and audit records.
-
-Keep these cancellation paths separate:
-
-| Situation | Mechanism |
-| --- | --- |
-| Runtime policy rejects the run | `run.cancel(...)` or `tool.cancel(...)` |
-| One tool should not execute | `tool.skip(...)` |
-| User presses Stop in a streaming UI | Abort the client request; see [Errors and cancellation](/sdk/streaming/errors-and-cancellation) |
-| Provider or service fails | Handle the original error; do not disguise it as policy cancellation |
-
-Tests should assert both the cancellation reason and that forbidden tools were never called.
+Next, configure [tool approval](/sdk/advanced/hooks/tool-control).

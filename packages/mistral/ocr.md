@@ -3,7 +3,9 @@
 Create an OCR model from the provider client:
 
 ```ts
-const ocr = mistral.ocrModel('mistral-ocr-latest')
+const ocr = mistral.ocrModel({
+    modelId: 'mistral-ocr-latest'
+})
 ```
 
 ## Source types

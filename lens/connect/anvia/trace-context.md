@@ -1,23 +1,23 @@
 # Trace context
 
-Tracing configuration describes the process. Trace context describes one agent request. Add it with `.withTrace()` before executing the request.
+Tracing configuration describes the process. Trace context describes one agent request. Add it through the run's `trace` option.
 
 ```ts
-const response = await supportAgent
-  .prompt('Summarize ticket TICKET-1001 for engineering.')
-  .withTrace({
-    name: 'support-ticket-summary',
-    userId: 'user_42',
-    sessionId: 'ticket_1001',
-    tags: ['support', 'summary'],
-    version: 'prompt-v3',
-    metadata: {
-      ticketId: 'TICKET-1001',
-      team: 'checkout',
-      channel: 'dashboard',
-    },
-  })
-  .send()
+const response = await supportAgent.generate({
+    prompt: 'Summarize ticket TICKET-1001 for engineering.',
+    trace: {
+        name: 'support-ticket-summary',
+        userId: 'user_42',
+        sessionId: 'ticket_1001',
+        tags: ['support', 'summary'],
+        version: 'prompt-v3',
+        metadata: {
+            ticketId: 'TICKET-1001',
+            team: 'checkout',
+            channel: 'dashboard',
+        },
+    }
+})
 ```
 
 This context travels with the run and makes the same request discoverable through the trace, session, and user views.
@@ -48,14 +48,14 @@ async function reply(input: {
   accountId: string
   conversationId: string
 }) {
-  return supportAgent
-    .prompt(input.message)
-    .withTrace({
-      name: 'support-chat',
-      userId: input.accountId,
-      sessionId: input.conversationId,
-    })
-    .send()
+  return supportAgent.generate({
+      prompt: input.message,
+      trace: {
+          name: 'support-chat',
+          userId: input.accountId,
+          sessionId: input.conversationId,
+      }
+  })
 }
 ```
 
@@ -64,15 +64,16 @@ async function reply(input: {
 If an agent configured with memory uses an Anvia session, keep its id aligned with the trace context:
 
 ```ts
-const response = await agentWithMemory
-  .session(conversation.id, { userId: account.id })
-  .prompt(message)
-  .withTrace({
-    name: 'support-chat',
-    userId: account.id,
-    sessionId: conversation.id,
-  })
-  .send()
+const session = { sessionId: conversation.id, userId: account.id };
+const response = await agentWithMemory.generate({
+    prompt: message,
+    trace: {
+        name: 'support-chat',
+        userId: account.id,
+        sessionId: conversation.id,
+    },
+    session: session
+});
 ```
 
 Session memory and Lens sessions serve different purposes: memory supplies context to future prompts, while Lens groups telemetry for investigation.
@@ -93,16 +94,18 @@ Do not put access tokens, secrets, raw documents, full customer records, or unre
 Anvia returns the trace identity with the response:
 
 ```ts
-const response = await supportAgent
-  .prompt(message)
-  .withTrace({ name: 'support-chat', sessionId: conversation.id })
-  .send()
-
-applicationLogger.info({
-  traceId: response.trace?.traceId,
-  observationId: response.trace?.observationId,
-  conversationId: conversation.id,
+const response = await supportAgent.generate({
+    prompt: message,
+    trace: { name: 'support-chat', sessionId: conversation.id }
 })
+
+if (response.status === 'completed') {
+  applicationLogger.info({
+    traceId: response.trace?.traceId,
+    observationId: response.trace?.observationId,
+    conversationId: conversation.id,
+  })
+}
 ```
 
 Recording the ids in application logs creates a reliable bridge from a product incident to its Lens trace.
@@ -114,15 +117,21 @@ Observer errors are normally isolated from the product request. That is the safe
 Use strict behavior only when observer callbacks are part of the job contract, such as an integration test:
 
 ```ts
-await supportAgent
-  .prompt('Run the observability smoke test.')
-  .withTrace({
-    name: 'observability-smoke-test',
-    failOnObserverError: true,
-  })
-  .send()
+const strictAgent = new Agent({
+  id: 'observability-smoke-test',
+  model,
+  observability: {
+    observers: { lens: lens.observer() },
+    errorPolicy: 'throw',
+  },
+})
+
+await strictAgent.generate({
+  prompt: 'Run the observability smoke test.',
+  trace: { name: 'observability-smoke-test' },
+})
 ```
 
-This catches observer callback failures during the run. It does not prove that the asynchronous OTLP exporter delivered the batch to Lens; use `flush()` for that boundary.
+`observability.errorPolicy: 'throw'` surfaces observer callback failures during the run. It does not prove that the asynchronous OTLP exporter delivered the batch to Lens; use `flush()` for that boundary.
 
 Continue to [Capture and privacy](/lens/connect/anvia/capture-and-privacy) before enabling request or response bodies.

@@ -1,6 +1,6 @@
 # `@anvia/sandbox`
 
-`@anvia/sandbox` gives agents isolated Docker-backed workspaces for commands, files, long-running processes, and published ports. It can also turn a live sandbox session into policy-constrained Anvia tools.
+`@anvia/sandbox` gives agents isolated Docker-backed workspaces for commands, files, long-running processes, and published ports. It can also turn a live sandbox runtime into policy-constrained Anvia tools.
 
 ## Install
 
@@ -8,65 +8,71 @@
 pnpm add @anvia/core @anvia/sandbox
 ```
 
-Docker must be available to the application process.
+Docker must be available to the application process. Images must exist locally before `createSandbox()` runs; call `pullImage()` explicitly when your application owns image acquisition.
 
-## Create a session
+## Create a sandbox
 
 ```ts
-import { DockerSandbox } from '@anvia/sandbox'
+import { DockerSandboxClient } from '@anvia/sandbox'
 
-const sandbox = DockerSandbox.node({
-  network: 'none',
-  limits: {
-    timeoutMs: 30_000,
+const client = new DockerSandboxClient()
+await client.pullImage({ image: 'node:22-bookworm' })
+
+const sandbox = await client.createSandbox({
+  image: 'node:22-bookworm',
+  workspace: { type: 'ephemeral' },
+  network: { mode: 'none' },
+  files: { 'README.md': '# Workspace\n' },
+  resources: {
     memoryMb: 512,
     cpus: 1,
     pidsLimit: 128,
   },
-})
-
-const session = await sandbox.createSession({
-  manifest: {
-    files: { 'README.md': '# Workspace\n' },
+  runtime: {
+    commandTimeoutMs: 30_000,
+    maxOutputBytes: 64_000,
   },
 })
 
 try {
-  const result = await session.exec({ command: 'node', args: ['--version'] })
-  console.log(result.stdout)
+  const result = await sandbox.runtime.exec({
+    command: 'node',
+    args: ['--version'],
+  })
+  console.log(new TextDecoder().decode(result.stdout))
 } finally {
-  await session.destroy()
+  await sandbox.destroy()
 }
 ```
 
 ## Give tools to an agent
 
 ```ts
-import { createSandboxTools } from '@anvia/sandbox'
+import { createDockerSandboxTools } from '@anvia/sandbox'
 
-const tools = createSandboxTools(session, {
-  allow: ['read_file', 'write_file', 'list_files', 'exec_command'],
+const tools = createDockerSandboxTools({
+  sandbox: sandbox.runtime,
+  tools: ['read_file', 'write_file', 'list_files', 'exec_command'],
   exec: {
-    allowedCommands: ['node', 'pnpm'],
+    commands: { mode: 'allow', values: ['node', 'pnpm'] },
     maxTimeoutMs: 30_000,
   },
 })
 ```
 
-The tool policy narrows the session API presented to the model. It is one layer in a larger isolation policy; Docker configuration, host privileges, mounted data, credentials, and network access still determine the real boundary.
+The tool policy narrows the runtime API presented to the model. Docker configuration, host privileges, image contents, credentials, and network access still determine the real boundary.
 
 ## Workspace lifecycle
 
-Ephemeral workspaces are appropriate for one run. Persistent workspaces require an explicit ID and an application policy for cleanup. Always destroy sessions in `finally`, even when lifecycle timers are configured.
+Use `{ type: 'ephemeral' }` for one task. A `{ type: 'docker-volume', name }` workspace reuses an existing Docker volume that the application owns. Always destroy sandbox handles in `finally`; use `stop()` followed by `client.resumeSandbox({ id })` only when a workflow intentionally pauses and resumes the same container.
 
 ## Compatibility
 
-The package requires Node.js 20.12 or newer, a compatible Docker CLI and daemon, and `@anvia/core` as a peer dependency. Port and process capabilities are discoverable because not every future sandbox provider must implement them.
+The package requires Node.js 20.12 or newer, a compatible Docker CLI and daemon, and `@anvia/core` as a peer dependency.
 
 ## Next steps
 
 - [Public API](/packages/sandbox/api-reference)
 - [Sandbox execution guide](/sdk/advanced/sandbox)
 - [Studio sandbox inspector](/studio/sandboxes)
-- [Package changelog](https://github.com/anvia-hq/anvia/blob/main/packages/tool-sandbox/CHANGELOG.md)
-
+- [Package changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/tool-sandbox/CHANGELOG.md)

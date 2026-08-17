@@ -1,7 +1,7 @@
 # Production
 
 - Manage the extension, table, and ANN index through migrations.
-- Use `createIfMissing: false` after schema deployment.
+- Use `validate()` after schema deployment.
 - Inject a pool configured for TLS, limits, timeouts, and shutdown.
 - Match vector dimension, adapter distance, and index operator class.
 - Inspect query plans after realistic data volume is loaded.

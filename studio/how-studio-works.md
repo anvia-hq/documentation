@@ -40,7 +40,7 @@ Studio reads the registered configuration and enables relevant surfaces automati
 | --- | --- |
 | One or more agents | Playground and Agents. |
 | Static or dynamic tools | Tool inventory and direct invocation. |
-| Approval-enabled tools or hooks | Interactive approval and question handling. |
+| Tools with `requiresApproval` | Interactive approval handling. |
 | Context or dynamic tools | Knowledge inspection. |
 | MCP-backed tools | MCP server and tool inspection. |
 | Pipelines | Graph, runs, logs, history, and replay. |
@@ -75,7 +75,7 @@ The default browser entry is `/playground`. The compatibility path `/ui/playgrou
 
 ## 4. Execute the registered runtime
 
-When the Playground starts a run, Studio resolves the selected agent and model, creates the agent prompt request, applies session context and runtime controls, then calls the normal Anvia `send()` or `stream()` path.
+When the Playground starts a run, Studio resolves the selected agent and model, applies session context and runtime controls, then uses the normal Anvia `generate()` or `stream()` path.
 
 Studio adds development behavior around that run:
 
@@ -86,7 +86,7 @@ Studio adds development behavior around that run:
 - local trace recording;
 - realtime browser updates.
 
-The agent still owns its instructions, tools, memory, context, hooks, output schema, and turn limits.
+The agent still owns its instructions, tools, memory, context, lifecycle configuration, output schema, and turn limits.
 
 ## 5. Store local development state
 

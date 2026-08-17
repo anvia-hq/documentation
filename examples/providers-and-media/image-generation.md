@@ -17,23 +17,24 @@ for server-side asset generation where prompts and outputs pass your product's s
 
 ```ts
 import { writeFile } from 'node:fs/promises'
-import { imageGenerationRequest } from '@anvia/core/image-generation'
+import { generateImage } from '@anvia/core/image-generation'
 import { GPT_IMAGE_2, OpenAIClient } from '@anvia/openai'
 
-const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY })
-const model = client.imageGenerationModel(
-  process.env.OPENAI_IMAGE_MODEL ?? GPT_IMAGE_2,
-)
+const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! })
+const model = client.imageGenerationModel({
+    modelId: process.env.OPENAI_IMAGE_MODEL ?? GPT_IMAGE_2
+})
 
-const response = await imageGenerationRequest(model)
-  .prompt('A clean technical illustration of a document ingestion pipeline')
-  .width(1024)
-  .height(1024)
-  .additionalParams({ output_format: 'png' })
-  .send()
+const response = await generateImage({
+    prompt: 'A clean technical illustration of a document ingestion pipeline',
+    model,
+    width: 1024,
+    height: 1024,
+    providerOptions: { output_format: 'png' }
+})
 
-await writeFile('pipeline.png', response.image)
-console.log({ images: response.images.length, mediaType: response.mediaType })
+await writeFile('pipeline.png', response.images[0].data)
+console.log({ images: response.images.length, mediaType: response.images[0].mediaType })
 ```
 
 ## Run and expected behavior
@@ -56,9 +57,9 @@ from transient failures.
 ## Source and extensions
 
 Run the
-[OpenAI image cookbook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/04_providers_and_multimodal/07-openai-image-generation.ts)
+[OpenAI image cookbook](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/07-openai-image-generation.ts)
 or compare the
-[Gemini media example](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/04_providers_and_multimodal/09-gemini-image-and-transcription.ts).
+[Gemini media example](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/09-gemini-image-and-transcription.ts).
 Next, add job status, prompt templates, and an approved asset library.
 
 - [Image generation](/sdk/models/image-generation)

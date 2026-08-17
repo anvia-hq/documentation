@@ -5,9 +5,9 @@ Transformers.js provides local dense embeddings through Hugging Face feature-ext
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `0.2.11` |
+| Version | `1.0.0-rc.2` |
 | Runtime | ESM, runtimes supported by Transformers.js |
-| Peer | `@anvia/core >=0.7.1 <1.0.0` |
+| Peer | Matching `@anvia/core` release candidate |
 
 ## Install
 
@@ -20,9 +20,9 @@ pnpm add @anvia/transformers @anvia/core
 ## Create local embeddings
 
 ```ts
-import { createTransformersEmbeddingModel } from '@anvia/transformers'
+import { DEFAULT_TRANSFORMERS_EMBEDDING_MODEL, loadTransformersEmbeddingModel } from '@anvia/transformers'
 
-const embeddings = await createTransformersEmbeddingModel()
+const embeddings = await loadTransformersEmbeddingModel({ modelId: DEFAULT_TRANSFORMERS_EMBEDDING_MODEL })
 const vectors = await embeddings.embedTexts([
   'Password reset links expire after 30 minutes.',
   'Enterprise customers receive priority support.',
@@ -47,8 +47,8 @@ console.log(vectors[0].vector)
 ### Configure the feature extractor
 
 ```ts
-const embeddings = await createTransformersEmbeddingModel({
-  model: 'Xenova/all-MiniLM-L6-v2',
+const embeddings = await loadTransformersEmbeddingModel({
+  modelId: 'Xenova/all-MiniLM-L6-v2',
   pooling: 'mean',
   normalize: true,
   maxBatchSize: 16,
@@ -58,16 +58,17 @@ const embeddings = await createTransformersEmbeddingModel({
 ### Inject a pipeline
 
 ```ts
-import { TransformersEmbeddingModel } from '@anvia/transformers'
+import { adaptTransformersEmbeddingModel } from '@anvia/transformers'
 
-const embeddings = new TransformersEmbeddingModel(featureExtractionPipeline, {
-  model: 'my-local-model',
+const embeddings = adaptTransformersEmbeddingModel({
+  runtime: featureExtractionPipeline,
+  modelId: 'my-local-model',
   pooling: 'cls',
   normalize: true,
 })
 ```
 
-Direct construction is useful when the application owns model loading or tests need a deterministic pipeline. For ordinary use, prefer the async factory.
+The adapter is useful when the application owns model loading or tests need a deterministic pipeline. For ordinary use, prefer the async loader.
 
 Use the same model, pooling, normalization, and preprocessing for ingestion and query embeddings. A change to any of them usually requires rebuilding the vector index.
 
@@ -84,4 +85,4 @@ Use the same model, pooling, normalization, and preprocessing for ingestion and 
 - [API reference](/packages/transformers/api-reference)
 - [Releases](/packages/transformers/releases)
 - [Embeddings guide](/sdk/knowledges/embeddings)
-- [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/embedding-transformers/CHANGELOG.md)
+- [Source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/embedding-transformers/CHANGELOG.md)

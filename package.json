@@ -3,9 +3,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "docs:dev": "vitepress dev",
-    "docs:build": "vitepress build",
-    "docs:preview": "vitepress preview",
+    "docs:dev": "pnpm docs:dev:rc",
+    "docs:dev:current": "DOCS_CHANNEL=current DOCS_RC_DEV_PROXY=http://127.0.0.1:5174 vitepress dev --port 5173",
+    "docs:dev:rc": "DOCS_CHANNEL=rc vitepress dev --port 5174",
+    "docs:build": "pnpm docs:build:rc",
+    "docs:build:current": "DOCS_CHANNEL=current vitepress build",
+    "docs:build:rc": "DOCS_CHANNEL=rc vitepress build",
+    "docs:preview": "pnpm docs:preview:rc",
+    "docs:preview:current": "DOCS_CHANNEL=current vitepress preview",
+    "docs:preview:rc": "DOCS_CHANNEL=rc vitepress preview",
     "docs:deploy": "pnpm docs:build && wrangler deploy",
     "docs:deploy:dry-run": "pnpm docs:build && wrangler deploy --dry-run"
   },

@@ -1,69 +1,74 @@
-# Parallel and batch
+# Parallel and batch execution
 
-Parallel and batch execution reduces waiting time when work is genuinely independent. Anvia provides two pipeline primitives for two different shapes of work.
-
-## Choose the execution shape
-
-| Requirement | Primitive | Result |
-| --- | --- | --- |
-| Run several operations from one value | `.parallel({...})` | One object keyed by branch name. |
-| Run the same pipeline for many values | `pipeline.batch(inputs, options)` | One ordered array of outputs. |
-| Survive restarts or process a large backlog | Worker queue | Durable jobs with application-owned status. |
+Parallel and batch execution reduce waiting time when work is genuinely independent.
 
 ```text
-Parallel                              Batch
+Parallel branches                    Batch
 
-one ticket                            ticket A ─┐
-   ├─ classify                        ticket B ─┼─ same pipeline
-   ├─ detect risk                     ticket C ─┘
-   └─ estimate priority
-        ↓                                  ↓
-one combined result                   ordered results
+one ticket                           ticket A --\
+  |- classify                        ticket B ---- same pipeline
+  |- detect risk                     ticket C --/
+  `- estimate impact
+       |                                  |
+one keyed result                     ordered results
 ```
 
-## Explore parallel and batch work
+Use `.parallel()` to fan one current value into named pipelines. Use `.runBatch()` to run one pipeline over many inputs with bounded concurrency. Use an application-owned job system when work must survive process restarts.
 
-| Page | Learn how to |
-| --- | --- |
-| [Parallel branches](/sdk/advanced/parallel-and-batch/parallel) | Fan one value into independent named operations. |
-| [Batch runs](/sdk/advanced/parallel-and-batch/batch) | Process many inputs through one pipeline. |
-| [Concurrency limits](/sdk/advanced/parallel-and-batch/concurrency) | Bound pressure on models, services, and local resources. |
-| [Failures and results](/sdk/advanced/parallel-and-batch/failures) | Choose fail-fast or per-item outcomes. |
-| [Long-running jobs](/sdk/advanced/parallel-and-batch/jobs) | Move durable work behind a queue and worker. |
-| [Retries and idempotency](/sdk/advanced/parallel-and-batch/retries) | Retry the smallest safe boundary. |
-| [Production checklist](/sdk/advanced/parallel-and-batch/checklist) | Review dependencies, limits, state, and observability. |
-
-## Use parallel branches
+## 1. Run independent branches
 
 ```ts
-const triage = new PipelineBuilder(ticketSchema)
-  .parallel({
-    classification: classifyTicket,
-    policy: checkPolicy,
-    urgency: estimateUrgency,
-  })
-  .step(({ classification, policy, urgency }) => ({
-    category: classification.category,
-    allowed: policy.allowed,
-    priority: urgency.priority,
-  }))
-  .build()
-```
-
-Every branch receives the same parsed ticket. The next step receives an object whose keys match the branch names.
-
-## Run a batch
-
-```ts
-const results = await triage.batch(tickets, {
-  concurrency: 3,
+import { Pipeline } from '@anvia/core/pipeline';
+import { z } from 'zod';
+const triage = new Pipeline({
+    id: 'ticket-triage',
+    inputSchema: ticketSchema,
 })
+    .parallel({
+    id: "parallel-1",
+    branches: {
+        classification: classifyTicket,
+        policy: checkPolicy,
+        impact: estimateImpact,
+    }
+})
+    .step({
+    id: "step-1",
+    run: ({ input: input }) => (({ classification, policy, impact }) => ({
+        category: classification.category,
+        allowed: policy.allowed,
+        priority: impact.priority,
+    }))(input)
+});
+
 ```
 
-At most three inputs run concurrently, and the returned results preserve the order of `tickets`.
+Every branch receives the same validated value. The joined object uses the branch names as keys.
 
-## Parallelism is not durability
+## 2. Run one pipeline over many inputs
 
-Both primitives run inside the current JavaScript process. They do not create durable jobs, persist progress, or survive a process restart.
+```ts
+const results = await triage.runBatch({
+    inputs: tickets,
+    concurrency: 3
+});
 
-Use them for bounded in-process work. Use BullMQ, Trigger.dev, or another job system when work must continue independently of an HTTP request or application instance.
+```
+
+At most three inputs are active at once. Successful results preserve the input order even when individual items finish out of order.
+
+## 3. Separate concurrency from durability
+
+Both primitives run in the current JavaScript process. They do not persist progress, schedule delayed work, or survive a restart.
+
+Use them for bounded in-process work. Put long, expensive, or restart-sensitive operations behind a durable queue and store user-visible status in the product database.
+
+## 4. Continue through the section
+
+- [Build parallel branches](/sdk/advanced/parallel-and-batch/parallel)
+- [Run batches](/sdk/advanced/parallel-and-batch/batch)
+- [Set concurrency limits](/sdk/advanced/parallel-and-batch/concurrency)
+- [Handle failures and results](/sdk/advanced/parallel-and-batch/failures)
+- [Operate long-running jobs](/sdk/advanced/parallel-and-batch/jobs)
+- [Design retries and idempotency](/sdk/advanced/parallel-and-batch/retries)
+- [Review the production checklist](/sdk/advanced/parallel-and-batch/checklist)

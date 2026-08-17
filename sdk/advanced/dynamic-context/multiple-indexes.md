@@ -1,76 +1,54 @@
 # Multiple indexes
 
-Register multiple indexes when an agent needs independent knowledge sources with different retrieval rules.
+Add several context indexes when an agent needs independent knowledge sources with different retrieval rules.
 
-## Add each source separately
+## 1. Create each context entry separately
 
 ```ts
-import { Agent } from '@anvia/core'
-import { vectorFilter } from '@anvia/core/vector-store'
-
+import { Agent, createVectorContext } from '@anvia/core';
+import { vectorFilter } from '@anvia/core/vector-store';
+const publicDocs = createVectorContext({
+    store: publicDocsIndex,
+    model: embeddingModel,
+    topK: 4,
+    minScore: 0.72,
+    filter: vectorFilter.eq('published', true)
+});
+const supportPolicy = createVectorContext({
+    store: policyIndex,
+    model: embeddingModel,
+    topK: 2,
+    minScore: 0.78,
+    filter: vectorFilter.and(vectorFilter.eq('audience', 'support'), vectorFilter.eq('region', user.region)),
+    format: (result) => ({
+        id: `policy:${result.id}`,
+        text: `Source: Internal policy\n\n${String(result.document)}`,
+    })
+});
 const agent = new Agent({
-  id: 'support',
-  model: model,
-  instructions: 'Answer from public documentation and applicable support policy.',
-  dynamicContexts: [
-    {
-      index: publicDocsIndex,
-      topK: 4,
-      threshold: 0.72,
-      filter: vectorFilter.eq('published', true),
-    },
-    {
-      index: policyIndex,
-      topK: 2,
-      threshold: 0.78,
-      filter: vectorFilter.and(
-        vectorFilter.eq('audience', 'support'),
-        vectorFilter.eq('region', user.region),
-      ),
-    },
-  ],
-})
+    id: 'support',
+    model,
+    instructions: 'Use public documentation and applicable support policy.',
+    context: [publicDocs, supportPolicy],
+});
 ```
 
-Anvia searches every registered index before the model turn and appends the formatted matches. Each index keeps its own `topK`, threshold, filter, and formatter.
+Anvia searches each vector context for the turn and appends its formatted matches in context order. Each entry keeps its own `topK`, `minScore`, filter, and formatter.
 
-## Budget the combined result
+## 2. Budget the combined context
 
-The maximum retrieved document count is the sum of each index's `topK`. In the example, the model can receive up to six documents per turn.
+The maximum retrieved document count is the sum of the entries' `topK` values. The example can add up to six documents per turn.
 
-Set smaller limits for secondary sources. More results do not automatically produce a better answer; they can bury the strongest evidence and consume the model's context window.
+Use smaller limits for secondary sources. More results can bury the strongest evidence and consume the completion model's context window without improving the answer.
 
-## Use separate indexes when boundaries differ
+## 3. Separate sources when governance differs
 
-Separate indexes are useful when sources have different:
+Separate indexes are useful when sources have different permissions, tenant scopes, embedding models, vector-store adapters, update schedules, record shapes, or relevance thresholds.
 
-- permissions or tenant scopes
-- embedding models or vector-store adapters
-- update schedules
-- document shapes and formatters
-- relevance thresholds
+Use one index when documents share the same lifecycle and access policy. A metadata filter is usually simpler than splitting an otherwise uniform corpus.
 
-Use one index when the documents share the same lifecycle and access policy. Metadata filters are usually simpler than splitting an otherwise uniform corpus.
+## 4. Preserve source identity
 
-## Keep source identity visible
+Give each formatted result a recognizable ID and source label. This helps the model distinguish public documentation from internal policy and makes retrieval traces easier to inspect.
 
-Format each source with a recognizable ID and label:
-
-```ts
-const policyOptions = {
-  topK: 2,
-  threshold: 0.78,
-  format(result) {
-    return {
-      id: `policy:${result.id}`,
-      text: `Source: Internal policy\n\n${String(result.document)}`,
-    }
-  },
-}
-```
-
-Clear source identity helps the model distinguish product documentation from internal policy and makes retrieval traces easier to inspect.
-
-## Tune sources independently
-
-Test which index supplied each answer. If one source dominates with weak matches, raise its threshold or reduce its `topK` instead of changing every index. Keep permission tests separate for each source because every registered index is an independent path into model context.
+Test and tune every source independently. If one source dominates with weak matches, raise its `minScore` or reduce its `topK` without changing stronger sources. Run separate permission tests because each vector context is an independent path into the model request.

@@ -1,14 +1,13 @@
 # Agent as a tool
 
-`agent.asTool(...)` turns an agent into a tool that another agent can call with a focused prompt.
+`agent.asTool()` creates a normal Anvia tool whose input is a focused prompt and whose output is the child agent's final text.
 
-## Build the specialist first
+## 1. Build a narrow specialist
 
 ```ts
-import { Agent } from '@anvia/core'
-
 const policyAgent = new Agent({
   id: 'policy-review',
+  name: 'Policy reviewer',
   model: policyModel,
   instructions: [
     'Review the supplied draft for policy risk.',
@@ -19,51 +18,50 @@ const policyAgent = new Agent({
 })
 ```
 
-A specialist should have a stable ID, narrow instructions, and only the tools or context required for its role. It may use a different completion model from the coordinator.
+Give the child only the tools and context required for its role. It may use a different model from the coordinator.
 
-## Expose the specialist
+## 2. Expose it with a precise description
 
 ```ts
 const policyReview = policyAgent.asTool({
   name: 'policy_review',
   description: 'Review a draft customer response for policy risk.',
   maxTurns: 2,
+  stream: true,
 })
 ```
 
-| Option | Purpose |
-| --- | --- |
-| `name` | Stable tool name the coordinator calls. |
-| `description` | Explains exactly when and why to delegate. |
-| `maxTurns` | Bounds the child agent's model-tool loop. |
-| `stream` | Forwards child events into the parent stream when `true`. |
+`name` is the stable tool name. `description` tells the coordinator when to delegate. `maxTurns` overrides the child run limit for this tool call. `stream: true` forwards child runtime events through a streamed parent run.
 
-The generated tool accepts a prompt for the child. When called, Anvia runs the child agent and returns its final output as the tool result.
+Without `stream: true`, the parent still receives the final child output as its tool result.
 
-## Add it to a coordinator
+## 3. Add it to a coordinator
 
 ```ts
-const supportAgent = new Agent({
+const coordinator = new Agent({
   id: 'support',
   model: coordinatorModel,
   instructions: [
-    'Answer support questions.',
     'Use policy_review before sending a high-risk answer.',
-    'Use the findings as evidence, then write the final answer yourself.',
+    'Resolve the findings and write one final response yourself.',
   ].join('\n'),
   maxTurns: 6,
-  tools: [policyReview, ...supportTools],
+  tools: [policyReview],
 })
 ```
 
-The tool description and coordinator instructions should agree. A vague description makes delegation unpredictable; overlapping specialist descriptions make tool selection ambiguous.
+Keep specialist names and descriptions distinct. Overlapping tools make model routing ambiguous.
 
-## Keep the task self-contained
+## 4. Pass a self-contained task
 
-`asTool(...)` runs a stateless child prompt. The child does not automatically inherit the parent's conversation memory or session.
+`asTool()` calls the child with a stateless prompt. It does not inherit the parent transcript, memory session, user ID, tenant metadata, or retrieval context.
 
-Tell the coordinator to pass the facts the child needs in the tool prompt. If the child truly needs durable memory, use an explicit session wrapper described in [Memory boundaries](/sdk/advanced/multi-agent/memory).
+Tell the coordinator to include only the facts and draft the specialist needs. Use the explicit session wrapper in [Memory boundaries](/sdk/advanced/multi-agent/memory) only when the child truly needs durable continuity.
 
-## Keep specialist tools narrow
+## 5. Avoid approval inside an agent tool
 
-Prefer read-only specialist agents for analysis, review, retrieval, and recommendations. If a child can perform side effects, every underlying tool must still enforce product permissions, validation, idempotency, and audit independently.
+An agent used through `asTool()` cannot suspend for its own tool approval. If the child reaches `approval_required`, Anvia cancels that child continuation and reports an agent-tool error.
+
+Run approval-capable work directly at an application boundary, or expose the side effect as a protected parent tool whose approval the product can resume.
+
+Next, consume [child events](/sdk/advanced/multi-agent/child-events).

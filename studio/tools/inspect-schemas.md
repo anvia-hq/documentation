@@ -6,19 +6,19 @@ Select an agent in **Tools**, then select **Use** beside a tool. The runner show
 
 ## From Zod to the Studio form
 
-`createTool(...)` converts the Zod `input` schema into the JSON Schema returned by the tool definition:
+`createTool(...)` converts the Zod `inputSchema` into the JSON Schema returned by the tool definition:
 
 ```ts
 const issueRefund = createTool({
   name: 'issue_refund',
   description: 'Issue a customer refund.',
-  input: z.object({
+  inputSchema: z.object({
     orderId: z.string().describe('The order ID to refund.'),
     amount: z.number().positive().describe('Refund amount in USD.'),
     reason: z.string().describe('Reason recorded with the refund.'),
     notifyCustomer: z.boolean().default(true),
   }),
-  output: z.object({
+  outputSchema: z.object({
     refundId: z.string(),
     status: z.literal('issued'),
   }),
@@ -55,7 +55,7 @@ Studio's **Parameter schema** is the tool definition's input schema—the payloa
 An output schema still matters:
 
 ```ts
-output: z.object({
+outputSchema: z.object({
   refundId: z.string(),
   status: z.literal('issued'),
 })

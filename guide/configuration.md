@@ -8,10 +8,13 @@ Anvia configuration is application code. Create concrete dependencies at the edg
 import { OpenAIClient } from '@anvia/openai'
 
 const client = new OpenAIClient({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 
-const model = client.completionModel('gpt-5')
+const model = client.completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
+})
 ```
 
 Keep provider credentials on the server. To change vendors, create a model from another provider package and pass it through the same core APIs.
@@ -35,13 +38,13 @@ Turn limits bound model/tool loops. A tool-assisted answer usually needs one tur
 
 ## Request overrides
 
-Configure exceptional requests at the prompt level instead of creating a second agent:
+Configure exceptional runs through `generate(...)` options instead of creating a second agent:
 
 ```ts
-const response = await agent
-  .prompt('Summarize this ticket in one sentence.')
-  .maxTurns(2)
-  .send()
+const response = await agent.generate({
+    prompt: 'Summarize this ticket in one sentence.',
+    maxTurns: 2
+})
 ```
 
 ## Memory
@@ -56,11 +59,12 @@ npx prisma migrate dev --name add_anvia_memory
 ```
 
 ```ts
-import { createPrismaMemoryStore } from '@anvia/memory-prisma'
+import { PrismaMemoryStore } from '@anvia/memory-prisma'
 import { prisma } from './db'
 
-const memory = createPrismaMemoryStore(prisma, {
-  scope: { metadataKeys: ['tenantId'] },
+const memory = new PrismaMemoryStore({
+  client: prisma,
+  scopeKey: { metadataKeys: ['tenantId'] },
 })
 
 const agent = new Agent({
@@ -77,7 +81,14 @@ const agent = new Agent({
 `@anvia/server` emits JSONL by default. Use SSE only when the client requires `text/event-stream` compatibility:
 
 ```ts
-return createEventStream(agent.prompt(messages).stream(), { format: 'sse' })
+const events = agent.stream({
+    messages
+})
+
+return createClientStreamResponse({
+  events: agentToClientStream({ events }),
+  format: 'sse',
+})
 ```
 
 ## Logging payloads

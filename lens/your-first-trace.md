@@ -18,12 +18,13 @@ Complete [Install and setup](/lens/install-and-setup) first if you do not have t
 Initialize tracing once during application startup and reuse it across agents and requests:
 
 ```ts
-import { lens } from '@anvia/lens'
+import { LensClient } from '@anvia/lens'
 
-export const tracing = lens.create()
+export const lens = new LensClient()
+export const tracing = lens.observer()
 ```
 
-`lens.create()` reads the `ANVIA_LENS_*` environment variables. Its default safe capture mode exports structure, status, duration, model, and available token information while omitting prompt and response bodies.
+`LensClient` reads the `ANVIA_LENS_*` environment variables. Its observer uses safe capture by default, exporting structure, status, duration, model, and available token information while omitting prompt and response bodies.
 
 ## Observe an agent
 
@@ -39,7 +40,7 @@ const supportAgent = new Agent({
   model: model,
   name: 'Support agent',
   instructions: 'Answer support questions clearly and concisely.',
-  observers: [tracing],
+  observability: { observers: { tracing } },
 })
 ```
 
@@ -49,29 +50,31 @@ The observer records runtime activity without changing the agent result.
 
 ```ts
 try {
-  const response = await supportAgent
-    .prompt('Why does observability matter for an AI agent?')
-    .withTrace({
-      name: 'explain-observability',
-      userId: 'user_42',
-      sessionId: 'getting-started',
-      tags: ['docs', 'first-trace'],
-      metadata: {
-        source: 'lens-getting-started',
-      },
-    })
-    .send()
+  const response = await supportAgent.generate({
+      prompt: 'Why does observability matter for an AI agent?',
+      trace: {
+          name: 'explain-observability',
+          userId: 'user_42',
+          sessionId: 'getting-started',
+          tags: ['docs', 'first-trace'],
+          metadata: {
+              source: 'lens-getting-started',
+          },
+      }
+  })
 
-  await tracing.flush()
+  await lens.flush()
 
-  console.log(response.output)
-  console.log(response.trace?.traceId)
+  if (response.status === 'completed') {
+    console.log(response.output)
+    console.log(response.trace?.traceId)
+  }
 } finally {
-  await tracing.shutdown()
+  await lens.close()
 }
 ```
 
-`withTrace(...)` adds investigation context:
+The `trace` run option adds investigation context:
 
 | Field | How Lens uses it |
 | --- | --- |
@@ -99,17 +102,18 @@ If the trace is missing, confirm that the application uses the correct Lens orig
 
 Lens exports telemetry in batches:
 
-- `flush()` delivers buffered telemetry while keeping the tracing instance usable.
-- `shutdown()` performs final delivery and releases resources. Do not reuse the instance afterward.
+- `lens.flush()` delivers buffered telemetry while keeping the client usable.
+- `lens.close()` performs final delivery and releases resources. Do not reuse the client afterward.
 
-Long-running servers should reuse one tracing instance and call `shutdown()` from their graceful termination path. Short-lived scripts should flush after their final request and shut down in `finally`, as in the example above.
+Long-running servers should reuse one client and call `close()` from their graceful termination path. Short-lived scripts should flush after their final request and close in `finally`, as in the example above.
 
 ## About full capture
 
 The Lens repository examples use synthetic data and enable payload capture explicitly:
 
 ```ts
-const tracing = lens.create({ captureMode: 'full' })
+const lens = new LensClient()
+const tracing = lens.observer({ captureMode: 'full' })
 ```
 
 Do not copy this into production automatically. Full capture can export prompts, responses, tool arguments, and tool results. Enable it only after redaction, project access, and retention have been reviewed.

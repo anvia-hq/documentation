@@ -1,90 +1,78 @@
 # Conversation memory
 
-**Type:** Pattern
+An agent session loads and saves message history under a stable conversation ID. This recipe uses an in-memory store to demonstrate the contract; the data disappears when the process restarts.
 
-## Outcome
-
-Keep conversation history by session so a later prompt can use facts from an earlier turn. Use this
-for authenticated chats that need durable continuity across requests or processes.
-
-## Prerequisites
-
-- Node.js 22 or newer and pnpm
-- `@anvia/core`, `@anvia/openai`, and `tsx`
-- A server-side `OPENAI_API_KEY`
-
-## Store boundary
-
-This in-memory store demonstrates the contract; it is not durable across restarts:
+## 1. Implement the store
 
 ```ts
+// local-memory-store.ts
 import type { Message } from '@anvia/core/completion'
-import type { MemoryAppendInput, MemoryContext, MemoryStore } from '@anvia/core/memory'
+import type {
+  MemoryAppendOptions,
+  MemoryScope,
+  MemoryStore,
+} from '@anvia/core/memory'
 
 export class LocalMemoryStore implements MemoryStore {
   private readonly sessions = new Map<string, Message[]>()
 
-  async load({ sessionId }: MemoryContext): Promise<Message[]> {
-    return [...(this.sessions.get(sessionId) ?? [])]
+  async load({ scope }: { scope: MemoryScope }): Promise<Message[]> {
+    return [...(this.sessions.get(scope.sessionId) ?? [])]
   }
 
-  async append(input: MemoryAppendInput): Promise<void> {
-    const id = input.context.sessionId
-    this.sessions.set(id, [...(this.sessions.get(id) ?? []), ...input.messages])
+  async append(input: MemoryAppendOptions): Promise<void> {
+    const id = input.scope.sessionId
+    const current = this.sessions.get(id) ?? []
+    this.sessions.set(id, [...current, ...input.messages])
   }
 
-  async clear({ sessionId }: MemoryContext): Promise<void> {
-    this.sessions.delete(sessionId)
+  async clear({ scope }: { scope: MemoryScope }): Promise<void> {
+    this.sessions.delete(scope.sessionId)
   }
 }
 ```
 
-Use the store from `memory-demo.ts`:
+## 2. Continue one session
 
 ```ts
-import { Agent } from '@anvia/core/agent'
-import { OpenAIClient } from '@anvia/openai'
-import { LocalMemoryStore } from './local-memory-store.js'
-
-const apiKey = process.env.OPENAI_API_KEY
-if (!apiKey) throw new Error('Set OPENAI_API_KEY.')
-
+// memory-demo.ts
+import { Agent } from '@anvia/core';
+import { OpenAIClient } from '@anvia/openai';
+import { LocalMemoryStore } from './local-memory-store.js';
+const apiKey = process.env.OPENAI_API_KEY;
+if (!apiKey)
+    throw new Error('Set OPENAI_API_KEY.');
 const agent = new Agent({
-  id: 'assistant',
-  model: new OpenAIClient({ apiKey }).completionModel('gpt-5'),
-  instructions: 'Use remembered context, but do not invent missing facts.',
-  memory: { store: new LocalMemoryStore() },
-})
-
-const session = agent.session('chat_7d8f', { userId: 'user_42' })
-await session.prompt('Remember that my project is named Anvia.').send()
-console.log((await session.prompt('What is my project named?').send()).output)
+    id: 'assistant',
+    model: new OpenAIClient({ apiKey }).completionModel({
+        modelId: 'gpt-5.5',
+        api: "responses"
+    }),
+    instructions: 'Use remembered context. Do not invent missing facts.',
+    memory: { store: new LocalMemoryStore() },
+});
+const session = { sessionId: 'chat_7d8f', userId: 'user_42', metadata: { tenantId: 'tenant_9' } };
+await agent.generate({
+    prompt: 'Remember that my project is named Anvia.',
+    session,
+});
+const result = await agent.generate({
+    prompt: 'What is my project named?',
+    session,
+});
+if (result.status === 'approval_required') {
+    throw new Error(`Approval required for ${result.approval.toolName}`);
+}
+if (result.status === 'blocked') throw new Error(`Agent blocked at ${result.stage}`);
+console.log(result.output);
 ```
 
-## Run and expected behavior
+The second run loads the first run's messages before calling the model. Another session ID addresses separate history.
 
-```bash
-pnpm tsx memory-demo.ts
-```
+## Protect session scope
 
-The second run should answer “Anvia,” with wording determined by the model. A different session ID
-has a separate history.
+A session ID is a lookup key, not authorization. Derive the session, user, and tenant identifiers from trusted application state and enforce the complete scope in every store operation. Never accept a browser-supplied conversation ID as sufficient proof of access.
 
-## Boundaries
+The local store has no durability, concurrency control, retention, compaction, or encryption. Use a database adapter or transactional custom store in production, establish deletion policy, and keep long histories within the model context budget.
 
-A session ID is a lookup key, not authorization. Derive it from trusted application state, verify
-the authenticated user and tenant on every store operation, and prevent cross-tenant reads. The
-local implementation also lacks concurrency control, persistence, retention, compaction, and
-encryption. Use an Anvia store adapter or a transactional custom store in production, establish
-deletion and retention policies, and keep long histories within the model context budget.
-
-## Source and extensions
-
-See the runnable
-[conversation memory cookbook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/01_basics/02-conversation-memory.ts)
-and [session variant](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/01_basics/06-session-memory.ts).
-Next, replace the map with a database adapter, add compaction, and test concurrent requests.
-
-- [Configure memory](/sdk/memory/configure)
-- [Sessions](/sdk/memory/sessions)
-- [Custom stores](/sdk/memory/custom-stores)
+Continue with [memory sessions](/sdk/memory/sessions), [save policies](/sdk/memory/save-policies), and [custom stores](/sdk/memory/custom-stores).

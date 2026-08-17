@@ -1,22 +1,24 @@
 # OCR
 
-OCR recovers text and document structure from scans, images, and PDFs. In Anvia, the current OCR adapter is provided by `@anvia/mistral`; it returns combined text and Markdown plus normalized page entries.
+OCR recovers text and structure from scans, images, and PDFs. The v1 OCR adapter is provided by `@anvia/mistral` rather than a provider-neutral core contract.
 
-Use OCR when a file does not already contain reliable selectable text. For ordinary text-based PDFs and documents, prefer a [loader](/sdk/knowledges/load-documents) so the application does not pay for unnecessary OCR.
+For documents with reliable selectable text, prefer [text extraction](/sdk/knowledges/load-documents) and avoid unnecessary OCR cost.
 
-## Create the OCR model
+## 1. Create the model
 
 ```ts
 import { MistralClient } from '@anvia/mistral'
 
 const mistral = new MistralClient({
-  apiKey: process.env.MISTRAL_API_KEY,
+  apiKey: process.env.MISTRAL_API_KEY!,
 })
 
-const ocr = mistral.ocrModel()
+const ocr = mistral.ocrModel({ modelId: 'mistral-ocr-latest' })
 ```
 
-## Process an uploaded file
+Pass an explicit model ID to `ocrModel(modelId)` when the application must pin a version.
+
+## 2. Process uploaded bytes
 
 ```ts
 const result = await ocr.ocr({
@@ -32,9 +34,9 @@ const result = await ocr.ocr({
 console.log(result.markdown)
 ```
 
-Byte sources are uploaded through the Mistral files API before OCR. The response can include uploaded-file metadata so the application can track or clean up the provider-side file according to its retention policy.
+Byte sources are uploaded through the Mistral files API before OCR. `result.uploadedFile` records normalized upload metadata when that path is used. The adapter does not delete the provider-side file; apply the retention policy your application requires.
 
-OCR also accepts document URLs, image URLs, and existing Mistral file IDs:
+## 3. Use URL or existing-file sources
 
 ```ts
 const result = await ocr.ocr({
@@ -47,11 +49,11 @@ const result = await ocr.ocr({
 })
 ```
 
-Use a URL that the provider can reach and that remains valid for the request duration. Do not expose a permanently public asset merely to make OCR possible.
+Other source variants are `image_url` and `file_id`. A URL must remain reachable by the provider for the request duration; prefer a short-lived signed URL.
 
-## Preserve page boundaries
+## 4. Preserve page provenance
 
-Use `result.markdown` for one combined document. Use `result.pages` when citations, review, or knowledge ingestion must retain page-level provenance:
+`result.text` and `result.markdown` contain the combined page Markdown. Use `result.pages` for page-level review or knowledge ingestion:
 
 ```ts
 const pages = result.pages.map((page) => ({
@@ -62,6 +64,8 @@ const pages = result.pages.map((page) => ({
 }))
 ```
 
-Page Markdown can still contain recognition mistakes. Validate critical values such as totals, dates, identifiers, and signatures before product writes. OCR is an extraction aid, not proof that a document is authentic or that the current user may access it.
+Normalized pages may also include images, tables, hyperlinks, header, footer, dimensions, and confidence data when returned by the provider.
 
-Leave `includeImageBase64` disabled unless a later stage genuinely needs extracted images. Inline images can make responses and traces unexpectedly large; keep originals in application-owned media storage instead.
+Keep `includeImageBase64` disabled unless a later stage needs extracted images. Verify totals, dates, identifiers, and signatures before product writes. OCR neither proves authenticity nor grants access to the source.
+
+Next, return media through [tool results](/sdk/advanced/multimodal/tool-results).

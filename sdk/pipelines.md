@@ -1,29 +1,59 @@
 # Pipelines
 
-Pipelines combine deterministic TypeScript, agents, and extractors into a typed, inspectable workflow.
-
-## Explore pipelines
-
-| Page | Learn how to |
-| --- | --- |
-| [Typed input](/sdk/pipelines/typed-input) | Validate input before any work begins. |
-| [Steps](/sdk/pipelines/steps) | Transform values with synchronous or asynchronous logic. |
-| [Agents and extractors](/sdk/pipelines/agents-and-extractors) | Add model reasoning and schema-validated extraction. |
-| [Composition](/sdk/pipelines/composition) | Reuse pipelines and name inspectable stages. |
-| [Parallel and batch](/sdk/pipelines/parallel-and-batch) | Run independent branches or many inputs safely. |
-| [Runs and errors](/sdk/pipelines/runs-and-errors) | Execute, observe, inspect, and map failures. |
-| [Production workers](/sdk/pipelines/production-workers) | Move long-running workflows out of HTTP requests. |
-
-## The pipeline flow
+Pipelines combine deterministic TypeScript, agents, extractors, and reusable operations into a typed workflow.
 
 ```text
-Validate input → run typed stages → return final output
+Validate input -> run typed stages -> return final output
 ```
 
-A pipeline is useful when work is more than one prompt: normalize input, load product data, ask an agent, extract fields, run independent checks, and shape the final result.
+Use a pipeline when work needs several explicit stages, reusable composition, bounded batch execution, parallel branches, or an inspectable graph. A clear single function does not need to become a pipeline.
 
-## Use ordinary TypeScript first
+## 1. Create a pipeline
 
-Keep normalization, authorization, database access, branching, side effects, and final response shaping in `.step(...)`. Use `.prompt(...)` only for model reasoning and `.extract(...)` only when existing content must become [structured data](/sdk/structured-output).
+In v1, construct `Pipeline` directly and chain stages from it:
 
-If one function already expresses the workflow clearly, it does not need a pipeline. Reach for a pipeline when typed composition, reusable stages, bounded batch work, or graph inspection adds practical value.
+```ts
+import { Pipeline } from '@anvia/core/pipeline';
+import { z } from 'zod';
+const normalizeTicket = new Pipeline({
+  id: 'normalize-ticket',
+  inputSchema: z.object({
+    subject: z.string().min(1),
+    body: z.string().min(1),
+  }),
+}).step({
+  id: 'normalize-fields',
+  run: ({ input: ticket }) => ({
+    subject: ticket.subject.trim(),
+    body: ticket.body.trim().replace(/\s+/g, ' '),
+  }),
+});
+
+const ticket = await normalizeTicket.run({
+  input: {
+    subject: ' Checkout failure ',
+    body: ' Payment   authorization failed. ',
+  },
+});
+console.log(ticket.output);
+```
+
+There is no `PipelineBuilder` or `.build()` phase in v1. Every fluent method returns a new immutable pipeline with its updated output type.
+
+## 2. Put work in the right stage
+
+Use `.step()` for normalization, authorization, database access, service calls, branching, side effects, and response shaping.
+
+Use `.agent()` only where model reasoning adds value. Use `.extract()` when existing text must become [schema-validated data](/sdk/structured-output/extractors).
+
+Keep deterministic product decisions in TypeScript rather than prompt instructions.
+
+## 3. Continue through the section
+
+- [Validate typed input](/sdk/pipelines/typed-input)
+- [Add deterministic steps](/sdk/pipelines/steps)
+- [Use agents and extractors](/sdk/pipelines/agents-and-extractors)
+- [Compose reusable operations](/sdk/pipelines/composition)
+- [Run parallel branches and batches](/sdk/pipelines/parallel-and-batch)
+- [Observe runs and handle errors](/sdk/pipelines/runs-and-errors)
+- [Operate pipelines in workers](/sdk/pipelines/production-workers)

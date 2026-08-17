@@ -6,40 +6,38 @@
 pnpm add @anvia/sandbox @anvia/core
 ```
 
-Create and always destroy a session:
+Create and always destroy a sandbox:
 
 ```ts
-import { DockerSandbox } from '@anvia/sandbox'
+import { DockerSandboxClient } from '@anvia/sandbox'
 
-const sandbox = DockerSandbox.node({
-  network: false,
-  limits: {
-    timeoutMs: 30_000,
-    memoryMb: 512,
-    cpus: 1,
-    pidsLimit: 128,
-  },
-})
+const client = new DockerSandboxClient()
+await client.pullImage({ image: 'node:22-bookworm' })
 
-const session = await sandbox.createSession({
-  manifest: {
-    files: {
-      'README.md': '# Temporary workspace\n',
-    },
+const sandbox = await client.createSandbox({
+  image: 'node:22-bookworm',
+  workspace: { type: 'ephemeral' },
+  network: { mode: 'none' },
+  files: { 'README.md': '# Temporary workspace\n' },
+  resources: { memoryMb: 512, cpus: 1, pidsLimit: 128 },
+  runtime: { commandTimeoutMs: 30_000, maxOutputBytes: 64_000 },
+  security: {
+    noNewPrivileges: true,
+    dropCapabilities: ['ALL'],
   },
 })
 
 try {
-  const result = await session.exec({
+  const result = await sandbox.runtime.exec({
     command: 'node',
     args: ['--version'],
   })
-  console.log(result.stdout)
+  console.log(new TextDecoder().decode(result.stdout))
 } finally {
-  await session.destroy()
+  await sandbox.destroy()
 }
 ```
 
-The default workspace is ephemeral. Networking defaults to disabled, Docker capabilities default to dropped, and no-new-privileges defaults to enabled. The root filesystem is writable unless `readonlyRootfs` is enabled; the workspace remains the intended writable area.
+The image, workspace, and network policy are explicit. The root filesystem is writable unless `readonlyRootfs` is enabled; the workspace remains the intended writable area.
 
-To expose a constrained tool subset to an agent, use `createSandboxTools` after reviewing [security](/packages/sandbox/security). For cleanup and persistent workspaces, read [lifecycle](/packages/sandbox/lifecycle).
+To expose a constrained tool subset to an agent, use `createDockerSandboxTools` after reviewing [security](/packages/sandbox/security). For stopping, resuming, and persistent volumes, read [lifecycle](/packages/sandbox/lifecycle).

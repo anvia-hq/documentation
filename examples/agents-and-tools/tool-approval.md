@@ -1,76 +1,61 @@
 # Tool approval
 
-**Type:** Pattern
+`requiresApproval` pauses a guarded tool immediately before execution. Trusted application code can then approve or reject the exact pending call.
 
-## Outcome
-
-Pause a guarded tool at its execution boundary and let trusted application code approve or reject
-it. Use approval for consequential actions such as refunds, deletions, deployments, or outbound
-messages—not for ordinary read-only lookups.
-
-## Prerequisites
-
-- A typed tool and an authenticated server-side approval surface
-- `@anvia/core`, `@anvia/openai`, and `zod`
-- A persistence plan if a human cannot decide synchronously
-
-## Guard and handle the action
+## Guard the action
 
 ```ts
 const issueRefund = createTool({
   name: 'issue_refund',
-  description: 'Issue a refund in USD.',
-  input: z.object({ orderId: z.string(), amount: z.number().positive() }),
-  output: z.object({ refundId: z.string(), status: z.literal('issued') }),
-  approval: {
-    when: ({ args }) => args.amount > 0,
-    reason: ({ args }) => `Review $${args.amount} refund for ${args.orderId}.`,
-    rejectMessage: 'The refund was not approved.',
+  description: 'Issue a customer refund in USD.',
+  inputSchema: z.object({
+    orderId: z.string(),
+    amount: z.number().positive(),
+  }),
+  outputSchema: z.object({
+    refundId: z.string(),
+    status: z.literal('issued'),
+  }),
+  requiresApproval: ({ orderId, amount }) => ({
+    reason: `Review $${amount} refund for ${orderId}.`,
+  }),
+  async execute({ orderId, amount }) {
+    await auth.requireRefundAccess(actor, orderId)
+    return refundService.issue({ orderId, amount })
   },
-  execute: async ({ orderId, amount }) => refundService.issue({ orderId, amount }),
 })
-
-const request = agent.prompt('Refund $25 for order A-100.')
-
-const response = await request
-  .approvals({
-    async handler(approval) {
-      return approvalService.decide({
-        actorId: authenticatedReviewer.id,
-        toolName: approval.toolName,
-        args: approval.args,
-        reason: approval.reason,
-      })
-    },
-  })
-  .send()
 ```
 
-`refundService`, `approvalService`, and `authenticatedReviewer` are application boundaries. The
-handler returns `true`, `false`, or a structured approval decision.
+Return `false` from the callback when a particular input may run automatically. Use `true` or `{ reason }` when it must pause.
 
-## Run and expected behavior
+## Resume the pending run
 
-When the model requests a positive refund, Anvia calls the approval handler before `execute`. An
-approval runs the tool; a rejection skips execution and gives the model the configured rejection
-message. With no handler, a guarded request throws `ToolApprovalRequiredError` rather than running.
+```ts
+let result = await agent.generate({
+    prompt: 'Refund $25 for order A-100.'
+})
 
-## Boundaries
+if (result.status === 'approval_required') {
+  const decision = await approvalService.decide({
+    reviewerId: authenticatedReviewer.id,
+    toolName: result.approval.toolName,
+    input: result.approval.input,
+    reason: result.approval.reason,
+  })
 
-Approval is not authentication. Bind the decision to the exact actor, tenant, tool, normalized
-arguments, and request identity; expire stale decisions; and make the action idempotent. Do not let
-the model fabricate the reviewer or approval result. A synchronous handler is suitable only when
-the decision is immediately available.
+  result = await agent.resume(result, {
+    approved: decision.approved,
+    reason: decision.reason,
+  })
+}
 
-For durable human review, use Studio or persist a pending run and resume it through an audited
-workflow. Revalidate resource state immediately before executing an approved action.
+if (result.status === 'completed') {
+  console.log(result.output)
+}
+```
 
-## Source and extensions
+Pass the exact pending object back to the same agent. The continuation is tied to that in-memory run. A stream similarly yields an `approval_required` event and can be resumed with that event.
 
-See the runnable
-[Studio approval example](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/09_studio/03-tool-approval.ts)
-and [permission hook](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/02_tools/08-tool-permission-hook.ts).
-Next, add two-person approval or amount-based risk tiers.
+Approval is not authentication. Bind the decision to the actor, tenant, tool, normalized input, and request identity. Expire stale decisions, recheck authorization and resource state inside `execute`, and make the side effect idempotent.
 
-- [Studio approvals](/studio/tools/approval-behavior)
-- [Tool security](/sdk/tools/security)
+For delayed human review, persist application state around the pending operation or use [Studio approval behavior](/studio/tools/approval-behavior).

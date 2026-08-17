@@ -56,19 +56,22 @@ telemetry.start();
 ```ts
 import { Agent } from "@anvia/core/agent";
 import { OpenAIClient } from "@anvia/openai";
-import { otel } from "@anvia/otel";
+import { createOtelObserver } from "@anvia/otel";
 
-const tracing = otel.create({
+const tracing = createOtelObserver({
   serviceName: "support-api",
   captureMode: "safe",
 });
 
-const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! });
 export const agent = new Agent({
   id: "support",
-  model: openai.completionModel("gpt-5"),
+  model: openai.completionModel({
+      modelId: "gpt-5.5",
+      api: "responses"
+  }),
   instructions: "Answer support questions concisely.",
-  observers: [tracing],
+  observability: { observers: { tracing } },
 });
 ```
 
@@ -94,6 +97,6 @@ drain. Keep exporter-network tests separate. Add a smoke trace for each deployme
 
 ## Source and extensions
 
-- Source: [`10_integrations/05-otel-tracing.ts`](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/10_integrations/05-otel-tracing.ts)
+- Source: [`10_integrations/05-otel-tracing.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/10_integrations/05-otel-tracing.ts)
 - Read the [`@anvia/otel` package guide](/packages/otel/get-started).
 - Extend with correlated eval reporting, collector tail sampling, and application HTTP/database spans.

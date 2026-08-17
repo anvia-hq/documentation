@@ -6,42 +6,41 @@ Gemini completions accept Anvia image and document content in user messages. The
 
 ```ts
 import { readFile } from 'node:fs/promises'
-import { Message, UserContent } from '@anvia/core'
+import type { UserMessage } from '@anvia/core'
 
 const screenshot = await readFile('uploads/checkout.png')
 const report = await readFile('uploads/incident.pdf')
 
-const prompt = Message.user([
-  UserContent.text(
-    'Compare the screenshot with the incident report.',
-  ),
-  UserContent.imageBase64(
-    screenshot.toString('base64'),
-    'image/png',
-  ),
-  UserContent.documentBase64(
-    report.toString('base64'),
-    'application/pdf',
-    { filename: 'incident.pdf' },
-  ),
-])
+const prompt: UserMessage = {
+  role: 'user',
+  content: [
+    { type: 'text', text: 'Compare the screenshot with the incident report.' },
+    {
+      type: 'image',
+      image: { type: 'data', data: screenshot.toString('base64') },
+      mediaType: 'image/png',
+    },
+    {
+      type: 'file',
+      data: { type: 'data', data: report.toString('base64') },
+      mediaType: 'application/pdf',
+      filename: 'incident.pdf',
+    },
+  ],
+}
 
-const response = await agent.prompt(prompt).send()
-console.log(response.output)
+const result = await agent.generate({ messages: [prompt] })
+
+if (result.status === 'completed') {
+  console.log(result.output)
+}
 ```
 
 Validate file ownership, size, and detected media type before reading or encoding an upload. Base64 increases memory and payload size, so large assets should use a supported provider file URI or a bounded preprocessing pipeline.
 
 ## Input mapping
 
-| Anvia content | Google request part |
-| --- | --- |
-| Text | `text` |
-| Base64 image | `inlineData` with the supplied media type |
-| Image URL | `fileData`; image type is inferred from the URL path |
-| Text document | `text` |
-| Base64 document | `inlineData` with the supplied media type |
-| Document URL | `fileData` with the supplied media type |
+Text becomes a Google `text` part. Base64 images and documents become `inlineData` with the supplied media type. Image URLs become `fileData` with a type inferred from the URL path. Document URLs become `fileData` with the supplied type.
 
 The adapter does not upload or download URL content. The URI must be accessible and accepted by the configured Gemini API or Vertex deployment. Prefer base64 for small controlled assets and provider-native file or Cloud Storage URIs for larger media when the selected API supports them.
 

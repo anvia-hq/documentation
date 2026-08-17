@@ -13,20 +13,27 @@ import { Agent } from '@anvia/core'
 import { AnthropicClient } from '@anvia/anthropic'
 
 const anthropic = new AnthropicClient({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
 const agent = new Agent({
   id: 'analyst',
-  model: anthropic.completionModel('claude-sonnet-4-20250514'),
+  model: anthropic.completionModel({
+      modelId: 'claude-sonnet-4-20250514'
+  }),
   instructions: 'Analyze the evidence before answering.',
 })
 
-const result = await agent.prompt('Summarize the incident report.').send()
-console.log(result.output)
+const result = await agent.generate({
+    prompt: 'Summarize the incident report.'
+})
+
+if (result.status === 'completed') {
+  console.log(result.output)
+}
 ```
 
-The returned `AnthropicCompletionModel` works with direct completion, streaming, tools, agents, extractors, and pipeline stages.
+The returned streaming completion handle works with direct completion, streaming, tools, agents, extractors, and pipeline stages.
 
 ## List Anthropic models
 
@@ -46,7 +53,9 @@ const vertex = new AnthropicVertexClient({
   region: 'global',
 })
 
-const model = vertex.completionModel('claude-sonnet-5')
+const model = vertex.completionModel({
+    modelId: 'claude-sonnet-5'
+})
 ```
 
 Vertex uses the same normalized completion adapter but a different official SDK and authentication path. It does not expose `listModels()`.

@@ -32,38 +32,43 @@ release, and service-name variables in server secrets.
 
 ```ts
 import { Agent } from "@anvia/core/agent";
-import { langfuse } from "@anvia/langfuse";
+import { LangfuseClient } from "@anvia/langfuse";
 import { OpenAIClient } from "@anvia/openai";
 
-const tracing = langfuse.create({
+const langfuse = new LangfuseClient({
   serviceName: "support-api",
-  captureMode: "safe",
 });
+const tracing = langfuse.observer({ captureMode: "safe" });
 
-const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! });
 const agent = new Agent({
   id: "support",
-  model: openai.completionModel("gpt-5"),
+  model: openai.completionModel({
+      modelId: "gpt-5.5",
+      api: "responses"
+  }),
   instructions: "Answer with verified support policy only.",
-  observers: [tracing],
+  observability: { observers: { tracing } },
 });
 
 try {
-  const response = await agent
-    .prompt("Who may change billing settings?")
-    .withTrace({
-      name: "support-answer",
-      userId: "usr_opaque_42",
-      sessionId: "conv_opaque_91",
-      tags: ["support"],
-      metadata: { channel: "web" },
-    })
-    .send();
+  const response = await agent.generate({
+      prompt: "Who may change billing settings?",
+      trace: {
+          name: "support-answer",
+          userId: "usr_opaque_42",
+          sessionId: "conv_opaque_91",
+          tags: ["support"],
+          metadata: { channel: "web" },
+      }
+  });
 
-  await tracing.flush(); // useful for a short-lived command or job
-  console.log(response.output, response.trace?.traceId);
+  await langfuse.flush(); // useful for a short-lived command or job
+  if (response.status === "completed") {
+    console.log(response.output, response.trace?.traceId);
+  }
 } finally {
-  await tracing.shutdown();
+  await langfuse.close();
 }
 ```
 
@@ -72,7 +77,7 @@ down once during graceful process termination, not after every request.
 
 ## Expected behavior and failures
 
-Langfuse receives a root run plus model and tool observations. `send()` completing does not guarantee
+Langfuse receives a root run plus model and tool observations. `generate()` completing does not guarantee
 that buffered telemetry is already delivered. Configuration may be valid while the network or keys
 fail only during export, flush, or shutdown.
 
@@ -92,6 +97,6 @@ Use synthetic content in a staging smoke trace.
 
 ## Source and extensions
 
-- Source: [`10_integrations/03-langfuse-tracing.ts`](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/10_integrations/03-langfuse-tracing.ts)
+- Source: [`10_integrations/03-langfuse-tracing.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/10_integrations/03-langfuse-tracing.ts)
 - Explore the [`@anvia/langfuse` package guide](/packages/langfuse/get-started).
 - Extend with [evaluations](/examples/production/evaluations), prompt versions, datasets, and redaction transforms.

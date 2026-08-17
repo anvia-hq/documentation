@@ -2,12 +2,12 @@
 
 Anvia provides primitives intended for production applications, but installing the SDK does not make an application production-ready by itself.
 
-The runtime can bound agent turns, validate tool arguments, stream structured events, persist memory through adapters, stop runs at hook boundaries, emit telemetry, and run evaluation suites. The application must still turn those capabilities into an operational policy.
+The runtime can bound agent turns, validate tool arguments, stream structured events, persist memory through adapters, expose cancellation through stream consumption, emit telemetry, and run evaluation suites. The application must still turn those capabilities into an operational policy.
 
 ## What Anvia provides
 
 - Explicit model, tool, memory, pipeline, streaming, and observer contracts.
-- Agent turn and tool-concurrency controls, plus hook-driven cancellation.
+- Agent turn and tool-concurrency controls, plus explicit streaming cancellation boundaries.
 - Provider, storage, vector, UI, and observability adapters.
 - Studio for local inspection.
 - Lens or OpenTelemetry integrations for retained operational telemetry.

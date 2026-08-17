@@ -15,16 +15,16 @@ import { z } from 'zod'
 
 const client = new OpenAIClient({
   baseUrl: process.env.OPENAI_BASEURL,
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 
 const getOrder = createTool({
   name: 'get_order',
   description: 'Read an order summary from local application state.',
-  input: z.object({
+  inputSchema: z.object({
     id: z.string().describe('The order ID to read.'),
   }),
-  output: z.object({
+  outputSchema: z.object({
     id: z.string(),
     status: z.enum(['processing', 'blocked', 'shipped']),
     customer: z.string(),
@@ -40,7 +40,10 @@ const getOrder = createTool({
 
 const agent = new Agent({
   id: 'support-operations',
-  model: client.completionModel('gpt-5.6-luna'),
+  model: client.completionModel({
+      modelId: 'gpt-5.6-luna',
+      api: "chat"
+  }),
   name: 'Support Operations',
   description: 'Answers operational questions with concise summaries.',
   instructions: 'Use tools when useful. Keep answers action-oriented.',

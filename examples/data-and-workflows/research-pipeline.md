@@ -23,7 +23,7 @@ HTTP/CLI boundary -> ResearchInput validation -> parallel source adapters
                          -> evidence packet -> synthesis agent -> report
 ```
 
-`PipelineBuilder` owns typed stage composition and parallel branch execution. Your application owns
+`Pipeline` owns typed stage composition and parallel branch execution. Your application owns
 source credentials, authorization, freshness, citations, storage, and request-level time budgets.
 
 ## Setup
@@ -38,7 +38,7 @@ First define the external contract and the evidence shape:
 
 ```ts
 import { Agent } from "@anvia/core/agent";
-import { PipelineBuilder } from "@anvia/core/pipeline";
+import { Pipeline } from "@anvia/core/pipeline";
 import { OpenAIClient } from "@anvia/openai";
 import { z } from "zod";
 
@@ -83,44 +83,70 @@ async function readMetrics(topic: string, tenantId: string): Promise<Evidence[]>
 Build small branch pipelines, then combine their named outputs:
 
 ```ts
-const internalSearch = new PipelineBuilder(ResearchInput)
-  .step(({ topic, tenantId }) => searchInternal(topic, tenantId))
-  .build();
-
-const metricsSearch = new PipelineBuilder(ResearchInput)
-  .step(({ topic, tenantId }) => readMetrics(topic, tenantId))
-  .build();
-
-const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY });
+const internalSearch = new Pipeline({ id: "internal-search", inputSchema: ResearchInput })
+    .step({
+    id: "step-1",
+    run: ({ input: input }) => (({ topic, tenantId }) => searchInternal(topic, tenantId))(input)
+});
+const metricsSearch = new Pipeline({ id: "metrics-search", inputSchema: ResearchInput })
+    .step({
+    id: "step-2",
+    run: ({ input: input }) => (({ topic, tenantId }) => readMetrics(topic, tenantId))(input)
+});
+const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! });
 const synthesizer = new Agent({
-  id: "research-synthesizer",
-  model: openai.completionModel("gpt-5"),
-  instructions: [
-    "Use only the supplied evidence.",
-    "Separate findings, uncertainty, and follow-up checks.",
-    "Cite source IDs in square brackets. Never invent a source ID.",
-  ].join("\n"),
+    id: "research-synthesizer",
+    model: openai.completionModel({
+        modelId: "gpt-5.5"
+    }),
+    instructions: [
+        "Use only the supplied evidence.",
+        "Separate findings, uncertainty, and follow-up checks.",
+        "Cite source IDs in square brackets. Never invent a source ID.",
+    ].join("\n"),
+});
+export const researchPipeline = new Pipeline({
+    id: "research-report",
+    inputSchema: ResearchInput,
+})
+    .parallel({
+    id: "parallel-1",
+    name: "Collect evidence",
+    branches: { internal: internalSearch, metrics: metricsSearch }
+})
+    .step({
+    id: "step-3",
+    name: "Build evidence packet",
+    run: ({ input: input }) => (({ internal, metrics }) => {
+        const evidence = [...internal, ...metrics];
+        if (evidence.length === 0)
+            throw new Error("No authorized evidence was found.");
+        return JSON.stringify({ evidence });
+    })(input)
+})
+    .agent({
+    id: "agent-1",
+    name: "Synthesize report",
+    agent: synthesizer,
+    approval: "reject",
+    request({ input: input }) {
+        return { prompt: String(input) };
+    }
 });
 
-export const researchPipeline = new PipelineBuilder(ResearchInput)
-  .parallel({ internal: internalSearch, metrics: metricsSearch }, { name: "Collect evidence" })
-  .step(({ internal, metrics }) => {
-    const evidence = [...internal, ...metrics];
-    if (evidence.length === 0) throw new Error("No authorized evidence was found.");
-    return JSON.stringify({ evidence });
-  }, { name: "Build evidence packet" })
-  .prompt(synthesizer, { name: "Synthesize report" })
-  .build();
 ```
 
 ## Run and expected behavior
 
 ```ts
 const report = await researchPipeline.run({
-  topic: "webhook retry failures",
-  tenantId: "10e93df0-8e59-4a2e-a4a4-b12f37e64365",
+    input: {
+        topic: "webhook retry failures",
+        tenantId: "10e93df0-8e59-4a2e-a4a4-b12f37e64365",
+    }
 });
 console.log(report);
+
 ```
 
 Both lookups begin concurrently. The final report should contain findings, caveats, next checks,
@@ -149,6 +175,6 @@ in the output belongs to the input packet. Run a small golden eval set separatel
 
 ## Source and extensions
 
-- Source: [`05_pipelines/08-research-pipeline.ts`](https://github.com/anvia-hq/anvia/blob/main/examples/cookbook/05_pipelines/08-research-pipeline.ts)
+- Source: [`05_pipelines/08-research-pipeline.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/05_pipelines/08-research-pipeline.ts)
 - Related: [Parallel pipelines](/sdk/pipelines/parallel-and-batch) and [evaluations](/examples/production/evaluations)
 - Extend it with reranking, human review, an immutable evidence snapshot, and structured report output.

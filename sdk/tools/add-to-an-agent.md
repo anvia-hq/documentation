@@ -15,18 +15,20 @@ const agent = new Agent({
   tools: [getInvoice, searchInvoices],
 })
 
-const response = await agent
-  .prompt('Has invoice inv_123 been paid?')
-  .send()
+const response = await agent.generate({
+    prompt: 'Has invoice inv_123 been paid?'
+})
 
-console.log(response.output)
+if (response.status === 'completed') {
+  console.log(response.output)
+}
 ```
 
 The model chooses whether to call a tool and supplies its arguments. The runtime executes the handler, returns its result to the model, and continues until the agent produces a final answer or reaches its turn limit.
 
 ## Build user-scoped tools
 
-Create the tool set from the current application scope when handlers depend on user or tenant state.
+Create the tools from the current application scope when handlers depend on user or tenant state.
 
 ```ts
 export function createBillingAgent(scope: BillingScope) {

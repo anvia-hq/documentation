@@ -1,6 +1,6 @@
 # Releases
 
-Current package version: `0.3.11`.
+Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 history.
 
 ## Notable history
 
@@ -11,6 +11,6 @@ Current package version: `0.3.11`.
 | `0.3.0` | Aligned imports with the focused Core public entrypoints. |
 | `0.2.0` | Introduced structured logger types, Console and Pino factories, and the agent observer. |
 
-Install compatible versions together. This release peers with `@anvia/core >=0.7.1 <1.0.0`.
+Install matching Anvia release-candidate versions together.
 
-Read the [complete source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/logger/CHANGELOG.md) for every patch and dependency-only release.
+Read the [complete source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/logger/CHANGELOG.md) for every patch and dependency-only release.

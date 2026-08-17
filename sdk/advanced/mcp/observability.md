@@ -1,64 +1,56 @@
 # Observability
 
-Trace MCP tools as external dependencies so operators can distinguish remote capability failures from local tool and model failures.
+Treat MCP tools as external dependencies so operators can distinguish connection failures, remote tool failures, model failures, and local tool failures.
 
-## Preserve server identity
-
-MCP-adapted tools carry their server name in tool metadata. Anvia observers can use that metadata to identify which connected server supplied a tool.
-
-Choose stable, meaningful names when connecting:
+## 1. Preserve server identity
 
 ```ts
-const crm = await connectMcp(
-  mcp.http({
-    name: 'customer-crm',
+import { McpClient } from '@anvia/core/mcp'
+
+const crmClient = new McpClient({
+  name: 'customer-crm',
+  transport: {
+    type: 'streamableHttp',
     url: config.crmMcpUrl,
-  }),
-)
+  },
+})
+const crm = await crmClient.connect()
 ```
 
-Avoid environment-specific random names that make traces difficult to group.
+Adapted tools carry the stable server name into Anvia's tool observation metadata. Avoid random, environment-specific names that make runs difficult to group.
 
-## Trace the parent run
+## 2. Correlate the parent run
 
 ```ts
-const response = await agent
-  .prompt(message)
-  .withTrace({
-    name: 'support-mcp-run',
-    userId: user.id,
-    metadata: {
-      tenantId: user.tenantId,
-      requestId,
-    },
-  })
-  .send()
+const response = await agent.generate({
+    prompt: message,
+    trace: {
+        name: 'support-mcp-run',
+        userId: user.id,
+        metadata: {
+            tenantId: user.tenantId,
+            requestId,
+        },
+    }
+})
 ```
 
-The trace should connect the model's tool choice, the adapted MCP tool call, its result or error, and the final agent response.
+A trace should connect model selection, the MCP tool call, result or failure, and final agent response without capturing unnecessary private payloads.
 
-## Observe connection lifecycle
+## 3. Observe connection lifecycle separately
 
-Agent observers begin after the tools are already connected. Record startup and shutdown separately so connection, tool-listing, and cleanup failures are visible even when no agent run starts.
+Agent observers start after MCP connection and tool listing. Record startup, listing, and `crmClient.close()` separately so those failures remain visible even when no agent run begins.
 
-Useful operational fields include:
+Useful fields include server name, transport, connection duration, listed and exposed tool counts, reviewed tool names, tool latency, failure category, parent run ID, and cleanup outcome.
 
-- MCP server name and transport
-- connection and tool-listing duration
-- exposed tool count and reviewed tool names
-- tool latency and failure category
-- parent run ID and trace ID
-- cleanup success or failure
+Never log credentials, raw private arguments, complete remote results, or sensitive resource content by default.
 
-Do not log credentials, raw private arguments, full remote results, or sensitive resource contents by default.
+## 4. Preserve failure classes
 
-## Distinguish failure classes
+Keep DNS and connection failures, tool-listing failures, argument validation, remote `isError` results, model failures, and local tool failures distinct. They have different owners and recovery paths.
 
-Keep transport connection failures, remote tool errors, argument validation errors, model failures, and local tool failures separate. They have different owners and recovery paths.
+Map failures to stable user-facing messages while retaining a protected correlation ID.
 
-Map raw remote messages to safe user-facing errors while retaining a correlation ID for internal diagnosis.
+Inspect server identity, definitions, schemas, and direct tool behavior before debugging model routing. Studio can help with [MCP inspection](/studio/mcp).
 
-## Inspect tools before runs
-
-Use internal tooling or [Studio MCP inspection](/studio/mcp) to verify server identity, listed tools,
-schemas, and direct tool behavior before debugging agent routing.
+Finish with the [MCP checklist](/sdk/advanced/mcp/checklist).

@@ -4,34 +4,32 @@ The Tools view reports approval metadata, but approvals are resolved in the Play
 
 ## What the Tools registry can discover
 
-When a tool declares an `approval` policy, Studio marks it **required**:
+When a tool declares `requiresApproval`, Studio marks it **required**:
 
 ```ts
 const issueRefund = createTool({
   name: 'issue_refund',
   description: 'Issue a customer refund.',
-  input: z.object({
+  inputSchema: z.object({
     orderId: z.string(),
     amount: z.number().positive(),
     reason: z.string(),
   }),
-  output: z.object({
+  outputSchema: z.object({
     refundId: z.string(),
     status: z.literal('issued'),
   }),
-  approval: {
-    when: ({ args }) => args.amount > 0,
-    reason: ({ args }) =>
-      `Review refund of $${args.amount} for order ${args.orderId}.`,
-    rejectMessage: 'Refund request rejected in Anvia Studio.',
-  },
+  requiresApproval: ({ orderId, amount }) =>
+    amount > 0
+      ? { reason: `Review refund of $${amount} for order ${orderId}.` }
+      : false,
   execute: issueRefundHandler,
 })
 ```
 
-The table can identify that an approval policy exists. A fixed string `reason` or `rejectMessage` can also be exposed as metadata. A function-valued reason depends on real arguments and run context, so Studio evaluates and displays it only when the agent actually requests approval during a Playground run.
+The table can identify that an approval requirement exists. A fixed string `reason` can also be exposed as metadata. A function-valued reason depends on parsed arguments, so Studio evaluates and displays it only when the agent actually requests approval during a Playground run.
 
-The badge means **this tool has approval policy**, not **every possible call will pause**. The policy's `when(...)` function decides that at runtime.
+The badge means **this tool can require approval**, not **every possible call will pause**. The callback decides that from parsed input at runtime.
 
 ## Registry, runner, and Playground
 
@@ -41,42 +39,14 @@ The badge means **this tool has approval policy**, not **every possible call wil
 | Tools runner | Invoke a chosen handler with manual arguments. | Executes directly; it does not create an approval request. |
 | Playground | Run the agent through its prompt lifecycle. | Pauses a guarded call and presents **Approve** and **Reject**. |
 
-The direct runner bypasses both declarative tool approval and hook-requested approval. Never use it as evidence that an approval policy is correctly enforced. It is also capable of performing the underlying side effect immediately.
-
-## Hook approvals are runtime behavior
-
-A hook can request approval for a tool that has no declarative `approval` property:
-
-```ts
-const approvalHook = createHook({
-  onToolCall({ toolName, args, tool }) {
-    if (toolName === 'cancel_order') {
-      return tool.requestApproval({
-        reason: `Review order cancellation request: ${args}`,
-        rejectMessage: 'Order cancellation rejected in Anvia Studio.',
-      })
-    }
-
-    return tool.run()
-  },
-})
-
-const agent = new Agent({
-  id: 'support-operations',
-  model: model,
-  hook: approvalHook,
-  tools: [getOrder, cancelOrder],
-})
-```
-
-Because the policy lives in the hook, the Tools registry may show **none** for `cancel_order`. During a Playground run, the hook still pauses the call and Studio renders the request. Test hook policy through the Playground, not by reading the registry badge.
+The direct runner bypasses declarative tool approval. Never use it as evidence that an approval requirement is correctly enforced. It is also capable of performing the underlying side effect immediately.
 
 ## What happens in the Playground
 
 For a guarded agent tool call, Studio records the run, agent, tool, raw arguments, request time, and approval reason. Execution waits until the operator responds:
 
 - **Approve** resumes the same tool call and lets the handler execute.
-- **Reject** resolves the tool call as denied, using the operator reason or configured rejection message.
+- **Reject** resolves the tool call as denied and records the operator reason.
 - stopping the run changes a pending approval to `cancelled` and resolves it as denied.
 
 A resolved approval cannot be decided twice. These requests live inside the Studio process and are intended for development workflows, not as a durable production approval queue.

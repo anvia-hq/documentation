@@ -3,11 +3,14 @@
 `connect()` calls Chroma's get-or-create path by default. New collections use `embeddingFunction: null` and cosine HNSW space unless custom metadata or configuration is supplied.
 
 ```ts
-const store = await ChromaVectorStore.connect({
-  client,
-  collectionName: 'support_docs_v2',
-  createIfMissing: false,
-})
+const storeClient = new ChromaVectorClient({
+    client
+});
+const store = storeClient.vectorStore({
+    collectionName: 'support_docs_v2',
+    dimensions: embeddings.dimensions!
+});
+await store.validate();
 ```
 
 Provision production collections before startup so distance, replication, authentication, and storage settings are reviewed. The adapter has no `vectorSize` option; Chroma and your ingestion workflow must reject dimension mismatches.

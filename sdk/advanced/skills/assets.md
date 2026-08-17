@@ -1,28 +1,20 @@
 # References and scripts
 
-References provide read-only supporting content. Scripts provide deterministic helpers the agent can run through generated skill tools.
+References provide read-only supporting content. Scripts provide reviewed executable helpers.
 
-## Add references
+## 1. Add focused references
 
 ```text
 release-notes/
-  SKILL.md
   references/
     style-guide.md
     strong-example.md
     review-checklist.md
 ```
 
-References work well for:
+References work well for small style guides, examples, policies, rubrics, checklists, and command notes. Tell the model which file to read and why inside `SKILL.md`.
 
-- style guides and output examples
-- policies and review rubrics
-- checklists and migration notes
-- small tables or command references
-
-Tell the agent which reference to read and why inside `SKILL.md`.
-
-## Add scripts
+## 2. Add executable scripts
 
 ```text
 release-notes/
@@ -31,28 +23,24 @@ release-notes/
     normalize-input.ts
 ```
 
-Scripts work well for deterministic tasks such as collecting local data, formatting structured input, linting an artifact, or generating a mechanical draft.
+`run_skill_script` launches the discovered file directly with `shell: false`, the skill directory as its working directory, and no standard input. The file must be executable and have an appropriate shebang or native executable format.
 
-Do not use a script when a short instruction is enough. Do not put credentials or broad environment access inside a skill package.
+Arguments are passed as separate strings. The default timeout is 30 seconds, and the caller may request a positive timeout. Standard output and error are captured and capped at approximately 20,000 characters each before a truncation marker.
 
-## Understand containment
+Non-zero exit, signal exit, spawn failure, and timeout reject the tool call.
 
-Generated skill tools enforce several filesystem boundaries:
+## 3. Understand the containment boundary
 
-- absolute paths are rejected
-- path traversal is rejected
-- only discovered reference and script paths can be accessed
-- scripts run with a timeout
-- script output is capped
+Generated tools allow only discovered paths inside the selected skill's `references/` or `scripts/` directory. They reject absolute paths and traversal.
 
-These controls prevent a skill call from naming arbitrary host files. They do not review what a listed script itself does.
+Containment does not inspect script behavior. A listed script still inherits the server process's filesystem, environment, and network permissions.
 
-## Decide whether scripts are allowed
+Run executable skills only from trusted packages in a constrained worker or server environment. Keep credentials out of the package and return only the output the model needs.
 
-Many user-facing products should load read-only skills without executable scripts. If skill scripts are enabled, run only trusted, reviewed packages in an appropriately constrained server or worker environment.
+## 4. Plan for transcript exposure
 
-The application owns process permissions, environment variables, network access, working directories, resource limits, and audit policy.
+Reference and script results become tool messages and may appear in streams, traces, memory, or error text. Generated skill-tool results bypass normal tool-output middleware, so do not rely on middleware to redact them.
 
-## Keep outputs small and safe
+Review assets before loading, keep outputs small, and project public stream events explicitly.
 
-Script output can enter tool messages, traces, or memory. Return only the data the agent needs, redact secrets, and store large artifacts outside the transcript with a safe reference.
+Next, [load skills](/sdk/advanced/skills/load).

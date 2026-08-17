@@ -32,9 +32,9 @@ Anvia does not replace the underlying service. Its provider adapter maps selecte
 
 With a direct SDK, application code owns the model loop and provider data structures. Switching providers means rewriting that layer or maintaining an application-defined interface. In return, the code can use every native field and endpoint without translation.
 
-With Anvia, application code targets provider-neutral contracts. The same agent, tool, memory, pipeline, and stream lifecycle can use a model created by [`@anvia/openai`](/packages/openai), [`@anvia/anthropic`](/packages/anthropic), [`@anvia/gemini`](/packages/gemini), [`@anvia/mistral`](/packages/mistral), or [`@anvia/grok`](/packages/grok). Provider-specific `additionalParams` remain available for many model requests, but they do not turn an unsupported endpoint into a supported contract.
+With Anvia, application code targets provider-neutral contracts. The same agent, tool, memory, pipeline, and stream lifecycle can use a model created by [`@anvia/openai`](/packages/openai), [`@anvia/anthropic`](/packages/anthropic), [`@anvia/gemini`](/packages/gemini), [`@anvia/mistral`](/packages/mistral), or [`@anvia/grok`](/packages/grok). Provider-specific `providerOptions` remain available for many model requests, but they do not turn an unsupported endpoint into a supported contract.
 
-Anvia also supplies behavior above a model call: multi-turn agent execution, memory, retrieval, hooks, approvals, pipelines, normalized events, Studio, and observability adapters. A direct SDK intentionally leaves those application/runtime decisions to you.
+Anvia also supplies behavior above a model call: multi-turn agent execution, memory, retrieval, lifecycle callbacks, approvals, pipelines, normalized events, Studio, and observability adapters. A direct SDK intentionally leaves those application/runtime decisions to you.
 
 ## Choose Anvia when
 
@@ -69,12 +69,15 @@ import OpenAI from 'openai'
 import { OpenAIClient } from '@anvia/openai'
 
 const native = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 
 const anvia = new OpenAIClient({ client: native })
 
-const agentModel = anvia.completionModel('gpt-5')
+const agentModel = anvia.completionModel({
+    modelId: 'gpt-5.5',
+    api: "responses"
+})
 const nativeFile = await native.files.create({
   file,
   purpose: 'fine-tune',

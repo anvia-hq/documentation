@@ -1,16 +1,15 @@
 # Search and filters
 
 ```ts
-import { vectorFilter } from '@anvia/core/vector-store'
-
-const results = await store.index(embeddings).search({
-  query: 'reset a password',
-  topK: 5,
-  filter: vectorFilter.and(
-    vectorFilter.eq('tenantId', 'acme'),
-    vectorFilter.lt('revision', 10),
-  ),
-})
+import { retrieveDocuments } from "@anvia/core/vector-store";
+import { vectorFilter } from '@anvia/core/vector-store';
+const results = await retrieveDocuments({
+    store: store,
+    model: embeddings,
+    query: 'reset a password',
+    topK: 5,
+    filter: vectorFilter.and(vectorFilter.eq('tenantId', 'acme'), vectorFilter.lt('revision', 10))
+});
 ```
 
 `filterToWeaviateWhere` emits `Equal`, `GreaterThan`, `LessThan`, `And`, and `Or` structures, selecting string, integer/number, or boolean value fields from the metadata value.
