@@ -87,7 +87,7 @@ import { readFile } from 'node:fs/promises'
 import { transcribe } from '@anvia/core/transcription'
 
 const transcriptionModel = gemini.transcriptionModel({
-    modelId: 'gemini-2.5-flash'
+    modelId: 'gemini-3.6-flash'
 })
 
 const transcript = await transcribe({

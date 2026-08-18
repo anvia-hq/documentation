@@ -19,7 +19,7 @@ const openai = new OpenAIClient({
 const agent = new Agent({
   id: 'support',
   model: openai.completionModel({
-      modelId: 'gpt-5.5',
+      modelId: 'gpt-5.6-luna',
       api: "responses"
   }),
   instructions: 'Answer support questions clearly.',
@@ -59,7 +59,7 @@ Create only the capability objects the process needs:
 const embeddings = openai.embeddingModel({
     modelId: 'text-embedding-3-small'
 })
-const image = openai.imageGenerationModel({ modelId: 'gpt-image-1' })
+const image = openai.imageGenerationModel({ modelId: 'gpt-image-2' })
 const speech = openai.speechGenerationModel({ modelId: 'tts-1' })
 const transcription = openai.transcriptionModel({ modelId: 'whisper-1' })
 ```

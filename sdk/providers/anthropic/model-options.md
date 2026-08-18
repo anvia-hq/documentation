@@ -6,9 +6,15 @@ Choose the model when creating the completion adapter, then keep common generati
 
 ```ts
 const model = anthropic.completionModel({
-    modelId: 'claude-sonnet-4-20250514'
+    modelId: 'claude-sonnet-5'
+})
+
+const deepAgentModel = anthropic.completionModel({
+    modelId: 'claude-opus-5'
 })
 ```
+
+Use Claude Sonnet 5 for the default balance of speed and intelligence. Evaluate Claude Opus 5 for long-running agents and complex coding or enterprise work where its additional capability justifies the latency and cost.
 
 Known Anthropic model IDs are included for editor autocomplete, while custom strings remain valid. This allows newly released models and compatible endpoints without waiting for a package release.
 
@@ -39,12 +45,11 @@ const result = await generateCompletion({
     prompt: 'Summarize the deployment risk.',
     model,
     instructions: 'Answer precisely and state uncertainty.',
-    temperature: 0.2,
     maxTokens: 600
 })
 ```
 
-`temperature`, `maxTokens`, tools, and tool choice are mapped to Anthropic request fields by the adapter. Keeping them normalized makes the calling code easier to move between providers.
+`maxTokens`, tools, and tool choice are mapped to Anthropic request fields by the adapter. Claude Sonnet 5 and Claude Opus 5 use adaptive thinking; avoid non-default `temperature`, `top_p`, and `top_k` values because these model generations reject manual sampling changes.
 
 ## Pass Anthropic-specific parameters
 
@@ -56,7 +61,6 @@ const result = await generateCompletion({
     model,
     maxTokens: 400,
     providerOptions: {
-        top_p: 0.9,
         stop_sequences: ['</release-note>'],
     }
 })

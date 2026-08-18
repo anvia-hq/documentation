@@ -71,7 +71,7 @@ if (!apiKey) throw new Error('Set OPENAI_API_KEY.')
 const agent = new Agent({
   id: 'order-status',
   model: new OpenAIClient({ apiKey }).completionModel({
-      modelId: 'gpt-5.5',
+      modelId: 'gpt-5.6-sol',
       api: "responses"
   }),
   instructions: 'Use lookup_order before answering. Never invent order data.',
@@ -83,8 +83,8 @@ const result = await agent.generate({
     prompt: 'Look up order ord_123 and tell me its status and ship date.'
 })
 
-if (result.status === 'approval_required') {
-  throw new Error(`Approval required for ${result.approval.toolName}`)
+if (result.status === 'suspended') {
+  throw new Error(`Agent suspended for ${result.interaction.type}`)
 }
 if (result.status === 'blocked') throw new Error(`Agent blocked at ${result.stage}`)
 

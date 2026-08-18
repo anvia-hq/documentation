@@ -36,7 +36,7 @@ Tool concurrency must be a positive safe integer. The runtime reduces it to one 
 
 ## 2. Read the result union
 
-`generate()` can complete or pause for tool approval:
+`generate()` returns a discriminated completed, blocked, or suspended result:
 
 ```ts
 if (result.status === 'completed') {
@@ -45,37 +45,46 @@ if (result.status === 'completed') {
   console.log(result.usage.totalTokens)
   console.log(result.messages)
   console.log(result.trace)
+} else if (result.status === 'blocked') {
+  console.log(result.stage, result.text)
 } else {
-  console.log(result.approval.toolName)
-  console.log(result.approval.input)
-  console.log(result.approval.reason)
+  console.log(result.interaction.type)
+  console.log(result.interaction.toolName)
+  console.log(result.continuation)
 }
 ```
 
 A completed result may also contain context usage, guardrail decisions, normalized sources, and provider-executed tool metadata.
 
-## 3. Resume an approval
+## 3. Continue an approval
 
-Pass the exact pending result back to the same agent with a decision:
+Keep the continuation server-side and start a linked phase with a matching response:
 
 ```ts
 let result = await supportAgent.generate({
     prompt: input.message
 })
 
-while (result.status === 'approval_required') {
-  const approved = await requestHumanDecision(result.approval)
+while (result.status === 'suspended') {
+  if (result.interaction.type !== 'tool-approval') {
+    throw new Error(`Unexpected interaction: ${result.interaction.type}`)
+  }
+  const approved = await requestHumanDecision(result.interaction)
 
-  result = await supportAgent.resume(result, {
-    approved,
-    reason: approved ? 'Approved by operator' : 'Rejected by operator',
+  result = await supportAgent.generate({
+    continuation: result.continuation,
+    response: {
+      type: 'tool-approval',
+      approved,
+      reason: approved ? 'Approved by operator' : 'Rejected by operator',
+    },
   })
 }
 
-console.log(result.output)
+if (result.status === 'completed') console.log(result.output)
 ```
 
-Approval is a suspended result, not an exception. The continuation belongs to the agent and pending object that created it and can be resumed once.
+An interaction is a suspended result, not an exception. The application must claim it once, expire stale responses, and preserve the continuation on a trusted server.
 
 ## 4. Stream one run
 

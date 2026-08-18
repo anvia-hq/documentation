@@ -11,7 +11,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Agents, tools, and MCP](https://docs.anvia.dev/llms-agents.txt): Models, agents, tools, MCP, skills, multi-agent coordination, pipelines, sandboxing, and streaming.
 - [Full-stack applications](https://docs.anvia.dev/llms-apps.txt): Hono routes, `@anvia/server` streaming, `@anvia/react` client state, `@anvia/react-ui` components, authentication, cancellation, and resumption.
 - [Evaluations and observability](https://docs.anvia.dev/llms-evals.txt): Tracing, Lens, evaluation suites, datasets, release comparison, quality gates, alerts, cost, and testing.
-- [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt): Ingestion, embeddings, vector stores, metadata filters, dynamic context, permission-aware retrieval, and memory boundaries.
+- [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt): Ingestion, embeddings, vector stores, Neo4j GraphRAG, metadata filters, dynamic context, permission-aware retrieval, and memory boundaries.
 
 ## Advanced Workflow Map
 

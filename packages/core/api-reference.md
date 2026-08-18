@@ -35,7 +35,6 @@ Important methods:
 ```ts
 agent.generate(options): Promise<AgentResult>
 agent.stream(options): AgentStream<AgentStreamEvent>
-agent.resume(pending, decision): Promise<AgentResult> | AgentStream
 agent.asTool(options): Tool
 ```
 
@@ -63,9 +62,10 @@ type AgentResult =
       messages: Message[]
     }
   | {
-      status: 'approval_required'
+      status: 'suspended'
       runId: string
-      approval: AgentToolApprovalRequest
+      interaction: AgentInteractionRequest
+      continuation: AgentContinuation
       usage: Usage
       messages: Message[]
     }
@@ -167,22 +167,26 @@ Pass the returned `ToolIndex` directly in `Agent.tools`. `embedTools(...)` retur
 
 ## Tool approval
 
-Generated runs pause with `status: 'approval_required'` before a guarded tool executes:
+Generated runs pause with `status: 'suspended'` before a guarded tool executes:
 
 ```ts
 const pending = await agent.generate({
     prompt: input
 })
 
-if (pending.status === 'approval_required') {
-  const result = await agent.resume(pending, {
-    approved: reviewer.approved,
-    reason: reviewer.reason,
+if (pending.status === 'suspended' && pending.interaction.type === 'tool-approval') {
+  const result = await agent.generate({
+    continuation: pending.continuation,
+    response: {
+      type: 'tool-approval',
+      approved: reviewer.approved,
+      reason: reviewer.reason,
+    },
   })
 }
 ```
 
-The exact pending object must return to the originating agent. Approval is orchestration; authorization still belongs in the tool handler.
+The continuation must return to the originating agent. Approval is orchestration; authorization still belongs in the tool handler. `createQuestionTool({ name, description })` creates the other first-class interaction boundary for structured free-text or choice questions.
 
 ## Guardrails and lifecycle
 
@@ -388,6 +392,37 @@ Model, request, response, result, and retry types are exported from `@anvia/core
 ## MCP and skills
 
 `@anvia/core/mcp` exports `McpClient` and `McpClientGroup` plus transport, server, and tool types. Construct a client with a `stdio`, `streamableHttp`, or `custom` transport, call `connect()`, register the returned `McpServer` through `Agent.mcpServers`, and close the owning client at the application lifecycle boundary.
+
+The built-in HTTP transport has an explicit configuration boundary:
+
+```ts
+type McpStreamableHttpTransport = {
+  type: 'streamableHttp'
+  url: string | URL
+  ssrfProtection?: 'strict' | 'disabled'
+  headers?: Readonly<Record<string, string>>
+  authProvider?: OAuthClientProvider
+  reconnectionOptions?: StreamableHTTPReconnectionOptions
+  sessionId?: string
+}
+```
+
+`headers` applies string values only to the exact MCP endpoint. Redirects fail, OAuth traffic receives none of those headers, and transport-owned protocol headers cannot be overridden. Arbitrary `requestInit` is not supported. A static `Authorization` header and `authProvider` are mutually exclusive.
+
+Streamable HTTP accepts `ssrfProtection?: 'strict' | 'disabled'` and defaults to `'strict'`. Use the explicit opt-out only for an application-owned local or private endpoint:
+
+```ts
+const localMcp = new McpClient({
+  name: 'local',
+  transport: {
+    type: 'streamableHttp',
+    url: 'http://localhost:3000/mcp',
+    ssrfProtection: 'disabled',
+  },
+})
+```
+
+See [MCP transport configuration](/sdk/advanced/mcp/transports#streamable-http) for header scoping and SSRF guidance.
 
 `@anvia/core/skills` exports `skill.local(...)`, `loadSkills(...)`, `SkillSet`, and validation types.
 

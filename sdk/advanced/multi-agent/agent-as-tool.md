@@ -60,8 +60,8 @@ Tell the coordinator to include only the facts and draft the specialist needs. U
 
 ## 5. Avoid approval inside an agent tool
 
-An agent used through `asTool()` cannot suspend for its own tool approval. If the child reaches `approval_required`, Anvia cancels that child continuation and reports an agent-tool error.
+An agent used through `asTool()` requires `suspension: 'reject'`. If the child reaches a `suspended` approval or question result, Anvia cancels that child phase and reports an agent-tool error.
 
-Run approval-capable work directly at an application boundary, or expose the side effect as a protected parent tool whose approval the product can resume.
+Run interaction-capable work directly at an application boundary, or expose the side effect as a protected parent tool whose interaction the product can continue.
 
 Next, consume [child events](/sdk/advanced/multi-agent/child-events).

@@ -88,7 +88,7 @@ const client = new OpenAIClient({ apiKey })
 const agent = new Agent({
   id: 'assistant',
   model: client.completionModel({
-      modelId: 'gpt-5.5',
+      modelId: 'gpt-5.6-sol',
       api: "responses"
   }),
   instructions: 'Answer clearly and concisely.',

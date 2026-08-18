@@ -33,6 +33,7 @@ const policyReview = policyAgent.asTool({
   name: 'policy_review',
   description: 'Review a draft support response for policy risk.',
   maxTurns: 2,
+  suspension: 'reject',
 })
 ```
 
@@ -56,7 +57,7 @@ const result = await supportAgent.generate({
 })
 ```
 
-The generated tool accepts `{ prompt: string }` and returns the child's final output string.
+The generated tool accepts `{ prompt: string }` and returns the child's final output string. Agent tools require an explicit suspension policy; `reject` prevents a child interaction from crossing the nested tool boundary.
 
 ## 3. Use a meaningful boundary
 

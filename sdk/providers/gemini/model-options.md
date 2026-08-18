@@ -6,7 +6,7 @@ Choose a model when creating each adapter, then keep portable behavior on Anvia'
 
 ```ts
 const completionModel = gemini.completionModel({
-    modelId: 'gemini-2.5-flash'
+    modelId: 'gemini-3.6-flash'
 })
 
 const embeddingModel = gemini.embeddingModel({
@@ -29,12 +29,11 @@ const result = await generateCompletion({
     prompt: 'Summarize the deployment risk.',
     model: completionModel,
     instructions: 'Answer precisely and state uncertainty.',
-    temperature: 0.2,
     maxTokens: 500
 })
 ```
 
-The adapter maps temperature, maximum output tokens, tools, tool choice, and output schemas to Gemini configuration.
+The adapter maps maximum output tokens, tools, tool choice, and output schemas to Gemini configuration. Gemini 3.6 Flash deprecates `temperature`, `top_p`, and `top_k`, so do not add those sampling parameters to new 3.6 integrations.
 
 ## Pass Gemini-specific configuration
 
@@ -47,7 +46,6 @@ const result = await generateCompletion({
     maxTokens: 300,
     providerOptions: {
         config: {
-            topP: 0.8,
             stopSequences: ['</release-note>'],
         },
     }

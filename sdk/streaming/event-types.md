@@ -38,9 +38,9 @@ Provider-generation events such as `text_delta`, `reasoning_delta`, `tool_call_d
 
 `guardrail_decision` records a guardrail outcome and may identify its turn.
 
-`approval_required` ends the current stream segment with the pending approval request. Resume it with `agent.resume(pendingEvent, decision)`.
+`interaction_response` records an accepted approval or question response in the resumed phase.
 
-`final` contains the completed run ID, output, cumulative usage, messages, and optional context usage, trace, guardrails, sources, or provider tool calls.
+`final` contains the run result. A completed result includes output; a blocked result includes its guardrail stage; a suspended result includes the interaction and JSON-safe continuation required to start a linked phase.
 
 `error` contains the failure and cumulative authoritative usage. The agent stream then throws the same failure when consumption continues.
 

@@ -28,7 +28,7 @@ escalation path.
 ## Prerequisites and packages
 
 - Node.js 22 or newer and pnpm 11 or newer.
-- OpenAI access to `gpt-5.5` and `text-embedding-3-small`.
+- OpenAI access to `gpt-5.6-sol` and `text-embedding-3-small`.
 - Two independently generated bearer tokens for the example roles.
 
 ```sh
@@ -235,7 +235,7 @@ const { documents: embedded } = await embedDocuments({
     })
 });
 export const completionModel = openai.completionModel({
-    modelId: "gpt-5.5",
+    modelId: "gpt-5.6-sol",
     api: "responses"
 });
 export const knowledgeStore = InMemoryVectorStore.fromDocuments<KnowledgeDocument>({

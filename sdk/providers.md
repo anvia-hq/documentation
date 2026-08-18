@@ -37,7 +37,7 @@ const openai = new OpenAIClient({
 
 export const supportModel =
   openai.completionModel({
-      modelId: 'gpt-5.5',
+      modelId: 'gpt-5.6-sol',
       api: "responses"
   })
 ```
@@ -65,7 +65,7 @@ A provider client may expose several independent contracts:
 
 ```ts
 const chat = openai.completionModel({
-    modelId: 'gpt-5.5'
+    modelId: 'gpt-5.6-sol'
 })
 const embeddings = openai.embeddingModel({
     modelId: 'text-embedding-3-small'

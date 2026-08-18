@@ -4,9 +4,10 @@ Core is split into focused package entry points. The root export contains common
 
 | Capability | Entry point | Package responsibility |
 | --- | --- | --- |
-| Agents | `@anvia/core/agent` | Bounded model/tool loops, sessions, observability, dynamic context, agent-as-tool |
+| Agents | `@anvia/core/agent` | Bounded model/tool loops, sessions, typed interactions and continuations, observability, dynamic context, agent-as-tool |
 | Completions | `@anvia/core/completion` | Provider-neutral requests, streams, messages, usage, documents, structured parsing |
-| Tools | `@anvia/core/tool` | Zod validation, approvals, middleware, dynamic discovery, result normalization |
+| Tools | `@anvia/core/tool` | Zod validation, approvals, structured questions, middleware, dynamic discovery, result normalization |
+| Documents | `@anvia/core/documents` | Deterministic text chunking and scoped PDF text extraction from app-supplied bytes |
 | Lifecycle | `@anvia/core/agent` | Typed run, turn, generation, tool, finish, and error observation |
 | Guardrails | `@anvia/core/guardrails` | Input/final-output allow, block, and rewrite policies |
 | Memory | `@anvia/core/memory` | Conversation store, inspection, save policy, durable compaction contracts |
@@ -17,7 +18,7 @@ Core is split into focused package entry points. The root export contains common
 | MCP and skills | `@anvia/core/mcp`, `@anvia/core/skills` | MCP transports/tool discovery and validated local skill loading |
 | Observability | `@anvia/core/observability` | Run, generation, tool, trace, and streaming observer contracts |
 | Evaluations | `@anvia/core/evals` | Cases, metrics, suites, reporters, traces, CLI results, cost/usage totals |
-| UI protocol | `@anvia/core/ui` | UI messages, stream events, resume cursors, Core/UI conversion |
+| UI protocol | `@anvia/core/ui` | UI messages, stream events, interactions, resume cursors, Core/UI conversion |
 
 ## Capability boundaries
 

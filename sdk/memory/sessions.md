@@ -20,7 +20,7 @@ const first = await supportAgent.generate({
     session,
 });
 if (first.status !== 'completed') {
-    throw new Error(`Approval required for ${first.approval.toolName}`);
+    throw new Error(`Unexpected agent result: ${first.status}`);
 }
 const followUp = await supportAgent.generate({
     prompt: 'When is it due?',
@@ -33,13 +33,17 @@ if (followUp.status === 'completed') {
 
 Before each run, Anvia loads the stored messages and uses them as history. New runtime messages are appended according to the configured [save policy](/sdk/memory/save-policies).
 
-If a tool requires approval, resume the exact pending result through the parent agent:
+If a tool requires approval, continue the suspended phase through the same parent agent:
 
 ```ts
-if (first.status === 'approval_required') {
-  const resumed = await supportAgent.resume(first, {
-    approved: true,
-    reason: 'Approved by the account owner.',
+if (first.status === 'suspended' && first.interaction.type === 'tool-approval') {
+  const resumed = await supportAgent.generate({
+    continuation: first.continuation,
+    response: {
+      type: 'tool-approval',
+      approved: true,
+      reason: 'Approved by the account owner.',
+    },
   })
 }
 ```

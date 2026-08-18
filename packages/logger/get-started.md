@@ -32,8 +32,8 @@ const result = await agent.generate({
     prompt: 'Where is order A123?'
 })
 
-if (result.status === 'approval_required') {
-  logger.info('Agent paused for approval', { approval: result.approval })
+if (result.status === 'suspended') {
+  logger.info('Agent paused for interaction', { interaction: result.interaction })
 }
 ```
 

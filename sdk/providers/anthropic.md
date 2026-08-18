@@ -24,7 +24,7 @@ const anthropic = new AnthropicClient({
 })
 
 export const model = anthropic.completionModel({
-    modelId: 'claude-sonnet-4-20250514'
+    modelId: 'claude-sonnet-5'
 })
 ```
 

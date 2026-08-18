@@ -49,26 +49,30 @@ const requestRefund = createTool({
 
 Return `false` to run immediately, `true` to request approval, or `{ reason }` to request it with context. The input is parsed once and the same value is used after approval.
 
-## 3. Resume a generated run
+## 3. Continue a generated run
 
 ```ts
 const pending = await agent.generate({
     prompt: message
 })
 
-if (pending.status === 'approval_required') {
-  console.log(pending.approval.toolName)
-  console.log(pending.approval.input)
-  console.log(pending.approval.reason)
+if (pending.status === 'suspended' && pending.interaction.type === 'tool-approval') {
+  console.log(pending.interaction.toolName)
+  console.log(pending.interaction.input)
+  console.log(pending.interaction.reason)
 
-  const result = await agent.resume(pending, {
-    approved: reviewer.approved,
-    reason: reviewer.reason,
+  const result = await agent.generate({
+    continuation: pending.continuation,
+    response: {
+      type: 'tool-approval',
+      approved: reviewer.approved,
+      reason: reviewer.reason,
+    },
   })
 }
 ```
 
-A stream yields `approval_required` and ends that segment. Pass the exact pending event to `agent.resume()`; approval continuations are tied to the originating agent and in-memory pending object.
+A stream ends with a suspended `final` result. Start a linked stream phase with `agent.stream({ continuation, response })`; the continuation is JSON-safe but still belongs to the originating agent and interaction.
 
 ## 4. Keep authorization inside execution
 

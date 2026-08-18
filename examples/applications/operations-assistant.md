@@ -67,13 +67,13 @@ export function createOperationsTools(operator: Operator) {
 ```
 
 The authenticated operator is captured by trusted server code. `requiresApproval` pauses the exact
-tool call, and the caller resumes it through `agent.resume(...)`. The approval system must bind its
+tool call, and the caller continues it through `agent.generate({ continuation, response })`. The approval system must bind its
 decision to the principal, normalized input, incident, and expiry—not merely the tool name.
 
 ## Compose specialists
 
 Create support, engineering, and communications agents, expose each with
-`specialist.asTool({ name: "ask_engineering_agent" })`, and attach them to a coordinator with the
+`specialist.asTool({ name: "ask_engineering_agent", suspension: "reject" })`, and attach them to a coordinator with the
 `tools` and `maxTurns: 4` options. Stream with
 `coordinator.stream({ prompt: message, toolConcurrency: 3 })` when tasks are independent. Keep remediation
 tools out of specialist agents.

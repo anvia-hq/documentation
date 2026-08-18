@@ -12,12 +12,12 @@ const openai = new OpenAIClient({
 })
 
 const responsesModel = openai.completionModel({
-  modelId: 'gpt-5.5',
+  modelId: 'gpt-5.6-sol',
   api: 'responses',
 })
 
 const chatModel = openai.completionModel({
-  modelId: 'gpt-5.5',
+  modelId: 'gpt-5.6-sol',
   api: 'chat',
 })
 ```

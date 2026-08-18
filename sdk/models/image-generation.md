@@ -11,7 +11,7 @@ import { OpenAIClient } from '@anvia/openai'
 
 const client = new OpenAIClient({ apiKey })
 
-export const imageModel = client.imageGenerationModel({ modelId: 'gpt-image-1' })
+export const imageModel = client.imageGenerationModel({ modelId: 'gpt-image-2' })
 ```
 
 OpenAI, Gemini, and Grok provide v1 RC image-generation adapters. Each provider may support different dimensions, formats, and additional parameters.

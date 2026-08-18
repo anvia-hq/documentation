@@ -51,7 +51,7 @@ for await (const event of events) {
 }
 ```
 
-An agent stream covers the complete runtime loop and ends with a `final`, `approval_required`, or failure outcome.
+An agent stream covers the complete runtime loop and ends with a `final` result or a thrown failure. The final result can be completed, blocked, or suspended for an interaction.
 
 ## 3. Continue through the section
 

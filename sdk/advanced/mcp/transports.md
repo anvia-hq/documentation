@@ -29,8 +29,9 @@ const client = new McpClient({
   transport: {
     type: 'streamableHttp',
     url: 'https://mcp.example.com/api',
-    requestInit: {
-      headers: { Authorization: `Bearer ${process.env.MCP_TOKEN}` },
+    headers: {
+      Authorization: `Bearer ${process.env.MCP_TOKEN}`,
+      'X-Workspace-Id': config.workspaceId,
     },
   },
 })
@@ -38,7 +39,42 @@ const client = new McpClient({
 const server = await client.connect()
 ```
 
-The HTTP transport also accepts an MCP SDK `authProvider`, `reconnectionOptions`, and `sessionId`. The RC API does not expose a legacy SSE transport.
+The HTTP transport also accepts an MCP SDK `authProvider`, `reconnectionOptions`, and `sessionId`. The RC transport union contains only `stdio`, `streamableHttp`, and `custom` variants.
+
+### Configure static endpoint headers
+
+`headers` must be a plain object whose values are strings. These configured headers are added only to requests whose URL exactly matches the MCP endpoint. They are not attached to OAuth discovery, authorization, or token requests. Endpoint redirects fail instead of forwarding configured credentials to another URL.
+
+The transport owns its HTTP method, body, abort signal, session state, and protocol fields. For that reason, Streamable HTTP does not expose arbitrary `RequestInit`, and configured headers cannot replace:
+
+- `Accept`
+- `Content-Type`
+- `Last-Event-ID`
+- `MCP-Protocol-Version`
+- `MCP-Session-ID`
+
+Header names are checked case-insensitively. A static `Authorization` header cannot be combined with `authProvider`; use exactly one authentication mechanism. If a value must change per request or requires a different scope, create a reviewed `custom` transport and own that complete security boundary.
+
+### Connect to a trusted local or private server
+
+Streamable HTTP uses strict SSRF protection by default. That mode rejects loopback, private-network, link-local, and cloud-metadata destinations and applies the same checks to DNS resolution, redirects, and OAuth discovery.
+
+For an intentionally local MCP server, opt out explicitly:
+
+```ts
+import { McpClient } from '@anvia/core/mcp'
+
+const client = new McpClient({
+  name: 'local',
+  transport: {
+    type: 'streamableHttp',
+    url: 'http://localhost:3000/mcp',
+    ssrfProtection: 'disabled',
+  },
+})
+```
+
+`ssrfProtection` is `'strict' | 'disabled'` and defaults to `'strict'`. Disabling it removes Anvia's hostname and DNS restrictions for the complete MCP transport, including redirects and OAuth discovery; the URL must still use HTTP or HTTPS. Use this only when the application owns and trusts the network boundary. Never derive this option from user input or disable it merely to make an untrusted URL connect.
 
 ## Custom transport
 

@@ -20,7 +20,7 @@ const openai = new OpenAIClient({
 })
 
 const model = openai.completionModel({
-  modelId: 'gpt-5.5',
+  modelId: 'gpt-5.6-sol',
   api: 'responses',
 })
 ```

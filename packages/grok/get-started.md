@@ -38,7 +38,7 @@ The example selects Responses and `grok-4.5` explicitly. Provider tools require 
 ## Add media
 
 ```ts
-const image = grok.imageGenerationModel({ modelId: 'grok-imagine-image' })
+const image = grok.imageGenerationModel({ modelId: 'grok-imagine-image-quality' })
 const speech = grok.speechGenerationModel()
 const transcription = grok.transcriptionModel()
 ```

@@ -108,7 +108,7 @@ const openai = new OpenAIClient({ apiKey });
 export const supportAgent = new Agent({
   id: "support-summary",
   model: openai.completionModel({
-      modelId: "gpt-5.5",
+      modelId: "gpt-5.6-sol",
       api: "responses"
   }),
   name: "Support summary agent",

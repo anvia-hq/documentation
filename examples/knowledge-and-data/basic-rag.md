@@ -69,7 +69,7 @@ const response = await agent.generate({
 });
 
 if (response.status !== "completed") {
-  throw new Error(`Unexpected approval request for ${response.approval.toolName}`);
+  throw new Error(`Unexpected agent result: ${response.status}`);
 }
 
 console.log(response.output);

@@ -74,7 +74,7 @@ Compound components read their controller and item state from context, so the sa
 | `@anvia/react-ui/chat` | `Composer`, `Thread` | Chat layout, rich composer, suggestions, and scrolling |
 | `@anvia/react-ui/message` | `Message` | Message parts, Markdown, tools, reasoning, entities, and actions |
 | `@anvia/react-ui/completion` | `Completion` | Prompt form and completion output |
-| `@anvia/react-ui/human-input` | `HumanInput` | Tool approvals and structured questions |
+| `@anvia/react-ui/human-input` | `HumanInput` | Pending tool-approval and structured-question interactions |
 | `@anvia/react-ui/attachment` | `Attachment` | Attachment name, preview, and removal |
 | `@anvia/react-ui/image` | `Image` | Preview, copy, download, and zoom overlay |
 | `@anvia/react-ui/thread-list` | `ThreadList`, `ThreadListItem` | Conversation navigation and management actions |
@@ -120,6 +120,7 @@ The components target React DOM and use browser behavior for rich composer, sele
 - [Messages and content](/sdk/messages/content)
 - [Tool calls](/sdk/messages/tools)
 - [Streaming event types](/sdk/streaming/event-types)
+- [Interactions and continuations](/sdk/agents/interactions)
 - [Approvals and questions in Studio](/studio/playground/approvals-and-questions)
 
 For exact exports, compound parts, and controller types, use the [API reference](/packages/react-ui/api-reference). For release history, read the [source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/react-ui/CHANGELOG.md).

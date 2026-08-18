@@ -45,7 +45,7 @@ if (!apiKey)
 const agent = new Agent({
     id: 'assistant',
     model: new OpenAIClient({ apiKey }).completionModel({
-        modelId: 'gpt-5.5',
+        modelId: 'gpt-5.6-sol',
         api: "responses"
     }),
     instructions: 'Use remembered context. Do not invent missing facts.',
@@ -60,8 +60,8 @@ const result = await agent.generate({
     prompt: 'What is my project named?',
     session,
 });
-if (result.status === 'approval_required') {
-    throw new Error(`Approval required for ${result.approval.toolName}`);
+if (result.status === 'suspended') {
+    throw new Error(`Agent suspended for ${result.interaction.type}`);
 }
 if (result.status === 'blocked') throw new Error(`Agent blocked at ${result.stage}`);
 console.log(result.output);

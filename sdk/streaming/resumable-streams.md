@@ -31,6 +31,9 @@ export async function POST(request: Request) {
     })
   }
 
+  if (body.type !== 'messages') {
+    return new Response('Interaction responses are not enabled', { status: 400 })
+  }
   await authorizeStart(request, body.messages)
   const streamId = crypto.randomUUID()
 

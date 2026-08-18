@@ -85,7 +85,7 @@ const openai = new OpenAIClient({ apiKey });
 export const supportAgent = new Agent({
   id: "support",
   model: openai.completionModel({
-      modelId: "gpt-5.5",
+      modelId: "gpt-5.6-sol",
       api: "responses"
   }),
   instructions: "Answer support questions clearly and concisely.",
@@ -131,7 +131,7 @@ export function createPostHandler(auth: AuthService, conversations: Conversation
     });
 
     if (response.status !== "completed") {
-      return Response.json({ error: "approval_required" }, { status: 409 });
+      return Response.json({ error: "agent_not_completed", status: response.status }, { status: 409 });
     }
 
     return Response.json({ output: response.output });

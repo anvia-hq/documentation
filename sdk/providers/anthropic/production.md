@@ -14,7 +14,7 @@ const anthropic = new AnthropicClient({
 })
 
 export const supportModel = anthropic.completionModel({
-    modelId: process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-20250514'
+    modelId: process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-5'
 })
 ```
 

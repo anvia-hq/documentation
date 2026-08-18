@@ -11,7 +11,7 @@ const gemini = new GeminiClient({
 })
 
 const model = gemini.completionModel({
-    modelId: 'gemini-2.5-flash'
+    modelId: 'gemini-3.6-flash'
 })
 
 export const supportAgent = new Agent({

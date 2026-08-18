@@ -61,7 +61,7 @@ await studio.serve({
 
 ## Clean up sandbox sessions explicitly
 
-Studio discovers sandbox sessions from registered tools so it can inspect their files, ports, processes, and logs. It does not own or destroy those sessions.
+Studio inspects only sandbox inspectors supplied explicitly through `StudioOptions.sandboxes`. It does not own or destroy the underlying sessions.
 
 Keep creation and cleanup in the same entry point:
 
@@ -75,7 +75,11 @@ const sandbox = await client.createSandbox({
   workspace: { type: 'ephemeral' },
   network: { mode: 'none' },
 })
-const studio = new Studio()
+const studio = new Studio([], {
+  sandboxes: [{
+    inspector: sandbox.inspector({ files: true, ports: true, processes: true }),
+  }],
+})
 
 try {
   await studio.serve({

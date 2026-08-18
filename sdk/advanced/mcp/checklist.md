@@ -5,6 +5,11 @@ Review connection ownership, capability scope, data handling, and operations bef
 ## Connection and lifecycle
 
 - Keep credentials and endpoints server-side.
+- Keep Streamable HTTP SSRF protection strict unless the application deliberately owns and trusts a local or private-network endpoint.
+- Never let request data or model output select `ssrfProtection: 'disabled'`.
+- Configure static Streamable HTTP headers as a trusted string record; never forward an arbitrary caller-supplied header map.
+- Use either a static `Authorization` header or `authProvider`, never both.
+- Verify configured headers reach only the exact MCP endpoint and are absent from OAuth traffic.
 - Give every server a stable name.
 - Choose shared, tenant, request, or job connection scope deliberately.
 - Close shared connections during shutdown.
@@ -38,7 +43,7 @@ Review connection ownership, capability scope, data handling, and operations bef
 
 ## Boundary tests
 
-Verify that a newly listed unreviewed tool does not reach the agent, unauthorized callers cannot perform remote actions, private or oversized output is filtered, and `isError` results are mapped safely.
+Verify that a newly listed unreviewed tool does not reach the agent, unauthorized callers cannot perform remote actions, private or oversized output is filtered, and `isError` results are mapped safely. For a remote Streamable HTTP server, verify that loopback and private destinations remain blocked and endpoint redirects do not forward configured headers. For an intentional local opt-out, verify that the endpoint is fixed by trusted application configuration.
 
 Verify that short-lived servers close when the run throws and name collisions are caught by the application's review step.
 

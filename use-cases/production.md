@@ -15,7 +15,7 @@ if (!apiKey) {
 
 const client = new OpenAIClient({ apiKey })
 const model = client.completionModel({
-    modelId: 'gpt-5.5'
+    modelId: 'gpt-5.6-sol'
 })
 ```
 
@@ -83,8 +83,11 @@ const response = await agent.generate({
     maxTurns: 3
 })
 
-if (response.status === 'approval_required') {
-  return queueApproval(response.approval)
+if (response.status === 'suspended') {
+  return queueInteraction({
+    interaction: response.interaction,
+    continuation: response.continuation,
+  })
 }
 ```
 

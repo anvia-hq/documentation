@@ -4,6 +4,18 @@ An MCP server is an external capability source. Connecting does not make every l
 
 The application runtime owns transport credentials and connection scope. The agent factory owns which tools are exposed. Product services own user and tenant authorization. The MCP server owns remote validation. The public transport owns user-facing filtering.
 
+## Keep Streamable HTTP SSRF protection strict
+
+`McpClient` defaults `streamableHttp` connections to `ssrfProtection: 'strict'`. Keep that default for external or caller-influenced endpoints.
+
+Set `ssrfProtection: 'disabled'` only for an intentionally trusted local or private-network MCP server. The opt-out covers the entire connection path, including redirects and OAuth discovery, while still requiring an HTTP(S) URL. Do not expose this switch through a request body, tenant configuration, model-generated value, or other untrusted input. See [MCP transports](/sdk/advanced/mcp/transports#connect-to-a-trusted-local-or-private-server) for the complete example.
+
+## Scope static headers to the endpoint
+
+Supply fixed Streamable HTTP credentials through the explicit `headers: Record<string, string>` option. Anvia applies them only to the exact MCP endpoint, excludes them from OAuth traffic, and rejects endpoint redirects. It also prevents applications from overriding transport-owned protocol headers.
+
+Do not combine a static `Authorization` header with `authProvider`. Do not put user-controlled secrets, arbitrary `RequestInit`, or a caller-supplied header map into the built-in transport. See [Configure static endpoint headers](/sdk/advanced/mcp/transports#configure-static-endpoint-headers) for the complete contract.
+
 ## 1. Allow-list remote tools
 
 ```ts

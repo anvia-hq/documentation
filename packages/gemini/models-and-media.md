@@ -41,7 +41,7 @@ Both image adapters reduce requested dimensions into an aspect-ratio string. Use
 
 ```ts
 const transcript = await gemini.transcriptionModel({
-    modelId: 'gemini-2.5-flash'
+    modelId: 'gemini-3.6-flash'
 })
   .transcription({
     data: audioBytes,

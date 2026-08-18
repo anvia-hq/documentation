@@ -20,7 +20,7 @@ const gemini = new GeminiClient({
 })
 
 export const model = gemini.completionModel({
-    modelId: 'gemini-2.5-flash'
+    modelId: 'gemini-3.6-flash'
 })
 ```
 

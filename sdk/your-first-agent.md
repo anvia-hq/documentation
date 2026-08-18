@@ -20,7 +20,7 @@ if (!apiKey) {
 
 const client = new OpenAIClient({ apiKey })
 const model = client.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 
@@ -43,21 +43,20 @@ Tools, memory, context, guardrails, middleware, and observers can be added to th
 
 ## 2. Generate the first answer
 
-`generate()` starts a run and resolves when it completes or pauses for tool approval.
+`generate()` starts a run and resolves when it completes, is blocked, or suspends for an interaction.
 
 ```ts
 const response = await supportAgent.generate({
     prompt: 'What information do you need to investigate a failed checkout?'
 })
 
-if (response.status === 'approval_required') {
-  throw new Error(`Approval required for ${response.approval.toolName}`)
-}
+if (response.status === 'suspended') throw new Error(`Interaction required: ${response.interaction.type}`)
+if (response.status === 'blocked') throw new Error(`Blocked at ${response.stage}`)
 
 console.log(response.output)
 ```
 
-This agent has no approval-gated tools, so the expected status is `completed`. The check keeps the code correct when tools are added later.
+This agent has no guardrails or interaction-capable tools, so the expected status is `completed`. The checks keep the code correct when capabilities are added later.
 
 ## 3. Read the run result
 
@@ -109,7 +108,7 @@ for await (const event of supportAgent.stream({
 }
 ```
 
-The same stream may later include reasoning, tool calls, tool results, approval requests, turn boundaries, and errors.
+The same stream may later include reasoning, tool calls, tool results, interaction responses, turn boundaries, and errors.
 
 ## Choose the next capability
 

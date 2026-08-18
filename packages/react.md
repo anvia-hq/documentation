@@ -47,12 +47,14 @@ The hook converts local `UIMessage` values into core messages, sends a `ClientSt
 
 ## Key features
 
-- `useChat`: messages, events, send/regenerate/stop/reset, suggestions, usage, resume, approvals, and questions.
+- `useChat`: messages, events, send/regenerate/stop/reset, suggestions, usage, stream resume, and pending agent interactions.
 - `useCompletion`: prompt and accumulated completion state over a required client transport.
 - `useSmoothStreamText` and `useSmoothStreamItems`: display-only pacing for streamed text.
 - `createHttpClientTransport` and `createDirectClientTransport` from `@anvia/client`: HTTP and in-process protocol boundaries.
 
-`useChat({ resume: { key } })` stores a cursor and transcript cache in browser storage. The server must implement matching resumable client responses; the client option alone does not make a run durable.
+`useChat({ resume: { key } })` stores a version 3 cursor, transcript, interaction state, and last request in browser storage. The server must implement matching resumable client responses; the client option alone does not make a run durable.
+
+Use `chat.interactions.pending` to render approvals or structured questions, then call `chat.respondToInteraction({ interactionId, response })`. An interaction response is a new client-protocol request and starts a linked agent phase on the server.
 
 The hooks do not render Markdown, authenticate routes, authorize tool decisions, persist server conversations, or create resumable storage. Pair them with an authenticated `@anvia/server` route.
 

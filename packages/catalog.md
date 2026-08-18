@@ -7,8 +7,9 @@ All packages below are maintained in the Anvia monorepo. “First-party” descr
 | Package | Purpose | Reference |
 | --- | --- | --- |
 | `@anvia/core` | Agent, model, tool, memory, pipeline, evaluation, and streaming primitives | [Open](/packages/core) |
+| `@anvia/client` | Framework-neutral protocol v3, transports, UI messages, interactions, and stream state | [Open](/packages/client) |
 | `@anvia/server` | Server-side event stream and UI transport helpers | [Open](/packages/server) |
-| `@anvia/react` | React hooks and client transports | [Open](/packages/react) |
+| `@anvia/react` | React state hooks over `@anvia/client` transports | [Open](/packages/react) |
 | `@anvia/react-ui` | Composable React chat and completion components | [Open](/packages/react-ui) |
 
 ## Model providers
@@ -50,6 +51,12 @@ All packages below are maintained in the Anvia monorepo. “First-party” descr
 | `@anvia/redis` | Redis vector search | [Open](/packages/redis) |
 | `@anvia/weaviate` | Weaviate | [Open](/packages/weaviate) |
 
+## Knowledge graphs
+
+| Package | Backend | Reference |
+| --- | --- | --- |
+| `@anvia/neo4j` | Neo4j schema-first GraphRAG | [Open](/packages/neo4j) |
+
 ## Observability
 
 | Package | Purpose | Reference |
@@ -65,4 +72,4 @@ All packages below are maintained in the Anvia monorepo. “First-party” descr
 | --- | --- | --- |
 | `@anvia/studio` | Local UI and HTTP runtime for agents and pipelines | [Open](/packages/studio) |
 | `@anvia/sandbox` | Docker-backed workspaces and agent tools | [Open](/packages/sandbox) |
-
+| `@anvia/browser` | Visible Docker Chromium and semantic browser tools | [Open](/packages/browser) |

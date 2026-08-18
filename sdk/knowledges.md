@@ -80,6 +80,8 @@ The index uses the current prompt as its search query. Only matching documents a
 
 Use [automatic retrieval](/sdk/knowledges/automatic-retrieval) when knowledge is useful for most prompts. Use a [search tool](/sdk/knowledges/search-tools) when search is optional or the model may need to refine the query.
 
+Use [Neo4j GraphRAG](/sdk/knowledges/neo4j-graph-rag) when typed relationships and bounded traversal add evidence that independent document similarity cannot represent.
+
 Use static agent [context](/sdk/agents/context) for a small set of facts that should be present on every turn. Use an application [tool](/sdk/tools) for live records, permission checks, and actions.
 
 Continue through the ingestion flow:

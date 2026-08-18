@@ -15,7 +15,7 @@ if (!apiKey) throw new Error('Set OPENAI_API_KEY.')
 
 const model = new OpenAIClient({ apiKey })
     .completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 
@@ -35,8 +35,8 @@ const result = await reviewer.generate({
     prompt: 'Added streaming support and changed the retry defaults.'
 })
 
-if (result.status === 'approval_required') {
-  throw new Error(`Approval required for ${result.approval.toolName}`)
+if (result.status === 'suspended') {
+  throw new Error(`Agent suspended for ${result.interaction.type}`)
 }
 if (result.status === 'blocked') throw new Error(`Agent blocked at ${result.stage}`)
 
@@ -49,7 +49,7 @@ console.log(result.output)
 pnpm tsx first-agent.ts
 ```
 
-`Agent` snapshots stable configuration. `generate(input, options?)` creates and runs a fresh execution. Its result is either `completed` with final `output`, or `approval_required` when a guarded tool pauses the run.
+`Agent` snapshots stable configuration. `generate(input, options?)` creates and runs a fresh execution. Its result is `completed`, `blocked` by a guardrail, or `suspended` with a JSON-safe approval or question interaction.
 
 ## Stream the same agent
 

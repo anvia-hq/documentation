@@ -1,6 +1,6 @@
 # `@anvia/core`
 
-`@anvia/core` is Anvia's provider-neutral runtime. It owns agents, direct completions, typed tools, memory contracts, retrieval, pipelines, streaming events, guardrails, skills, MCP connections, evaluations, and the shared message types used by the rest of the SDK.
+`@anvia/core` is Anvia's provider-neutral runtime. It owns agents, direct completions, typed tools, resumable human interactions, document utilities, memory contracts, retrieval, pipelines, streaming events, guardrails, skills, MCP connections, evaluations, and the shared message types used by the rest of the SDK.
 
 Use it when application code should describe agent behavior without depending on one model provider. Provider packages such as `@anvia/openai`, `@anvia/anthropic`, and `@anvia/gemini` supply the runnable model objects.
 
@@ -22,7 +22,7 @@ import { z } from 'zod'
 const model = new OpenAIClient({
     apiKey: process.env.OPENAI_API_KEY!,
 }).completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 
@@ -61,12 +61,13 @@ The model, credentials, business data, permissions, storage, and deployment rema
 | --- | --- | --- |
 | Agents | `@anvia/core/agent` | Stateful model-and-tool loops with instructions and runtime policy |
 | Completions | `@anvia/core/completion` | Direct model requests, streaming, messages, and parsed results |
-| Tools | `@anvia/core/tool` | Typed tools, middleware, approvals, and dynamic discovery |
+| Tools | `@anvia/core/tool` | Typed tools, middleware, approvals, structured questions, and dynamic discovery |
+| Documents | `@anvia/core/documents` | Deterministic in-memory text chunking and scoped PDF text extraction |
 | Memory | `@anvia/core/memory` | Conversation persistence and compaction contracts |
 | Retrieval | `@anvia/core/embeddings`, `@anvia/core/vector-store` | Embedding documents and searching vector indexes |
 | Pipelines | `@anvia/core/pipeline` | Typed multi-stage workflows, batches, graphs, and run events |
 | Media | `@anvia/core/image-generation`, `@anvia/core/speech-generation`, `@anvia/core/transcription` | Provider-neutral media requests |
-| Runtime control | `@anvia/core/agent`, `@anvia/core/guardrails` | Lifecycle observation and enforced input/output policy |
+| Runtime control | `@anvia/core/agent`, `@anvia/core/guardrails` | Lifecycle observation, resumable interactions, and enforced input/output policy |
 | Integration | `@anvia/core/mcp`, `@anvia/core/skills`, `@anvia/core/observability` | External tools, reusable instructions, and run telemetry |
 | Evaluation | `@anvia/core/evals` | Typed evaluation suites, metrics, reporters, and CLI output |
 
@@ -107,6 +108,7 @@ Core's contracts are broadly portable, but not every entry point has the same en
 - [Install and setup](/sdk/install-and-setup)
 - [Your first agent](/sdk/your-first-agent)
 - [Agents](/sdk/agents)
+- [Interactions and continuations](/sdk/agents/interactions)
 - [Tools](/sdk/tools)
 - [Streaming](/sdk/streaming)
 - [Register agents in Studio](/studio/configure/register-agents-and-pipelines)

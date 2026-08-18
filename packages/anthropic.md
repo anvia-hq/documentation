@@ -28,7 +28,7 @@ const anthropic = new AnthropicClient({
 const agent = new Agent({
   id: 'assistant',
   model: anthropic.completionModel({
-      modelId: 'claude-sonnet-4-20250514'
+      modelId: 'claude-sonnet-5'
   }),
   instructions: 'Give direct, well-supported answers.',
 })

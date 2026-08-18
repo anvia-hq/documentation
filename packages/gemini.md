@@ -28,7 +28,7 @@ const gemini = new GeminiClient({
 const agent = new Agent({
   id: 'assistant',
   model: gemini.completionModel({
-      modelId: 'gemini-2.5-flash'
+      modelId: 'gemini-3.6-flash'
   }),
 })
 
@@ -67,7 +67,7 @@ const vertex = new GeminiClient({
 })
 
 const model = vertex.completionModel({
-    modelId: 'gemini-2.5-flash'
+    modelId: 'gemini-3.6-flash'
 })
 ```
 

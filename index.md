@@ -33,7 +33,7 @@ if (!apiKey) {
 
 const client = new OpenAIClient({ apiKey })
 const model = client.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 ```
@@ -59,16 +59,15 @@ The dependencies remain visible at construction time. Tools, memory, context, gu
 
 ## 4. Generate an answer
 
-`generate()` starts the agent loop and resolves when the run completes or pauses for tool approval. Checking the status keeps that pause explicit, even though this first agent has no tools yet.
+`generate()` starts the agent loop and resolves when the run completes, is blocked, or suspends for an approval or question. Checking the status keeps that boundary explicit, even though this first agent has no tools yet.
 
 ```ts
 const response = await supportAgent.generate({
     prompt: 'A customer cannot reset their password. What should I check first?'
 })
 
-if (response.status === 'approval_required') {
-  throw new Error('The run is waiting for tool approval')
-}
+if (response.status === 'suspended') throw new Error(`Interaction required: ${response.interaction.type}`)
+if (response.status === 'blocked') throw new Error(`Blocked at ${response.stage}`)
 
 console.log(response.output)
 ```

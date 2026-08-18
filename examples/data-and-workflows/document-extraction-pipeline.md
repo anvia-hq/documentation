@@ -131,7 +131,7 @@ const apiKey = process.env.OPENAI_API_KEY;
 if (!apiKey) throw new Error("Set OPENAI_API_KEY before running this example.");
 
 const openai = new OpenAIClient({ apiKey });
-const model = openai.completionModel({ modelId: "gpt-5.5", api: "responses" });
+const model = openai.completionModel({ modelId: "gpt-5.6-sol", api: "responses" });
 
 export const invoicePipeline = new Pipeline({
   id: "invoice-extraction",

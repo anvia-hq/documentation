@@ -44,6 +44,7 @@
 
   /* Code and media */
   --code-surface: #fbfcfa;
+  --code-border: #ecefeb;
   --code-hover: #f2f8f5;
   --code-text: #48504c;
   --code-gutter: #a6ada7;
@@ -122,6 +123,14 @@
   --ops-glow: transparent;
   --ops-invert: #c4c4c4;
   --ops-invert-text: #080808;
+  --ops-code-text: #b7c0ca;
+  --ops-syntax-keyword: #e6a15c;
+  --ops-syntax-type: #62c3b5;
+  --ops-syntax-function: #78aee8;
+  --ops-syntax-string: #9fbd73;
+  --ops-syntax-number: #bd93d8;
+  --ops-syntax-literal: #df7d68;
+  --ops-syntax-comment: #56606a;
   --ink: var(--ops-ink);
   --text-muted: var(--ops-muted);
   --text-subtle: var(--ops-muted);
@@ -144,10 +153,19 @@
   --shadow-accent: #262828;
   --shadow-strong: #000000;
   --code-surface: var(--ops-card);
+  --code-border: #202020;
   --code-hover: #141414;
-  --code-text: var(--ops-ink);
+  --code-text: var(--ops-code-text);
   --code-gutter: var(--ops-dim);
   --inline-code: var(--ops-card);
+  --syntax-comment: var(--ops-syntax-comment);
+  --syntax-string: var(--ops-syntax-string);
+  --syntax-keyword: var(--ops-syntax-keyword);
+  --syntax-literal: var(--ops-syntax-literal);
+  --syntax-number: var(--ops-syntax-number);
+  --syntax-function: var(--ops-syntax-function);
+  --syntax-type: var(--ops-syntax-type);
+  --syntax-operator: var(--ops-muted);
   --inverse-surface: var(--ops-invert);
   --inverse-text: var(--ops-invert-text);
   --image-matte: var(--ops-bg);
@@ -228,7 +246,12 @@ body {
   overflow: hidden;
   background: url('/anvia-wordmark.png') center / contain no-repeat;
   color: transparent;
+  filter: brightness(0) invert(1);
   white-space: nowrap;
+}
+
+.VPNavBarTitle .title img {
+  filter: brightness(0) invert(1);
 }
 
 .VPNavBar .divider {
@@ -249,10 +272,6 @@ body {
   border-bottom: 0 !important;
 }
 
-:root:not(.dark) .VPNavBarTitle .title span {
-  filter: invert(1);
-}
-
 .VPHomeHero .image-src {
   width: 220px;
   height: 220px;
@@ -264,10 +283,6 @@ body {
 
 .dark .VPButton.brand {
   color: var(--ops-invert-text) !important;
-}
-
-.dark .VPNavBarTitle .title span {
-  filter: brightness(0) invert(77%);
 }
 
 .VPSidebar .group + .group {
@@ -369,6 +384,12 @@ body {
   border-color: var(--vp-c-divider);
 }
 
+.vp-doc h2,
+.vp-doc hr {
+  border: 0;
+  border-top: 1px dashed var(--code-border);
+}
+
 .vp-doc table {
   display: table;
   width: 100%;
@@ -402,7 +423,7 @@ body {
 }
 
 .vp-doc [class*='language-'] {
-  border: 1px solid var(--strong-line);
+  border: 1px solid var(--code-border);
   background: var(--code-surface);
 }
 

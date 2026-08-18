@@ -4,6 +4,7 @@ The current source manifest is `@anvia/server` **1.0.0-rc.2**. The entries below
 
 | Version | Summary |
 | --- | --- |
+| `v1-rc3` source | Aligned framed client responses with protocol v3 so message requests and interaction-response requests can create linked agent stream phases while continuations remain server-owned. |
 | `1.0.0-rc.2` | Synchronized Server with the Anvia 1.0 release-candidate train. |
 | `0.7.5` | Updated the Core dependency to `0.26.0`. |
 | `0.7.4` | Updated the Core dependency to `0.25.1`. |
@@ -19,6 +20,7 @@ The current source manifest is `@anvia/server` **1.0.0-rc.2**. The entries below
 
 - Upgrade `@anvia/core` with Server when the changelog lists a dependency alignment.
 - Keep clients aligned with envelope and UI-event changes; resumable routes require a resume-aware React client.
+- Validate the discriminated `ClientStreamRequest` union and persist interaction continuations server-side; never return trusted continuations to the browser.
 - Re-test proxy buffering, content types, cancellation, and custom serializers after transport changes.
 - When adopting resume, add shared persistence before enabling it across multiple production replicas.
 

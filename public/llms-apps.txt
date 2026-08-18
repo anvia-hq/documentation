@@ -715,5 +715,5 @@ Both formats carry JSON event values with different framing:
 - [React UI components and theming](https://docs.anvia.dev/packages/react-ui/components-and-theming): Styling and composition guidance.
 - [Resumable streams](https://docs.anvia.dev/sdk/streaming/resumable-streams): End-to-end server and client resume protocol.
 - [Agents, tools, and MCP](https://docs.anvia.dev/llms-agents.txt): Server-side agent and tool construction.
-- [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt): Add permission-aware retrieval to the server agent.
+- [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt): Add permission-aware vector or Neo4j graph retrieval to the server agent.
 - [Evaluations and observability](https://docs.anvia.dev/llms-evals.txt): Trace and evaluate the delivered application.

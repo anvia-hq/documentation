@@ -20,7 +20,7 @@ const ticketSchema = z.object({
 
 const model = new OpenAIClient({ apiKey })
     .completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 

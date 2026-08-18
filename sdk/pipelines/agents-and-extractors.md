@@ -20,16 +20,16 @@ const supportSummary = new Pipeline({
   .agent({
     id: 'summarize',
     agent: summaryAgent,
-    approval: 'reject',
+    suspension: 'reject',
     request: ({ input }) => ({
       prompt: `Write a concise internal support summary:\n\n${input}`,
     }),
   })
 ```
 
-`.agent()` requires an explicit `request` mapper and returns the completed agent output. The stage rejects blocked runs and approval suspension.
+`.agent()` requires an explicit `request` mapper and returns the completed agent output. The stage requires `suspension: 'reject'` and rejects blocked or suspended child runs.
 
-Pipeline agent stages cannot pause for tool approval. If the agent returns `approval_required`, the pipeline cancels that agent run and rejects. Run approval-capable agents outside the pipeline when a person or policy engine must resume them.
+Pipeline agent stages cannot cross an interaction boundary. If the agent returns `suspended`, the pipeline cancels that child phase and rejects. Run interaction-capable agents outside the pipeline when a person or policy engine must continue them.
 
 ## 2. Add an extractor stage
 
@@ -52,7 +52,7 @@ const triagePipeline = new Pipeline({
   .agent({
     id: 'summarize',
     agent: summaryAgent,
-    approval: 'reject',
+    suspension: 'reject',
     request: ({ input }) => ({ prompt: input }),
   })
   .extract({

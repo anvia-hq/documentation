@@ -25,7 +25,7 @@ export const vertexGemini = new GeminiClient({
 })
 
 export const model = vertexGemini.completionModel({
-    modelId: 'gemini-2.5-flash'
+    modelId: 'gemini-3.6-flash'
 })
 ```
 
@@ -58,7 +58,7 @@ import type { CompletionModel } from '@anvia/core'
 
 export function createSupportModel(): CompletionModel {
   return vertexGemini.completionModel({
-      modelId: 'gemini-2.5-flash'
+      modelId: 'gemini-3.6-flash'
   })
 }
 ```

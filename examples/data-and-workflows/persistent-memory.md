@@ -91,7 +91,7 @@ export function createProjectAgent() {
   return new Agent({
     id: "project-assistant",
     model: openai.completionModel({
-        modelId: "gpt-5.5",
+        modelId: "gpt-5.6-sol",
         api: "responses"
     }),
     instructions: "Answer concisely. Use stored conversation facts when relevant.",
@@ -128,7 +128,7 @@ async function main(): Promise<void> {
     session,
   });
   if (response.status !== "completed") {
-    throw new Error(`Unexpected approval request for ${response.approval.toolName}`);
+    throw new Error(`Unexpected agent result: ${response.status}`);
   }
   console.log(response.output);
   if (command === "write") console.log("The completed turn is stored in SQLite.");

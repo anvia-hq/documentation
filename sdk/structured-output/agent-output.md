@@ -35,8 +35,8 @@ const response = await agent.generate({
     prompt: 'Resolve the customer billing question.'
 })
 
-if (response.status === 'approval_required') {
-  return handleApproval(response)
+if (response.status === 'suspended') {
+  return handleInteraction(response)
 }
 
 if (response.status === 'blocked') {

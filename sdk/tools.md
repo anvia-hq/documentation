@@ -111,7 +111,7 @@ const refundOrder = createTool({
 })
 ```
 
-When approval is required, `generate()` returns `status: 'approval_required'` before the handler runs. The application can approve or reject that specific continuation through `agent.resume()`.
+When approval is required, `generate()` returns `status: 'suspended'` before the handler runs. The application can approve or reject that specific interaction through `agent.generate({ continuation, response })`.
 
 ## Explore tools
 

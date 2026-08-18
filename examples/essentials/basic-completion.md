@@ -33,7 +33,7 @@ if (!apiKey) {
 
 const openai = new OpenAIClient({ apiKey })
 const model = openai.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-luna',
     api: "responses"
 })
 

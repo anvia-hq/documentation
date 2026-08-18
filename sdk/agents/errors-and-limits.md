@@ -69,15 +69,19 @@ let result = await supportAgent.generate({
     prompt: input.message
 })
 
-if (result.status === 'approval_required') {
-  result = await supportAgent.resume(result, {
-    approved: false,
-    reason: 'The operator rejected this action.',
+if (result.status === 'suspended' && result.interaction.type === 'tool-approval') {
+  result = await supportAgent.generate({
+    continuation: result.continuation,
+    response: {
+      type: 'tool-approval',
+      approved: false,
+      reason: 'The operator rejected this action.',
+    },
   })
 }
 ```
 
-The pending result contains the run ID, approval request, usage, and messages accumulated so far. Persist the information needed by the application before waiting for a human decision, and do not execute the protected action outside the runtime as a shortcut.
+The suspended result contains the run ID, interaction, continuation, usage, and messages accumulated so far. Persist the trusted continuation before waiting for a human decision, and do not execute the protected action outside the runtime as a shortcut.
 
 ## 4. Retry transient model failures
 

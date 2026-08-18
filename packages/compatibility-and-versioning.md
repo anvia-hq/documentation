@@ -35,6 +35,8 @@ Some adapters require a specific Node.js version, browser runtime, native depend
 - local embedding packages may download models or load native/WASM runtimes;
 - database and vector adapters require compatible client libraries and schemas;
 - `@anvia/sandbox` requires a supported Docker environment;
+- `@anvia/browser` requires Docker, a compatible browser image, and Playwright-compatible Chromium;
+- `@anvia/neo4j` requires Neo4j 2026.01 or newer and matching vector dimensions;
 - observability adapters require credentials and network access to their backend.
 
 ## Public API boundary

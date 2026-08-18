@@ -32,7 +32,7 @@ export function createSupportModel(
     })
 
     return client.completionModel({
-        modelId: 'claude-sonnet-4-20250514'
+        modelId: 'claude-sonnet-5'
     })
   }
 
@@ -41,7 +41,7 @@ export function createSupportModel(
   })
 
   return client.completionModel({
-      modelId: 'gpt-5.5',
+      modelId: 'gpt-5.6-sol',
       api: "responses"
   })
 }

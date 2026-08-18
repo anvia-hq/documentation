@@ -14,14 +14,13 @@ const chat = useChat({
   transport,
   initialMessages,
   resume: { key, storage, auto },
-  humanInput,
   suggestions,
   onEvent,
   onError,
 })
 ```
 
-`transport` is required and follows `ClientTransport<ClientStreamRequest, Data, Metadata>`.
+`transport` is required and follows `ClientTransport<ClientStreamRequest, Data, Metadata>`. Chat status is `'ready' | 'submitted' | 'streaming' | 'waiting' | 'error'`; `waiting` means a suspended interaction is awaiting a response.
 
 The result exposes readonly `messages`, `events`, `contextUsage`, `suggestions`, `status`, `error`, `text`, `streamId`, and `isResuming`, plus:
 
@@ -32,12 +31,16 @@ await chat.regenerate()
 chat.stop()
 chat.reset()
 await chat.resume()
-await chat.approveTool({ approvalId, reason })
-await chat.rejectTool({ approvalId, reason })
-await chat.answerToolQuestion({ questionId, answers })
+chat.interactions.all
+chat.interactions.pending
+chat.respondingInteractions
+await chat.respondToInteraction({
+  interactionId,
+  response: { type: 'tool-approval', approved: true },
+})
 ```
 
-Status is `'ready' | 'submitted' | 'streaming' | 'error'`.
+For a structured question, pass `{ type: 'tool-question', answers: [{ questionId, value }] }` as the response. The pending entry contains the complete `AgentInteractionRequest` under `request`.
 
 ## `useCompletion`
 

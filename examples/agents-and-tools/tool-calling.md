@@ -23,7 +23,7 @@ const agent = new Agent({
   model: new OpenAIClient({
       apiKey: process.env.OPENAI_API_KEY!,
   }).completionModel({
-      modelId: 'gpt-5.5',
+      modelId: 'gpt-5.6-sol',
       api: "responses"
   }),
   instructions: 'Use add for arithmetic, then explain the result briefly.',
@@ -35,8 +35,8 @@ const result = await agent.generate({
     prompt: 'What is 12 + 30? Use the add tool.'
 })
 
-if (result.status === 'approval_required') {
-  throw new Error(`Approval required for ${result.approval.toolName}`)
+if (result.status === 'suspended') {
+  throw new Error(`Agent suspended for ${result.interaction.type}`)
 }
 if (result.status === 'blocked') throw new Error(`Agent blocked at ${result.stage}`)
 

@@ -97,7 +97,7 @@ const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! });
 export const synthesizer = new Agent({
   id: "research-synthesizer",
   model: client.completionModel({
-      modelId: "gpt-5.5",
+      modelId: "gpt-5.6-sol",
       api: "responses"
   }),
   instructions: [

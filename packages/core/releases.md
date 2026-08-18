@@ -4,8 +4,9 @@ The current source manifest is `@anvia/core` **1.0.0-rc.2**. The source changelo
 
 | Version | Summary |
 | --- | --- |
-| `1.0.0-rc.2` | Prepared the synchronized Anvia 1.0 package train for its first public release candidate. |
-| `0.26.0` | Hardened MCP HTTP and SSE connections against SSRF, including DNS rebinding, redirects, and OAuth metadata requests; custom transport fetch implementations are rejected. |
+| `v1-rc3` source | Replaced one-shot approval results with typed suspended interactions and JSON-safe continuations; added structured question tools and app-owned document chunking/PDF extraction; added an explicit trusted-network SSRF opt-out and exact-endpoint static headers for Streamable HTTP; split agent and guardrail internals without changing their intended public boundaries. |
+| `1.0.0-rc.2` | Prepared the synchronized Anvia 1.0 package train and replaced legacy MCP connection factories with lifecycle-owning clients supporting `stdio`, `streamableHttp`, and `custom` transports. |
+| `0.26.0` | Hardened the legacy remote MCP connection layer against SSRF, including DNS rebinding, redirects, and OAuth metadata requests. |
 | `0.25.1` | Published updated upstream runtime dependencies. |
 | `0.25.0` | Expanded evaluation CLI handling, deterministic and abstention metrics, totals, score direction, usage/cost aggregation, negative controls, and richer typed suite/reporting contracts. |
 | `0.24.0` | Added evaluation run identity and lifecycle reporting for grouped Lens runs, comparisons, and quality gates. |
@@ -21,6 +22,10 @@ The current source manifest is `@anvia/core` **1.0.0-rc.2**. The source changelo
 - Read every minor-version entry crossed by the upgrade; pre-1.0 minor releases can contain meaningful contract changes.
 - If upgrading from before `0.19.0`, replace removed hook and middleware aliases before updating.
 - Upgrade provider, memory, vector, Server, and React packages together when their changelogs reference the new Core version.
+- Replace `approval_required` and `agent.resume()` handling with `status: 'suspended'`, the returned continuation, and `agent.generate({ continuation, response })` or `agent.stream(...)`.
+- Move file discovery and reads out of Core document helpers; pass text to `chunkText()` and PDF bytes plus an explicit page range to `extractPdfText()`.
+- Keep Streamable HTTP `ssrfProtection` at its default `'strict'`; use `'disabled'` only for a fixed, application-trusted local or private endpoint.
+- Replace Streamable HTTP `requestInit.headers` with the explicit `headers` string record. Do not attempt to override transport-owned protocol fields or combine static `Authorization` with `authProvider`.
 - Re-run type checking and tests for tool calls, streams, memory persistence, and custom observers after a Core upgrade.
 - Check whether new provider-neutral fields require adapter updates even when application code does not use them directly.
 

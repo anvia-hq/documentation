@@ -11,7 +11,7 @@ const openai = new OpenAIClient({
 })
 
 const model = openai.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 
@@ -21,6 +21,8 @@ export const supportAgent = new Agent({
   instructions: 'Answer support questions clearly and concisely.',
 })
 ```
+
+Use `gpt-5.6-sol` for complex professional work, coding, and agentic workflows. For cost-sensitive, high-volume completion workloads, create the same adapter with `modelId: 'gpt-5.6-luna'`.
 
 The returned model implements Anvia's streaming completion contract, so it can back `agent.generate()`, `agent.stream()`, and the direct completion helpers.
 

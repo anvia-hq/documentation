@@ -8,7 +8,7 @@ React UI exposes compound component families backed by context from `@anvia/reac
 | Composer | `Composer` | Rich or textarea input, attachments, drops, quotes, trigger entities, submit/stop |
 | Messages | `Message` | Text, Markdown, reasoning, tools, data, attachments, errors, actions |
 | Completion | `Completion` | Prompt form, input, output, submit, and stop |
-| Human input | `HumanInput` | Approval and structured-question collections and actions |
+| Human input | `HumanInput` | Pending interaction collections and approval/question response actions |
 | Attachments | `Attachment` | Name, preview, and removal |
 | Images | `Image` | Preview, copy, download, and zoom overlay |
 | Selection | `SelectionToolbar` | Quote and copy actions for message selections |
@@ -22,7 +22,7 @@ Most parts forward native element props and refs. Many support `asChild`, lettin
 
 ## Boundaries
 
-The package does not provide a complete visual theme, application navigation, server persistence, authentication, Markdown link policy, or tool authorization. Thread-list mutations call the controller supplied by the application. Human-input buttons call the `useChat` controller and do not decide whether the current user is allowed to resolve an approval.
+The package does not provide a complete visual theme, application navigation, server persistence, authentication, Markdown link policy, or tool authorization. Thread-list mutations call the controller supplied by the application. Human-input buttons call `useChat().respondToInteraction()` and do not decide whether the current user is allowed to resolve an interaction.
 
 The rich composer uses Tiptap and browser DOM behavior. Image zoom, selection tooling, attachments, and rich editing should run on the client in SSR applications.
 

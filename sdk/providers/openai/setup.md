@@ -59,7 +59,7 @@ A small model module keeps provider details out of agents and business logic:
 
 ```ts
 export const supportModel = openai.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: 'responses',
 })
 export const knowledgeEmbeddings = openai.embeddingModel({

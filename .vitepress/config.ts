@@ -1,4 +1,5 @@
 import { defineConfig, type HeadConfig } from 'vitepress'
+import { landingCodeTheme } from './theme/landing-code-theme'
 
 const docsChannel = process.env.DOCS_CHANNEL === 'rc' ? 'rc' : 'current'
 const isReleaseCandidate = docsChannel === 'rc'
@@ -22,6 +23,7 @@ function withDocsBase(path: string) {
 export default defineConfig({
   appearance: 'force-dark',
   base: docsBase,
+  outDir: isReleaseCandidate ? '.vitepress/dist/v1-rc' : '.vitepress/dist',
   title: 'Anvia',
   description: isReleaseCandidate
     ? 'Release-candidate documentation for Anvia Core v1'
@@ -34,6 +36,9 @@ export default defineConfig({
     ['meta', { name: 'theme-color', content: '#080808' }],
     ...channelHead
   ],
+  markdown: {
+    theme: landingCodeTheme
+  },
   vite: {
     define: {
       __DOCS_VERSION_CONFIG__: JSON.stringify({
@@ -113,6 +118,7 @@ export default defineConfig({
                 { text: 'Instructions', link: '/sdk/agents/instructions' },
                 { text: 'Context', link: '/sdk/agents/context' },
                 { text: 'Per-run controls', link: '/sdk/agents/per-run-controls' },
+                { text: 'Interactions and continuations', link: '/sdk/agents/interactions' },
                 { text: 'Runtime lifecycle', link: '/sdk/agents/runtime-lifecycle' },
                 { text: 'Errors and limits', link: '/sdk/agents/errors-and-limits' }
               ]
@@ -166,7 +172,8 @@ export default defineConfig({
                 { text: 'Vector stores', link: '/sdk/knowledges/vector-stores' },
                 { text: 'Metadata filters', link: '/sdk/knowledges/metadata-filters' },
                 { text: 'Automatic retrieval', link: '/sdk/knowledges/automatic-retrieval' },
-                { text: 'Search tools', link: '/sdk/knowledges/search-tools' }
+                { text: 'Search tools', link: '/sdk/knowledges/search-tools' },
+                { text: 'Neo4j GraphRAG', link: '/sdk/knowledges/neo4j-graph-rag' }
               ]
             },
             {
@@ -258,7 +265,7 @@ export default defineConfig({
               items: [
                 { text: 'Overview', link: '/sdk/advanced/mcp' },
                 { text: 'Connect a server', link: '/sdk/advanced/mcp/connect' },
-                { text: 'HTTP and SSE', link: '/sdk/advanced/mcp/transports' },
+                { text: 'stdio and HTTP', link: '/sdk/advanced/mcp/transports' },
                 { text: 'Result mapping', link: '/sdk/advanced/mcp/results' },
                 { text: 'Trust boundaries', link: '/sdk/advanced/mcp/security' },
                 { text: 'Local tools', link: '/sdk/advanced/mcp/local-tools' },
@@ -348,6 +355,10 @@ export default defineConfig({
                 { text: 'Limits and security', link: '/sdk/advanced/sandbox/security' },
                 { text: 'Production checklist', link: '/sdk/advanced/sandbox/checklist' }
               ]
+            },
+            {
+              text: 'Visible browser agents',
+              link: '/sdk/advanced/browser'
             }
           ]
         },
@@ -478,7 +489,8 @@ export default defineConfig({
             { text: 'Metadata filters', link: '/examples/knowledge-and-data/metadata-filters' },
             { text: 'Postgres memory', link: '/examples/knowledge-and-data/persistent-memory' },
             { text: 'Multi-tenant memory', link: '/examples/knowledge-and-data/multi-tenant-memory' },
-            { text: 'Vector stores', link: '/examples/knowledge-and-data/vector-store-adapters' }
+            { text: 'Vector stores', link: '/examples/knowledge-and-data/vector-store-adapters' },
+            { text: 'Neo4j GraphRAG', link: '/examples/knowledge-and-data/neo4j-graph-rag' }
           ]
         },
         {
@@ -595,6 +607,7 @@ export default defineConfig({
             },
             { text: 'Memory', link: '/studio/memory' },
             { text: 'Sandboxes', link: '/studio/sandboxes' },
+            { text: 'Browser desktop', link: '/studio/browser' },
             { text: 'Runtime status', link: '/studio/runtime-status' }
           ]
         },
@@ -763,6 +776,17 @@ export default defineConfig({
                 { text: 'Patterns', link: '/packages/core/patterns' },
                 { text: 'API', link: '/packages/core/api-reference' },
                 { text: 'Releases', link: '/packages/core/releases' }
+              ]
+            },
+            {
+              text: '@anvia/client',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/client' },
+                { text: 'Get started', link: '/packages/client/get-started' },
+                { text: 'Protocol and state', link: '/packages/client/protocol-and-state' },
+                { text: 'API', link: '/packages/client/api-reference' },
+                { text: 'Releases', link: '/packages/client/releases' }
               ]
             },
             {
@@ -1095,6 +1119,23 @@ export default defineConfig({
           ]
         },
         {
+          text: 'Knowledge graphs',
+          items: [
+            {
+              text: '@anvia/neo4j',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/neo4j' },
+                { text: 'Get started', link: '/packages/neo4j/get-started' },
+                { text: 'Capabilities', link: '/packages/neo4j/capabilities' },
+                { text: 'Production', link: '/packages/neo4j/production' },
+                { text: 'API', link: '/packages/neo4j/api-reference' },
+                { text: 'Releases', link: '/packages/neo4j/releases' }
+              ]
+            }
+          ]
+        },
+        {
           text: 'Observability',
           items: [
             {
@@ -1182,6 +1223,18 @@ export default defineConfig({
                 { text: 'Security', link: '/packages/sandbox/security' },
                 { text: 'API', link: '/packages/sandbox/api-reference' },
                 { text: 'Releases', link: '/packages/sandbox/releases' }
+              ]
+            },
+            {
+              text: '@anvia/browser',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/browser' },
+                { text: 'Get started', link: '/packages/browser/get-started' },
+                { text: 'Capabilities', link: '/packages/browser/capabilities' },
+                { text: 'Security', link: '/packages/browser/security' },
+                { text: 'API', link: '/packages/browser/api-reference' },
+                { text: 'Releases', link: '/packages/browser/releases' }
               ]
             }
           ]

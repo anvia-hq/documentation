@@ -44,7 +44,7 @@ const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! });
 const agent = new Agent({
   id: "support",
   model: openai.completionModel({
-      modelId: "gpt-5.5",
+      modelId: "gpt-5.6-sol",
       api: "responses"
   }),
   instructions: "Answer with verified support policy only.",

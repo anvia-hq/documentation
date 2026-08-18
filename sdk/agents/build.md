@@ -17,7 +17,7 @@ if (!apiKey) {
 
 const client = new OpenAIClient({ apiKey })
 const model = client.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 ```
@@ -54,16 +54,15 @@ const result = await supportAgent.generate({
     prompt: 'A customer cannot reset their password. What should I verify first?'
 })
 
-if (result.status === 'approval_required') {
-  throw new Error(`Approval required for ${result.approval.toolName}`)
-}
+if (result.status === 'suspended') throw new Error(`Interaction required: ${result.interaction.type}`)
+if (result.status === 'blocked') throw new Error(`Blocked at ${result.stage}`)
 
 console.log(result.output)
 console.log(result.runId)
 console.log(result.usage.totalTokens)
 ```
 
-The status check is important even before tools are added. `generate()` returns an `approval_required` result when a configured tool suspends the run for a human decision.
+The status checks remain important as capabilities are added. `generate()` can return a `suspended` result when a configured tool needs approval or a structured human answer.
 
 ## 4. Stream the same agent
 
@@ -82,8 +81,8 @@ for await (const event of supportAgent.stream({
     console.log(event.result.runId, event.result.usage)
   }
 
-  if (event.type === 'approval_required') {
-    console.log('Approval required:', event.approval)
+  if (event.type === 'final' && event.result.status === 'suspended') {
+    console.log('Interaction required:', event.result.interaction)
   }
 }
 ```

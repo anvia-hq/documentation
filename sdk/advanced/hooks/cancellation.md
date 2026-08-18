@@ -65,10 +65,14 @@ const pending = await agent.generate({
     prompt: message
 })
 
-if (pending.status === 'approval_required') {
-  const result = await agent.resume(pending, {
-    approved: false,
-    reason: 'The reviewer rejected this operation.',
+if (pending.status === 'suspended' && pending.interaction.type === 'tool-approval') {
+  const result = await agent.generate({
+    continuation: pending.continuation,
+    response: {
+      type: 'tool-approval',
+      approved: false,
+      reason: 'The reviewer rejected this operation.',
+    },
   })
 }
 ```

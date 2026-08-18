@@ -4,6 +4,7 @@ The current source manifest is `@anvia/studio` **1.0.0-rc.2**. The entries below
 
 | Version | Summary |
 | --- | --- |
+| `v1-rc3` source | Adopted linked interaction phases and continuation storage, replaced automatic sandbox discovery with explicit inspectors, and added authorized noVNC browser views with coordinated human-control leases. |
 | `1.0.0-rc.2` | Synchronized Studio with the Anvia 1.0 release-candidate train. |
 | `0.7.54` | Updated React, Server, and React UI dependencies for Core `0.26.0` compatibility. |
 | `0.7.53` | Published updated upstream runtime dependencies. |
@@ -25,6 +26,6 @@ The current source manifest is `@anvia/studio` **1.0.0-rc.2**. The entries below
 - Back up local SQLite files before a version change when their data matters.
 - Re-test custom stores against current public store contracts.
 - Review route and UI-option behavior when embedding Studio in another server.
-- Re-test tool approvals, cancellation, model policy, and custom client scripts.
+- Re-test approval and question interactions, linked phase history, cancellation, model policy, sandbox registrations, browser-view authorization, and custom client scripts.
 
 Read the complete [Studio changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/tool-studio/CHANGELOG.md).

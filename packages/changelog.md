@@ -5,6 +5,7 @@ Every published Anvia package keeps its release history beside its implementatio
 ## Core runtime
 
 - [`@anvia/core`](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/core/CHANGELOG.md)
+- [`@anvia/client`](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/client/CHANGELOG.md)
 - [`@anvia/server`](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/server/CHANGELOG.md)
 - [`@anvia/react`](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/react/CHANGELOG.md)
 - [`@anvia/react-ui`](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/react-ui/CHANGELOG.md)
@@ -43,7 +44,11 @@ Every published Anvia package keeps its release history beside its implementatio
 - [`@anvia/studio`](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/tool-studio/CHANGELOG.md)
 - [`@anvia/sandbox`](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/tool-sandbox/CHANGELOG.md)
 
+New RC3 packages do not have a generated package changelog until the synchronized release commit. Use their release pages and changesets:
+
+- [`@anvia/browser`](/packages/browser/releases)
+- [`@anvia/neo4j`](/packages/neo4j/releases)
+
 ## Upgrade workflow
 
 Read the changelog for each directly installed Anvia package and any adapter whose peer dependency changes. Then follow the [upgrade checklist](/packages/compatibility-and-versioning#upgrade-checklist).
-

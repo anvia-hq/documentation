@@ -71,4 +71,4 @@ Jobs, scripts, tests, and request-scoped connections should close in `finally`. 
 
 Do not reconnect and list tools for every message unless credentials or remote visibility are intentionally request-scoped.
 
-Next, choose an [HTTP or SSE transport](/sdk/advanced/mcp/transports).
+Next, choose a [stdio, streamable HTTP, or custom transport](/sdk/advanced/mcp/transports).

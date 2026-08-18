@@ -14,7 +14,7 @@ import { OpenAIClient } from '@anvia/openai'
 
 const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! })
 const model = client.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 
@@ -31,18 +31,20 @@ The model handles provider communication. The agent options define behavior shar
 
 ## 2. Run the agent
 
-`generate()` starts the model-and-tool loop and resolves when the run completes or pauses for approval:
+`generate()` starts the model-and-tool loop and resolves when the run completes, is blocked, or suspends for an interaction:
 
 ```ts
 const result = await supportAgent.generate({
     prompt: 'What should I check when a customer cannot reset their password?'
 })
 
-if (result.status === 'approval_required') {
-  console.log(result.approval)
-} else {
+if (result.status === 'completed') {
   console.log(result.output)
   console.log(result.usage)
+} else if (result.status === 'suspended') {
+  console.log(result.interaction)
+} else {
+  console.log('Blocked at', result.stage)
 }
 ```
 
@@ -56,7 +58,7 @@ For each run, Anvia can:
 2. apply input guardrails;
 3. retrieve relevant context and tool definitions;
 4. send a normalized request to the model;
-5. execute requested local tools or pause for approval;
+5. execute requested local tools or suspend for approval or a structured question;
 6. add tool results to the transcript and call the model again; and
 7. apply output guardrails, save memory, and return the final result.
 
@@ -69,6 +71,7 @@ The application still owns authentication, authorization, services, persistence 
 - [Instructions](/sdk/agents/instructions) defines durable model behavior.
 - [Context](/sdk/agents/context) covers static documents, retrieval, sessions, and trace metadata.
 - [Per-run controls](/sdk/agents/per-run-controls) configures one `generate()` or `stream()` call.
+- [Interactions and continuations](/sdk/agents/interactions) handles approvals, questions, and linked resumed phases.
 - [Runtime lifecycle](/sdk/agents/runtime-lifecycle) explains turns, tools, memory, and events.
 - [Errors and limits](/sdk/agents/errors-and-limits) bounds runs and maps failures safely.
 

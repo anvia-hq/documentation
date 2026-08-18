@@ -28,7 +28,7 @@ const openai = new OpenAIClient({
 const agent = new Agent({
   id: 'assistant',
   model: openai.completionModel({
-      modelId: 'gpt-5.5',
+      modelId: 'gpt-5.6-sol',
       api: "responses"
   }),
   instructions: 'Answer clearly and concisely.',
@@ -78,7 +78,7 @@ const model = compatible.completionModel({
 
 ```ts
 const completion = openai.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: 'responses',
 })
 const embeddings = openai.embeddingModel({
@@ -86,7 +86,7 @@ const embeddings = openai.embeddingModel({
     dimensions: 1536,
     maxBatchSize: 64
 })
-const images = openai.imageGenerationModel({ modelId: 'gpt-image-1' })
+const images = openai.imageGenerationModel({ modelId: 'gpt-image-2' })
 ```
 
 Create the provider client once at the server boundary. Keep credentials there, inject the returned model contracts, and keep fallback policy and tenant routing in application code.

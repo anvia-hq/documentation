@@ -72,7 +72,7 @@ Use Chat only when the workflow specifically requires that API and does not depe
 ### Generate an image
 
 ```ts
-const image = await grok.imageGenerationModel({ modelId: 'grok-imagine-image' }).imageGeneration({
+const image = await grok.imageGenerationModel({ modelId: 'grok-imagine-image-quality' }).imageGeneration({
   prompt: 'A robot sketching a distributed system on glass',
   width: 1024,
   height: 1024,

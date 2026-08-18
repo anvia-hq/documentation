@@ -16,7 +16,7 @@ No. Schemas validate model-facing input and output shapes. The handler must stil
 
 ## Does approval replace authorization?
 
-No. Approval answers whether this proposed action may continue. It does not prove identity, grant database access, make a command safe, or undo an action that already happened. When a run returns `approval_required`, persist that pending result only for the lifetime and process supported by your application, collect an authorized decision, and continue it with `agent.resume(pending, decision)`.
+No. Approval answers whether this proposed action may continue. It does not prove identity, grant database access, make a command safe, or undo an action that already happened. When a run returns `suspended`, keep its continuation on the trusted server, collect an authorized matching response, and continue through `agent.generate({ continuation, response })`.
 
 Use [Studio approvals](/studio/playground/approvals-and-questions) to exercise the flow locally.
 

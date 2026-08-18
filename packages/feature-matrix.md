@@ -7,6 +7,7 @@ Use this matrix to find the package family that owns a capability. A check means
 | Package | Agents and models | Streaming transport | React hooks | UI components |
 | --- | :---: | :---: | :---: | :---: |
 | `@anvia/core` | ✓ | — | — | — |
+| `@anvia/client` | — | Protocol/client | — | — |
 | `@anvia/server` | — | ✓ | — | — |
 | `@anvia/react` | — | Client | ✓ | — |
 | `@anvia/react-ui` | — | Client | — | ✓ |
@@ -27,12 +28,13 @@ Provider-specific support for images, audio, transcription, OCR, tools, reasonin
 
 ## Persistence and retrieval
 
-| Family | Session memory | Vector retrieval | Caller-managed service |
-| --- | :---: | :---: | :---: |
-| `@anvia/memory-*` | ✓ | — | Depends on adapter |
-| `@anvia/chroma`, `@anvia/lancedb`, `@anvia/milvus` | — | ✓ | Depends on adapter |
-| `@anvia/pgvector`, `@anvia/pinecone`, `@anvia/qdrant` | — | ✓ | ✓ |
-| `@anvia/redis`, `@anvia/weaviate` | — | ✓ | ✓ |
+| Family | Session memory | Vector retrieval | Graph traversal | Caller-managed service |
+| --- | :---: | :---: | :---: | :---: |
+| `@anvia/memory-*` | ✓ | — | — | Depends on adapter |
+| `@anvia/chroma`, `@anvia/lancedb`, `@anvia/milvus` | — | ✓ | — | Depends on adapter |
+| `@anvia/pgvector`, `@anvia/pinecone`, `@anvia/qdrant` | — | ✓ | — | ✓ |
+| `@anvia/redis`, `@anvia/weaviate` | — | ✓ | — | ✓ |
+| `@anvia/neo4j` | — | ✓ | ✓ | ✓ |
 
 ## Observability
 
@@ -45,8 +47,8 @@ Provider-specific support for images, audio, transcription, OCR, tools, reasonin
 
 ## Development
 
-| Package | Inspect agents | Run pipelines | Isolated commands | Persistent workspace |
-| --- | :---: | :---: | :---: | :---: |
-| `@anvia/studio` | ✓ | ✓ | Through sandbox adapters | — |
-| `@anvia/sandbox` | — | — | ✓ | Optional |
-
+| Package | Inspect agents | Run pipelines | Isolated commands | Visible browser | Persistent workspace |
+| --- | :---: | :---: | :---: | :---: | :---: |
+| `@anvia/studio` | ✓ | ✓ | Through sandbox adapters | Viewer | — |
+| `@anvia/sandbox` | — | — | ✓ | Infrastructure | Optional |
+| `@anvia/browser` | — | — | — | ✓ | Optional profile volume |

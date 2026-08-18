@@ -58,7 +58,7 @@ An MCP connection does not grant product authorization. Keep credentials server-
 ## 3. Continue through the section
 
 - [Connect and own a server](/sdk/advanced/mcp/connect)
-- [Use HTTP and SSE transports](/sdk/advanced/mcp/transports)
+- [Choose stdio or streamable HTTP](/sdk/advanced/mcp/transports)
 - [Understand result mapping](/sdk/advanced/mcp/results)
 - [Enforce trust boundaries](/sdk/advanced/mcp/security)
 - [Combine MCP and local tools](/sdk/advanced/mcp/local-tools)

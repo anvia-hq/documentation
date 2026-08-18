@@ -7,7 +7,7 @@ ClientStreamRequest
    ↓ ClientTransport
 ClientStreamFrame / ClientStreamEvent
    ↓ applyClientStreamEvent
-UIMessage[] + status + usage + human input
+UIMessage[] + status + usage + interactions
 ```
 
 `events` retains protocol events for the current request. `messages` is reduced UI state; `text` and `completion` are derived convenience values.
@@ -27,6 +27,10 @@ const chat = useChat({
 })
 ```
 
-The hook stores v2 state containing `streamId`, the latest event ID, and messages. A matching `resumeClientStreamResponse()` route replays later records. Terminal streams clear resume state.
+The hook stores v3 state containing `streamId`, the latest event ID, messages, interactions, and the last typed request. A matching `resumeClientStreamResponse()` route replays later records. Terminal streams clear resume state.
+
+## Interaction phases
+
+When an agent suspends, the hook enters `waiting` and adds the request to `chat.interactions.pending`. Calling `respondToInteraction()` sends a discriminated `interaction_response` request. The application server resolves that ID to its trusted continuation and begins a linked stream phase; the continuation itself never belongs in browser state.
 
 Smoothing hooks only buffer displayed values. They do not change source messages, events, or persistence.

@@ -13,6 +13,9 @@ import { supportAgent } from './support-agent'
 
 export async function POST(request: Request) {
   const body = parseClientStreamRequest(await request.json())
+  if (body.type !== 'messages') {
+    return new Response('Interaction responses are not enabled', { status: 400 })
+  }
 
   return createClientStreamResponse({
     events: agentToClientStream({

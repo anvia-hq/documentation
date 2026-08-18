@@ -31,7 +31,7 @@ if (!apiKey) {
 
 const client = new OpenAIClient({ apiKey })
 const model = client.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 ```
@@ -75,16 +75,15 @@ const supportAgent = new Agent({
 
 ## 5. Generate an answer
 
-`generate()` runs the agent until it completes or pauses for tool approval. The result status makes that boundary explicit.
+`generate()` runs the agent until it completes, is blocked, or suspends for an interaction. The result status makes that boundary explicit.
 
 ```ts
 const response = await supportAgent.generate({
     prompt: 'Explain what the Anvia runtime owns.'
 })
 
-if (response.status === 'approval_required') {
-  throw new Error(`Approval required for ${response.approval.toolName}`)
-}
+if (response.status === 'suspended') throw new Error(`Interaction required: ${response.interaction.type}`)
+if (response.status === 'blocked') throw new Error(`Blocked at ${response.stage}`)
 
 console.log(response.output)
 console.log(response.usage)
@@ -111,7 +110,7 @@ for await (const event of supportAgent.stream({
 }
 ```
 
-Agent streams can also include reasoning deltas, tool calls, tool results, turn boundaries, approval requests, final run metadata, and errors.
+Agent streams can also include reasoning deltas, tool calls, tool results, turn boundaries, interaction responses, final run metadata, and errors.
 
 ## Next
 

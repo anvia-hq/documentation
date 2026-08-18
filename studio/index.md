@@ -21,7 +21,7 @@ Studio discovers capabilities from the agents and pipelines you register. The br
 | Pipelines | Read a pipeline graph, run it, inspect logs, and replay saved input. |
 | Knowledge | Inspect registered context, dynamic tools, and retrieval evidence. |
 | Memory | Explore users, conversations, messages, and recorded run steps. |
-| MCPs and sandboxes | Inspect connected MCP tools and active sandbox resources. |
+| MCPs and sandboxes | Inspect connected MCP tools, active sandbox resources, and registered browser desktops. |
 | Status | Check registered targets, storage adapters, and enabled capabilities. |
 
 These are not mocked representations. Playground runs call the registered agent, tool execution uses the registered tool, and pipeline runs use the registered pipeline.

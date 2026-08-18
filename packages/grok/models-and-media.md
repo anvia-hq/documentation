@@ -17,10 +17,12 @@ const chat = new GrokClient({ apiKey }).completionModel({
 
 Choose Responses for provider tools and native source normalization. Choose Chat only for workflows that require that endpoint and do not use provider-executed tools.
 
+`grok-4.5` is the current xAI model ID for coding, agentic tasks, and knowledge work. It supports both Responses and Chat Completions; the v1 RC examples prefer Responses for web search, X search, code execution, and other provider tools.
+
 ## Image generation
 
 ```ts
-const result = await grok.imageGenerationModel({ modelId: 'grok-imagine-image' }).imageGeneration({
+const result = await grok.imageGenerationModel({ modelId: 'grok-imagine-image-quality' }).imageGeneration({
   prompt: 'A robot reviewing a pull request in a glass office',
   width: 1024,
   height: 1024,

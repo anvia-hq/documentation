@@ -5,10 +5,10 @@
   "scripts": {
     "dev": "pnpm docs:dev",
     "docs:dev": "node scripts/docs-dev.mjs",
-    "docs:dev:current": "DOCS_CHANNEL=current DOCS_RC_DEV_PROXY=http://127.0.0.1:5174 vitepress dev --port 5173 --strictPort",
+    "docs:dev:current": "node scripts/docs-dev-current.mjs",
     "docs:dev:rc": "DOCS_CHANNEL=rc vitepress dev --port 5174 --strictPort",
-    "docs:build": "pnpm docs:build:current",
-    "docs:build:current": "DOCS_CHANNEL=current vitepress build",
+    "docs:build": "node scripts/docs-build.mjs",
+    "docs:build:current": "node scripts/docs-build.mjs --current-only",
     "docs:build:rc": "DOCS_CHANNEL=rc vitepress build",
     "docs:preview": "pnpm docs:preview:current",
     "docs:preview:current": "DOCS_CHANNEL=current vitepress preview",

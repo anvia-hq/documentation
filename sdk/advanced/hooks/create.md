@@ -18,8 +18,12 @@ const supportLifecycle: AgentLifecycle = {
   },
 
   async onFinish(event) {
-    if (event.status !== 'completed') {
+    if (event.status === 'blocked') {
       await runs.blocked({ runId: event.runId, stage: event.stage })
+      return
+    }
+    if (event.status === 'suspended') {
+      await runs.suspended({ runId: event.runId, interaction: event.interaction })
       return
     }
     await runs.completed({

@@ -81,7 +81,7 @@ const finding = z.object({
 });
 const report = z.object({ title: z.string(), findings: z.array(finding) });
 const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! });
-const model = client.completionModel({ modelId: "gpt-5.5", api: "responses" });
+const model = client.completionModel({ modelId: "gpt-5.6-sol", api: "responses" });
 
 export const analysis = new Pipeline({
   id: "document-analysis",

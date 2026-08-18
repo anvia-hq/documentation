@@ -22,7 +22,7 @@ import { OpenAIClient } from '@anvia/openai'
 
 const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! })
 const model = client.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 if (!model.capabilities.imageInput) throw new Error('Selected model has no image input.')

@@ -25,7 +25,7 @@ const client = new OpenAIClient({
 })
 
 const model = client.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 
@@ -56,6 +56,9 @@ export async function POST(request: Request) {
   }
 
   const body = parseClientStreamRequest(await request.json())
+  if (body.type !== 'messages') {
+    return new Response('Interaction responses are not enabled', { status: 400 })
+  }
 
   return createClientStreamResponse({
     events: agentToClientStream({

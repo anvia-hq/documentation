@@ -19,7 +19,7 @@ const anthropic = new AnthropicClient({
 const agent = new Agent({
   id: 'analyst',
   model: anthropic.completionModel({
-      modelId: 'claude-sonnet-4-20250514'
+      modelId: 'claude-sonnet-5'
   }),
   instructions: 'Analyze the evidence before answering.',
 })

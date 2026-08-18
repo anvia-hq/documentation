@@ -43,7 +43,7 @@ Learn [tool calling](/examples/agents-and-tools/tool-calling), then add [permiss
 
 ### Knowledge and data
 
-Start with [basic RAG](/examples/knowledge-and-data/basic-rag), enforce access with [permission-aware retrieval](/examples/knowledge-and-data/permission-aware-rag), and build ingestion with [document loading](/examples/knowledge-and-data/document-ingestion) and [metadata filters](/examples/knowledge-and-data/metadata-filters). For stateful systems, compare [persistent memory](/examples/knowledge-and-data/persistent-memory) with [multi-tenant memory](/examples/knowledge-and-data/multi-tenant-memory), then choose a [vector-store adapter](/examples/knowledge-and-data/vector-store-adapters).
+Start with [basic RAG](/examples/knowledge-and-data/basic-rag), enforce access with [permission-aware retrieval](/examples/knowledge-and-data/permission-aware-rag), and build ingestion with [document loading](/examples/knowledge-and-data/document-ingestion) and [metadata filters](/examples/knowledge-and-data/metadata-filters). Use [Neo4j GraphRAG](/examples/knowledge-and-data/neo4j-graph-rag) when bounded relationships materially improve retrieval. For stateful systems, compare [persistent memory](/examples/knowledge-and-data/persistent-memory) with [multi-tenant memory](/examples/knowledge-and-data/multi-tenant-memory), then choose a [vector-store adapter](/examples/knowledge-and-data/vector-store-adapters).
 
 ### Workflows
 

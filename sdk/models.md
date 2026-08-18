@@ -31,13 +31,13 @@ if (!apiKey) {
 const openai = new OpenAIClient({ apiKey })
 
 const completionModel = openai.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 const embeddingModel = openai.embeddingModel({
     modelId: 'text-embedding-3-small'
 })
-const imageModel = openai.imageGenerationModel({ modelId: 'gpt-image-1' })
+const imageModel = openai.imageGenerationModel({ modelId: 'gpt-image-2' })
 const audioModel = openai.speechGenerationModel({ modelId: 'tts-1' })
 const transcriptionModel = openai.transcriptionModel({ modelId: 'whisper-1' })
 ```

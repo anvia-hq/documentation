@@ -75,8 +75,11 @@ At least one inspector capability must be enabled. File inspection requires both
 | **File preview** | UTF-8 text and common image formats, plus a download action. |
 | **Published ports** | Container port and protocol mapped to the provider's host and host port. |
 | **Managed processes** | Command, arguments, state, and bounded stdout and stderr. |
+| **Registered views** | Authorized noVNC desktop views such as an `@anvia/browser` Chromium session. |
 
 Studio previews recognized text and image files up to 1 MiB. Other binary files and larger previews are downloads. The runtime refuses file responses larger than 10 MiB, requires relative paths, rejects traversal, disables caching, and bounds process-log reads.
+
+Register browser desktops through the sandbox registration's `views` array. See [Browser desktop](/studio/browser) for automatic Playground display and human-control leases.
 
 ## Inspector actions versus agent tools
 

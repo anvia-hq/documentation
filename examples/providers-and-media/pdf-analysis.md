@@ -23,7 +23,7 @@ import { OpenAIClient } from '@anvia/openai'
 
 const model = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! })
     .completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 if (!model.capabilities.documentInput) throw new Error('Selected model has no document input.')

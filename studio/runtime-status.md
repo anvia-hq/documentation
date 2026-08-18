@@ -1,6 +1,6 @@
 # Runtime status
 
-Studio's Status page summarizes what the current Studio process has registered and which development surfaces it can expose. Use it to verify wiring—targets, stores, sandbox discovery, and feature availability—without digging through the process at runtime.
+Studio's Status page summarizes what the current Studio process has registered and which development surfaces it can expose. Use it to verify wiring—targets, stores, explicit sandbox registrations, and feature availability—without digging through the process at runtime.
 
 Open `http://localhost:4021/status` in the browser console. To read the raw JSON instead, request the same path with an API client; the browser console itself fetches `GET /status` and renders that payload.
 
@@ -53,7 +53,7 @@ The SQLite adapter implements all four interfaces. The status payload reports it
 
 ## Understand the counters
 
-`agents` and `pipelines` are exact counts of the targets registered in this process. `sandboxes`, when present, is the number of live session objects Studio discovered through sandbox-tool metadata.
+`agents` and `pipelines` are exact counts of the targets registered in this process. `sandboxes`, when present, is the number of inspectors supplied through `StudioOptions.sandboxes`.
 
 Stored record counters are lightweight summaries rather than database totals:
 
@@ -78,8 +78,8 @@ Capabilities reflect current registration and adapter availability:
 | `evals` | At least one evaluation suite is registered. |
 | `tools` | An agent has static or dynamic tools. |
 | `mcps` | An agent has a tool carrying MCP server provenance. |
-| `sandboxes` | Studio discovers at least one sandbox session from registered tools. |
-| `approvals` | An agent has at least one tool with `requiresApproval`. |
+| `sandboxes` | At least one sandbox inspector is explicitly registered. |
+| `interactions` | An agent has an approval-capable tool or a question tool. |
 | `knowledge` | An agent has static context, dynamic context, or dynamic tools. |
 
 The map contains discovered, enabled capabilities. A missing entry usually means the required target or adapter was not registered; it does not necessarily indicate an error.

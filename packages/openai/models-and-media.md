@@ -15,7 +15,7 @@ import {
 const openai = new OpenAIClient({ apiKey })
 
 const completion = openai.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 const embeddings = openai.embeddingModel({

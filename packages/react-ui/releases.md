@@ -4,6 +4,7 @@ The current source manifest is `@anvia/react-ui` **1.0.0-rc.2**. The entries bel
 
 | Version | Summary |
 | --- | --- |
+| `v1-rc3` source | Aligned human-input collections and actions with the unified pending-interaction controller exposed by `@anvia/react`. |
 | `1.0.0-rc.2` | Synchronized the package with the Anvia 1.0 release-candidate train. |
 | `0.7.1` | Published updated upstream runtime dependencies. |
 | `0.7.0` | Added the `ContextMeter` and model-aware active context usage display. |

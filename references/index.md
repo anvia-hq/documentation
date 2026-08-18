@@ -29,10 +29,10 @@ Pass only the options required by the agent. Construction returns a ready-to-use
 
 ## Agent execution
 
-- `agent.generate({ prompt | messages, ...runOptions })` returns a completed, blocked, or approval-required result.
+- `agent.generate({ prompt | messages, ...runOptions })` returns a completed, blocked, or suspended result.
 - `agent.generate({ prompt, maxTurns: n })` overrides the turn limit for one run.
 - `agent.stream({ prompt | messages, ...runOptions })` yields runtime events.
-- `agent.resume(pending, decision)` continues an approval-required run.
+- `agent.generate({ continuation, response })` starts a linked phase after an approval or question.
 - `agent.generate({ prompt, session: { sessionId, userId? } })` runs with persisted memory.
 
 ## Agent stream events
@@ -46,7 +46,8 @@ Pass only the options required by the agent. Construction returns a ready-to-use
 | `tool_result` | The application returned a tool result. |
 | `turn_end` | A model turn completed. |
 | `agent_tool_event` | A nested agent emitted an event while running as a tool. |
-| `final` | Completed output, usage, messages, run id, and trace metadata. |
+| `interaction_response` | A linked phase accepted an approval or question response. |
+| `final` | Completed, blocked, or suspended result with usage, messages, and run metadata. |
 | `error` | The active run failed. |
 
 ## Server stream
@@ -58,7 +59,7 @@ createClientStreamResponse({
 })
 ```
 
-JSONL is the default. React clients send `{ messages, metadata?, resume? }` through a `ClientTransport`.
+JSONL is the default. React clients send either a `messages` request or an `interaction_response` request through a `ClientTransport`.
 
 ## External reference
 

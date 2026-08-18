@@ -75,7 +75,7 @@ const native = new OpenAI({
 const anvia = new OpenAIClient({ client: native })
 
 const agentModel = anvia.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 const nativeFile = await native.files.create({

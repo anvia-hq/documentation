@@ -12,12 +12,13 @@ If you are choosing between adapters, use the [feature matrix](/packages/feature
 
 | Family | Use it for | Start here |
 | --- | --- | --- |
-| Core runtime | Agents, completions, streaming, server transports, and React clients | [`@anvia/core`](/packages/core) |
+| Core runtime | Agents, protocol clients, streaming server responses, and React state/UI | [`@anvia/core`](/packages/core) |
 | Model providers | Completion, embedding, image, audio, transcription, and OCR models | [`@anvia/openai`](/packages/openai) |
 | Memory | Durable agent sessions and message history | [`@anvia/memory-sqlite`](/packages/memory-sqlite) |
 | Vector stores | Retrieval indexes for embedded documents | [`@anvia/pgvector`](/packages/pgvector) |
+| Knowledge graphs | Typed GraphRAG extraction, traversal, and evidence | [`@anvia/neo4j`](/packages/neo4j) |
 | Observability | Logs, traces, evaluations, datasets, and prompts | [`@anvia/otel`](/packages/otel) |
-| Development tools | Local inspection and isolated execution | [`@anvia/studio`](/packages/studio) |
+| Development tools | Local inspection, isolated execution, and visible browsing | [`@anvia/studio`](/packages/studio) |
 
 ## Guides versus package reference
 
@@ -28,4 +29,3 @@ Use the guide first when learning a concept. Use Packages when selecting an adap
 ## Public API policy
 
 API-reference pages cover public exports from the package manifest and published entry points. Files that are not exported by a package are implementation details and are intentionally excluded, even when they exist in the repository.
-

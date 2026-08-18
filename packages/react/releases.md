@@ -4,6 +4,7 @@ The current source manifest is `@anvia/react` **1.0.0-rc.2**. The entries below 
 
 | Version | Summary |
 | --- | --- |
+| `v1-rc3` source | Adopted client protocol v3, persisted interaction-aware resume state, added `waiting` status, and replaced separate approval/question methods with `interactions` plus `respondToInteraction()`. |
 | `1.0.0-rc.2` | Synchronized React with the Anvia 1.0 release-candidate train. |
 | `0.11.5` | Updated the Core dependency to `0.26.0`. |
 | `0.11.4` | Updated the Core dependency to `0.25.1`. |
@@ -21,6 +22,7 @@ The current source manifest is `@anvia/react` **1.0.0-rc.2**. The entries below 
 ## Upgrade checks
 
 - Align `@anvia/core`, `@anvia/server`, and `@anvia/react-ui` when adopting protocol changes.
+- Replace `approveTool()`, `rejectTool()`, and `answerToolQuestion()` calls with `respondToInteraction({ interactionId, response })`.
 - Re-test custom event mappers whenever Core adds a stream event type.
 - Verify stop behavior for custom transports; they must honor `AbortSignal`.
 - When enabling resume, test reload, reconnect, terminal cleanup, and expired/missing server state.

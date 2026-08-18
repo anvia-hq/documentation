@@ -16,7 +16,7 @@ const supportNotes = new Pipeline({
 }).agent({
   id: 'ask-support-agent',
   agent: supportAgent,
-  approval: 'reject',
+  suspension: 'reject',
   request: ({ input }) => ({ prompt: input }),
 });
 const engineeringNotes = new Pipeline({
@@ -28,7 +28,7 @@ const engineeringNotes = new Pipeline({
 }).agent({
   id: 'ask-engineering-agent',
   agent: engineeringAgent,
-  approval: 'reject',
+  suspension: 'reject',
   request: ({ input }) => ({ prompt: input }),
 });
 
@@ -56,7 +56,7 @@ const incidentBrief = new Pipeline({
 }).agent({
   id: 'ask-synthesizer',
   agent: synthesizerAgent,
-  approval: 'reject',
+  suspension: 'reject',
   request: ({ input }) => ({ prompt: input }),
 });
 

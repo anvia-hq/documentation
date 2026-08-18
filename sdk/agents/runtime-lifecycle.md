@@ -64,10 +64,9 @@ const lifecycle = {
     console.log('tool finished', event.toolName, event.success)
   },
   onFinish(event) {
-    console.log(
-      'run finished',
-      event.status === 'completed' ? event.output : `blocked at ${event.stage}`,
-    )
+    if (event.status === 'completed') console.log('run completed', event.output)
+    if (event.status === 'blocked') console.log('run blocked', event.stage)
+    if (event.status === 'suspended') console.log('run suspended', event.interaction.type)
   },
   onError({ error }) {
     console.error('run failed', error)
@@ -93,9 +92,9 @@ Use observers for tracing and telemetry integrations. Lifecycle callbacks are ap
 - `text_delta`, `reasoning_delta`, and optional `tool_call_delta`;
 - `tool_call`, `tool_result`, and nested `agent_tool_event`;
 - `source`, `provider_tool_call`, and `guardrail_decision`;
-- `turn_end`, `approval_required`, `final`, and `error`.
+- `turn_end`, `interaction_response`, `final`, and `error`.
 
-A stream segment ends when approval is required. Resume the exact event with `agent.resume(event, decision)` to receive the next stream segment. Closing an active stream early cancels the run, finalizes memory and observers, and prevents silent work from continuing in the background.
+A stream segment ends with a `final` event whose result is `suspended` when approval or a structured answer is required. Start the next phase with `agent.stream({ continuation, response })`. Closing an active stream early cancels that phase, finalizes memory and observers, and prevents silent work from continuing in the background.
 
 Filter events before sending them to a client because reasoning, tool inputs, tool results, retrieved context, and provider metadata may contain private data.
 

@@ -16,5 +16,6 @@ Use advanced capabilities when an agent needs runtime control, specialized coord
 | [Parallel and batch](/sdk/advanced/parallel-and-batch) | Concurrent branches, batches, and workers. |
 | [Multimodal](/sdk/advanced/multimodal) | Image, audio, transcription, and OCR. |
 | [Sandbox execution](/sdk/advanced/sandbox) | Isolated file and command execution. |
+| [Visible browser agents](/sdk/advanced/browser) | Semantic Chromium tools, desktop viewing, and human takeover. |
 
 Each section starts with the public v1 contract, then builds toward production boundaries and failure handling.

@@ -1,6 +1,6 @@
 # Approvals and questions
 
-Studio can pause an agent run when a tool needs authorization or missing human context. The request appears inline in the Playground transcript, and the same run resumes after the operator responds.
+Studio can suspend an agent phase when a tool needs authorization or missing human context. The request appears inline in the Playground transcript, and the operator response starts a new linked phase from the server-held continuation.
 
 Use the two controls for different decisions:
 
@@ -46,55 +46,25 @@ Selecting **Reject** resumes the agent with a denied result and records the oper
 
 ## Ask the operator a question
 
-Studio recognizes a tool named `ask_question` as its human-question boundary. Give the tool a structured schema so the model can ask one or more questions in a single call:
+Create a first-class question tool so the model can request one or more structured answers in a single interaction:
 
 ```ts
-import { createTool } from '@anvia/core/tool'
-import { z } from 'zod'
+import { createQuestionTool } from '@anvia/core/tool'
 
-const choiceSchema = z.object({
-  label: z.string(),
-  value: z.string(),
-})
-
-const askQuestion = createTool({
+const askQuestion = createQuestionTool({
   name: 'ask_question',
-  description: 'Ask the operator follow-up questions. Always include choices.',
-  inputSchema: z.object({
-    questions: z.array(
-      z.object({
-        id: z.string(),
-        question: z.string(),
-        choices: z.array(choiceSchema).min(1),
-      }),
-    ),
-  }),
-  outputSchema: z.object({
-    answers: z.array(
-      z.object({
-        questionId: z.string(),
-        answer: z.string(),
-        choice: z.string().optional(),
-        custom: z.boolean().optional(),
-      }),
-    ),
-  }),
-  execute: ({ questions }) => ({
-    answers: questions.map((question) => ({
-      questionId: question.id,
-      answer: 'No human answer was provided by this runtime.',
-    })),
-  }),
+  description: 'Ask the operator for missing details before continuing.',
 })
 ```
 
-The `execute` function is a fallback for runtimes that do not provide Studio’s interaction layer. During a Studio agent run, Studio intercepts `ask_question`, displays the questions in the Playground, waits for the operator, and returns the submitted answers to the agent instead of calling this fallback.
+Question tools do not have an ordinary execution fallback. Core suspends with a `tool-question` interaction, Studio displays it, and the submitted answers enter the next linked agent phase as a tool response.
 
 Each question must include:
 
 - a stable, non-empty `id`;
-- non-empty question text;
-- at least one `{ label, value }` choice.
+- non-empty `text`;
+- optional `{ label, value }` choices; and
+- optional `allowCustom` when declared choices should also accept free text.
 
 The operator may select a declared choice or enter a custom answer. For multiple questions, Studio presents them in sequence and enables submission only after every question has an answer.
 
@@ -124,7 +94,7 @@ new Studio([agent], {
 }).start()
 ```
 
-Allow enough turns for the question response and the follow-up action. Human answers resume the existing tool call; they do not start a new Playground message.
+Allow enough turns for the question response and follow-up action. Human answers continue the suspended tool call in a linked phase; they do not create a new user chat message.
 
 ## Cancellation and failure behavior
 

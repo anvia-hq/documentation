@@ -15,7 +15,7 @@ if (!apiKey) throw new Error('Set OPENAI_API_KEY.')
 
 const model = new OpenAIClient({ apiKey })
     .completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-luna',
     api: "responses"
 })
 

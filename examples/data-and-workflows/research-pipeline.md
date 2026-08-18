@@ -97,7 +97,7 @@ const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! });
 const synthesizer = new Agent({
     id: "research-synthesizer",
     model: openai.completionModel({
-        modelId: "gpt-5.5"
+        modelId: "gpt-5.6-sol"
     }),
     instructions: [
         "Use only the supplied evidence.",

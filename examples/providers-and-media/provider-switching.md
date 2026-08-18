@@ -10,7 +10,7 @@ experiments—not unbounded fallback after a side effect.
 
 ## Prerequisites
 
-- `pnpm add @anvia/core @anvia/openai @anvia/anthropic @anvia/gemini @anvia/mistral`
+- `pnpm add @anvia/core @anvia/openai @anvia/anthropic @anvia/gemini @anvia/grok @anvia/mistral`
 - Credentials only for providers enabled by deployment configuration
 - A live contract suite for every selected model
 
@@ -21,6 +21,7 @@ import { AnthropicClient } from '@anvia/anthropic'
 import { Agent } from '@anvia/core/agent'
 import type { StreamingCompletionModel } from '@anvia/core/completion'
 import { GeminiClient } from '@anvia/gemini'
+import { GrokClient } from '@anvia/grok'
 import { MistralClient } from '@anvia/mistral'
 import { OpenAIClient } from '@anvia/openai'
 
@@ -28,13 +29,20 @@ function completionModel(provider: string): StreamingCompletionModel {
   if (provider === 'anthropic') {
     return new AnthropicClient({ apiKey: process.env.ANTHROPIC_API_KEY! })
         .completionModel({
-        modelId: process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-20250514'
+        modelId: process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-5'
     })
   }
   if (provider === 'gemini') {
     return new GeminiClient({ apiKey: process.env.GEMINI_API_KEY! })
         .completionModel({
-        modelId: process.env.GEMINI_MODEL ?? 'gemini-2.5-flash'
+        modelId: process.env.GEMINI_MODEL ?? 'gemini-3.6-flash'
+    })
+  }
+  if (provider === 'grok') {
+    return new GrokClient({ apiKey: process.env.XAI_API_KEY! })
+        .completionModel({
+        modelId: process.env.GROK_MODEL ?? 'grok-4.5',
+        api: 'responses'
     })
   }
   if (provider === 'mistral') {
@@ -46,7 +54,7 @@ function completionModel(provider: string): StreamingCompletionModel {
   if (provider === 'openai') {
     return new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! })
         .completionModel({
-        modelId: process.env.OPENAI_MODEL ?? 'gpt-5.5',
+        modelId: process.env.OPENAI_MODEL ?? 'gpt-5.6-luna',
         api: "responses"
     })
   }
@@ -90,6 +98,7 @@ the exact account and model, compare normalized usage and quality, and keep roll
 Compare the runnable [OpenAI](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/01_basics/01-text-call.ts),
 [Anthropic](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/11-anthropic-text-call.ts),
 [Gemini](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/01-gemini-text-call.ts),
+[Grok](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/13-grok-live-search.ts),
 and [Mistral](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/02-mistral-text-call.ts)
 examples. Next, build a provider conformance test and an offline quality evaluation.
 

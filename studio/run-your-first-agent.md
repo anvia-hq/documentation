@@ -23,7 +23,7 @@ const client = new OpenAIClient({
 const supportAgent = new Agent({
   id: 'support',
   model: client.completionModel({
-      modelId: 'gpt-5.5',
+      modelId: 'gpt-5.6-sol',
       api: "responses"
   }),
   name: 'Support',

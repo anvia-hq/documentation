@@ -11,7 +11,7 @@ import { OpenAIClient } from '@anvia/openai'
 
 const client = new OpenAIClient({ apiKey })
 const model = client.completionModel({
-    modelId: 'gpt-5.5',
+    modelId: 'gpt-5.6-sol',
     api: "responses"
 })
 ```
@@ -125,7 +125,7 @@ Use retrieval indexes for large or frequently changing knowledge collections so 
 
 ## Streams are the application boundary
 
-Agent streams expose structured events such as `turn_start`, `text_delta`, `reasoning_delta`, `tool_call`, `tool_result`, `turn_end`, `approval_required`, `final`, and `error`.
+Agent streams expose structured events such as `turn_start`, `text_delta`, `reasoning_delta`, `tool_call`, `tool_result`, `turn_end`, `interaction_response`, `final`, and `error`.
 
 ```ts
 for await (const event of agent.stream({

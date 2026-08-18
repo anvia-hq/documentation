@@ -1,10 +1,10 @@
 # Anvia RAG, Knowledge, and Retrieval
 
-> Curated implementation context for document ingestion, embeddings, vector stores, metadata filtering, automatic retrieval, search tools, permission-aware RAG, and related memory patterns in Anvia.
+> Curated implementation context for document ingestion, embeddings, vector stores, Neo4j GraphRAG, metadata filtering, automatic retrieval, search tools, permission-aware RAG, and related memory patterns in Anvia.
 
 Anvia calls its retrieval layer “knowledge.” It connects agents to relevant source material without placing the entire corpus in every prompt. RAG is the common use case, but the same primitives support search, source-aware assistance, dynamic context, and large tool catalogs.
 
-This guide is optimized for coding agents. Prefer the linked documentation for adapter-specific configuration and complete APIs. Updated 2026-08-13.
+This guide is optimized for coding agents. Prefer the linked documentation for adapter-specific configuration and complete APIs. Updated 2026-08-17.
 
 ## Core Mental Model
 
@@ -24,6 +24,7 @@ Choose the narrowest mechanism:
 - `index.asTool(...)`: retrieval is optional or the model may refine the query across turns.
 - Application tools: live account data, permissions, transactions, and actions.
 - `.dynamicTools(...)`: retrieve model-facing tool definitions from a large capability catalog.
+- Neo4j GraphRAG: retrieve semantic seeds, traverse typed relationships, and return provenance-linked evidence when connected facts matter.
 - Memory: durable conversation history, not a factual corpus or retrieval index.
 
 Retrieval is read-only evidence. Do not use a vector index as an operational database or an authorization system.
@@ -45,6 +46,12 @@ pnpm add @anvia/core @anvia/qdrant @qdrant/js-client-rest
 ```
 
 Other supported vector-store packages include `@anvia/pgvector`, `@anvia/pinecone`, `@anvia/chroma`, `@anvia/lancedb`, `@anvia/milvus`, `@anvia/redis`, and `@anvia/weaviate`.
+
+For a schema-first knowledge graph backed by Neo4j 2026.01 or newer:
+
+```sh
+pnpm add @anvia/core @anvia/neo4j zod
+```
 
 ## Load Documents
 
@@ -372,6 +379,159 @@ const results = await index.search({
 
 Hybrid `prefetchLimit` controls candidates contributed by each branch; final `topK` controls returned logical results. Tune retrieval and thresholds on evaluation data because dense, sparse, and fused scores have different meanings.
 
+## Neo4j GraphRAG
+
+Use `@anvia/neo4j` when an answer depends on explicit relationships as well as semantically similar passages—for example, incidents affecting products, people owning services, or controls governing resources. Use a normal vector store when independent chunks are sufficient; a graph adds schema, ingestion, traversal, and operational cost.
+
+The GraphRAG path is:
+
+```text
+application-owned documents and chunks
+→ schema-valid entity, relationship, and mention extraction
+→ chunk and entity embeddings
+→ transactional document replacement in Neo4j
+→ vector or hybrid seed search
+→ bounded typed traversal
+→ optional provenance-linked chunk evidence
+```
+
+Define the domain before extraction. Node and relationship property schemas use strict Zod objects so identity, validation, comparison, and storage stay deterministic:
+
+```ts
+import {
+  defineNeo4jGraphSchema,
+  Neo4jClient,
+} from '@anvia/neo4j'
+import { z } from 'zod'
+
+const schema = defineNeo4jGraphSchema({
+  nodes: {
+    Product: {
+      description: 'A product or customer-facing service.',
+      identity: ['id'],
+      properties: z.strictObject({
+        id: z.string(),
+        name: z.string(),
+      }),
+    },
+    Incident: {
+      description: 'An operational incident.',
+      identity: ['id'],
+      properties: z.strictObject({
+        id: z.string(),
+        title: z.string(),
+      }),
+    },
+  },
+  relationships: {
+    AFFECTS: {
+      description: 'An incident affects a product.',
+      from: 'Incident',
+      to: 'Product',
+      properties: z.strictObject({
+        severity: z.enum(['low', 'medium', 'high']),
+      }),
+    },
+  },
+})
+
+await using neo4j = new Neo4jClient({
+  uri: process.env.NEO4J_URI!,
+  auth: {
+    username: process.env.NEO4J_USERNAME!,
+    password: process.env.NEO4J_PASSWORD!,
+  },
+})
+```
+
+Choose one ownership mode:
+
+- `managedKnowledgeGraph(...)` provisions Anvia labels, constraints, vector indexes, and optional full-text indexes. It owns document replacement/deletion and can hydrate stored chunk evidence.
+- `knowledgeGraph(...)` validates caller-owned indexes and performs read-only retrieval against an existing graph. The application owns provisioning and writes; retrieval must use `evidence: { type: 'none' }`.
+
+Keep model work and database writes separate. `extractGraphFacts(...)` performs model calls but no Neo4j writes. Embed application-owned chunks and canonical entity text, then pass the normalized facts to one deterministic replacement transaction:
+
+```ts
+import { embedDocuments } from '@anvia/core/embeddings'
+import { extractGraphFacts } from '@anvia/neo4j'
+
+const facts = await extractGraphFacts({
+  model: extractionModel,
+  schema,
+  chunks,
+  retries: { maxAttempts: 2 },
+  concurrency: 4,
+})
+
+const [embeddedChunks, embeddedEntities] = await Promise.all([
+  embedDocuments({
+    model: embeddingModel,
+    documents: chunks,
+    id: (chunk) => chunk.id,
+    content: (chunk) => chunk.text,
+  }),
+  embedDocuments({
+    model: embeddingModel,
+    documents: [...facts.output.entities],
+    id: (entity) => entity.key,
+    content: (entity) => formatEntityForEmbedding(entity),
+  }),
+])
+
+await graph.replaceDocuments({
+  documents,
+  chunks: embeddedChunks.documents,
+  entities: embeddedEntities.documents,
+  relationships: facts.output.relationships,
+  mentions: facts.output.mentions,
+  conflict: 'error',
+  orphanEntities: 'delete',
+})
+```
+
+Stable document, chunk, entity, and relationship identities make re-ingestion meaningful. Replacing one document removes its previous chunks and provenance while retaining facts still supported by other documents.
+
+Expose retrieval to an agent with explicit search, traversal, and evidence limits:
+
+```ts
+import { Agent } from '@anvia/core/agent'
+import { createNeo4jGraphSearchTool } from '@anvia/neo4j'
+
+const searchGraph = createNeo4jGraphSearchTool({
+  name: 'search_incident_graph',
+  description: 'Search incidents, affected products, and supporting evidence.',
+  graph,
+  model: embeddingModel,
+  search: {
+    type: 'hybrid',
+    seeds: ['chunks', 'entities'],
+    topK: 6,
+    candidatesPerSeed: 12,
+    rrfK: 60,
+  },
+  traversal: {
+    relationships: ['AFFECTS'],
+    direction: 'both',
+    maxDepth: 2,
+    maxNodes: 24,
+    maxRelationships: 36,
+  },
+  evidence: { type: 'chunks', maxChunks: 8 },
+})
+
+const agent = new Agent({
+  id: 'incident-assistant',
+  model: completionModel,
+  instructions: 'Use the graph tool before answering incident questions.',
+  tools: [searchGraph],
+  maxTurns: 3,
+})
+```
+
+Vector search ranks seed chunks and/or entities. Hybrid search combines vector and full-text candidates with reciprocal-rank fusion. Traversal follows only the declared relationship types, direction, depth, node limit, and relationship limit.
+
+Graph retrieval does not replace authorization or a transactional source of truth. Scope graph credentials and data by environment or tenant as required, validate evidence eligibility before public output, cap every search and traversal dimension, and evaluate entity/relationship identity plus evidence—not only final model prose.
+
 ## Memory Is Not RAG
 
 Memory stores provider-neutral conversation messages so a stable session can continue later:
@@ -696,6 +856,9 @@ See [Full-stack applications](https://docs.anvia.dev/llms-apps.txt) to expose a 
 - [Metadata filters](https://docs.anvia.dev/sdk/knowledges/metadata-filters): Eligibility and permission boundaries.
 - [Automatic retrieval](https://docs.anvia.dev/sdk/knowledges/automatic-retrieval): Dynamic context on every turn.
 - [Search tools](https://docs.anvia.dev/sdk/knowledges/search-tools): Model-directed retrieval.
+- [Neo4j GraphRAG](https://docs.anvia.dev/sdk/knowledges/neo4j-graph-rag): Schema-first extraction, transactional replacement, bounded traversal, and evidence.
+- [`@anvia/neo4j`](https://docs.anvia.dev/packages/neo4j): Managed and existing graph registration, retrieval, and production boundaries.
+- [Neo4j GraphRAG example](https://docs.anvia.dev/examples/knowledge-and-data/neo4j-graph-rag): Incident-to-product relationship retrieval.
 - [Dynamic context](https://docs.anvia.dev/sdk/advanced/dynamic-context): Formatting, filters, and multiple indexes.
 - [Vector-store adapters](https://docs.anvia.dev/examples/knowledge-and-data/vector-store-adapters): Backend selection and production qualification.
 - [Permission-aware RAG](https://docs.anvia.dev/examples/knowledge-and-data/permission-aware-rag): Authenticated filter construction and security tests.

@@ -45,7 +45,8 @@ Studio reads the registered configuration and enables relevant surfaces automati
 | MCP-backed tools | MCP server and tool inspection. |
 | Pipelines | Graph, runs, logs, history, and replay. |
 | Agent memory or Studio sessions | Memory and session inspection. |
-| Active sandbox-backed tools | Read-only sandbox inspection. |
+| Explicit sandbox inspectors | Read-only files, ports, and process inspection. |
+| Registered sandbox views | Authorized browser desktops and human-control leases. |
 
 Studio keeps every navigation item accessible so developers can discover the available inspection
 surfaces. A page whose capability is not configured shows an empty or unavailable state instead of
