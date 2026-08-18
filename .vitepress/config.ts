@@ -29,7 +29,14 @@ export default defineConfig({
     ? 'Release-candidate documentation for Anvia Core v1'
     : 'Documentation for Anvia Core v0.x',
   head: [
-    ['link', { rel: 'icon', href: `${docsBase}logo.svg` }],
+    [
+      'link',
+      { rel: 'icon', type: 'image/svg+xml', href: `${docsBase}favicon-light.svg`, media: '(prefers-color-scheme: light)' }
+    ],
+    [
+      'link',
+      { rel: 'icon', type: 'image/svg+xml', href: `${docsBase}favicon-dark.svg`, media: '(prefers-color-scheme: dark)' }
+    ],
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
     ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap' }],

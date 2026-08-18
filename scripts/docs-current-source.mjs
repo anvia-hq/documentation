@@ -30,9 +30,30 @@ export async function prepareCurrentDocsSource() {
     join(sourceDir, '.vitepress/theme'),
     { recursive: true, force: true }
   )
+  await Promise.all([
+    cp(
+      resolve(projectDir, 'public/favicon-light.svg'),
+      join(sourceDir, 'public/favicon-light.svg'),
+      { force: true }
+    ),
+    cp(
+      resolve(projectDir, 'public/favicon-dark.svg'),
+      join(sourceDir, 'public/favicon-dark.svg'),
+      { force: true }
+    )
+  ])
 
   const configPath = join(sourceDir, '.vitepress/config.ts')
   let config = await readFile(configPath, 'utf8')
+  const originalConfig = config
+
+  config = config.replace(
+    "    ['link', { rel: 'icon', href: `${docsBase}logo.svg` }],",
+    [
+      "    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${docsBase}favicon-light.svg`, media: '(prefers-color-scheme: light)' }],",
+      "    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${docsBase}favicon-dark.svg`, media: '(prefers-color-scheme: dark)' }],"
+    ].join('\n')
+  )
 
   if (!config.includes("./theme/landing-code-theme")) {
     config = config.replace(
@@ -43,6 +64,9 @@ export async function prepareCurrentDocsSource() {
       '  vite: {',
       '  markdown: {\n    theme: landingCodeTheme\n  },\n  vite: {'
     )
+  }
+
+  if (config !== originalConfig) {
     await writeFile(configPath, config)
   }
 

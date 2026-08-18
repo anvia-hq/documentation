@@ -10,7 +10,7 @@ const currentUrl = __DOCS_VERSION_CONFIG__.currentUrl
     aria-label="Release candidate documentation notice"
   >
     <span>You’re viewing Anvia Core v1 release-candidate documentation.</span>
-    <a :href="currentUrl">View the current v0.x docs</a>
+    <a :href="currentUrl" target="_self">View the current v0.x docs</a>
   </aside>
 </template>
 
