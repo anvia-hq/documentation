@@ -85,7 +85,7 @@ The shown values are illustrative. Read the actual object at runtime and smoke t
 
 ## Provider support differs
 
-The v1 RC currently includes these media and data adapters:
+Anvia v1 currently includes these media and data adapters:
 
 - OpenAI: completions, embeddings, image generation, speech, and transcription.
 - Gemini: completions, embeddings, image generation, and transcription.

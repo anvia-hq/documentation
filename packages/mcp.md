@@ -8,7 +8,7 @@ and connection cleanup. `@anvia/core` keeps only the lightweight registration co
 ## Install
 
 ```sh
-pnpm add @anvia/core@rc @anvia/mcp@rc
+pnpm add @anvia/core @anvia/mcp
 ```
 
 The package requires Node.js 20 or newer, the official split MCP TypeScript SDK v2, and MCP protocol

@@ -1,10 +1,10 @@
 # Releases
 
-The current source manifest is `@anvia/react` **1.0.0-rc.9**. The entries below preserve notable v0 protocol milestones.
+The current stable release is `@anvia/react` **1.0.0**. The entries below preserve notable v0 protocol milestones.
 
 | Version | Summary |
 | --- | --- |
-| `staging` source | Adopted client protocol v3, persisted interaction-aware resume state, added `waiting` status, and replaced separate approval/question methods with `interactions` plus `respondToInteraction()`. |
+| `1.0.0` | Adopted client protocol v3, persisted interaction-aware resume state, added `waiting` status, and replaced separate approval/question methods with `interactions` plus `respondToInteraction()`. |
 | `1.0.0-rc.9` | Synchronized React with the Anvia 1.0 release-candidate train. |
 | `0.11.5` | Updated the Core dependency to `0.26.0`. |
 | `0.11.4` | Updated the Core dependency to `0.25.1`. |
@@ -28,4 +28,4 @@ The current source manifest is `@anvia/react` **1.0.0-rc.9**. The entries below 
 - When enabling resume, test reload, reconnect, terminal cleanup, and expired/missing server state.
 - Keep smoothing lifecycle mounted long enough to drain when upgrading from preset-era versions.
 
-Read the complete [React changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/react/CHANGELOG.md).
+Read the complete [React changelog](https://github.com/anvia-hq/anvia/blob/main/packages/react/CHANGELOG.md).

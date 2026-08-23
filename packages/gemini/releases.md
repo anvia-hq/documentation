@@ -1,6 +1,6 @@
 # Releases
 
-Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 history.
+Current stable release: `1.0.0`. The entries below preserve notable v0 history.
 
 ## Recent changes
 
@@ -22,6 +22,6 @@ Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 h
 
 Review the source changelog when upgrading across several versions; dependency-only releases are included there even when they do not alter Anvia’s authored API.
 
-- [Full `@anvia/gemini` changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/provider-gemini/CHANGELOG.md)
+- [Full `@anvia/gemini` changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-gemini/CHANGELOG.md)
 - [Compatibility and versioning](/packages/compatibility-and-versioning)
 - [API reference](/packages/gemini/api-reference)

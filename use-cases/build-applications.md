@@ -4,10 +4,10 @@ Anvia applications keep provider credentials and agent execution on the server, 
 
 ## 1. Install the application packages
 
-Keep every Anvia package on the same release-candidate channel:
+Keep every Anvia package on the same stable release line:
 
 ```bash
-pnpm add @anvia/core@rc @anvia/client@rc @anvia/openai@rc @anvia/server@rc @anvia/react@rc
+pnpm add @anvia/core @anvia/client @anvia/openai @anvia/server @anvia/react
 ```
 
 `@anvia/client` defines the public protocol and transport, `@anvia/server` returns its HTTP stream, and `@anvia/react` maintains UI state.

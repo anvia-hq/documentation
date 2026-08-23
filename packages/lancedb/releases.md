@@ -1,6 +1,6 @@
 # Releases
 
-Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 history.
+Current stable release: `1.0.0`. The entries below preserve notable v0 history.
 
 Notable releases in the source changelog include:
 
@@ -10,4 +10,4 @@ Notable releases in the source changelog include:
 - `0.2.2` moved `@anvia/core` to peer dependencies.
 - `0.2.0` introduced the embedded LanceDB adapter with columnar storage and SQL-like filters.
 
-See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-lancedb/CHANGELOG.md).
+See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-lancedb/CHANGELOG.md).

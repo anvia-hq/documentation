@@ -1,14 +1,13 @@
 # Releases
 
-The current published manifest is `@anvia/core` **1.0.0-rc.9**. The next synchronized RC source
-makes `pdfjs-dist` optional, moves MCP connection ownership into `@anvia/mcp`, introduces explicit
-Agent outcomes, and makes memory compaction token-aware. The source changelog is authoritative;
-the entries below preserve notable v0 compatibility milestones.
+The current stable release is `@anvia/core` **1.0.0**. It makes `pdfjs-dist` optional, moves MCP
+connection ownership into `@anvia/mcp`, introduces explicit Agent outcomes, and makes memory
+compaction token-aware. The source changelog is authoritative; the entries below preserve notable
+v0 compatibility milestones.
 
 | Version | Summary |
 | --- | --- |
-| Next RC source | Made `pdfjs-dist` an optional peer; moved MCP clients and transports to `@anvia/mcp`; replaced Agent status/final wrappers with explicit outcomes and a stream handle; added token-aware automatic and manual memory compaction. |
-| `staging` baseline | Replaced one-shot approval results with typed suspended interactions and JSON-safe continuations; added structured question tools and app-owned document chunking/PDF extraction; added an explicit trusted-network SSRF opt-out and exact-endpoint static headers for Streamable HTTP; split agent and guardrail internals without changing their intended public boundaries. |
+| `1.0.0` | Made `pdfjs-dist` an optional peer; moved MCP clients and transports to `@anvia/mcp`; replaced Agent status/final wrappers with explicit outcomes and a stream handle; added token-aware automatic and manual memory compaction; finalized typed interactions, document utilities, and Streamable HTTP security boundaries. |
 | `1.0.0-rc.9` | Prepared the synchronized Anvia 1.0 package train and replaced legacy MCP connection factories with lifecycle-owning clients supporting `stdio`, `streamableHttp`, and `custom` transports. |
 | `0.26.0` | Hardened the legacy remote MCP connection layer against SSRF, including DNS rebinding, redirects, and OAuth metadata requests. |
 | `0.25.1` | Published updated upstream runtime dependencies. |
@@ -37,4 +36,4 @@ the entries below preserve notable v0 compatibility milestones.
 - Re-run type checking and tests for tool calls, streams, memory persistence, and custom observers after a Core upgrade.
 - Check whether new provider-neutral fields require adapter updates even when application code does not use them directly.
 
-Read the complete [Core changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/core/CHANGELOG.md) and verify the installed version with your package manager before applying migration assumptions.
+Read the complete [Core changelog](https://github.com/anvia-hq/anvia/blob/main/packages/core/CHANGELOG.md) and verify the installed version with your package manager before applying migration assumptions.

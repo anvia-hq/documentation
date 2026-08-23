@@ -5,7 +5,7 @@ Thanks for helping make Anvia easier to understand and operate. Contributions ca
 ## Before you start
 
 - Read [README.md](README.md) for the repository structure and commands.
-- Follow the Anvia [Code of Conduct](https://github.com/anvia-hq/anvia/blob/staging/CODE_OF_CONDUCT.md).
+- Follow the Anvia [Code of Conduct](https://github.com/anvia-hq/anvia/blob/main/CODE_OF_CONDUCT.md).
 - Check the current implementation in [`anvia-hq/anvia`](https://github.com/anvia-hq/anvia) before documenting an API or behavior.
 - Search existing issues and pull requests to avoid duplicating active work.
 
@@ -21,8 +21,7 @@ pnpm docs:dev
 Build the complete site before opening a pull request:
 
 ```sh
-pnpm docs:build:current
-pnpm docs:build:rc
+pnpm docs:build
 ```
 
 For deployment-related changes, also run:

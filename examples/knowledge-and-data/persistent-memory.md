@@ -83,8 +83,8 @@ failed completion, deletion, compaction, adapter outage, and retry behavior.
 
 ## Runnable references
 
-- [Conversation memory contract](https://github.com/anvia-hq/anvia/blob/staging/cookbook/01_basics/02-conversation-memory.ts)
-- [Session memory](https://github.com/anvia-hq/anvia/blob/staging/cookbook/01_basics/06-session-memory.ts)
+- [Conversation memory contract](https://github.com/anvia-hq/anvia/blob/main/cookbook/01_basics/02-conversation-memory.ts)
+- [Session memory](https://github.com/anvia-hq/anvia/blob/main/cookbook/01_basics/06-session-memory.ts)
 
 ## Extensions
 

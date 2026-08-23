@@ -4,15 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm docs:dev",
-    "docs:dev": "node scripts/docs-dev.mjs",
-    "docs:dev:current": "node scripts/docs-dev-current.mjs",
-    "docs:dev:rc": "DOCS_CHANNEL=rc vitepress dev --port 5174 --strictPort",
-    "docs:build": "node scripts/docs-build.mjs",
-    "docs:build:current": "node scripts/docs-build.mjs --current-only",
-    "docs:build:rc": "DOCS_CHANNEL=rc vitepress build",
-    "docs:preview": "pnpm docs:preview:current",
-    "docs:preview:current": "DOCS_CHANNEL=current vitepress preview",
-    "docs:preview:rc": "DOCS_CHANNEL=rc vitepress preview",
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview",
     "docs:deploy": "pnpm docs:build && wrangler deploy",
     "docs:deploy:dry-run": "pnpm docs:build && wrangler deploy --dry-run"
   },

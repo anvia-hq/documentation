@@ -373,9 +373,9 @@ to inspect the exact context without network calls.
 
 ## Runnable references and extensions
 
-- [Embed and search](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/01-embed-and-search.ts)
-- [Filters and LSH](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/02-filters-and-lsh.ts)
-- [RAG search tool](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/05-rag-search-tool.ts)
+- [Embed and search](https://github.com/anvia-hq/anvia/blob/main/cookbook/06_retrieval/01-embed-and-search.ts)
+- [Filters and LSH](https://github.com/anvia-hq/anvia/blob/main/cookbook/06_retrieval/02-filters-and-lsh.ts)
+- [RAG search tool](https://github.com/anvia-hq/anvia/blob/main/cookbook/06_retrieval/05-rag-search-tool.ts)
 
 Those files demonstrate the current primitives independently. This page provides a coherent
 application layout but intentionally omits deployment identity middleware, a durable ingestion

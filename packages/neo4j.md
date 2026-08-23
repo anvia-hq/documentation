@@ -5,7 +5,7 @@
 ## Install
 
 ```bash
-pnpm add @anvia/neo4j@rc @anvia/core@rc zod
+pnpm add @anvia/neo4j @anvia/core zod
 ```
 
 ## Two registration modes

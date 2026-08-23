@@ -274,5 +274,5 @@ run/generation correlation, error recording, `flush()` in a short-lived job, and
 `shutdown()`. Keep the deployment smoke test synthetic and verify its trace ID in the expected Lens
 project after key or network changes.
 
-- Cookbook source: [`10_integrations/08-lens-native.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/10_integrations/08-lens-native.ts)
-- Adapter tests: [`packages/observability-lens/test`](https://github.com/anvia-hq/anvia/tree/staging/packages/observability-lens/test)
+- Cookbook source: [`10_integrations/08-lens-native.ts`](https://github.com/anvia-hq/anvia/blob/main/cookbook/10_integrations/08-lens-native.ts)
+- Adapter tests: [`packages/observability-lens/test`](https://github.com/anvia-hq/anvia/tree/main/packages/observability-lens/test)

@@ -288,6 +288,6 @@ inputs. Use a fake completion model to exercise valid extraction, invalid submis
 exhaustion. Keep a small adversarial document corpus and verify the final object against business
 rules before persistence or action.
 
-- Cookbook source: [`05_pipelines/07-extractor-pipeline.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/05_pipelines/07-extractor-pipeline.ts)
-- Structured extraction source: [`03_structured_output`](https://github.com/anvia-hq/anvia/tree/staging/cookbook/03_structured_output)
+- Cookbook source: [`05_pipelines/07-extractor-pipeline.ts`](https://github.com/anvia-hq/anvia/blob/main/cookbook/05_pipelines/07-extractor-pipeline.ts)
+- Structured extraction source: [`03_structured_output`](https://github.com/anvia-hq/anvia/tree/main/cookbook/03_structured_output)
 - Extend the ingestion boundary with OCR, malware scanning, human review, and immutable source hashes.

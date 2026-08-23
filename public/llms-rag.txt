@@ -1,6 +1,6 @@
 # Anvia RAG, Knowledge, and Retrieval
 
-> Current v1 RC context for ingestion, embeddings, vector stores, GraphRAG, and retrieval policy. Updated 2026-08-23.
+> Current stable v1 context for ingestion, embeddings, vector stores, GraphRAG, and retrieval policy. Updated 2026-08-23.
 
 Anvia calls its retrieval layer knowledge. Ingest outside the request path; at runtime search a
 prepared index and send only relevant, authorized evidence to the model.
@@ -18,7 +18,7 @@ conversation history, not a factual corpus.
 ## Install
 
 ```sh
-pnpm add @anvia/core@rc @anvia/openai@rc
+pnpm add @anvia/core @anvia/openai
 ```
 
 Add one embedding adapter and one durable vector adapter for production. The in-memory store is

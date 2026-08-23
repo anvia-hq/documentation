@@ -83,5 +83,5 @@ chunked input reads, provider-specific throttling, progress records, and a dead-
 
 ## Source
 
-- [`05_pipelines/05-batch-run.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/05_pipelines/05-batch-run.ts)
+- [`05_pipelines/05-batch-run.ts`](https://github.com/anvia-hq/anvia/blob/main/cookbook/05_pipelines/05-batch-run.ts)
 - [Parallel and batch pipelines](/sdk/pipelines/parallel-and-batch)

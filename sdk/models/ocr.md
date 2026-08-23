@@ -1,13 +1,13 @@
 # OCR models
 
-OCR extracts text and document structure from scanned files and images. In the v1 RC, OCR is a provider-specific capability exposed by `@anvia/mistral` rather than a generic `@anvia/core` model helper.
+OCR extracts text and document structure from scanned files and images. In v1, OCR is a provider-specific capability exposed by `@anvia/mistral` rather than a generic `@anvia/core` model helper.
 
 ## 1. Install and create the OCR model
 
-Keep the Mistral adapter on the same release-candidate channel as core.
+Keep the Mistral adapter on the same stable release line as Core.
 
 ```bash
-pnpm add @anvia/core@rc @anvia/mistral@rc
+pnpm add @anvia/core @anvia/mistral
 ```
 
 ```ts

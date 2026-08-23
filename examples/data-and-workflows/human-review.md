@@ -95,6 +95,6 @@ a sandbox payment account in integration tests.
 
 ## Source and extensions
 
-- Related cookbook approval flow: [`09_studio/03-tool-approval.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/09_studio/03-tool-approval.ts)
+- Related cookbook approval flow: [`09_studio/03-tool-approval.ts`](https://github.com/anvia-hq/anvia/blob/main/cookbook/09_studio/03-tool-approval.ts)
 - Read [tool control](/sdk/advanced/hooks/tool-control) and [lifecycle production guidance](/sdk/advanced/hooks/production-guidance).
 - Extend with multi-step approval, reviewer comments, or confidence-based routing.

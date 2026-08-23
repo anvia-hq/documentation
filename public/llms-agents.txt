@@ -1,6 +1,6 @@
 # Anvia Agents, Tools, and MCP
 
-> Current v1 RC implementation context for coding agents. Updated 2026-08-23.
+> Current stable v1 implementation context for coding agents. Updated 2026-08-23.
 
 Anvia is a provider-neutral TypeScript runtime. The host application owns authentication,
 authorization, tenant scope, business services, persistence policy, deployment, and the response
@@ -9,7 +9,7 @@ shown to users.
 ## Install and create an agent
 
 ```sh
-pnpm add @anvia/core@rc @anvia/openai@rc
+pnpm add @anvia/core @anvia/openai
 ```
 
 ```ts
@@ -75,7 +75,7 @@ MCP clients and transports live in the dedicated package. Core keeps only lightw
 registration contracts.
 
 ```sh
-pnpm add @anvia/core@rc @anvia/mcp@rc
+pnpm add @anvia/core @anvia/mcp
 ```
 
 ```ts

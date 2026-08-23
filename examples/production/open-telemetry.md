@@ -97,6 +97,6 @@ drain. Keep exporter-network tests separate. Add a smoke trace for each deployme
 
 ## Source and extensions
 
-- Source: [`10_integrations/05-otel-tracing.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/10_integrations/05-otel-tracing.ts)
+- Source: [`10_integrations/05-otel-tracing.ts`](https://github.com/anvia-hq/anvia/blob/main/cookbook/10_integrations/05-otel-tracing.ts)
 - Read the [`@anvia/otel` package guide](/packages/otel/get-started).
 - Extend with correlated eval reporting, collector tail sampling, and application HTTP/database spans.

@@ -73,7 +73,7 @@ await store.upsert({
 });
 ```
 
-All RC vector stores use `store.upsert({ documents })`. Call `store.ensure()` during provisioning,
+All v1 vector stores use `store.upsert({ documents })`. Call `store.ensure()` during provisioning,
 or `store.validate()` when startup must fail rather than create missing infrastructure.
 
 ## Expected behavior
@@ -102,8 +102,8 @@ version races, source deletion, dimension mismatch, and provenance round trips.
 
 ## Runnable references
 
-- [Document utilities](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/04-documents.ts)
-- [pgvector adapter](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/08-pgvector-store.ts)
+- [Document utilities](https://github.com/anvia-hq/anvia/blob/main/cookbook/06_retrieval/04-documents.ts)
+- [pgvector adapter](https://github.com/anvia-hq/anvia/blob/main/cookbook/06_retrieval/08-pgvector-store.ts)
 
 ## Extensions
 

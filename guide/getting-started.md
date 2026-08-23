@@ -2,12 +2,12 @@
 
 This tutorial verifies a provider model, wraps it in reusable agent behavior, and runs both a complete and streaming response. You need an ESM-compatible TypeScript project, `pnpm`, and an OpenAI API key.
 
-## 1. Install the release candidate
+## 1. Install Anvia
 
-Install the provider-neutral runtime and the OpenAI adapter from the same release channel. The `rc` tag prevents a v0 stable package from being mixed with the v1 API shown here.
+Install the provider-neutral runtime and the OpenAI adapter from the stable release line.
 
 ```bash
-pnpm add @anvia/core@rc @anvia/openai@rc
+pnpm add @anvia/core @anvia/openai
 ```
 
 Keep the provider credential in your application's environment:

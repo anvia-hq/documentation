@@ -1,6 +1,6 @@
 # Releases
 
-Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 history.
+Current stable release: `1.0.0`. The entries below preserve notable v0 history.
 
 Notable package releases include:
 
@@ -11,4 +11,4 @@ Notable package releases include:
 - `0.2.1` preserved tool-result names.
 - `0.2.0` introduced the durable Prisma adapter family release.
 
-Release entries are generated through Changesets. Consult the complete [source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/memory-prisma/CHANGELOG.md) before migrating schema or changing peer versions.
+Release entries are generated through Changesets. Consult the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-prisma/CHANGELOG.md) before migrating schema or changing peer versions.

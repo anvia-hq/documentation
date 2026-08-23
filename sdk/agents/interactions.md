@@ -1,7 +1,7 @@
 # Interactions and continuations
 
 An Agent interaction is an intentional, JSON-safe boundary where one run phase ends and control
-returns to the application. The v1 RC supports two interaction types:
+returns to the application. Anvia v1 supports two interaction types:
 
 - `tool-approval` asks whether one validated tool call may execute;
 - `tool-question` asks for structured human answers before the tool call continues.

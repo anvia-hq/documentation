@@ -1,6 +1,6 @@
 # Load and chunk documents
 
-Anvia RC keeps document parsing deliberately small: the core package extracts PDF text and chunks text, while your application owns file discovery, storage reads, source IDs, and error handling. Run ingestion in a script, worker, or deployment job—not on every agent request.
+Anvia keeps document parsing deliberately small: the core package extracts PDF text and chunks text, while your application owns file discovery, storage reads, source IDs, and error handling. Run ingestion in a script, worker, or deployment job—not on every agent request.
 
 ## 1. Read application-approved text
 

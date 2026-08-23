@@ -166,7 +166,7 @@ agent for endpoint tests and separately test the real agent contract.
 
 ## Source and extensions
 
-- Transport source: [`01_basics/07-server-react-transport.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/01_basics/07-server-react-transport.ts)
+- Transport source: [`01_basics/07-server-react-transport.ts`](https://github.com/anvia-hq/anvia/blob/main/cookbook/01_basics/07-server-react-transport.ts)
 - Add [rate limits](/examples/production/rate-limits) and [persistent memory](/examples/data-and-workflows/persistent-memory).
 - Review [memory sessions](/sdk/memory/sessions) and [tool control](/sdk/advanced/hooks/tool-control).
 - Extend with service accounts, webhook signatures, or step-up approval for high-risk tools.

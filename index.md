@@ -2,14 +2,14 @@
 
 Anvia is a TypeScript runtime for adding AI agents to an application without handing over the rest of its architecture. You create the provider model and define the agent's behavior; Anvia runs the model and tool loop.
 
-The tutorial below builds a small support agent with the v1 release-candidate API. Add each snippet to the same TypeScript file in order.
+The tutorial below builds a small support agent with the stable v1 API. Add each snippet to the same TypeScript file in order.
 
 ## 1. Install the runtime and a provider
 
-`@anvia/core` contains the provider-neutral agent runtime. `@anvia/openai` adapts OpenAI and OpenAI-compatible models to that runtime. During the release-candidate period, use the `rc` tag so both packages stay on the v1 release train.
+`@anvia/core` contains the provider-neutral agent runtime. `@anvia/openai` adapts OpenAI and OpenAI-compatible models to that runtime. Install both from the stable release line.
 
 ```bash
-pnpm add @anvia/core@rc @anvia/openai@rc
+pnpm add @anvia/core @anvia/openai
 ```
 
 Keep credentials in your application's configuration. Anvia clients receive credentials explicitly and do not read environment variables on their own.
@@ -110,7 +110,7 @@ const supportAgent = new AgentBuilder('support', model)
 const response = await supportAgent.prompt(input).send()
 ```
 
-In the v1 release candidate, the constructor receives that configuration directly and `generate()` starts the run:
+In v1, the constructor receives that configuration directly and `generate()` starts the run:
 
 ```ts
 const supportAgent = new Agent({

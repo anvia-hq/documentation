@@ -8,7 +8,7 @@
 pnpm add @anvia/chroma @anvia/core @anvia/openai chromadb
 ```
 
-The package is ESM-only, includes `chromadb`, and should be installed with the matching `@anvia/core` release candidate.
+The package is ESM-only, includes `chromadb`, and should be installed with the matching stable `@anvia/core` release.
 
 ## Store and search documents
 
@@ -88,5 +88,5 @@ Pass `metadata` or `configuration` when Studio should create the collection with
 - [API reference](/packages/chroma/api-reference)
 - [Embeddings](/sdk/knowledges/embeddings)
 - [Metadata filters](/sdk/knowledges/metadata-filters)
-- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/vector-chroma)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-chroma/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/vector-chroma)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-chroma/CHANGELOG.md)

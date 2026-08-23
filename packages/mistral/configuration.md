@@ -48,4 +48,4 @@ This ordering protects the selected model and normalized source while still allo
 
 ## Runtime
 
-The package is ESM, includes declarations, uses the official Mistral SDK, and should be installed with the matching `@anvia/core` release candidate. OCR byte uploads and server credentials make it a server-side integration.
+The package is ESM, includes declarations, uses the official Mistral SDK, and should be installed with the matching stable `@anvia/core` release. OCR byte uploads and server credentials make it a server-side integration.

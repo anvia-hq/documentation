@@ -8,7 +8,7 @@
 pnpm add @anvia/redis @anvia/core @anvia/openai redis
 ```
 
-The ESM package includes the Redis client and should be installed with the matching `@anvia/core` release candidate. The target Redis deployment must support the `FT.*` search commands used by the adapter.
+The ESM package includes the Redis client and should be installed with the matching stable `@anvia/core` release. The target Redis deployment must support the `FT.*` search commands used by the adapter.
 
 ## Store and search documents
 
@@ -76,5 +76,5 @@ The adapter writes hashes without expiration. Retention, deletion, and stale-doc
 - [API reference](/packages/redis/api-reference)
 - [Vector stores](/sdk/knowledges/vector-stores)
 - [Metadata filters](/sdk/knowledges/metadata-filters)
-- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/vector-redis)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-redis/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/vector-redis)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-redis/CHANGELOG.md)

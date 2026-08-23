@@ -223,5 +223,5 @@ changing each scope dimension prevents recall, invalid persisted messages are re
 concurrent prompts follow your application's ordering policy. Delete the temporary database after
 the suite.
 
-- Cookbook foundation: [`01_basics/06-session-memory.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/01_basics/06-session-memory.ts)
-- Adapter tests: [`packages/memory-sqlite/test`](https://github.com/anvia-hq/anvia/tree/staging/packages/memory-sqlite/test)
+- Cookbook foundation: [`01_basics/06-session-memory.ts`](https://github.com/anvia-hq/anvia/blob/main/cookbook/01_basics/06-session-memory.ts)
+- Adapter tests: [`packages/memory-sqlite/test`](https://github.com/anvia-hq/anvia/tree/main/packages/memory-sqlite/test)

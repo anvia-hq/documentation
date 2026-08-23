@@ -17,7 +17,7 @@ const result = await generateCompletion({
             id: 'release-notes',
             text: releaseNotes,
             additionalProps: {
-                version: '1.0.0-rc.9',
+                version: '1.0.0',
                 source: 'release-process',
             },
         },

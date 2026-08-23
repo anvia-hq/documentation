@@ -4,10 +4,10 @@ Configure memory in three steps: create a store, attach it to the agent, and con
 
 ## 1. Install one adapter
 
-During the v1 release-candidate period, keep the memory adapter and core runtime on the `rc` channel:
+Keep the memory adapter and core runtime on the same stable release line:
 
 ```bash
-pnpm add @anvia/core@rc @anvia/memory-prisma@rc @prisma/client
+pnpm add @anvia/core @anvia/memory-prisma @prisma/client
 ```
 
 Use the adapter that matches the database layer the application already operates. See [Store adapters](/sdk/memory/store-adapters) for Drizzle, direct Postgres, and SQLite alternatives.

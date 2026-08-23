@@ -57,9 +57,9 @@ from transient failures.
 ## Source and extensions
 
 Run the
-[OpenAI image cookbook](https://github.com/anvia-hq/anvia/blob/staging/cookbook/04_providers_and_multimodal/07-openai-image-generation.ts)
+[OpenAI image cookbook](https://github.com/anvia-hq/anvia/blob/main/cookbook/04_providers_and_multimodal/07-openai-image-generation.ts)
 or compare the
-[Gemini media example](https://github.com/anvia-hq/anvia/blob/staging/cookbook/04_providers_and_multimodal/09-gemini-image-and-transcription.ts).
+[Gemini media example](https://github.com/anvia-hq/anvia/blob/main/cookbook/04_providers_and_multimodal/09-gemini-image-and-transcription.ts).
 Next, add job status, prompt templates, and an approved asset library.
 
 - [Image generation](/sdk/models/image-generation)

@@ -1,6 +1,6 @@
 # Lifecycle
 
-Application code owns every created sandbox. The v1 RC API makes image acquisition, creation, pausing, resumption, and destruction explicit.
+Application code owns every created sandbox. The v1 API makes image acquisition, creation, pausing, resumption, and destruction explicit.
 
 ## Ephemeral workspaces
 

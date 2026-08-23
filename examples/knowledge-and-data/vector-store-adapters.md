@@ -77,11 +77,11 @@ filters, deletion, inspection, empty collections, and dimension errors.
 
 ## Runnable references
 
-- [Chroma](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/06-chromadb-vector-store.ts)
-- [Qdrant](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/07-qdrant-vector-store.ts)
-- [pgvector](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/08-pgvector-store.ts)
-- [Milvus](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/12-milvus-vector-store.ts)
-- [Pinecone](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/13-pinecone-vector-store.ts)
+- [Chroma](https://github.com/anvia-hq/anvia/blob/main/cookbook/06_retrieval/06-chromadb-vector-store.ts)
+- [Qdrant](https://github.com/anvia-hq/anvia/blob/main/cookbook/06_retrieval/07-qdrant-vector-store.ts)
+- [pgvector](https://github.com/anvia-hq/anvia/blob/main/cookbook/06_retrieval/08-pgvector-store.ts)
+- [Milvus](https://github.com/anvia-hq/anvia/blob/main/cookbook/06_retrieval/12-milvus-vector-store.ts)
+- [Pinecone](https://github.com/anvia-hq/anvia/blob/main/cookbook/06_retrieval/13-pinecone-vector-store.ts)
 
 ## Extensions
 

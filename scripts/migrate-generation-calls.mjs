@@ -124,4 +124,4 @@ for (const markdownPath of await collectMarkdown(docsRoot)) {
   await writeFile(markdownPath, migrated)
 }
 
-console.log(`Migrated ${migratedCalls} generation calls to the object-only RC API.`)
+console.log(`Migrated ${migratedCalls} generation calls to the object-only v1 API.`)

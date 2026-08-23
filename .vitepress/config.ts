@@ -1,16 +1,7 @@
-import { defineConfig, type HeadConfig } from 'vitepress'
+import { defineConfig } from 'vitepress'
 import { landingCodeTheme } from './theme/landing-code-theme'
 
-const docsChannel = process.env.DOCS_CHANNEL === 'rc' ? 'rc' : 'current'
-const isReleaseCandidate = docsChannel === 'rc'
-const docsBase = normalizeBase(process.env.DOCS_BASE ?? (isReleaseCandidate ? '/v1-rc/' : '/'))
-const currentDocsUrl = process.env.DOCS_CURRENT_URL ?? '/'
-const releaseCandidateDocsUrl = process.env.DOCS_RC_URL ?? '/v1-rc/'
-const releaseCandidateDevProxy = process.env.DOCS_RC_DEV_PROXY
-
-const channelHead: HeadConfig[] = isReleaseCandidate
-  ? [['style', {}, ':root { --vp-layout-top-height: 44px; }']]
-  : []
+const docsBase = normalizeBase(process.env.DOCS_BASE ?? '/')
 
 function normalizeBase(base: string) {
   return `/${base.replace(/^\/+|\/+$/g, '')}${base === '/' ? '' : '/'}`
@@ -23,11 +14,9 @@ function withDocsBase(path: string) {
 export default defineConfig({
   appearance: 'force-dark',
   base: docsBase,
-  outDir: isReleaseCandidate ? '.vitepress/dist/v1-rc' : '.vitepress/dist',
+  outDir: '.vitepress/dist',
   title: 'Anvia',
-  description: isReleaseCandidate
-    ? 'Release-candidate documentation for Anvia Core v1'
-    : 'Documentation for Anvia Core v0.x',
+  description: 'Documentation for Anvia v1',
   head: [
     [
       'link',
@@ -40,33 +29,10 @@ export default defineConfig({
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
     ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap' }],
-    ['meta', { name: 'theme-color', content: '#080808' }],
-    ...channelHead
+    ['meta', { name: 'theme-color', content: '#080808' }]
   ],
   markdown: {
     theme: landingCodeTheme
-  },
-  vite: {
-    define: {
-      __DOCS_VERSION_CONFIG__: JSON.stringify({
-        channel: docsChannel,
-        currentUrl: currentDocsUrl,
-        releaseCandidateUrl: releaseCandidateDocsUrl
-      })
-    },
-    ...(releaseCandidateDevProxy && !isReleaseCandidate
-      ? {
-          server: {
-            proxy: {
-              '/v1-rc': {
-                target: releaseCandidateDevProxy,
-                changeOrigin: true,
-                ws: true
-              }
-            }
-          }
-        }
-      : {})
   },
   themeConfig: {
     logo: '/logo.svg',

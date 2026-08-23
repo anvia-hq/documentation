@@ -14,10 +14,10 @@ Schemas protect the shape of the boundary. They do not replace authentication, a
 
 ## 1. Define a typed tool
 
-Install Zod alongside the v1 RC runtime if it is not already in the project:
+Install Zod alongside the v1 runtime if it is not already in the project:
 
 ```bash
-pnpm add @anvia/core@rc zod
+pnpm add @anvia/core zod
 ```
 
 Use `inputSchema` for model-supplied arguments and `outputSchema` when the returned value should also be validated.

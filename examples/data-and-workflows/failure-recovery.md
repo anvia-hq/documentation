@@ -88,6 +88,6 @@ worker restart. Use fake time for backoff tests.
 
 ## Source and extensions
 
-- Retry implementation: [`retry.ts`](https://github.com/anvia-hq/anvia/blob/staging/packages/core/src/retry.ts)
+- Retry implementation: [`retry.ts`](https://github.com/anvia-hq/anvia/blob/main/packages/core/src/retry.ts)
 - Read [pipeline runs and errors](/sdk/pipelines/runs-and-errors) and [background workers](/examples/data-and-workflows/background-workers).
 - Extend with circuit breakers, provider fallback, reconciliation jobs, and operator replay tooling.

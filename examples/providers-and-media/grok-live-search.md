@@ -62,7 +62,7 @@ answer faithfulness on time-stamped queries.
 ## Source and extensions
 
 Run the
-[Grok live-search cookbook](https://github.com/anvia-hq/anvia/blob/staging/cookbook/04_providers_and_multimodal/13-grok-live-search.ts).
+[Grok live-search cookbook](https://github.com/anvia-hq/anvia/blob/main/cookbook/04_providers_and_multimodal/13-grok-live-search.ts).
 Next, add a source-quality gate, freshness display, or compare live results with a curated knowledge
 index.
 

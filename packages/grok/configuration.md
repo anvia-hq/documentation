@@ -44,4 +44,4 @@ Without `options.fetch`, the package uses a compatible `fetch` from the injected
 
 ## Runtime
 
-The package is ESM, uses Node binary utilities, depends on `@anvia/openai` and the official `openai` SDK, and should use matching Anvia release-candidate versions. Validate binary, `FormData`, and fetch support in edge runtimes.
+The package is ESM, uses Node binary utilities, depends on `@anvia/openai` and the official `openai` SDK, and should use matching stable Anvia versions. Validate binary, `FormData`, and fetch support in edge runtimes.

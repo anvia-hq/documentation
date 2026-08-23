@@ -8,7 +8,7 @@
 pnpm add @anvia/memory-sqlite @anvia/core
 ```
 
-The package is ESM-only and should be installed with the matching `@anvia/core` release candidate. It uses `node:sqlite`, so run it on a Node.js version that provides `DatabaseSync`.
+The package is ESM-only and should be installed with the matching stable `@anvia/core` release. It uses `node:sqlite`, so run it on a Node.js version that provides `DatabaseSync`.
 
 ## Create a persistent store
 
@@ -84,5 +84,5 @@ For horizontally scaled workers or multiple application instances, use a shared 
 
 - [API reference](/packages/memory-sqlite/api-reference)
 - [Memory store adapters](/sdk/memory/store-adapters)
-- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/memory-sqlite)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/memory-sqlite/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/memory-sqlite)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-sqlite/CHANGELOG.md)

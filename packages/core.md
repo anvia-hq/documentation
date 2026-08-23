@@ -117,4 +117,4 @@ Core's contracts are broadly portable, but not every entry point has the same en
 - [Register agents in Studio](/studio/configure/register-agents-and-pipelines)
 - [Inspect tools in Studio](/studio/tools)
 
-For exact exports and signatures, use the [API reference](/packages/core/api-reference). For release history, read the [source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/core/CHANGELOG.md).
+For exact exports and signatures, use the [API reference](/packages/core/api-reference). For release history, read the [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/core/CHANGELOG.md).

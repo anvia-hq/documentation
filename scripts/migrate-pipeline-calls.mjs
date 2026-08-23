@@ -215,4 +215,4 @@ for (const markdownPath of await collectMarkdown(docsRoot)) {
   await writeFile(markdownPath, migrated)
 }
 
-console.log(`Migrated ${migratedCalls} Pipeline calls to the RC API.`)
+console.log(`Migrated ${migratedCalls} Pipeline calls to the v1 API.`)

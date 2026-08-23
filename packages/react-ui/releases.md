@@ -1,13 +1,11 @@
 # Releases
 
-The current published manifest is `@anvia/react-ui` **1.0.0-rc.9**. The next synchronized RC source
-is strictly headless and pairs with the new `@anvia/cli` installer. The entries below preserve
-notable v0 history.
+The current stable release is `@anvia/react-ui` **1.0.0**. It is strictly headless and pairs with
+the `@anvia/cli` installer. The entries below preserve notable v0 history.
 
 | Version | Summary |
 | --- | --- |
-| Next RC source | Renamed compound exports to explicit `*Primitive` namespaces, removed package CSS and `data-anvia-*`, and standardized the semantic DOM contract on ARIA, `data-state`, and `data-role`. |
-| `staging` source | Aligned human-input collections and actions with the unified pending-interaction controller exposed by `@anvia/react`. |
+| `1.0.0` | Renamed compound exports to explicit `*Primitive` namespaces, removed package CSS and `data-anvia-*`, standardized the semantic DOM contract on ARIA, `data-state`, and `data-role`, and aligned human-input actions with the unified pending-interaction controller. |
 | `1.0.0-rc.9` | Synchronized the package with the Anvia 1.0 release-candidate train. |
 | `0.7.1` | Published updated upstream runtime dependencies. |
 | `0.7.0` | Added the `ContextMeter` and model-aware active context usage display. |
@@ -30,4 +28,4 @@ notable v0 history.
 - Keep reduced-motion behavior intact when adding an application-owned stream reveal animation.
 - Snapshot or interaction-test design-system components used with `asChild`; forwarded refs and disabled state remain required.
 
-Read the complete [React UI changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/react-ui/CHANGELOG.md).
+Read the complete [React UI changelog](https://github.com/anvia-hq/anvia/blob/main/packages/react-ui/CHANGELOG.md).

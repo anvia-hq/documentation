@@ -5,9 +5,9 @@ Grok’s provider adapter connects Anvia to xAI completions, provider-executed s
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.0.0-rc.9` |
+| Version | `1.0.0` |
 | Runtime | ESM, server-side JavaScript with `fetch` |
-| Peer | Matching `@anvia/core` release candidate |
+| Peer | Matching `@anvia/core` stable release |
 
 ## Install
 
@@ -99,4 +99,4 @@ The package does not expose embeddings, video generation, realtime voice, stream
 - [API reference](/packages/grok/api-reference)
 - [Releases](/packages/grok/releases)
 - [Provider capability matrix](/sdk/providers/capability-matrix)
-- [Source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/provider-grok/CHANGELOG.md)
+- [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-grok/CHANGELOG.md)

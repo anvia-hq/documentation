@@ -14,7 +14,7 @@ const client = new OpenAIClient({ apiKey })
 export const audioModel = client.speechGenerationModel({ modelId: 'tts-1' })
 ```
 
-OpenAI and Grok provide v1 RC speech-generation adapters. Available voices, formats, and limits are provider-specific.
+OpenAI and Grok provide v1 speech-generation adapters. Available voices, formats, and limits are provider-specific.
 
 ## 2. Generate speech
 

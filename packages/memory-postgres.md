@@ -8,7 +8,7 @@
 pnpm add @anvia/memory-postgres @anvia/core
 ```
 
-The package includes `pg` and should be installed with the matching `@anvia/core` release candidate.
+The package includes `pg` and should be installed with the matching stable `@anvia/core` release.
 
 ## Connect a store
 
@@ -100,5 +100,5 @@ See [Memory sessions](/sdk/memory/sessions) for context design and [Custom store
 
 - [API reference](/packages/memory-postgres/api-reference)
 - [Memory store adapters](/sdk/memory/store-adapters)
-- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/memory-postgres)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/memory-postgres/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/memory-postgres)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-postgres/CHANGELOG.md)

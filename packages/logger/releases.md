@@ -1,6 +1,6 @@
 # Releases
 
-Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 history.
+Current stable release: `1.0.0`. The entries below preserve notable v0 history.
 
 ## Notable history
 
@@ -11,6 +11,6 @@ Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 h
 | `0.3.0` | Aligned imports with the focused Core public entrypoints. |
 | `0.2.0` | Introduced structured logger types, Console and Pino factories, and the agent observer. |
 
-Install matching Anvia release-candidate versions together.
+Install matching stable Anvia versions together.
 
-Read the [complete source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/logger/CHANGELOG.md) for every patch and dependency-only release.
+Read the [complete source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/logger/CHANGELOG.md) for every patch and dependency-only release.

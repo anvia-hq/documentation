@@ -15,7 +15,7 @@ pnpm add @anvia/react-ui @anvia/react @anvia/client react react-dom
 For editable Tailwind and shadcn-based application components, install the complete chat registry:
 
 ```sh
-pnpm dlx @anvia/cli@rc add chat
+pnpm dlx @anvia/cli add chat
 ```
 
 The primitive package has no stylesheet. Style ordinary `className` props or compose design-system
@@ -115,7 +115,7 @@ Markdown output and tool results may contain model-produced content. Treat custo
 | Package format | ESM |
 | React peer dependency | `>=18` |
 | React DOM peer dependency | `>=18` |
-| `@anvia/react` peer dependency | Matching `1.0.0-rc.x` release candidate |
+| `@anvia/react` peer dependency | Matching stable release |
 | Styling | Application-owned; no package CSS exports |
 
 The components target React DOM and use browser behavior for rich composer, selection, image, and attachment interactions. Render browser-dependent interactions on the client when using an SSR framework.
@@ -128,4 +128,4 @@ The components target React DOM and use browser behavior for rich composer, sele
 - [Interactions and continuations](/sdk/agents/interactions)
 - [Approvals and questions in Studio](/studio/playground/approvals-and-questions)
 
-For exact exports, compound parts, and controller types, use the [API reference](/packages/react-ui/api-reference). For release history, read the [source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/react-ui/CHANGELOG.md).
+For exact exports, compound parts, and controller types, use the [API reference](/packages/react-ui/api-reference). For release history, read the [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/react-ui/CHANGELOG.md).

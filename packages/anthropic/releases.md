@@ -1,6 +1,6 @@
 # Releases
 
-Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 history.
+Current stable release: `1.0.0`. The entries below preserve notable v0 history.
 
 ## Recent changes
 
@@ -22,6 +22,6 @@ Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 h
 
 This is a selective operational summary, not a substitute for the source record.
 
-- [Full `@anvia/anthropic` changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/provider-anthropic/CHANGELOG.md)
+- [Full `@anvia/anthropic` changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-anthropic/CHANGELOG.md)
 - [Compatibility and versioning](/packages/compatibility-and-versioning)
 - [API reference](/packages/anthropic/api-reference)

@@ -97,6 +97,6 @@ Use synthetic content in a staging smoke trace.
 
 ## Source and extensions
 
-- Source: [`10_integrations/03-langfuse-tracing.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/10_integrations/03-langfuse-tracing.ts)
+- Source: [`10_integrations/03-langfuse-tracing.ts`](https://github.com/anvia-hq/anvia/blob/main/cookbook/10_integrations/03-langfuse-tracing.ts)
 - Explore the [`@anvia/langfuse` package guide](/packages/langfuse/get-started).
 - Extend with [evaluations](/examples/production/evaluations), prompt versions, datasets, and redaction transforms.

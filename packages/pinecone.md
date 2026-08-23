@@ -8,7 +8,7 @@
 pnpm add @anvia/pinecone @anvia/core @anvia/openai @pinecone-database/pinecone
 ```
 
-The ESM package includes the Pinecone SDK and should be installed with the matching `@anvia/core` release candidate.
+The ESM package includes the Pinecone SDK and should be installed with the matching stable `@anvia/core` release.
 
 ## Store and search documents
 
@@ -78,5 +78,5 @@ Metadata keys starting with `__anvia_` are reserved for document reconstruction 
 - [API reference](/packages/pinecone/api-reference)
 - [Vector stores](/sdk/knowledges/vector-stores)
 - [Automatic retrieval](/sdk/knowledges/automatic-retrieval)
-- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/vector-pinecone)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-pinecone/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/vector-pinecone)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-pinecone/CHANGELOG.md)

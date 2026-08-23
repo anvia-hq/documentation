@@ -50,43 +50,12 @@ pnpm docs:preview
 
 The generated site is written to `.vitepress/dist`.
 
-## Documentation versions
+## Documentation version
 
-The site has two documentation channels during the v1 release-candidate period:
+The site documents the stable Anvia v1 release and is served from `/`. Links to the former
+`/v1-rc/` channel redirect to the equivalent stable page.
 
-- **Current (v0.x)** is the production documentation from `main` and is served from `/`.
-- **Release candidate (v1)** is prerelease documentation from `staging` and is served from `/v1-rc/`.
-
-The branch remains named `staging` because it is a moving preview. The public selector calls it
-**Release candidate (v1)** so readers understand that the documented API is not yet stable.
-
-Run both channels locally behind one browser-visible origin:
-
-```sh
-pnpm dev
-```
-
-Open `/` for the current docs and `/v1-rc/` for the release candidate. Both URLs use
-`http://localhost:5173`; the development runner manages the RC server used internally by Vite's
-path proxy.
-
-To run only one channel while debugging its build, use its dedicated command:
-
-```sh
-pnpm docs:dev:current
-pnpm docs:dev:rc
-```
-
-Build both channels independently before publishing a documentation release:
-
-```sh
-pnpm docs:build:current
-pnpm docs:build:rc
-```
-
-The channel selector uses `/` and `/v1-rc/` by default. Set `DOCS_CURRENT_URL` or `DOCS_RC_URL`
-when previews or custom domains need different destinations, and use `DOCS_BASE` when a build is
-mounted at a different path.
+Use `DOCS_BASE` when a preview build is mounted at a different path.
 
 ## Deployment
 

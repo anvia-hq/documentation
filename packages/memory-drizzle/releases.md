@@ -1,6 +1,6 @@
 # Releases
 
-Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 history.
+Current stable release: `1.0.0`. The entries below preserve notable v0 history.
 
 Notable package releases include:
 
@@ -11,4 +11,4 @@ Notable package releases include:
 - `0.2.0` established the durable adapter contract.
 - `0.1.0` introduced the Drizzle store and PostgreSQL table exports.
 
-Read the complete [source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/memory-drizzle/CHANGELOG.md) before regenerating schema or upgrading peer dependencies.
+Read the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-drizzle/CHANGELOG.md) before regenerating schema or upgrading peer dependencies.

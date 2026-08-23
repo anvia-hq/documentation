@@ -1,10 +1,10 @@
 # Releases
 
-The current source manifest is `@anvia/sandbox` **1.0.0-rc.9**. The entries below preserve notable v0 history.
+The current stable release is `@anvia/sandbox` **1.0.0**. The entries below preserve notable v0 history.
 
 | Version | Summary |
 | --- | --- |
-| `staging` source | Replaced implicit session-style lifecycle with explicit image pull, sandbox create/stop/resume/destroy handles; added resource, security, shared-memory, inspection, async-disposal, and browser-runtime support. Studio sandbox exposure is now explicit registration. |
+| `1.0.0` | Replaced implicit session-style lifecycle with explicit image pull, sandbox create/stop/resume/destroy handles; added resource, security, shared-memory, inspection, async-disposal, and browser-runtime support. Studio sandbox exposure is now explicit registration. |
 | `1.0.0-rc.9` | Synchronized Sandbox with the Anvia 1.0 release-candidate train. |
 | `0.6.0` | Added bounded line pagination to session and `read_file` APIs, including continuation metadata and safe default line/byte limits. |
 | `0.5.0` | Added the interactive/scriptable `create-image` CLI for composed Node, Bun, Python, artifact, Playwright, apt, npm, and uv images. |
@@ -25,4 +25,4 @@ The current source manifest is `@anvia/sandbox` **1.0.0-rc.9**. The entries belo
 - Review generated image inputs and pin custom package versions needed for reproducibility.
 - Re-test lifecycle cleanup and persistent volume retention before deploying a new version.
 
-Read the complete [Sandbox changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/tool-sandbox/CHANGELOG.md).
+Read the complete [Sandbox changelog](https://github.com/anvia-hq/anvia/blob/main/packages/tool-sandbox/CHANGELOG.md).

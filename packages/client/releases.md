@@ -1,10 +1,10 @@
 # Releases
 
-The current published manifest is `@anvia/client` **1.0.0-rc.9**. Changes described as next RC are available from `staging` and publish with the next synchronized release commit.
+The current stable release is `@anvia/client` **1.0.0**.
 
 | Version | Summary |
 | --- | --- |
-| Next RC source | Introduced the `anvia.client.v3` request/event contract, typed `interaction_response` requests, public interaction state, and server-owned continuation boundaries. Added original, compacted, retained, and result token counts to memory-compaction events and terminal metadata. |
+| `1.0.0` | Introduced the `anvia.client.v3` request/event contract, typed `interaction_response` requests, public interaction state, and server-owned continuation boundaries. Added original, compacted, retained, and result token counts to memory-compaction events and terminal metadata. |
 | `1.0.0-rc.9` | Synchronized the framework-neutral client layer with the Anvia 1.0 release-candidate train. |
 
 ## Upgrade checks
@@ -15,4 +15,4 @@ The current published manifest is `@anvia/client` **1.0.0-rc.9**. Changes descri
 - Clear or migrate persisted v2 chat state before enabling v3 automatic resume.
 - Update custom `memory_compaction` decoders for the required token-count fields.
 
-Read the complete [Client changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/client/CHANGELOG.md).
+Read the complete [Client changelog](https://github.com/anvia-hq/anvia/blob/main/packages/client/CHANGELOG.md).

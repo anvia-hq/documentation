@@ -5,9 +5,9 @@ Anthropic’s provider adapter supplies streaming Claude completion models for A
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.0.0-rc.9` |
+| Version | `1.0.0` |
 | Runtime | ESM, server-side JavaScript |
-| Peer | Matching `@anvia/core` release candidate |
+| Peer | Matching `@anvia/core` stable release |
 
 ## Install
 
@@ -101,4 +101,4 @@ The Vertex client follows Google authentication through the official Anthropic V
 - [API reference](/packages/anthropic/api-reference)
 - [Releases](/packages/anthropic/releases)
 - [Anthropic SDK guide](/sdk/providers/anthropic)
-- [Source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/provider-anthropic/CHANGELOG.md)
+- [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-anthropic/CHANGELOG.md)

@@ -13,7 +13,7 @@ const typescriptPath = typescriptCandidates.find(existsSync)
 
 if (typescriptPath === undefined) {
   throw new Error(
-    `TypeScript was not found under ${anviaRoot}. Set ANVIA_REPO to the RC checkout and install its dependencies.`,
+    `TypeScript was not found under ${anviaRoot}. Set ANVIA_REPO to the Anvia checkout and install its dependencies.`,
   )
 }
 

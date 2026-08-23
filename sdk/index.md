@@ -65,12 +65,12 @@ The SDK is organized around explicit dependencies:
 
 These capabilities extend the same runtime objects. Adding memory to an agent or observability to a pipeline does not require moving the feature into a different framework.
 
-## Install the v1 release candidate
+## Install Anvia v1
 
 Install the core runtime and one provider package from the same release channel:
 
 ```bash
-pnpm add @anvia/core@rc @anvia/openai@rc
+pnpm add @anvia/core @anvia/openai
 ```
 
 ```ts

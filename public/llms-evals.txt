@@ -1,6 +1,6 @@
 # Anvia Evaluations and Observability
 
-> Current v1 RC context for tracing, evaluation suites, datasets, and release gates. Updated 2026-08-23.
+> Current stable v1 context for tracing, evaluation suites, datasets, and release gates. Updated 2026-08-23.
 
 Use unit and integration tests for deterministic code. Use evaluations for model behavior whose
 wording or reasoning can vary. Observability explains runtime activity; it is not application state.
@@ -13,7 +13,7 @@ instrument runtime → inspect traces → curate failures into cases
 ## Trace with Lens
 
 ```sh
-pnpm add @anvia/core@rc @anvia/lens@rc
+pnpm add @anvia/core @anvia/lens
 ```
 
 ```ts

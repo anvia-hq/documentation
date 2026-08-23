@@ -3,7 +3,7 @@
 Install the MCP integration and Core from the same release channel:
 
 ```sh
-pnpm add @anvia/core@rc @anvia/mcp@rc
+pnpm add @anvia/core @anvia/mcp
 ```
 
 Connect several independently owned clients with `McpClientGroup`:

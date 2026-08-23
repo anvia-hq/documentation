@@ -64,7 +64,7 @@ multilingual, accented, and domain-specific audio.
 ## Source and extensions
 
 Run the
-[OpenAI audio cookbook](https://github.com/anvia-hq/anvia/blob/staging/cookbook/04_providers_and_multimodal/08-openai-audio-and-transcription.ts).
+[OpenAI audio cookbook](https://github.com/anvia-hq/anvia/blob/main/cookbook/04_providers_and_multimodal/08-openai-audio-and-transcription.ts).
 Next, transcribe an uploaded file, add timestamps at the provider boundary if supported, or stream
 job progress to a UI.
 

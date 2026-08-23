@@ -1,6 +1,6 @@
 # Compatibility and versioning
 
-The v1 release candidate is published as a synchronized package train. Install matching RC versions across Anvia packages so Core, providers, transports, UI, storage, and observability adapters share the same public contracts.
+Anvia v1 is published as a synchronized package train. Keep matching versions across Anvia packages so Core, providers, transports, UI, storage, and observability adapters share the same public contracts.
 
 ## Check three boundaries
 
@@ -12,15 +12,15 @@ Before upgrading, verify:
 
 Package pages summarize these boundaries, while the package manifest remains the source of truth for exact dependency ranges.
 
-## Release-candidate versions
+## Stable versions
 
-Current Anvia packages use the `1.0.0-rc.x` prerelease line. Pin the exact RC in production-like environments because a later candidate may still include migration work before the stable `1.0.0` release.
+The current stable package train is `1.0.0` and npm exposes it through the default `latest` tag. Pin exact versions in production environments when upgrades require deliberate review.
 
 ```json
 {
   "dependencies": {
-    "@anvia/core": "1.0.0-rc.9",
-    "@anvia/openai": "1.0.0-rc.9"
+    "@anvia/core": "1.0.0",
+    "@anvia/openai": "1.0.0"
   }
 }
 ```
@@ -59,7 +59,7 @@ import type { Message } from '@anvia/core/completion'
 
 The v1 API uses declarative `new Agent({...})` construction and direct `agent.generate(...)` or `agent.stream(...)` runs. Builder-era APIs such as `AgentBuilder`, prompt requests, and `.send()` are not part of the v1 public surface.
 
-For the next RC after `rc.9`:
+Anvia `1.0.0` includes the final v1 migration boundary:
 
 - import MCP clients and transports from `@anvia/mcp`; Core retains registration contracts only;
 - verify MCP servers support protocol `2026-07-28` because there is no legacy fallback;
@@ -67,12 +67,12 @@ For the next RC after `rc.9`:
 - rename React UI compound namespaces to `*Primitive`, remove package CSS imports, and move styling
   into application code or generated `@anvia/cli` components.
 
-Keep an application on the v0 documentation and package line until its migration is complete. When moving to v1, update Core and every Anvia adapter together, then follow the [v1 Core API reference](/packages/core/api-reference) and provider-specific configuration pages.
+When moving from v0 to v1, update Core and every Anvia adapter together, then follow the [v1 Core API reference](/packages/core/api-reference) and provider-specific configuration pages.
 
 ## Upgrade checklist
 
 - Read the relevant entry in [Changelog](/packages/changelog).
-- Keep all Anvia packages on the same `1.0.0-rc.x` candidate.
+- Keep all Anvia packages on the same stable release train.
 - Compare public types used by your application.
 - Run TypeScript, unit, integration, and evaluation suites.
 - Test migrations against a copy of production data.

@@ -1,6 +1,6 @@
 # Install and setup
 
-This guide installs the v1 release candidate, creates a provider model, and verifies one direct completion before an agent is introduced.
+This guide installs stable Anvia v1, creates a provider model, and verifies one direct completion before an agent is introduced.
 
 ## Before you start
 
@@ -13,18 +13,18 @@ You need:
 
 ## 1. Install core and one provider
 
-Start with the provider-neutral runtime and a single provider adapter. During the release-candidate period, keep every Anvia package on the `rc` tag.
+Start with the provider-neutral runtime and a single provider adapter. Keep Anvia packages on the same stable release line.
 
 ```bash
-pnpm add @anvia/core@rc @anvia/openai@rc
+pnpm add @anvia/core @anvia/openai
 ```
 
 Other provider adapters use the same runtime boundary:
 
 ```bash
-pnpm add @anvia/anthropic@rc
-pnpm add @anvia/gemini@rc
-pnpm add @anvia/mistral@rc
+pnpm add @anvia/anthropic
+pnpm add @anvia/gemini
+pnpm add @anvia/mistral
 ```
 
 Add packages such as `@anvia/server`, `@anvia/react`, memory adapters, or observability integrations only when the application needs those capabilities.
@@ -88,10 +88,10 @@ The v1 completion API receives the input first and runtime options second. A suc
 
 ## 5. Keep packages aligned
 
-Do not mix stable v0 packages with v1 release-candidate packages. When adding another Anvia package, install its `rc` release as well:
+When adding another Anvia package, install it from the same stable release line:
 
 ```bash
-pnpm add @anvia/server@rc @anvia/react@rc
+pnpm add @anvia/server @anvia/react
 ```
 
 Package alignment matters because the provider, core runtime, server transport, and UI packages share TypeScript contracts.

@@ -1,6 +1,6 @@
 # MCP transports
 
-The v1 RC supports application-owned stdio processes, remote Streamable HTTP servers, and
+Anvia v1 supports application-owned stdio processes, remote Streamable HTTP servers, and
 application-controlled custom transports through `@anvia/mcp`. Keep every transport behind the
 server-side application boundary.
 
@@ -41,7 +41,7 @@ const client = new McpClient({
 const server = await client.connect()
 ```
 
-The HTTP transport also accepts an MCP SDK `authProvider`, `reconnectionOptions`, and `sessionId`. The RC transport union contains only `stdio`, `streamableHttp`, and `custom` variants.
+The HTTP transport also accepts an MCP SDK `authProvider`, `reconnectionOptions`, and `sessionId`. The transport union contains only `stdio`, `streamableHttp`, and `custom` variants.
 
 All built-in transports require MCP protocol `2026-07-28`; there is no legacy protocol fallback.
 

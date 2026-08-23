@@ -175,6 +175,6 @@ in the output belongs to the input packet. Run a small golden eval set separatel
 
 ## Source and extensions
 
-- Source: [`05_pipelines/08-research-pipeline.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/05_pipelines/08-research-pipeline.ts)
+- Source: [`05_pipelines/08-research-pipeline.ts`](https://github.com/anvia-hq/anvia/blob/main/cookbook/05_pipelines/08-research-pipeline.ts)
 - Related: [Parallel pipelines](/sdk/pipelines/parallel-and-batch) and [evaluations](/examples/production/evaluations)
 - Extend it with reranking, human review, an immutable evidence snapshot, and structured report output.

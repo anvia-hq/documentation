@@ -8,7 +8,7 @@
 pnpm add @anvia/lancedb @anvia/core @anvia/openai @lancedb/lancedb
 ```
 
-The ESM package includes `@lancedb/lancedb` and should be installed with the matching `@anvia/core` release candidate.
+The ESM package includes `@lancedb/lancedb` and should be installed with the matching stable `@anvia/core` release.
 
 ## Store and search documents
 
@@ -78,5 +78,5 @@ Learn the common workflow in [Load documents](/sdk/knowledges/load-documents) an
 
 - [API reference](/packages/lancedb/api-reference)
 - [Metadata filters](/sdk/knowledges/metadata-filters)
-- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/vector-lancedb)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-lancedb/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/vector-lancedb)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-lancedb/CHANGELOG.md)

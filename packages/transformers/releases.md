@@ -1,6 +1,6 @@
 # Releases
 
-Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 history.
+Current stable release: `1.0.0`. The entries below preserve notable v0 history.
 
 ## Notable changes
 
@@ -13,6 +13,6 @@ Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 h
 
 Other `0.2.x` releases primarily track compatible Core updates. Read the complete changelog when upgrading from an older Core version.
 
-- [Full `@anvia/transformers` changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/embedding-transformers/CHANGELOG.md)
+- [Full `@anvia/transformers` changelog](https://github.com/anvia-hq/anvia/blob/main/packages/embedding-transformers/CHANGELOG.md)
 - [Compatibility and versioning](/packages/compatibility-and-versioning)
 - [API reference](/packages/transformers/api-reference)

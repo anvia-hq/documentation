@@ -8,7 +8,7 @@
 pnpm add @anvia/weaviate @anvia/core @anvia/openai weaviate-client
 ```
 
-The ESM package includes `weaviate-client` and should be installed with the matching `@anvia/core` release candidate.
+The ESM package includes `weaviate-client` and should be installed with the matching stable `@anvia/core` release.
 
 ## Store and search documents
 
@@ -75,5 +75,5 @@ Metadata keys beginning with `__anvia_` are reserved. If metadata properties nee
 - [API reference](/packages/weaviate/api-reference)
 - [Vector stores](/sdk/knowledges/vector-stores)
 - [Automatic retrieval](/sdk/knowledges/automatic-retrieval)
-- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/vector-weaviate)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-weaviate/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/vector-weaviate)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-weaviate/CHANGELOG.md)

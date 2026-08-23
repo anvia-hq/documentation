@@ -2,14 +2,14 @@
 
 Anvia provides Prisma, Drizzle, direct Postgres, and SQLite memory stores. Choose the adapter that matches the database and migration workflow the application already operates.
 
-Keep every package on the v1 release-candidate channel while the core API is in RC.
+Keep every Anvia package on the same stable release line.
 
 ## Prisma
 
 Use Prisma when the application already owns a Prisma schema and client:
 
 ```bash
-pnpm add @anvia/core@rc @anvia/memory-prisma@rc @prisma/client
+pnpm add @anvia/core @anvia/memory-prisma @prisma/client
 npx @anvia/memory-prisma init
 npx @anvia/memory-prisma init --write
 npx prisma validate
@@ -36,7 +36,7 @@ See [Prisma memory](/packages/memory-prisma/get-started).
 Use Drizzle when memory tables should live in the application's Drizzle schema and migration flow:
 
 ```bash
-pnpm add @anvia/core@rc @anvia/memory-drizzle@rc drizzle-orm
+pnpm add @anvia/core @anvia/memory-drizzle drizzle-orm
 npx @anvia/memory-drizzle init
 npx @anvia/memory-drizzle init --write
 npx drizzle-kit generate
@@ -68,7 +68,7 @@ See [Drizzle memory](/packages/memory-drizzle/get-started).
 Use the Postgres adapter when the application owns a connection string or `pg`-compatible client without an ORM:
 
 ```bash
-pnpm add @anvia/core@rc @anvia/memory-postgres@rc
+pnpm add @anvia/core @anvia/memory-postgres
 ```
 
 ```ts
@@ -92,7 +92,7 @@ See [Postgres memory](/packages/memory-postgres/get-started).
 Use SQLite for local tools, desktop applications, tests, or small single-node deployments:
 
 ```bash
-pnpm add @anvia/core@rc @anvia/memory-sqlite@rc
+pnpm add @anvia/core @anvia/memory-sqlite
 ```
 
 ```ts

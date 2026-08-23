@@ -13,7 +13,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Evaluations and observability](https://docs.anvia.dev/llms-evals.txt): Tracing, Lens, evaluation suites, datasets, release comparison, quality gates, alerts, cost, and testing.
 - [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt): Ingestion, embeddings, vector stores, Neo4j GraphRAG, metadata filters, dynamic context, permission-aware retrieval, and memory boundaries.
 
-## Current v1 RC Boundaries
+## Stable v1 boundaries
 
 - Construct agents, pipelines, and extractors directly; builder-era APIs are migration context only.
 - Use `@anvia/mcp` for MCP SDK v2 clients and transports. Core retains lightweight registration contracts.

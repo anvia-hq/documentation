@@ -8,7 +8,7 @@
 pnpm add @anvia/memory-prisma @anvia/core @prisma/client
 ```
 
-The package is ESM-only and should be installed with the matching `@anvia/core` release candidate and `@prisma/client >=7.9.1 <8.0.0`.
+The package is ESM-only and should be installed with the matching stable `@anvia/core` release and `@prisma/client >=7.9.1 <8.0.0`.
 
 ## Generate the model file
 
@@ -94,5 +94,5 @@ Read [Memory save policies](/sdk/memory/save-policies) and [Memory sessions](/sd
 
 - [API reference](/packages/memory-prisma/api-reference)
 - [Memory store adapters](/sdk/memory/store-adapters)
-- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/memory-prisma)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/memory-prisma/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/memory-prisma)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-prisma/CHANGELOG.md)

@@ -1,6 +1,6 @@
 # Anvia Full-Stack Applications
 
-> Current v1 RC implementation context for server streaming and React chat. Updated 2026-08-23.
+> Current stable v1 implementation context for server streaming and React chat. Updated 2026-08-23.
 
 Keep agents, provider credentials, tools, memory, retrieval, observers, continuations, and access
 control on the server. Send only the reviewed Client Protocol to the browser.
@@ -19,8 +19,8 @@ server-side Agent stream
 ## Packages
 
 ```sh
-pnpm add @anvia/core@rc @anvia/client@rc @anvia/server@rc
-pnpm add @anvia/react@rc @anvia/react-ui@rc react react-dom
+pnpm add @anvia/core @anvia/client @anvia/server
+pnpm add @anvia/react @anvia/react-ui react react-dom
 ```
 
 - `@anvia/client` defines browser-safe request, event, message, and transport contracts.
@@ -100,8 +100,8 @@ maximum request duration in the deployed environment.
 Use the CLI when the application wants an editable starting point:
 
 ```sh
-pnpm dlx @anvia/cli@rc init
-pnpm dlx @anvia/cli@rc add chat
+pnpm dlx @anvia/cli init
+pnpm dlx @anvia/cli add chat
 ```
 
 Or compose headless primitives directly:

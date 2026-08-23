@@ -47,7 +47,7 @@ Inspect the rendered attributes for the part being styled. The stable semantic s
 `data-state` and `data-role`; internal structure is not a styling API. Prefer explicit `className`
 values on the exact primitives your application composes.
 
-To start from editable Tailwind components instead, run `pnpm dlx @anvia/cli@rc add chat` and modify
+To start from editable Tailwind components instead, run `pnpm dlx @anvia/cli add chat` and modify
 the generated application files directly.
 
 ## Design-system elements

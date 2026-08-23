@@ -14,7 +14,7 @@ const client = new OpenAIClient({ apiKey })
 export const transcriptionModel = client.transcriptionModel({ modelId: 'whisper-1' })
 ```
 
-OpenAI, Gemini, and Grok provide v1 RC transcription adapters. Supported formats, size limits, languages, and optional parameters vary by provider.
+OpenAI, Gemini, and Grok provide v1 transcription adapters. Supported formats, size limits, languages, and optional parameters vary by provider.
 
 ## 2. Read the audio bytes
 

@@ -8,7 +8,7 @@
 pnpm add @anvia/milvus @anvia/core @anvia/openai @zilliz/milvus2-sdk-node
 ```
 
-The ESM package includes the Milvus Node SDK and should be installed with the matching `@anvia/core` release candidate.
+The ESM package includes the Milvus Node SDK and should be installed with the matching stable `@anvia/core` release.
 
 ## Store and search documents
 
@@ -76,5 +76,5 @@ Metadata fields are written alongside reserved Anvia fields. Keys beginning with
 - [API reference](/packages/milvus/api-reference)
 - [Vector stores](/sdk/knowledges/vector-stores)
 - [Search tools](/sdk/knowledges/search-tools)
-- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/vector-milvus)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-milvus/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/main/packages/vector-milvus)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-milvus/CHANGELOG.md)

@@ -7,8 +7,8 @@ or Vite application; it does not create an application.
 ## Add a complete chat
 
 ```sh
-pnpm dlx @anvia/cli@rc init vite
-pnpm dlx @anvia/cli@rc add chat
+pnpm dlx @anvia/cli init vite
+pnpm dlx @anvia/cli add chat
 ```
 
 `init` prepares shadcn and `components.json`. `add chat` writes the complete component set below the

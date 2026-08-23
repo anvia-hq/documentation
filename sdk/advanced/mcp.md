@@ -5,7 +5,7 @@ Model Context Protocol connects Anvia agents to tools hosted by external servers
 Install the dedicated integration package alongside Core:
 
 ```sh
-pnpm add @anvia/core@rc @anvia/mcp@rc
+pnpm add @anvia/core @anvia/mcp
 ```
 
 `@anvia/mcp` owns connections, transports, tool discovery, result mapping, and cleanup. Core keeps

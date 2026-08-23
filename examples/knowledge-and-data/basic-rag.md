@@ -105,8 +105,8 @@ documents, malicious instructions, embedding failures, and source citation membe
 
 ## Runnable references
 
-- [Embed and search](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/01-embed-and-search.ts)
-- [OpenRouter RAG](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/03-openrouter-rag.ts)
+- [Embed and search](https://github.com/anvia-hq/anvia/blob/main/cookbook/06_retrieval/01-embed-and-search.ts)
+- [OpenRouter RAG](https://github.com/anvia-hq/anvia/blob/main/cookbook/06_retrieval/03-openrouter-rag.ts)
 
 ## Extensions
 

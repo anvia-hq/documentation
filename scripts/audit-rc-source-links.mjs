@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 
 const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const anviaRoot = resolve(process.env.ANVIA_REPO ?? join(docsRoot, '..', 'anvia'))
-const expectedRef = process.env.ANVIA_REF ?? 'staging'
+const expectedRef = process.env.ANVIA_REF ?? 'main'
 
 async function collectMarkdown(directory) {
   const files = []
@@ -41,7 +41,7 @@ for (const markdownPath of await collectMarkdown(docsRoot)) {
 
 if (failures.length > 0) {
   console.error(failures.sort().join('\n'))
-  console.error(`\n${failures.length} invalid RC source links across ${links} checked links.`)
+  console.error(`\n${failures.length} invalid source links across ${links} checked links.`)
   process.exitCode = 1
 } else {
   console.log(`Verified ${links} Anvia source links against ${expectedRef}.`)

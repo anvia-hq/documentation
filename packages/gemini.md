@@ -5,9 +5,9 @@ Gemini’s provider adapter connects Anvia to the Gemini Developer API or Vertex
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.0.0-rc.9` |
+| Version | `1.0.0` |
 | Runtime | ESM, server-side JavaScript |
-| Peer | Matching `@anvia/core` release candidate |
+| Peer | Matching `@anvia/core` stable release |
 
 ## Install
 
@@ -100,4 +100,4 @@ Use matching dimensions and a compatible task configuration when indexing and qu
 - [API reference](/packages/gemini/api-reference)
 - [Releases](/packages/gemini/releases)
 - [Gemini SDK guide](/sdk/providers/gemini)
-- [Source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/provider-gemini/CHANGELOG.md)
+- [Source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-gemini/CHANGELOG.md)

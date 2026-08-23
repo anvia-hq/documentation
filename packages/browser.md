@@ -5,7 +5,7 @@
 ## Install
 
 ```bash
-pnpm add @anvia/browser@rc @anvia/core@rc @anvia/sandbox@rc
+pnpm add @anvia/browser @anvia/core @anvia/sandbox
 ```
 
 The package requires Node.js 20.12 or newer, Docker, and an application-selected Anvia browser image. `@anvia/sandbox` owns Docker infrastructure; `@anvia/browser` owns the Chromium workload inside it.

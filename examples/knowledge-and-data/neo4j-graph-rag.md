@@ -39,4 +39,4 @@ Ask which incidents affect a known product, then ask for the supporting source t
 
 Failure cases include index-dimension mismatches, extraction schema violations, conflicting entity properties, unknown provenance chunk IDs, unavailable full-text indexes, and traversal limits that are too small for the required path.
 
-See the runnable [v1 RC cookbook source](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/14-neo4j-graph-rag.ts).
+See the runnable [v1 cookbook source](https://github.com/anvia-hq/anvia/blob/main/cookbook/06_retrieval/14-neo4j-graph-rag.ts).

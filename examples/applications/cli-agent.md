@@ -32,7 +32,7 @@ Create an application and install the runtime plus your preferred terminal UI fr
 ```sh
 mkdir anvia-cli-agent && cd anvia-cli-agent
 pnpm init
-pnpm add @anvia/core@rc @anvia/openai@rc ink react
+pnpm add @anvia/core @anvia/openai ink react
 ```
 
 Set `OPENROUTER_API_KEY`; `ANVIA_MODEL` and `TAVILY_API_KEY` are optional.

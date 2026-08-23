@@ -66,7 +66,7 @@ facets, forbidden nearest-neighbor canaries, and empty result sets.
 
 ## Runnable reference
 
-- [Filters and LSH](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/02-filters-and-lsh.ts)
+- [Filters and LSH](https://github.com/anvia-hq/anvia/blob/main/cookbook/06_retrieval/02-filters-and-lsh.ts)
 
 ## Extensions
 

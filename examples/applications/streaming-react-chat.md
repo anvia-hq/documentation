@@ -204,5 +204,5 @@ Vite can proxy `/api` to `http://127.0.0.1:8787` during development. In producti
 - Give mutating tools their own authorization, cancellation, idempotency, and audit rules.
 - Use [resumable streams](/sdk/streaming/resumable-streams) when disconnect replay is required.
 
-The staging repository's [server/React transport cookbook](https://github.com/anvia-hq/anvia/blob/staging/cookbook/01_basics/07-server-react-transport.ts)
+The main repository's [server/React transport cookbook](https://github.com/anvia-hq/anvia/blob/main/cookbook/01_basics/07-server-react-transport.ts)
 demonstrates the same framed client/server boundary in one focused file.

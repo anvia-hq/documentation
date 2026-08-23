@@ -10,7 +10,7 @@ Choose one of two styling paths:
 
 ```sh
 # Install editable application components
-pnpm dlx @anvia/cli@rc add chat
+pnpm dlx @anvia/cli add chat
 ```
 
 Or compose the headless primitives directly and pass your own `className` values:
