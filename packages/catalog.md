@@ -28,7 +28,6 @@ All packages below are maintained in the Anvia monorepo. “First-party” descr
 
 | Package | Integration | Reference |
 | --- | --- | --- |
-| `@anvia/fastembed` | Local embeddings through FastEmbed | [Open](/packages/fastembed) |
 | `@anvia/transformers` | Local Transformers.js embeddings | [Open](/packages/transformers) |
 
 ## Memory

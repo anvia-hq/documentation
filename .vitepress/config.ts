@@ -902,20 +902,6 @@ export default defineConfig({
           text: 'Embeddings',
           items: [
             {
-              text: '@anvia/fastembed',
-              collapsed: true,
-              items: [
-                { text: 'Overview', link: '/packages/fastembed' },
-                { text: 'Get started', link: '/packages/fastembed/get-started' },
-                { text: 'Capabilities', link: '/packages/fastembed/capabilities' },
-                { text: 'Configuration', link: '/packages/fastembed/configuration' },
-                { text: 'Local runtime', link: '/packages/fastembed/local-runtime' },
-                { text: 'Sparse embeddings', link: '/packages/fastembed/sparse-embeddings' },
-                { text: 'API', link: '/packages/fastembed/api-reference' },
-                { text: 'Releases', link: '/packages/fastembed/releases' }
-              ]
-            },
-            {
               text: '@anvia/transformers',
               collapsed: true,
               items: [

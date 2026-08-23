@@ -16,7 +16,7 @@ export const embeddingModel = client.embeddingModel({
 })
 ```
 
-OpenAI, Gemini, and Mistral provide hosted adapters. `@anvia/fastembed` and `@anvia/transformers` provide local alternatives.
+OpenAI, Gemini, and Mistral provide hosted adapters. `@anvia/transformers` provides a local alternative.
 
 ## 2. Embed one query
 

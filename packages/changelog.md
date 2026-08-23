@@ -19,7 +19,6 @@ Every published Anvia package keeps its release history beside its implementatio
 - [`@anvia/gemini`](https://github.com/anvia-hq/anvia/blob/main/packages/provider-gemini/CHANGELOG.md)
 - [`@anvia/mistral`](https://github.com/anvia-hq/anvia/blob/main/packages/provider-mistral/CHANGELOG.md)
 - [`@anvia/grok`](https://github.com/anvia-hq/anvia/blob/main/packages/provider-grok/CHANGELOG.md)
-- [`@anvia/fastembed`](https://github.com/anvia-hq/anvia/blob/main/packages/embedding-fastembed/CHANGELOG.md)
 - [`@anvia/transformers`](https://github.com/anvia-hq/anvia/blob/main/packages/embedding-transformers/CHANGELOG.md)
 
 ## Memory and vector stores

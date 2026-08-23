@@ -23,7 +23,6 @@ Use this matrix to find the package family that owns a capability. A check means
 | `@anvia/gemini` | ✓ | ✓ | — |
 | `@anvia/mistral` | ✓ | ✓ | — |
 | `@anvia/grok` | ✓ | — | — |
-| `@anvia/fastembed` | — | ✓ | ✓ |
 | `@anvia/transformers` | — | ✓ | ✓ |
 
 Provider-specific support for images, audio, transcription, OCR, tools, reasoning, and structured output varies by adapter and model. Check the provider page before selecting a model.
