@@ -36,8 +36,8 @@ const supportAgent = new Agent({
     store: memoryStore,
     savePolicy: 'turn',
     compaction: {
-      trigger: { afterMessages: 40 },
-      retention: { recentUserTurns: 4 },
+      trigger: { afterTokens: 32_000 },
+      retention: { recentTokens: 8_000 },
       conflictRetries: { maxAttempts: 2 },
       compactor: compactMemory,
     },
@@ -45,13 +45,41 @@ const supportAgent = new Agent({
 })
 ```
 
-`trigger.afterMessages` and `retention.recentUserTurns` must be positive integers. Omit `retention` to keep four recent user turns. Conflict retries are disabled by default; set `conflictRetries: { maxAttempts }` to allow that many total compaction attempts.
+`trigger.afterTokens` and `retention.recentTokens` must be positive safe integers, and the retained
+budget must be smaller than the trigger. Omit `retention` to use one quarter of the trigger budget.
+Conflict retries are disabled by default; set `conflictRetries: { maxAttempts }` to allow that many
+total attempts.
 
 ## 3. Understand the trigger
 
-Before a session run, Anvia loads a compaction snapshot. It compacts only when stored messages plus the incoming prompt exceed `trigger.afterMessages` and the history contains more user messages than the configured recent-turn count.
+Before a session run, Anvia loads a compaction snapshot. It compacts when stored messages plus the
+incoming prompt exceed `trigger.afterTokens` and an older prefix can be summarized while retaining
+recent complete user-led turns.
 
-The compacted prefix ends immediately before the oldest retained user message. This keeps the configured number of recent user-led turns intact. If a complete recent tail cannot be retained, compaction is skipped even when the threshold is exceeded.
+Reported `originalTokenCount` measures the stored snapshot; the incoming prompt participates in
+the automatic trigger but is not part of the prefix being replaced.
+
+The compacted prefix ends immediately before the oldest retained user message. Anvia keeps as many
+recent complete turns as fit in `recentTokens`; the newest turn is always retained even when it
+exceeds that budget. It never splits a user-led turn merely to hit an exact token number. If no
+complete older prefix can be compacted, compaction is skipped.
+
+The default `estimateMemoryTokens()` is a fast provider-neutral estimate based on message role and
+content. Supply an async or synchronous model-specific counter when the precise tokenizer matters.
+A custom counter may be called more than once and must be deterministic, nonnegative, safe-integer,
+and monotonic for message suffixes:
+
+```ts
+memory: {
+  store: memoryStore,
+  compaction: {
+    trigger: { afterTokens: 100_000 },
+    retention: { recentTokens: 20_000 },
+    tokenCounter: (messages) => tokenizer.count(serializeMessages(messages)),
+    compactor: compactMemory,
+  },
+}
+```
 
 The summary becomes a system message with framework metadata recording how many original messages it represents. `isMemoryCompactionMessage(message)` identifies that normalized summary later.
 
@@ -63,7 +91,58 @@ Compaction still processes user and tool data. Apply the same access, redaction,
 
 Summary-model usage is added to the agent run's total usage. A compaction failure occurs before the main model call.
 
-## 5. Handle concurrent updates
+## 5. Compact a session manually
+
+Use the same configured store, token counter, retention policy, and compactor without waiting for
+the automatic threshold:
+
+```ts
+const result = await supportAgent.compactMemory({ session })
+
+if (result.type === 'compacted') {
+  console.log(result.originalTokenCount, '->', result.resultTokenCount)
+} else {
+  console.log('No complete older prefix was available to compact.')
+}
+```
+
+Manual compaction requires configured memory and a store with compaction support. It ignores the
+automatic trigger but still preserves the configured recent-token tail. Pass `abortSignal` in the
+options object when the maintenance operation should be cancellable.
+
+## 6. Observe compaction
+
+Automatic compaction emits `memory_compaction` before the main model call. The same
+`MemoryCompactionInfo` is available on the terminal outcome as `memoryCompaction` and in lifecycle
+finish data:
+
+```ts
+for await (const event of supportAgent.stream({ prompt, session })) {
+  if (event.type === 'memory_compaction') {
+    console.log({
+      messages: {
+        original: event.originalMessageCount,
+        compacted: event.compactedMessageCount,
+        retained: event.retainedMessageCount,
+      },
+      tokens: {
+        original: event.originalTokenCount,
+        compacted: event.compactedTokenCount,
+        retained: event.retainedTokenCount,
+        result: event.resultTokenCount,
+      },
+      attempts: event.attempts,
+      usage: event.usage,
+    })
+  }
+}
+```
+
+The event includes original, compacted, and retained message counts plus original, compacted,
+retained, and resulting token counts. Manual compaction returns this data directly and does not
+create an agent stream event.
+
+## 7. Handle concurrent updates
 
 The memory store must expose the optional `MemoryCompactionCapability` capability. A compaction load returns an opaque revision; commit atomically replaces the chosen prefix only when that revision still matches.
 

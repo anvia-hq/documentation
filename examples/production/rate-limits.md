@@ -87,6 +87,6 @@ release on failure, multiple workers sharing state, limiter outages, and token r
 
 ## Source and extensions
 
-- For finite local batches, see [`05_pipelines/05-batch-run.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/05_pipelines/05-batch-run.ts).
+- For finite local batches, see [`05_pipelines/05-batch-run.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/05_pipelines/05-batch-run.ts).
 - Continue to [retries and timeouts](/examples/production/retries-and-timeouts) and [durable jobs](/examples/production/durable-jobs).
 - Extend with plan-based quotas, cost ceilings, and adaptive provider backpressure.

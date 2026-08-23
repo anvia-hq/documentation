@@ -29,10 +29,11 @@ Pass only the options required by the agent. Construction returns a ready-to-use
 
 ## Agent execution
 
-- `agent.generate({ prompt | messages, ...runOptions })` returns a completed, blocked, or suspended result.
+- `agent.generate({ prompt | messages, ...runOptions })` returns a `response`, `interaction`, or `blocked` outcome.
 - `agent.generate({ prompt, maxTurns: n })` overrides the turn limit for one run.
-- `agent.stream({ prompt | messages, ...runOptions })` yields runtime events.
-- `agent.generate({ continuation, response })` starts a linked phase after an approval or question.
+- `agent.stream({ prompt | messages, ...runOptions })` returns a single-consumer `AgentStream` handle.
+- `agent.resume(continuation, response, settings?)` starts a linked generated phase after an approval or question.
+- `agent.compactMemory({ session, abortSignal? })` explicitly compacts an eligible memory prefix.
 - `agent.generate({ prompt, session: { sessionId, userId? } })` runs with persisted memory.
 
 ## Agent stream events
@@ -47,7 +48,11 @@ Pass only the options required by the agent. Construction returns a ready-to-use
 | `turn_end` | A model turn completed. |
 | `agent_tool_event` | A nested agent emitted an event while running as a tool. |
 | `interaction_response` | A linked phase accepted an approval or question response. |
-| `final` | Completed, blocked, or suspended result with usage, messages, and run metadata. |
+| `memory_compaction` | Automatic memory compaction completed with message, token, attempt, and usage data. |
+| `steering_applied` | Queued steering input entered a later turn. |
+| `response` | Terminal answer with typed output, usage, messages, and run metadata. |
+| `interaction` | Terminal approval or question request with its continuation. |
+| `blocked` | Terminal guardrail block with stage and reason. |
 | `error` | The active run failed. |
 
 ## Server stream

@@ -60,8 +60,8 @@ review path for critical fields.
 ## Source and extensions
 
 The current source contract and tested sources are in
-[`MistralOcrModel`](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-mistral/src/mistral/ocr.ts)
-and its [OCR tests](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-mistral/test/ocr.test.ts).
+[`MistralOcrModel`](https://github.com/anvia-hq/anvia/blob/staging/packages/provider-mistral/src/mistral/ocr.ts)
+and its [OCR tests](https://github.com/anvia-hq/anvia/blob/staging/packages/provider-mistral/test/ocr.test.ts).
 Next, process selected pages, upload bytes, or feed reviewed Markdown into retrieval.
 
 - [Mistral OCR](/sdk/providers/mistral/ocr)

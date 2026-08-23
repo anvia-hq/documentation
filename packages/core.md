@@ -1,6 +1,9 @@
 # `@anvia/core`
 
-`@anvia/core` is Anvia's provider-neutral runtime. It owns agents, direct completions, typed tools, resumable human interactions, document utilities, memory contracts, retrieval, pipelines, streaming events, guardrails, skills, MCP connections, evaluations, and the shared message types used by the rest of the SDK.
+`@anvia/core` is Anvia's provider-neutral runtime. It owns agents, direct completions, typed tools,
+resumable human interactions, document utilities, memory contracts, retrieval, pipelines, streaming
+events, guardrails, skills, MCP registration contracts, evaluations, and the shared message types
+used by the rest of the SDK.
 
 Use it when application code should describe agent behavior without depending on one model provider. Provider packages such as `@anvia/openai`, `@anvia/anthropic`, and `@anvia/gemini` supply the runnable model objects.
 
@@ -48,7 +51,7 @@ const response = await supportAgent.generate({
     prompt: 'What is happening with order A123?'
 })
 
-if (response.status === 'completed') {
+if (response.type === 'response') {
   console.log(response.output)
 }
 ```
@@ -68,7 +71,7 @@ The model, credentials, business data, permissions, storage, and deployment rema
 | Pipelines | `@anvia/core/pipeline` | Typed multi-stage workflows, batches, graphs, and run events |
 | Media | `@anvia/core/image-generation`, `@anvia/core/speech-generation`, `@anvia/core/transcription` | Provider-neutral media requests |
 | Runtime control | `@anvia/core/agent`, `@anvia/core/guardrails` | Lifecycle observation, resumable interactions, and enforced input/output policy |
-| Integration | `@anvia/core/mcp`, `@anvia/core/skills`, `@anvia/core/observability` | External tools, reusable instructions, and run telemetry |
+| Integration contracts | `@anvia/core/mcp`, `@anvia/core/skills`, `@anvia/core/observability` | MCP registration types, reusable instructions, and run telemetry; MCP connections live in `@anvia/mcp` |
 | Evaluation | `@anvia/core/evals` | Typed evaluation suites, metrics, reporters, and CLI output |
 
 The root `@anvia/core` entry point re-exports the most common agent, completion, tool, memory, guardrail, lifecycle, and UI-stream APIs. Prefer a capability subpath when it makes ownership clearer or when the symbol is not available from the root.
@@ -114,4 +117,4 @@ Core's contracts are broadly portable, but not every entry point has the same en
 - [Register agents in Studio](/studio/configure/register-agents-and-pipelines)
 - [Inspect tools in Studio](/studio/tools)
 
-For exact exports and signatures, use the [API reference](/packages/core/api-reference). For release history, read the [source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/core/CHANGELOG.md).
+For exact exports and signatures, use the [API reference](/packages/core/api-reference). For release history, read the [source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/core/CHANGELOG.md).

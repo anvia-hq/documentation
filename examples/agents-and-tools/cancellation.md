@@ -40,7 +40,9 @@ const response = await fetch('/api/chat', {
 controller.abort()
 ```
 
-For a normal `createClientStreamResponse()` response, disconnecting closes the event iterator. Closing an active `AgentStream` cancels its run. There is no separate public `stream.cancel()` method.
+For a normal `createClientStreamResponse()` response, disconnecting closes the event iterator.
+Closing an active `AgentStream` cancels its run. A server-side owner can also call
+`stream.cancel(reason)` directly.
 
 ## Handle uncertain side effects
 

@@ -84,6 +84,6 @@ model-judged cases and manually review a sample of disagreements.
 
 ## Source and extensions
 
-- Sources: [`08_evals`](https://github.com/anvia-hq/anvia/tree/v1-rc3/examples/cookbook/08_evals)
+- Sources: [`08_evals`](https://github.com/anvia-hq/anvia/tree/staging/cookbook/08_evals)
 - Continue to [quality gates](/examples/production/quality-gates) and [testing agents](/examples/production/testing-agents).
 - Extend with Lens, Langfuse, or OTel reporters; slice results by capability and risk level.

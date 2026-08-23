@@ -1,6 +1,6 @@
 # Releases
 
-Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 history.
+Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 history.
 
 Notable releases include:
 
@@ -11,4 +11,4 @@ Notable releases include:
 - `0.2.10` moved `@anvia/core` to a peer dependency.
 - `0.2.0` aligned imports with the focused core public surface.
 
-See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/vector-qdrant/CHANGELOG.md).
+See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-qdrant/CHANGELOG.md).

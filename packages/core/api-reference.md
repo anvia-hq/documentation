@@ -33,43 +33,42 @@ const agent = new Agent({
 Important methods:
 
 ```ts
-agent.generate(options): Promise<AgentResult>
-agent.stream(options): AgentStream<AgentStreamEvent>
+agent.generate(options): Promise<AgentOutcome<Output>>
+agent.resume(continuation, response, settings?): Promise<AgentOutcome<Output>>
+agent.stream(options): AgentStream<Output, RawResponse>
+agent.compactMemory({ session, abortSignal? }): Promise<MemoryCompactionResult>
 agent.asTool(options): Tool
 ```
 
 Run options include `maxTurns`, `retries`, `abortSignal`, `lifecycle`, `guardrails`, `toolConcurrency`, `middlewares`, and `trace`.
 
-`AgentResult` is a discriminated union:
+`AgentOutcome` is a discriminated union. All branches share `runId`, `text`, `usage`, `messages`,
+and optional finish, context, trace, guardrail, source, provider-tool, memory-compaction, and resume
+metadata:
 
 ```ts
-type AgentResult =
+type AgentOutcome<Output> =
   | {
-      status: 'completed'
-      runId: string
-      output: string
-      text: string
-      usage: Usage
-      messages: Message[]
-      trace?: AgentTraceInfo
+      type: 'response'
+      output: Output
     }
   | {
-      status: 'blocked'
+      type: 'blocked'
       stage: 'input' | 'output'
-      runId: string
-      text: string
-      usage: Usage
-      messages: Message[]
+      reason: string
+      message?: string
     }
   | {
-      status: 'suspended'
-      runId: string
+      type: 'interaction'
       interaction: AgentInteractionRequest
       continuation: AgentContinuation
-      usage: Usage
-      messages: Message[]
     }
 ```
+
+`AgentStream` is an async iterable of `AgentStreamEvent`. Its final emitted item is an
+`AgentOutcome`, not a wrapped `final` event. The handle also exposes `events`, `textStream`,
+`text: Promise<string>`, `result: Promise<AgentOutcome<Output>>`, `steer(input)`, and
+`cancel(reason?)`. Consume only one iterable surface per stream.
 
 Pass `session: { sessionId, userId?, metadata? }` with a prompt to load and persist memory for that run. Use the configured store's `load({ scope })` and `clear({ scope })` methods for authorized inspection and deletion.
 
@@ -167,22 +166,22 @@ Pass the returned `ToolIndex` directly in `Agent.tools`. `embedTools(...)` retur
 
 ## Tool approval
 
-Generated runs pause with `status: 'suspended'` before a guarded tool executes:
+Generated runs return `type: 'interaction'` before a guarded tool executes:
 
 ```ts
 const pending = await agent.generate({
     prompt: input
 })
 
-if (pending.status === 'suspended' && pending.interaction.type === 'tool-approval') {
-  const result = await agent.generate({
-    continuation: pending.continuation,
-    response: {
+if (pending.type === 'interaction' && pending.interaction.type === 'tool-approval') {
+  const result = await agent.resume(
+    pending.continuation,
+    {
       type: 'tool-approval',
       approved: reviewer.approved,
       reason: reviewer.reason,
     },
-  })
+  )
 }
 ```
 
@@ -225,6 +224,12 @@ interface MemoryStore {
 ```
 
 The subpath also exports memory options, scope types, inspector contracts, compaction contracts, `createSummaryMemoryCompactor`, `isMemoryCompactionMessage`, and compaction errors.
+
+Token-aware compaction uses `trigger.afterTokens`, optional `retention.recentTokens`, an optional
+sync or async `tokenCounter`, and a `compactor`. Core exports `estimateMemoryTokens` as the default
+provider-neutral estimate. `MemoryCompactionInfo` records original, compacted, retained, and result
+token/message counts, attempts, and summary-model usage. `agent.compactMemory({ session })` forces
+an eligible prefix compaction and returns `type: 'compacted'` or `type: 'skipped'`.
 
 ## Embeddings and vector stores
 
@@ -391,7 +396,9 @@ Model, request, response, result, and retry types are exported from `@anvia/core
 
 ## MCP and skills
 
-`@anvia/core/mcp` exports `McpClient` and `McpClientGroup` plus transport, server, and tool types. Construct a client with a `stdio`, `streamableHttp`, or `custom` transport, call `connect()`, register the returned `McpServer` through `Agent.mcpServers`, and close the owning client at the application lifecycle boundary.
+`@anvia/core/mcp` exports only the lightweight `McpServer`, `McpTool`, and registration types used
+by `Agent`. Connection ownership, transports, discovery, result mapping, and cleanup live in the
+optional [`@anvia/mcp`](/packages/mcp) package.
 
 The built-in HTTP transport has an explicit configuration boundary:
 
@@ -412,6 +419,8 @@ type McpStreamableHttpTransport = {
 Streamable HTTP accepts `ssrfProtection?: 'strict' | 'disabled'` and defaults to `'strict'`. Use the explicit opt-out only for an application-owned local or private endpoint:
 
 ```ts
+import { McpClient } from '@anvia/mcp'
+
 const localMcp = new McpClient({
   name: 'local',
   transport: {

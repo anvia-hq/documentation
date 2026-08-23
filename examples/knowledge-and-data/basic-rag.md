@@ -68,8 +68,8 @@ const response = await agent.generate({
     ].join("\n\n")
 });
 
-if (response.status !== "completed") {
-  throw new Error(`Unexpected agent result: ${response.status}`);
+if (response.type !== "response") {
+  throw new Error(`Unexpected agent outcome: ${response.type}`);
 }
 
 console.log(response.output);
@@ -105,8 +105,8 @@ documents, malicious instructions, embedding failures, and source citation membe
 
 ## Runnable references
 
-- [Embed and search](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/01-embed-and-search.ts)
-- [OpenRouter RAG](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/03-openrouter-rag.ts)
+- [Embed and search](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/01-embed-and-search.ts)
+- [OpenRouter RAG](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/03-openrouter-rag.ts)
 
 ## Extensions
 

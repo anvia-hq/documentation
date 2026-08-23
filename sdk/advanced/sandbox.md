@@ -53,7 +53,7 @@ try {
   const result = await agent.generate({
     prompt: 'Analyze the ticket and create the report.',
   })
-  if (result.status !== 'completed') throw new Error(`Run status: ${result.status}`)
+  if (result.type !== 'response') throw new Error(`Run outcome: ${result.type}`)
 
   const report = await sandbox.runtime.readTextFile({
     path: 'output/report.md',

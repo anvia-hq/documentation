@@ -24,6 +24,14 @@ Do not accept an arbitrary filesystem path or glob from a request. File discover
 
 `extractPdfText()` accepts PDF bytes and returns one text value per page. Page numbers are one-based:
 
+PDF parsing uses the optional `pdfjs-dist` peer dependency. Applications that call
+`extractPdfText()` must install it directly; applications that only use text chunking do not need
+PDF.js or its native canvas dependency.
+
+```sh
+pnpm add pdfjs-dist
+```
+
 ```ts
 import { readFile } from 'node:fs/promises'
 import { extractPdfText } from '@anvia/core/documents'

@@ -92,9 +92,12 @@ Use observers for tracing and telemetry integrations. Lifecycle callbacks are ap
 - `text_delta`, `reasoning_delta`, and optional `tool_call_delta`;
 - `tool_call`, `tool_result`, and nested `agent_tool_event`;
 - `source`, `provider_tool_call`, and `guardrail_decision`;
-- `turn_end`, `interaction_response`, `final`, and `error`.
+- `turn_end`, `interaction_response`, `memory_compaction`, terminal outcomes, and `error`.
 
-A stream segment ends with a `final` event whose result is `suspended` when approval or a structured answer is required. Start the next phase with `agent.stream({ continuation, response })`. Closing an active stream early cancels that phase, finalizes memory and observers, and prevents silent work from continuing in the background.
+A stream segment ends directly with `response`, `interaction`, or `blocked`. When approval or a
+structured answer is required, start the next phase with `agent.stream({ continuation, response })`.
+Closing an active stream early cancels that phase, finalizes memory and observers, and prevents
+silent work from continuing in the background.
 
 Filter events before sending them to a client because reasoning, tool inputs, tool results, retrieved context, and provider metadata may contain private data.
 

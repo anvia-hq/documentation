@@ -98,7 +98,7 @@ const response = await agent.generate({
     prompt: 'Explain Anvia in one sentence.'
 })
 
-if (response.status === 'completed') {
+if (response.type === 'response') {
   console.log(response.output)
 }
 ```

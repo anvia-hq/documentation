@@ -100,5 +100,5 @@ See [Memory sessions](/sdk/memory/sessions) for context design and [Custom store
 
 - [API reference](/packages/memory-postgres/api-reference)
 - [Memory store adapters](/sdk/memory/store-adapters)
-- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/memory-postgres)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/memory-postgres/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/memory-postgres)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/memory-postgres/CHANGELOG.md)

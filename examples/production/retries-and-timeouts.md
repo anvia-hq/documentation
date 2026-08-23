@@ -97,6 +97,6 @@ effects. Include one integration test against a mock HTTP server that hangs and 
 
 ## Source and extensions
 
-- Source: [`retry.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/core/src/retry.ts)
+- Source: [`retry.ts`](https://github.com/anvia-hq/anvia/blob/staging/packages/core/src/retry.ts)
 - Read [stream errors and cancellation](/sdk/streaming/errors-and-cancellation) and [failure recovery](/examples/data-and-workflows/failure-recovery).
 - Add circuit breaking, provider fallback, and an operation-wide deadline budget.

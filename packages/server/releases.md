@@ -1,11 +1,11 @@
 # Releases
 
-The current source manifest is `@anvia/server` **1.0.0-rc.2**. The entries below preserve notable v0 transport milestones.
+The current source manifest is `@anvia/server` **1.0.0-rc.9**. The entries below preserve notable v0 transport milestones.
 
 | Version | Summary |
 | --- | --- |
-| `v1-rc3` source | Aligned framed client responses with protocol v3 so message requests and interaction-response requests can create linked agent stream phases while continuations remain server-owned. |
-| `1.0.0-rc.2` | Synchronized Server with the Anvia 1.0 release-candidate train. |
+| `staging` source | Aligned framed client responses with protocol v3 so message requests and interaction-response requests can create linked agent stream phases while continuations remain server-owned. |
+| `1.0.0-rc.9` | Synchronized Server with the Anvia 1.0 release-candidate train. |
 | `0.7.5` | Updated the Core dependency to `0.26.0`. |
 | `0.7.4` | Updated the Core dependency to `0.25.1`. |
 | `0.7.0` | Carried model-aware context limits and active context usage through UI stream events. |
@@ -24,4 +24,4 @@ The current source manifest is `@anvia/server` **1.0.0-rc.2**. The entries below
 - Re-test proxy buffering, content types, cancellation, and custom serializers after transport changes.
 - When adopting resume, add shared persistence before enabling it across multiple production replicas.
 
-Read the complete [Server changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/server/CHANGELOG.md).
+Read the complete [Server changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/server/CHANGELOG.md).

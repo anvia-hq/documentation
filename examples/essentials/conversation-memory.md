@@ -60,10 +60,10 @@ const result = await agent.generate({
     prompt: 'What is my project named?',
     session,
 });
-if (result.status === 'suspended') {
-    throw new Error(`Agent suspended for ${result.interaction.type}`);
+if (result.type === 'interaction') {
+    throw new Error(`Agent requested ${result.interaction.type}`);
 }
-if (result.status === 'blocked') throw new Error(`Agent blocked at ${result.stage}`);
+if (result.type === 'blocked') throw new Error(`Agent blocked at ${result.stage}: ${result.reason}`);
 console.log(result.output);
 ```
 

@@ -19,8 +19,8 @@ Current Anvia packages use the `1.0.0-rc.x` prerelease line. Pin the exact RC in
 ```json
 {
   "dependencies": {
-    "@anvia/core": "1.0.0-rc.2",
-    "@anvia/openai": "1.0.0-rc.2"
+    "@anvia/core": "1.0.0-rc.9",
+    "@anvia/openai": "1.0.0-rc.9"
   }
 }
 ```
@@ -37,6 +37,9 @@ Some adapters require a specific Node.js version, browser runtime, native depend
 - `@anvia/sandbox` requires a supported Docker environment;
 - `@anvia/browser` requires Docker, a compatible browser image, and Playwright-compatible Chromium;
 - `@anvia/neo4j` requires Neo4j 2026.01 or newer and matching vector dimensions;
+- `@anvia/mcp` requires Node.js 20 or newer and MCP protocol `2026-07-28`;
+- `@anvia/cli` requires Node.js 20.18.1 or newer and an existing Next.js or Vite application;
+- Core PDF extraction requires the application to install the optional `pdfjs-dist` peer;
 - observability adapters require credentials and network access to their backend.
 
 ## Public API boundary
@@ -55,6 +58,14 @@ import type { Message } from '@anvia/core/completion'
 ## v0 to v1 migration boundary
 
 The v1 API uses declarative `new Agent({...})` construction and direct `agent.generate(...)` or `agent.stream(...)` runs. Builder-era APIs such as `AgentBuilder`, prompt requests, and `.send()` are not part of the v1 public surface.
+
+For the next RC after `rc.9`:
+
+- import MCP clients and transports from `@anvia/mcp`; Core retains registration contracts only;
+- verify MCP servers support protocol `2026-07-28` because there is no legacy fallback;
+- install `pdfjs-dist` only in applications that call `extractPdfText()`;
+- rename React UI compound namespaces to `*Primitive`, remove package CSS imports, and move styling
+  into application code or generated `@anvia/cli` components.
 
 Keep an application on the v0 documentation and package line until its migration is complete. When moving to v1, update Core and every Anvia adapter together, then follow the [v1 Core API reference](/packages/core/api-reference) and provider-specific configuration pages.
 

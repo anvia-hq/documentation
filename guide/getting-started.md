@@ -75,21 +75,23 @@ const supportAgent = new Agent({
 
 ## 5. Generate an answer
 
-`generate()` runs the agent until it completes, is blocked, or suspends for an interaction. The result status makes that boundary explicit.
+`generate()` runs the agent until it returns a response, interaction, or guardrail block. The
+outcome type makes that boundary explicit.
 
 ```ts
 const response = await supportAgent.generate({
     prompt: 'Explain what the Anvia runtime owns.'
 })
 
-if (response.status === 'suspended') throw new Error(`Interaction required: ${response.interaction.type}`)
-if (response.status === 'blocked') throw new Error(`Blocked at ${response.stage}`)
+if (response.type === 'interaction') throw new Error(`Interaction required: ${response.interaction.type}`)
+if (response.type === 'blocked') throw new Error(`Blocked at ${response.stage}: ${response.reason}`)
 
 console.log(response.output)
 console.log(response.usage)
 ```
 
-A completed response also contains normalized messages, a run ID, context usage when available, and trace metadata when tracing is enabled.
+A response also contains normalized messages, a run ID, context usage when available, and trace
+metadata when tracing is enabled.
 
 ## 6. Stream the same agent
 
@@ -103,9 +105,9 @@ for await (const event of supportAgent.stream({
     process.stdout.write(event.delta)
   }
 
-  if (event.type === 'final') {
+  if (event.type === 'response' || event.type === 'interaction' || event.type === 'blocked') {
     process.stdout.write('\n')
-    console.log(event.result.usage)
+    console.log(event.usage)
   }
 }
 ```

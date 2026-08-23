@@ -2,12 +2,16 @@
 
 `McpClient` owns one MCP transport. `connect()` returns an immutable server snapshot with adapted tools; the client owns cleanup.
 
+Construction performs no I/O. A successful connection negotiates MCP protocol `2026-07-28`, lists
+every page of tools once, and returns a frozen registration snapshot. Reconnect and rebuild the
+Agent when the remote tool catalog changes.
+
 ## 1. Connect through stdio
 
 Use stdio when the application starts and owns a local MCP process:
 
 ```ts
-import { McpClient } from '@anvia/core/mcp'
+import { McpClient } from '@anvia/mcp'
 
 const filesystemClient = new McpClient({
   name: 'docs-filesystem',

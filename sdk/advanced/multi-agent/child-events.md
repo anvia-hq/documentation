@@ -33,10 +33,8 @@ for await (const event of supportAgent.stream({
             childEventType: event.event.type,
         });
     }
-    if (event.type === 'final') {
-        if (event.result.status === 'completed') {
-            await responses.save(event.result.output);
-        }
+    if (event.type === 'response') {
+        await responses.save(event.output);
     }
 }
 ```

@@ -64,7 +64,7 @@ const response = await supportAgent.generate({
     prompt: 'Summarize the latest support request.'
 })
 
-if (response.status === 'completed') {
+if (response.type === 'response') {
   console.log(response.trace?.traceId)
 }
 ```

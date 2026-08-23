@@ -1,11 +1,13 @@
 # MCP transports
 
-RC supports application-owned stdio processes and remote streamable HTTP servers. Keep both behind the server-side application boundary.
+The v1 RC supports application-owned stdio processes, remote Streamable HTTP servers, and
+application-controlled custom transports through `@anvia/mcp`. Keep every transport behind the
+server-side application boundary.
 
 ## Local stdio
 
 ```ts
-import { McpClient } from '@anvia/core/mcp'
+import { McpClient } from '@anvia/mcp'
 
 const client = new McpClient({
   name: 'docs-filesystem',
@@ -41,6 +43,8 @@ const server = await client.connect()
 
 The HTTP transport also accepts an MCP SDK `authProvider`, `reconnectionOptions`, and `sessionId`. The RC transport union contains only `stdio`, `streamableHttp`, and `custom` variants.
 
+All built-in transports require MCP protocol `2026-07-28`; there is no legacy protocol fallback.
+
 ### Configure static endpoint headers
 
 `headers` must be a plain object whose values are strings. These configured headers are added only to requests whose URL exactly matches the MCP endpoint. They are not attached to OAuth discovery, authorization, or token requests. Endpoint redirects fail instead of forwarding configured credentials to another URL.
@@ -62,7 +66,7 @@ Streamable HTTP uses strict SSRF protection by default. That mode rejects loopba
 For an intentionally local MCP server, opt out explicitly:
 
 ```ts
-import { McpClient } from '@anvia/core/mcp'
+import { McpClient } from '@anvia/mcp'
 
 const client = new McpClient({
   name: 'local',

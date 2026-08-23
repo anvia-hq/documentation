@@ -1,6 +1,8 @@
 # `@anvia/react-ui`
 
-`@anvia/react-ui` is a set of composable React primitives for chat, completion, messages, attachments, human input, images, thread lists, and streaming Markdown. It connects to controllers from `@anvia/react` while leaving layout and product styling in the application.
+`@anvia/react-ui` is a strictly headless behavior layer for chat, completion, messages,
+attachments, human input, images, thread lists, and streaming Markdown. It connects to controllers
+from `@anvia/react` while leaving all layout and product styling in the application.
 
 Use the root package for a convenient combined API or import a component family such as `@anvia/react-ui/message` when you want a narrower boundary.
 
@@ -10,13 +12,15 @@ Use the root package for a convenient combined API or import a component family 
 pnpm add @anvia/react-ui @anvia/react @anvia/client react react-dom
 ```
 
-Import the optional base stylesheet once:
+For editable Tailwind and shadcn-based application components, install the complete chat registry:
 
-```ts
-import '@anvia/react-ui/styles.css'
+```sh
+pnpm dlx @anvia/cli@rc add chat
 ```
 
-You can omit it and style the stable `data-anvia-*` attributes or the classes passed to individual primitives.
+The primitive package has no stylesheet. Style ordinary `className` props or compose design-system
+elements with `asChild`. Its small DOM contract is limited to ARIA attributes, `data-state`, and
+`data-role`.
 
 ## Compose a chat interface
 
@@ -25,11 +29,10 @@ import { createHttpClientTransport } from '@anvia/client'
 import { useChat } from '@anvia/react'
 import {
   ChatProvider,
-  Composer,
-  Message,
-  Thread,
+  ComposerPrimitive,
+  MessagePrimitive,
+  ThreadPrimitive,
 } from '@anvia/react-ui'
-import '@anvia/react-ui/styles.css'
 
 export function SupportChat() {
   const transport = createHttpClientTransport({ endpoint: '/api/chat', format: 'jsonl' })
@@ -37,29 +40,29 @@ export function SupportChat() {
 
   return (
     <ChatProvider controller={chat}>
-      <Thread.Root>
-        <Thread.Viewport>
-          <Thread.Empty>Start a conversation.</Thread.Empty>
-          <Thread.Messages>
-            <Message.Root>
-              <Message.Content>
-                <Message.Parts />
-              </Message.Content>
-              <Message.Actions />
-            </Message.Root>
-          </Thread.Messages>
-          <Thread.Error />
-          <Thread.ScrollToBottom>Jump to latest</Thread.ScrollToBottom>
-        </Thread.Viewport>
+      <ThreadPrimitive.Root>
+        <ThreadPrimitive.Viewport>
+          <ThreadPrimitive.Empty>Start a conversation.</ThreadPrimitive.Empty>
+          <ThreadPrimitive.Messages>
+            <MessagePrimitive.Root>
+              <MessagePrimitive.Content>
+                <MessagePrimitive.Parts />
+              </MessagePrimitive.Content>
+              <MessagePrimitive.Actions />
+            </MessagePrimitive.Root>
+          </ThreadPrimitive.Messages>
+          <ThreadPrimitive.Error />
+          <ThreadPrimitive.ScrollToBottom>Jump to latest</ThreadPrimitive.ScrollToBottom>
+        </ThreadPrimitive.Viewport>
 
-        <Composer.Root>
-          <Composer.Attachments />
-          <Composer.AddAttachment>Attach</Composer.AddAttachment>
-          <Composer.Input placeholder="Send a message..." />
-          <Composer.Stop>Stop</Composer.Stop>
-          <Composer.Submit>Send</Composer.Submit>
-        </Composer.Root>
-      </Thread.Root>
+        <ComposerPrimitive.Root>
+          <ComposerPrimitive.Attachments />
+          <ComposerPrimitive.AddAttachment>Attach</ComposerPrimitive.AddAttachment>
+          <ComposerPrimitive.Input placeholder="Send a message..." />
+          <ComposerPrimitive.Stop>Stop</ComposerPrimitive.Stop>
+          <ComposerPrimitive.Submit>Send</ComposerPrimitive.Submit>
+        </ComposerPrimitive.Root>
+      </ThreadPrimitive.Root>
     </ChatProvider>
   )
 }
@@ -71,21 +74,21 @@ Compound components read their controller and item state from context, so the sa
 
 | Entry point | Public family | Purpose |
 | --- | --- | --- |
-| `@anvia/react-ui/chat` | `Composer`, `Thread` | Chat layout, rich composer, suggestions, and scrolling |
-| `@anvia/react-ui/message` | `Message` | Message parts, Markdown, tools, reasoning, entities, and actions |
-| `@anvia/react-ui/completion` | `Completion` | Prompt form and completion output |
-| `@anvia/react-ui/human-input` | `HumanInput` | Pending tool-approval and structured-question interactions |
-| `@anvia/react-ui/attachment` | `Attachment` | Attachment name, preview, and removal |
-| `@anvia/react-ui/image` | `Image` | Preview, copy, download, and zoom overlay |
-| `@anvia/react-ui/thread-list` | `ThreadList`, `ThreadListItem` | Conversation navigation and management actions |
-| `@anvia/react-ui/selection-toolbar` | `SelectionToolbar` | Quote and copy actions for selected text |
+| `@anvia/react-ui/chat` | `ComposerPrimitive`, `ThreadPrimitive` | Chat layout, rich composer, suggestions, and scrolling |
+| `@anvia/react-ui/message` | `MessagePrimitive` | Message parts, Markdown, tools, reasoning, entities, and actions |
+| `@anvia/react-ui/completion` | `CompletionPrimitive` | Prompt form and completion output |
+| `@anvia/react-ui/human-input` | `HumanInputPrimitive` | Pending tool-approval and structured-question interactions |
+| `@anvia/react-ui/attachment` | `AttachmentPrimitive` | Attachment name, preview, and removal |
+| `@anvia/react-ui/image` | `ImagePrimitive` | Preview, copy, download, and zoom overlay |
+| `@anvia/react-ui/thread-list` | `ThreadListPrimitive`, `ThreadListItemPrimitive` | Conversation navigation and management actions |
+| `@anvia/react-ui/selection-toolbar` | `SelectionToolbarPrimitive` | Quote and copy actions for selected text |
 | `@anvia/react-ui/stream` | `StreamMarkdown` | Context-free Markdown rendering for app-owned streamed text |
 
 ## Common patterns
 
 ### Use compound parts as the stable customization boundary
 
-Components such as `Message`, `Composer`, and `HumanInput` are objects containing individually renderable parts. Add product-specific layout around those parts instead of forking the controller logic.
+Components such as `MessagePrimitive`, `ComposerPrimitive`, and `HumanInputPrimitive` are objects containing individually renderable parts. Add product-specific layout around those parts instead of forking the controller logic.
 
 ### Integrate a design system with `asChild`
 
@@ -95,9 +98,11 @@ Interactive and structural primitives accept regular element props, and many acc
 
 `ChatProvider` and `CompletionProvider` receive hook results; they do not create network requests themselves. This separation makes controllers testable and keeps custom transports available.
 
-### Import stream styles separately
+### Own stream reveal styling
 
-When using `StreamMarkdown`, import `@anvia/react-ui/stream/styles.css` for its settle animation. The root stylesheet and stream stylesheet are separate public CSS entry points.
+`StreamMarkdown` marks its growing tail with `data-state="revealing"`, but the package does not
+animate it. Add an application animation directly or install the `markdown`, `message`, `thread`, or
+`chat` registry item from `@anvia/cli`.
 
 ### Render only trusted custom components
 
@@ -111,7 +116,7 @@ Markdown output and tool results may contain model-produced content. Treat custo
 | React peer dependency | `>=18` |
 | React DOM peer dependency | `>=18` |
 | `@anvia/react` peer dependency | Matching `1.0.0-rc.x` release candidate |
-| Styling | Optional public CSS entry points |
+| Styling | Application-owned; no package CSS exports |
 
 The components target React DOM and use browser behavior for rich composer, selection, image, and attachment interactions. Render browser-dependent interactions on the client when using an SSR framework.
 
@@ -123,4 +128,4 @@ The components target React DOM and use browser behavior for rich composer, sele
 - [Interactions and continuations](/sdk/agents/interactions)
 - [Approvals and questions in Studio](/studio/playground/approvals-and-questions)
 
-For exact exports, compound parts, and controller types, use the [API reference](/packages/react-ui/api-reference). For release history, read the [source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/react-ui/CHANGELOG.md).
+For exact exports, compound parts, and controller types, use the [API reference](/packages/react-ui/api-reference). For release history, read the [source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/react-ui/CHANGELOG.md).

@@ -1,6 +1,6 @@
 # Releases
 
-Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 history.
+Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 history.
 
 ## Notable history
 
@@ -15,4 +15,4 @@ Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 h
 
 Install it with the matching `@anvia/core` and `@anvia/otel` release candidates.
 
-Read the [complete source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/observability-lens/CHANGELOG.md) for every release.
+Read the [complete source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/observability-lens/CHANGELOG.md) for every release.

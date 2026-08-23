@@ -45,13 +45,14 @@ for await (const event of events) {
     process.stdout.write(event.delta)
   }
 
-  if (event.type === 'final') {
-    console.log('\nTokens:', event.result.usage.totalTokens)
+  if (event.type === 'response' || event.type === 'interaction' || event.type === 'blocked') {
+    console.log('\nTokens:', event.usage.totalTokens)
   }
 }
 ```
 
-An agent stream covers the complete runtime loop and ends with a `final` result or a thrown failure. The final result can be completed, blocked, or suspended for an interaction.
+An agent stream covers the complete runtime loop and ends with a direct `response`, `interaction`,
+or `blocked` outcome, or with a thrown failure.
 
 ## 3. Continue through the section
 

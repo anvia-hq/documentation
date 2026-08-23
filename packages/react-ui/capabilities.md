@@ -4,21 +4,25 @@ React UI exposes compound component families backed by context from `@anvia/reac
 
 | Family | Public namespace | Responsibility |
 | --- | --- | --- |
-| Chat | `Thread` | Viewport, messages, empty/loading/error states, suggestions, scrolling |
-| Composer | `Composer` | Rich or textarea input, attachments, drops, quotes, trigger entities, submit/stop |
-| Messages | `Message` | Text, Markdown, reasoning, tools, data, attachments, errors, actions |
-| Completion | `Completion` | Prompt form, input, output, submit, and stop |
-| Human input | `HumanInput` | Pending interaction collections and approval/question response actions |
-| Attachments | `Attachment` | Name, preview, and removal |
-| Images | `Image` | Preview, copy, download, and zoom overlay |
-| Selection | `SelectionToolbar` | Quote and copy actions for message selections |
-| Threads | `ThreadList`, `ThreadListItem` | App-controlled thread navigation and archive/delete actions |
-| Context usage | `ContextMeter` | Used or remaining model-context display |
+| Chat | `ThreadPrimitive` | Viewport, messages, empty/loading/error states, suggestions, scrolling |
+| Composer | `ComposerPrimitive` | Rich or textarea input, attachments, drops, quotes, trigger entities, submit/stop |
+| Messages | `MessagePrimitive` | Text, Markdown, reasoning, tools, data, attachments, errors, actions |
+| Completion | `CompletionPrimitive` | Prompt form, input, output, submit, and stop |
+| Human input | `HumanInputPrimitive` | Pending interaction collections and approval/question response actions |
+| Attachments | `AttachmentPrimitive` | Name, preview, and removal |
+| Images | `ImagePrimitive` | Preview, copy, download, and zoom overlay |
+| Selection | `SelectionToolbarPrimitive` | Quote and copy actions for message selections |
+| Threads | `ThreadListPrimitive`, `ThreadListItemPrimitive` | App-controlled thread navigation and archive/delete actions |
+| Context usage | `ContextMeterPrimitive` | Used or remaining model-context display |
 | Streamed Markdown | `StreamMarkdown` | Context-free rendering for an app-owned growing string |
 
 ## Headless behavior
 
-Most parts forward native element props and refs. Many support `asChild`, letting a design-system element become the rendered node while Anvia preserves behavior and data attributes. Collection parts establish item contexts consumed by hooks such as `useMessagePart`, `useApproval`, and `useThreadListItem`.
+Most parts forward native element props and refs. Many support `asChild`, letting a design-system
+element become the rendered node while Anvia preserves behavior and semantic attributes. Collection
+parts establish item contexts consumed by hooks such as `useMessagePart`, `useApproval`, and
+`useThreadListItem`. There is no package stylesheet; use `className`, `asChild`, or editable
+components installed by `@anvia/cli`.
 
 ## Boundaries
 

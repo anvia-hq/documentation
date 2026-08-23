@@ -32,7 +32,7 @@ const result = await agent.generate({
     prompt: 'Where is order A123?'
 })
 
-if (result.status === 'suspended') {
+if (result.type === 'interaction') {
   logger.info('Agent paused for interaction', { interaction: result.interaction })
 }
 ```

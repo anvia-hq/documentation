@@ -78,5 +78,5 @@ Metadata keys starting with `__anvia_` are reserved for document reconstruction 
 - [API reference](/packages/pinecone/api-reference)
 - [Vector stores](/sdk/knowledges/vector-stores)
 - [Automatic retrieval](/sdk/knowledges/automatic-retrieval)
-- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/vector-pinecone)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/vector-pinecone/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/vector-pinecone)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-pinecone/CHANGELOG.md)

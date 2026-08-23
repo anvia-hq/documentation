@@ -5,7 +5,8 @@
 ## Outcome
 
 Build a terminal assistant with streaming text, optional reasoning, faithful tool-call history, and
-workspace-scoped tools. Anvia includes a complete React + Ink example of this application.
+workspace-scoped tools. This guide describes the application boundary; the monorepo no longer ships
+a maintained React + Ink starter.
 
 ## When to use it
 
@@ -26,12 +27,12 @@ src/
 
 ## Setup
 
-Clone the Anvia repository and run the existing application:
+Create an application and install the runtime plus your preferred terminal UI framework:
 
 ```sh
-pnpm install
-cp examples/cli-agent/.env.example examples/cli-agent/.env
-pnpm --filter anvia-cli-agent dev
+mkdir anvia-cli-agent && cd anvia-cli-agent
+pnpm init
+pnpm add @anvia/core@rc @anvia/openai@rc ink react
 ```
 
 Set `OPENROUTER_API_KEY`; `ANVIA_MODEL` and `TAVILY_API_KEY` are optional.
@@ -86,12 +87,6 @@ Add signal cancellation, redacted structured logs, configurable limits, explicit
 side effects, atomic transcript persistence, and provider retry policy. Test path traversal,
 symlink escapes, failed commands, split stream events, tool-call round trips, missing optional keys,
 and terminal resize behavior.
-
-## Runnable reference
-
-- [Complete CLI agent](https://github.com/anvia-hq/anvia/tree/v1-rc3/examples/cli-agent)
-
-Unlike most documentation snippets, that directory is a runnable multi-file example.
 
 ## Extensions
 

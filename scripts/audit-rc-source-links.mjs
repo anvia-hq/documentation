@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 
 const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const anviaRoot = resolve(process.env.ANVIA_REPO ?? join(docsRoot, '..', 'anvia'))
-const expectedRef = process.env.ANVIA_REF ?? 'v1-rc3'
+const expectedRef = process.env.ANVIA_REF ?? 'staging'
 
 async function collectMarkdown(directory) {
   const files = []

@@ -35,7 +35,7 @@ const response = await researcher.generate({
     prompt: 'What are the latest xAI product updates?'
 })
 
-if (response.status === 'completed') {
+if (response.type === 'response') {
   console.log(response.output)
   console.log(response.sources)
   console.log(response.providerToolCalls)
@@ -62,7 +62,7 @@ answer faithfulness on time-stamped queries.
 ## Source and extensions
 
 Run the
-[Grok live-search cookbook](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/13-grok-live-search.ts).
+[Grok live-search cookbook](https://github.com/anvia-hq/anvia/blob/staging/cookbook/04_providers_and_multimodal/13-grok-live-search.ts).
 Next, add a source-quality gate, freshness display, or compare live results with a curated knowledge
 index.
 

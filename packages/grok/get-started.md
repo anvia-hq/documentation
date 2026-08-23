@@ -27,7 +27,7 @@ const result = await agent.generate({
     prompt: 'Summarize recent xAI product updates.'
 })
 
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
   console.log(result.sources)
 }

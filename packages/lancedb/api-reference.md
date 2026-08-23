@@ -6,7 +6,6 @@ All public symbols are exported from `@anvia/lancedb`.
 import {
   LanceDBVectorClient,
   LanceDBVectorStore,
-  filterToLanceExpr,
   type LanceDBConnectionLike,
   type LanceDBTableLike,
   type LanceDBVectorClientOptions,
@@ -37,6 +36,8 @@ await store.upsert({ documents, providerOptions })
 const results = await store.search({ vector, topK, minScore, filter, providerOptions, abortSignal })
 ```
 
-`ensure()` creates a missing table and validates it; `validate()` only checks an existing table. `filterToLanceExpr(filter)` returns the expression used for a direct LanceDB query.
+`ensure()` creates a missing table and validates it; `validate()` only checks an existing table.
+Metadata filters use Core's provider-neutral matcher after retrieval. The package no longer exports
+SQL-expression generation for the serialized metadata column.
 
 Return to the [package guide](/packages/lancedb).

@@ -54,8 +54,8 @@ const result = await supportAgent.generate({
     prompt: 'A customer cannot reset their password. What should I verify first?'
 })
 
-if (result.status === 'suspended') throw new Error(`Interaction required: ${result.interaction.type}`)
-if (result.status === 'blocked') throw new Error(`Blocked at ${result.stage}`)
+if (result.type === 'interaction') throw new Error(`Interaction required: ${result.interaction.type}`)
+if (result.type === 'blocked') throw new Error(`Blocked at ${result.stage}: ${result.reason}`)
 
 console.log(result.output)
 console.log(result.runId)
@@ -69,25 +69,29 @@ The status checks remain important as capabilities are added. `generate()` can r
 Use `stream()` when an interface should update while the run is active:
 
 ```ts
-for await (const event of supportAgent.stream({
+const stream = supportAgent.stream({
     prompt: 'Draft a short password-reset troubleshooting reply.'
-})) {
+})
+
+for await (const event of stream) {
   if (event.type === 'text_delta') {
     process.stdout.write(event.delta)
   }
 
-  if (event.type === 'final') {
+  if (event.type === 'response') {
     process.stdout.write('\n')
-    console.log(event.result.runId, event.result.usage)
+    console.log(event.runId, event.usage)
   }
 
-  if (event.type === 'final' && event.result.status === 'suspended') {
-    console.log('Interaction required:', event.result.interaction)
+  if (event.type === 'interaction') {
+    console.log('Interaction required:', event.interaction)
   }
 }
 ```
 
-The model must support streaming. Anvia emits normalized runtime events instead of exposing one provider's wire format.
+The terminal stream event is the same `response | interaction | blocked` union returned by
+`generate()`. The handle also exposes `textStream`, `text`, and `result` when an application does
+not need every runtime event. The model must support streaming.
 
 ## 5. Add capabilities deliberately
 

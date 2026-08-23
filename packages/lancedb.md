@@ -78,5 +78,5 @@ Learn the common workflow in [Load documents](/sdk/knowledges/load-documents) an
 
 - [API reference](/packages/lancedb/api-reference)
 - [Metadata filters](/sdk/knowledges/metadata-filters)
-- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/vector-lancedb)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/vector-lancedb/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/vector-lancedb)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-lancedb/CHANGELOG.md)

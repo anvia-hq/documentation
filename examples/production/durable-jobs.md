@@ -99,6 +99,6 @@ and result retention. Run the Anvia pipeline tests independently of queue integr
 ## Source and extensions
 
 - Start from [background workers](/examples/data-and-workflows/background-workers).
-- Pipeline unit source: [`05_pipelines/08-research-pipeline.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/05_pipelines/08-research-pipeline.ts)
+- Pipeline unit source: [`05_pipelines/08-research-pipeline.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/05_pipelines/08-research-pipeline.ts)
 - Review [pipeline production workers](/sdk/pipelines/production-workers).
 - Extend with scheduled jobs, webhook completion, checkpointed multi-stage execution, or per-tenant queues.

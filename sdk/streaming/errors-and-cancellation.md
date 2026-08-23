@@ -91,7 +91,14 @@ controller.abort()
 
 Aborting `fetch()` cancels the response body even after headers have arrived.
 
-For a normal `createClientStreamResponse()` response, cancellation calls `return()` on the event iterator. Closing an active `AgentStream` cancels its run. There is no separate public `stream.cancel()` method.
+For a normal `createClientStreamResponse()` response, cancellation calls `return()` on the event
+iterator. Closing an active `AgentStream` cancels its run. Server-side owners can also cancel the
+handle directly:
+
+```ts
+const stream = agent.stream({ prompt: message })
+stream.cancel('The caller no longer needs this run.')
+```
 
 Cancellation does not undo completed tool calls, writes, or external side effects. Long-running application work needs its own cancellation and cleanup design.
 

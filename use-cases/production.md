@@ -83,7 +83,7 @@ const response = await agent.generate({
     maxTurns: 3
 })
 
-if (response.status === 'suspended') {
+if (response.type === 'interaction') {
   return queueInteraction({
     interaction: response.interaction,
     continuation: response.continuation,
@@ -128,10 +128,10 @@ Handle disconnects and `error` events at the application boundary. Redact intern
 Record lifecycle state, failures, usage, run IDs, and trace metadata. Treat prompts, model payloads, final output, tool arguments, and tool results as potentially sensitive.
 
 ```ts
-if (event.type === 'final') {
+if (event.type === 'response' || event.type === 'interaction' || event.type === 'blocked') {
   metrics.recordUsage({
-    runId: event.result.runId,
-    totalTokens: event.result.usage.totalTokens,
+    runId: event.runId,
+    totalTokens: event.usage.totalTokens,
   })
 }
 ```

@@ -127,8 +127,8 @@ async function main(): Promise<void> {
     prompt,
     session,
   });
-  if (response.status !== "completed") {
-    throw new Error(`Unexpected agent result: ${response.status}`);
+  if (response.type !== "response") {
+    throw new Error(`Unexpected agent outcome: ${response.type}`);
   }
   console.log(response.output);
   if (command === "write") console.log("The completed turn is stored in SQLite.");
@@ -223,5 +223,5 @@ changing each scope dimension prevents recall, invalid persisted messages are re
 concurrent prompts follow your application's ordering policy. Delete the temporary database after
 the suite.
 
-- Cookbook foundation: [`01_basics/06-session-memory.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/01_basics/06-session-memory.ts)
-- Adapter tests: [`packages/memory-sqlite/test`](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/memory-sqlite/test)
+- Cookbook foundation: [`01_basics/06-session-memory.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/01_basics/06-session-memory.ts)
+- Adapter tests: [`packages/memory-sqlite/test`](https://github.com/anvia-hq/anvia/tree/staging/packages/memory-sqlite/test)

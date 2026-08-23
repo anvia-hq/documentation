@@ -49,7 +49,7 @@ const prompt: UserMessage = {
 
 const response = await analyst.generate({ messages: [prompt] })
 
-if (response.status === 'completed') {
+if (response.type === 'response') {
   console.log(response.output)
 }
 ```
@@ -73,7 +73,7 @@ repeatedly.
 ## Source and extensions
 
 Run the
-[PDF attachment cookbook](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/06-pdf-attachment.ts).
+[PDF attachment cookbook](https://github.com/anvia-hq/anvia/blob/staging/cookbook/04_providers_and_multimodal/06-pdf-attachment.ts).
 Next, add citations from extracted chunks or use OCR for scanned pages.
 
 - [Multimodal inputs](/sdk/advanced/multimodal/inputs)

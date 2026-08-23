@@ -41,7 +41,9 @@ async function* publicEvents() {
   for await (const event of agent.stream({ prompt: 'Explain the latest invoice.' })) {
     if (event.type === 'text_delta') yield { type: 'text', delta: event.delta }
     if (event.type === 'tool_call') yield { type: 'status', label: 'Checking data' }
-    if (event.type === 'final') yield { type: 'done', output: event.result.output }
+    if (event.type === 'response') yield { type: 'done', output: event.output }
+    if (event.type === 'interaction') yield { type: 'interaction', request: event.interaction }
+    if (event.type === 'blocked') yield { type: 'blocked', reason: event.reason }
   }
 }
 

@@ -1,6 +1,6 @@
 # Capabilities
 
-| Surface | RC3 behavior |
+| Surface | v1 RC behavior |
 | --- | --- |
 | Lifecycle | Explicit pull, create, wait, connect, stop, resume, and destroy operations |
 | Tabs | List, open, select, and close tabs with package-owned UUIDs |

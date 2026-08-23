@@ -45,7 +45,7 @@ const result = await supportAgent.generate({
   prompt: 'What is my project named?',
   session,
 })
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
 }
 ```

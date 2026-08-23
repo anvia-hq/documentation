@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import { readFile, readdir } from 'node:fs/promises'
-import { dirname, join, relative, resolve } from 'node:path'
+import { basename, dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -89,12 +89,19 @@ function lineAt(source, offset) {
 }
 
 const packages = await loadPackages()
-const markdownFiles = await collectFiles(docsRoot, (path) => path.endsWith('.md'))
+const documentationFiles = await collectFiles(
+  docsRoot,
+  (path) =>
+    path.endsWith('.md') ||
+    (dirname(path) === join(docsRoot, 'public') &&
+      basename(path).startsWith('llms') &&
+      path.endsWith('.txt')),
+)
 const imports = []
 const entryPaths = new Set()
 const failures = []
 
-for (const markdownPath of markdownFiles) {
+for (const markdownPath of documentationFiles) {
   const markdown = await readFile(markdownPath, 'utf8')
 
   for (const [blockIndex, block] of codeBlocks(markdown).entries()) {
@@ -166,8 +173,12 @@ for (const imported of imports) {
 
 if (failures.length > 0) {
   console.error(failures.sort().join('\n'))
-  console.error(`\n${failures.length} invalid Anvia imports across ${markdownFiles.length} Markdown files.`)
+  console.error(
+    `\n${failures.length} invalid Anvia imports across ${documentationFiles.length} documentation files.`,
+  )
   process.exitCode = 1
 } else {
-  console.log(`Verified ${imports.length} named/default Anvia imports across ${markdownFiles.length} Markdown files.`)
+  console.log(
+    `Verified ${imports.length} named/default Anvia imports across ${documentationFiles.length} documentation files.`,
+  )
 }

@@ -797,6 +797,17 @@ export default defineConfig({
               ]
             },
             {
+              text: '@anvia/mcp',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/mcp' },
+                { text: 'Get started', link: '/packages/mcp/get-started' },
+                { text: 'Capabilities', link: '/packages/mcp/capabilities' },
+                { text: 'API', link: '/packages/mcp/api-reference' },
+                { text: 'Releases', link: '/packages/mcp/releases' }
+              ]
+            },
+            {
               text: '@anvia/server',
               collapsed: true,
               items: [
@@ -832,6 +843,16 @@ export default defineConfig({
                 { text: 'Components and theming', link: '/packages/react-ui/components-and-theming' },
                 { text: 'API', link: '/packages/react-ui/api-reference' },
                 { text: 'Releases', link: '/packages/react-ui/releases' }
+              ]
+            },
+            {
+              text: '@anvia/cli',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/cli' },
+                { text: 'Get started', link: '/packages/cli/get-started' },
+                { text: 'API', link: '/packages/cli/api-reference' },
+                { text: 'Releases', link: '/packages/cli/releases' }
               ]
             }
           ]

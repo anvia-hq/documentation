@@ -29,7 +29,9 @@ The run applies request-level overrides, retrieves indexed context and tools, pe
 
 ## Message and event boundaries
 
-Core `Message` objects are the model-facing transcript. `UIMessage` objects preserve client presentation parts and metadata. Conversion is explicit through `@anvia/core/ui`; provider requests receive Core messages rather than UI-only structure.
+Core `Message` objects are the model-facing transcript. `UIMessage` objects preserve client
+presentation parts and metadata. Conversion is explicit through `@anvia/client`; provider requests
+receive Core messages rather than UI-only structure.
 
 Agent streams are semantic events, not raw provider chunks. Core combines provider deltas with run, generation, tool, usage, child-agent, and terminal events so transports and observers can understand the entire run.
 

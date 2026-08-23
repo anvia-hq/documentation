@@ -104,5 +104,5 @@ queue; integration-test the queue adapter separately.
 ## Source and extensions
 
 - Adapt [pipeline production workers](/sdk/pipelines/production-workers).
-- The unit of work can be based on [`05_pipelines/08-research-pipeline.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/05_pipelines/08-research-pipeline.ts).
+- The unit of work can be based on [`05_pipelines/08-research-pipeline.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/05_pipelines/08-research-pipeline.ts).
 - Extend with webhook completion, polling, resumable UI status, or per-tenant worker quotas.

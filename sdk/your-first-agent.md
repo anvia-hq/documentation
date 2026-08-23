@@ -43,27 +43,28 @@ Tools, memory, context, guardrails, middleware, and observers can be added to th
 
 ## 2. Generate the first answer
 
-`generate()` starts a run and resolves when it completes, is blocked, or suspends for an interaction.
+`generate()` starts a run and resolves to a response, interaction, or guardrail block.
 
 ```ts
 const response = await supportAgent.generate({
     prompt: 'What information do you need to investigate a failed checkout?'
 })
 
-if (response.status === 'suspended') throw new Error(`Interaction required: ${response.interaction.type}`)
-if (response.status === 'blocked') throw new Error(`Blocked at ${response.stage}`)
+if (response.type === 'interaction') throw new Error(`Interaction required: ${response.interaction.type}`)
+if (response.type === 'blocked') throw new Error(`Blocked at ${response.stage}: ${response.reason}`)
 
 console.log(response.output)
 ```
 
-This agent has no guardrails or interaction-capable tools, so the expected status is `completed`. The checks keep the code correct when capabilities are added later.
+This agent has no guardrails or interaction-capable tools, so the expected type is `response`. The
+checks keep the code correct when capabilities are added later.
 
 ## 3. Read the run result
 
-A completed response includes more than the visible answer:
+A response outcome includes more than the visible answer:
 
 ```ts
-if (response.status === 'completed') {
+if (response.type === 'response') {
   console.log({
     runId: response.runId,
     output: response.output,
@@ -101,9 +102,9 @@ for await (const event of supportAgent.stream({
     process.stdout.write(event.delta)
   }
 
-  if (event.type === 'final') {
+  if (event.type === 'response' || event.type === 'interaction' || event.type === 'blocked') {
     process.stdout.write('\n')
-    console.log(event.result.runId, event.result.usage)
+    console.log(event.runId, event.usage)
   }
 }
 ```

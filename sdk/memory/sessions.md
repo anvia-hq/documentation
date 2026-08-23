@@ -19,36 +19,36 @@ const first = await supportAgent.generate({
     prompt: 'Summarize my latest invoice.',
     session,
 });
-if (first.status !== 'completed') {
-    throw new Error(`Unexpected agent result: ${first.status}`);
+if (first.type !== 'response') {
+    throw new Error(`Unexpected agent outcome: ${first.type}`);
 }
 const followUp = await supportAgent.generate({
     prompt: 'When is it due?',
     session,
 });
-if (followUp.status === 'completed') {
+if (followUp.type === 'response') {
     console.log(followUp.output);
 }
 ```
 
 Before each run, Anvia loads the stored messages and uses them as history. New runtime messages are appended according to the configured [save policy](/sdk/memory/save-policies).
 
-If a tool requires approval, continue the suspended phase through the same parent agent:
+If a tool requires approval, resume the interaction through the same parent agent:
 
 ```ts
-if (first.status === 'suspended' && first.interaction.type === 'tool-approval') {
-  const resumed = await supportAgent.generate({
-    continuation: first.continuation,
-    response: {
+if (first.type === 'interaction' && first.interaction.type === 'tool-approval') {
+  const resumed = await supportAgent.resume(
+    first.continuation,
+    {
       type: 'tool-approval',
       approved: true,
       reason: 'Approved by the account owner.',
     },
-  })
+  )
 }
 ```
 
-The suspended continuation retains its memory context.
+The interaction continuation retains its memory context.
 
 ## 3. Stream a session run
 
@@ -60,8 +60,8 @@ for await (const event of supportAgent.stream({
     if (event.type === 'text_delta') {
         process.stdout.write(event.delta);
     }
-    if (event.type === 'final') {
-        console.log(event.result.runId, event.result.usage);
+    if (event.type === 'response' || event.type === 'interaction' || event.type === 'blocked') {
+        console.log(event.runId, event.usage);
     }
 }
 ```

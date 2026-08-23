@@ -88,5 +88,5 @@ Pass `metadata` or `configuration` when Studio should create the collection with
 - [API reference](/packages/chroma/api-reference)
 - [Embeddings](/sdk/knowledges/embeddings)
 - [Metadata filters](/sdk/knowledges/metadata-filters)
-- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/vector-chroma)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/vector-chroma/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/vector-chroma)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-chroma/CHANGELOG.md)

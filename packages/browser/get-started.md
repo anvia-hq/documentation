@@ -40,7 +40,7 @@ try {
   })
 
   const result = await agent.generate({ prompt: 'Open the support page and summarize its heading.' })
-  if (result.status === 'completed') console.log(result.output)
+  if (result.type === 'response') console.log(result.output)
   await connection.disconnect()
 } finally {
   await browser.destroy()

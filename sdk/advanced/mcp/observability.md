@@ -5,7 +5,7 @@ Treat MCP tools as external dependencies so operators can distinguish connection
 ## 1. Preserve server identity
 
 ```ts
-import { McpClient } from '@anvia/core/mcp'
+import { McpClient } from '@anvia/mcp'
 
 const crmClient = new McpClient({
   name: 'customer-crm',

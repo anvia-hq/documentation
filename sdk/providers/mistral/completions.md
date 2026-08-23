@@ -28,12 +28,14 @@ const result = await supportAgent.generate({
     prompt: 'Explain why a refund can take two business days.'
 })
 
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
 }
 ```
 
-`generate(...)` runs the agent to completion and returns its normalized result. Use a direct completion when the application owns a single model call and does not need the agent runtime:
+`generate(...)` runs the agent and returns a normalized response, interaction, or blocked outcome.
+Use a direct completion when the application owns a single model call and does not need the agent
+runtime:
 
 ```ts
 import { generateCompletion } from '@anvia/core'
@@ -49,7 +51,7 @@ console.log(result.text)
 console.log(result.usage.totalTokens)
 ```
 
-The first argument is the input. The configured model and request options belong in the second argument.
+The input, configured model, and request options belong in the same options object.
 
 ## Stream an agent run
 

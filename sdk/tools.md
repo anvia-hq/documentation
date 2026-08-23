@@ -66,7 +66,7 @@ const response = await weatherAgent.generate({
     prompt: 'What is the weather in Jakarta?'
 })
 
-if (response.status === 'completed') {
+if (response.type === 'response') {
   console.log(response.output)
 }
 ```
@@ -111,7 +111,9 @@ const refundOrder = createTool({
 })
 ```
 
-When approval is required, `generate()` returns `status: 'suspended'` before the handler runs. The application can approve or reject that specific interaction through `agent.generate({ continuation, response })`.
+When approval is required, `generate()` returns `type: 'interaction'` before the handler runs. The
+application can approve or reject that specific interaction through
+`agent.resume(continuation, response)`.
 
 ## Explore tools
 

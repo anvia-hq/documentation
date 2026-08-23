@@ -27,7 +27,7 @@ const result = await agent.generate({
     prompt: 'Summarize this document.'
 })
 
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
 }
 ```

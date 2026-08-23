@@ -67,7 +67,7 @@ schema validity before shifting traffic.
 ## Source and extensions
 
 The behavior is grounded in the
-[`OpenAIClient` adapter](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-openai/src/openai/client.ts)
+[`OpenAIClient` adapter](https://github.com/anvia-hq/anvia/blob/staging/packages/provider-openai/src/openai/client.ts)
 and its package tests. Next, add streaming, one tool round trip, and one schema test to the probe.
 
 - [Compatible APIs](/sdk/providers/compatible)

@@ -140,8 +140,8 @@ completion model.
 
 ## Runnable references
 
-- [Research pipeline](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/05_pipelines/08-research-pipeline.ts)
-- [Parallel specialists](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/07_multi_agent/02-parallel-specialists.ts)
+- [Research pipeline](https://github.com/anvia-hq/anvia/blob/staging/cookbook/05_pipelines/08-research-pipeline.ts)
+- [Parallel specialists](https://github.com/anvia-hq/anvia/blob/staging/cookbook/07_multi_agent/02-parallel-specialists.ts)
 
 The files above demonstrate current Anvia APIs. The service structure in this page is a suggested
 application architecture, not a published runnable project.

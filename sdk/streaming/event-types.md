@@ -40,7 +40,14 @@ Provider-generation events such as `text_delta`, `reasoning_delta`, `tool_call_d
 
 `interaction_response` records an accepted approval or question response in the resumed phase.
 
-`final` contains the run result. A completed result includes output; a blocked result includes its guardrail stage; a suspended result includes the interaction and JSON-safe continuation required to start a linked phase.
+`memory_compaction` reports automatic transcript compaction with message counts, token counts,
+attempts, and summarizer usage.
+
+`steering_applied` identifies the turn that accepted a previously queued steering receipt.
+
+`response`, `interaction`, or `blocked` is the terminal outcome. A response includes `output`; an
+interaction includes the request and JSON-safe continuation required to start a linked phase; a
+blocked outcome includes guardrail stage, reason, and optional safe message.
 
 `error` contains the failure and cumulative authoritative usage. The agent stream then throws the same failure when consumption continues.
 

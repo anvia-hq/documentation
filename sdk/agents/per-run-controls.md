@@ -34,19 +34,19 @@ Supported run options are:
 
 Tool concurrency must be a positive safe integer. The runtime reduces it to one when approval-capable tools require serial execution.
 
-## 2. Read the result union
+## 2. Read the outcome union
 
-`generate()` returns a discriminated completed, blocked, or suspended result:
+`generate()` returns a discriminated response, interaction, or blocked outcome:
 
 ```ts
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
   console.log(result.runId)
   console.log(result.usage.totalTokens)
   console.log(result.messages)
   console.log(result.trace)
-} else if (result.status === 'blocked') {
-  console.log(result.stage, result.text)
+} else if (result.type === 'blocked') {
+  console.log(result.stage, result.reason)
 } else {
   console.log(result.interaction.type)
   console.log(result.interaction.toolName)
@@ -54,7 +54,8 @@ if (result.status === 'completed') {
 }
 ```
 
-A completed result may also contain context usage, guardrail decisions, normalized sources, and provider-executed tool metadata.
+A response may also contain context usage, guardrail decisions, normalized sources,
+provider-executed tool metadata, and memory-compaction details.
 
 ## 3. Continue an approval
 
@@ -65,26 +66,27 @@ let result = await supportAgent.generate({
     prompt: input.message
 })
 
-while (result.status === 'suspended') {
+while (result.type === 'interaction') {
   if (result.interaction.type !== 'tool-approval') {
     throw new Error(`Unexpected interaction: ${result.interaction.type}`)
   }
   const approved = await requestHumanDecision(result.interaction)
 
-  result = await supportAgent.generate({
-    continuation: result.continuation,
-    response: {
+  result = await supportAgent.resume(
+    result.continuation,
+    {
       type: 'tool-approval',
       approved,
       reason: approved ? 'Approved by operator' : 'Rejected by operator',
     },
-  })
+  )
 }
 
-if (result.status === 'completed') console.log(result.output)
+if (result.type === 'response') console.log(result.output)
 ```
 
-An interaction is a suspended result, not an exception. The application must claim it once, expire stale responses, and preserve the continuation on a trusted server.
+An interaction is an expected outcome, not an exception or an incomplete result. The application
+must claim it once, expire stale responses, and preserve the continuation on a trusted server.
 
 ## 4. Stream one run
 
@@ -105,8 +107,8 @@ for await (const event of stream) {
     console.log(event.toolName, event.result)
   }
 
-  if (event.type === 'final') {
-    console.log(event.result.text, event.result.usage)
+  if (event.type === 'response' || event.type === 'interaction' || event.type === 'blocked') {
+    console.log(event.text, event.usage)
   }
 }
 ```

@@ -28,7 +28,7 @@ const result = await agent.generate({
     prompt: 'Summarize the incident report.'
 })
 
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
 }
 ```

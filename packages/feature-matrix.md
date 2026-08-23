@@ -8,9 +8,11 @@ Use this matrix to find the package family that owns a capability. A check means
 | --- | :---: | :---: | :---: | :---: |
 | `@anvia/core` | ✓ | — | — | — |
 | `@anvia/client` | — | Protocol/client | — | — |
+| `@anvia/mcp` | Agent tools | Server transport | — | — |
 | `@anvia/server` | — | ✓ | — | — |
 | `@anvia/react` | — | Client | ✓ | — |
-| `@anvia/react-ui` | — | Client | — | ✓ |
+| `@anvia/react-ui` | — | Client | — | Headless primitives |
+| `@anvia/cli` | — | — | — | Editable components |
 
 ## Model integrations
 

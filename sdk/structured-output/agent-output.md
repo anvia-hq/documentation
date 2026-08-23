@@ -26,31 +26,34 @@ const agent = new Agent({
 
 Anvia converts the Zod schema to provider JSON Schema and includes it in the agent's model requests. The model must support both the agent capabilities used by the run and output schemas.
 
-## 2. Parse the completed response
+## 2. Read the response outcome
 
-`outputSchema` makes the agent generic output type match the schema. A completed result exposes the validated value directly:
+`outputSchema` makes the agent generic output type match the schema. A response outcome exposes the
+validated value directly:
 
 ```ts
 const response = await agent.generate({
     prompt: 'Resolve the customer billing question.'
 })
 
-if (response.status === 'suspended') {
+if (response.type === 'interaction') {
   return handleInteraction(response)
 }
 
-if (response.status === 'blocked') {
+if (response.type === 'blocked') {
   return handleBlocked(response)
 }
 
 console.log(response.output.needsHuman)
 ```
 
-Anvia validates the provider output with the supplied schema before returning a completed response. Invalid structured output rejects the run.
+Anvia validates the provider output with the supplied schema before returning a response. Invalid
+structured output rejects the run.
 
 ## 3. Validate streamed output at the end
 
-Text deltas are incomplete JSON and must not be parsed as they arrive. Accumulate UI text if needed, then validate the `output` on the final event:
+Text deltas are incomplete JSON and must not be parsed as they arrive. Accumulate UI text if
+needed, then use the validated `output` on the terminal `response` event:
 
 ```ts
 for await (const event of agent.stream({
@@ -60,10 +63,8 @@ for await (const event of agent.stream({
     renderDelta(event.delta)
   }
 
-  if (event.type === 'final') {
-    if (event.result.status === 'completed') {
-      await saveValidatedResult(event.result.output)
-    }
+  if (event.type === 'response') {
+    await saveValidatedResult(event.output)
   }
 }
 ```

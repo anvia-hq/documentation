@@ -47,7 +47,7 @@ const prompt: UserMessage = {
 
 const response = await agent.generate({ messages: [prompt] })
 
-if (response.status === 'completed') {
+if (response.type === 'response') {
   console.log(response.output)
 }
 ```
@@ -71,7 +71,7 @@ checks or human review.
 ## Source and extensions
 
 Run the
-[image attachment cookbook](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/05-image-attachment.ts).
+[image attachment cookbook](https://github.com/anvia-hq/anvia/blob/staging/cookbook/04_providers_and_multimodal/05-image-attachment.ts).
 Next, compare URL and base64 inputs or combine the result with a validated structured schema.
 
 - [Multimodal inputs](/sdk/advanced/multimodal/inputs)

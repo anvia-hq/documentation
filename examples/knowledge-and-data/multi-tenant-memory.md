@@ -76,7 +76,7 @@ guessed IDs, concurrent turns, conversation deletion, and database-policy enforc
 
 ## Runnable reference
 
-- [Session memory contract](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/01_basics/06-session-memory.ts)
+- [Session memory contract](https://github.com/anvia-hq/anvia/blob/staging/cookbook/01_basics/06-session-memory.ts)
 
 The cookbook demonstrates Anvia session mechanics; tenant repositories and identity checks here are
 suggested application architecture.

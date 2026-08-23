@@ -130,8 +130,8 @@ export function createPostHandler(auth: AuthService, conversations: Conversation
         }
     });
 
-    if (response.status !== "completed") {
-      return Response.json({ error: "agent_not_completed", status: response.status }, { status: 409 });
+    if (response.type !== "response") {
+      return Response.json({ error: "agent_no_response", outcome: response.type }, { status: 409 });
     }
 
     return Response.json({ output: response.output });
@@ -166,7 +166,7 @@ agent for endpoint tests and separately test the real agent contract.
 
 ## Source and extensions
 
-- Transport source: [`01_basics/07-server-react-transport.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/01_basics/07-server-react-transport.ts)
+- Transport source: [`01_basics/07-server-react-transport.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/01_basics/07-server-react-transport.ts)
 - Add [rate limits](/examples/production/rate-limits) and [persistent memory](/examples/data-and-workflows/persistent-memory).
 - Review [memory sessions](/sdk/memory/sessions) and [tool control](/sdk/advanced/hooks/tool-control).
 - Extend with service accounts, webhook signatures, or step-up approval for high-risk tools.

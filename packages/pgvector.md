@@ -85,5 +85,5 @@ Read [Embeddings](/sdk/knowledges/embeddings) and [Metadata filters](/sdk/knowle
 
 - [API reference](/packages/pgvector/api-reference)
 - [Vector stores](/sdk/knowledges/vector-stores)
-- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/vector-pgvector)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/vector-pgvector/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/vector-pgvector)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-pgvector/CHANGELOG.md)

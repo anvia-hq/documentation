@@ -99,7 +99,7 @@ const response = await supportAgent.generate({
     trace: { name: 'support-chat', sessionId: conversation.id }
 })
 
-if (response.status === 'completed') {
+if (response.type === 'response') {
   applicationLogger.info({
     traceId: response.trace?.traceId,
     observationId: response.trace?.observationId,

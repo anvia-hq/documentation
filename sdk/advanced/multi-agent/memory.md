@@ -41,10 +41,10 @@ function createPolicyMemoryTool(input: {
                 maxTurns: 2,
                 session: session
             });
-            if (response.status === 'suspended') {
+            if (response.type === 'interaction') {
                 throw new Error('A child session used as a tool cannot cross an interaction boundary.');
             }
-            if (response.status === 'blocked') throw new Error(`Child blocked at ${response.stage}`);
+            if (response.type === 'blocked') throw new Error(`Child blocked at ${response.stage}`);
             return response.output;
         },
     });

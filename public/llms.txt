@@ -13,28 +13,15 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Evaluations and observability](https://docs.anvia.dev/llms-evals.txt): Tracing, Lens, evaluation suites, datasets, release comparison, quality gates, alerts, cost, and testing.
 - [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt): Ingestion, embeddings, vector stores, Neo4j GraphRAG, metadata filters, dynamic context, permission-aware retrieval, and memory boundaries.
 
-## Advanced Workflow Map
+## Current v1 RC Boundaries
 
-The topic guides include compatible advanced examples built around one production-shaped workflow:
-
-```text
-approved web and X search
-→ normalized source discovery
-→ application-controlled fetch and validation
-→ model-assisted metadata enrichment
-→ chunk, embed, and upsert
-→ permission-filtered retrieval
-→ source-aware answer
-→ retrieval, faithfulness, freshness, and source-policy evaluations
-→ Lens traces and a release quality gate
-```
-
-- Use [Agents, tools, and MCP](https://docs.anvia.dev/llms-agents.txt) for a hybrid research agent that combines a local vector-search tool with Grok provider-executed web and X search.
-- Use [Full-stack applications](https://docs.anvia.dev/llms-apps.txt) to expose the resulting agent through an authenticated Hono route and `@anvia/server`, then consume and render it with `@anvia/react` and `@anvia/react-ui`.
-- Use [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt) for an advanced research-to-index ingestion pipeline with source discovery, secure fetching, structured enrichment, embedding, upsert, and activation boundaries.
-- Use [Evaluations and observability](https://docs.anvia.dev/llms-evals.txt) for an advanced suite that evaluates answer relevancy, grounding, hallucination, allowed-source policy, and evidence freshness.
-
-The xAI adapter calls these provider tools `grokTools.webSearch(...)` and `grokTools.xSearch(...)`; there is no generic `xTool` API. Search is a discovery mechanism, not a trust boundary. The application must still constrain sources, fetch content safely, preserve provenance, and decide what may enter a durable corpus.
+- Construct agents, pipelines, and extractors directly; builder-era APIs are migration context only.
+- Use `@anvia/mcp` for MCP SDK v2 clients and transports. Core retains lightweight registration contracts.
+- Use Client Protocol v3 across `@anvia/client`, `@anvia/server`, and `@anvia/react`.
+- Treat `@anvia/react-ui` as strictly headless. Use `@anvia/cli` to copy editable application-owned UI.
+- Install `pdfjs-dist` only in applications that load PDFs; it is an optional Core peer.
+- Keep retrieval permissions, tool authorization, interaction continuations, and public-event projection on the server.
+- Use Lens and Core evals for trace-correlated, versioned release evidence; deployment policy remains application-owned.
 
 ## Start Here
 
@@ -95,7 +82,9 @@ The xAI adapter calls these provider tools `grokTools.webSearch(...)` and `grokT
 - [`@anvia/core`](https://docs.anvia.dev/packages/core/): Core runtime APIs for models, agents, tools, messages, and pipelines.
 - [`@anvia/server`](https://docs.anvia.dev/packages/server/): Server transports and streaming integration.
 - [`@anvia/react`](https://docs.anvia.dev/packages/react/): React state and hooks for Anvia streams.
-- [`@anvia/react-ui`](https://docs.anvia.dev/packages/react-ui/): Ready-to-use React interface components.
+- [`@anvia/mcp`](https://docs.anvia.dev/packages/mcp/): MCP SDK v2 clients, transports, discovery, and lifecycle ownership.
+- [`@anvia/react-ui`](https://docs.anvia.dev/packages/react-ui/): Strictly headless React interface primitives.
+- [`@anvia/cli`](https://docs.anvia.dev/packages/cli/): Editable shadcn/Tailwind application components built on React UI.
 - [Model providers](https://docs.anvia.dev/sdk/providers): OpenAI, Anthropic, Gemini, Mistral, Grok, and compatible provider APIs.
 - [Memory adapters](https://docs.anvia.dev/sdk/memory/store-adapters): SQLite, PostgreSQL, Drizzle, and Prisma-backed memory.
 - [Vector stores](https://docs.anvia.dev/sdk/knowledges/vector-stores): Qdrant, Pinecone, pgvector, Redis, Chroma, LanceDB, Milvus, and Weaviate.

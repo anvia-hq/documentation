@@ -15,10 +15,10 @@ Core is split into focused package entry points. The root export contains common
 | Pipelines | `@anvia/core/pipeline` | Typed composition, parallel branches, batch execution, graphs, run observers |
 | Extraction | `@anvia/core/extractor` | Agent-backed schema extraction with retry support |
 | Media | `@anvia/core/image-generation`, `speech-generation`, `transcription` | Provider-neutral helpers and model interfaces |
-| MCP and skills | `@anvia/core/mcp`, `@anvia/core/skills` | MCP transports/tool discovery and validated local skill loading |
+| MCP registration and skills | `@anvia/core/mcp`, `@anvia/core/skills` | Lightweight MCP server/tool contracts and validated local skill loading |
 | Observability | `@anvia/core/observability` | Run, generation, tool, trace, and streaming observer contracts |
 | Evaluations | `@anvia/core/evals` | Cases, metrics, suites, reporters, traces, CLI results, cost/usage totals |
-| UI protocol | `@anvia/core/ui` | UI messages, stream events, interactions, resume cursors, Core/UI conversion |
+| Browser-safe interactions | `@anvia/core/agent/interactions` | JSON-safe approval/question contracts, assertions, and parsers without loading the Agent runtime |
 
 ## Capability boundaries
 
@@ -26,6 +26,10 @@ Core does not call a model without an injected model implementation. It does not
 
 Provider support also varies. A completion adapter may not implement embeddings, images, audio, transcription, model listing, provider tools, or every structured-output feature. Use the [provider capability matrix](/sdk/providers/capability-matrix) before assuming parity.
 
-Some entry points have additional runtime requirements. MCP `stdio`, local skill loading, and file/PDF loading belong on a server with process or filesystem access. `ReadableStream` helpers need Web Streams support.
+MCP connections and transports live in the optional Node.js package [`@anvia/mcp`](/packages/mcp).
+Client messages, the framed wire protocol, and UI conversion live in
+[`@anvia/client`](/packages/client). Core's document helpers accept app-supplied text or bytes and do
+not discover or read files. Local skill loading still belongs on a server with filesystem access;
+`ReadableStream` helpers need Web Streams support.
 
 For exact exports, see the [API reference](/packages/core/api-reference). For composition guidance, use [architecture](/packages/core/architecture) and [patterns](/packages/core/patterns).

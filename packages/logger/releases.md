@@ -1,6 +1,6 @@
 # Releases
 
-Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 history.
+Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 history.
 
 ## Notable history
 
@@ -13,4 +13,4 @@ Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 h
 
 Install matching Anvia release-candidate versions together.
 
-Read the [complete source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/logger/CHANGELOG.md) for every patch and dependency-only release.
+Read the [complete source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/logger/CHANGELOG.md) for every patch and dependency-only release.

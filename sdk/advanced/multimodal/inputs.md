@@ -21,7 +21,7 @@ const prompt: UserMessage = {
 
 const result = await visionAgent.generate({ messages: [prompt] })
 
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
 }
 ```

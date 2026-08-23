@@ -62,26 +62,28 @@ Other failures can come from unsupported model capabilities, provider authentica
 
 ## 3. Treat approval as a result
 
-Approval does not throw an error. It suspends the run:
+Approval does not throw an error. It returns an interaction outcome:
 
 ```ts
 let result = await supportAgent.generate({
     prompt: input.message
 })
 
-if (result.status === 'suspended' && result.interaction.type === 'tool-approval') {
-  result = await supportAgent.generate({
-    continuation: result.continuation,
-    response: {
+if (result.type === 'interaction' && result.interaction.type === 'tool-approval') {
+  result = await supportAgent.resume(
+    result.continuation,
+    {
       type: 'tool-approval',
       approved: false,
       reason: 'The operator rejected this action.',
     },
-  })
+  )
 }
 ```
 
-The suspended result contains the run ID, interaction, continuation, usage, and messages accumulated so far. Persist the trusted continuation before waiting for a human decision, and do not execute the protected action outside the runtime as a shortcut.
+The interaction outcome contains the run ID, interaction, continuation, usage, and messages
+accumulated so far. Persist the trusted continuation before waiting for a human decision, and do
+not execute the protected action outside the runtime as a shortcut.
 
 ## 4. Retry transient model failures
 

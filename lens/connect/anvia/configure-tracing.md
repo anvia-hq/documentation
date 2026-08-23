@@ -103,7 +103,7 @@ const response = await supportAgent.generate({
 })
 await lens.flush()
 
-if (response.status === 'completed') {
+if (response.type === 'response') {
   console.log(response.trace?.traceId)
 }
 ```

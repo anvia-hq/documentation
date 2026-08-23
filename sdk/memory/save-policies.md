@@ -51,7 +51,8 @@ const agent = new Agent({
 })
 ```
 
-`'run'` appends all new runtime messages only after the agent produces a successful final result. A failed or cancelled run contributes no normal conversation messages.
+`'run'` appends all new runtime messages only after the agent produces a response outcome. A failed
+or cancelled run contributes no normal conversation messages.
 
 Choose this policy when future model context must contain only fully completed runs.
 

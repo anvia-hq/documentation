@@ -2,6 +2,15 @@
 
 Model Context Protocol connects Anvia agents to tools hosted by external servers.
 
+Install the dedicated integration package alongside Core:
+
+```sh
+pnpm add @anvia/core@rc @anvia/mcp@rc
+```
+
+`@anvia/mcp` owns connections, transports, tool discovery, result mapping, and cleanup. Core keeps
+only the lightweight server-registration contracts consumed by `Agent`.
+
 ```text
 Application -> connect -> list tools -> review -> agent -> remote call
 ```
@@ -12,7 +21,7 @@ The application owns connection scope, credentials, the allowed tool set, produc
 
 ```ts
 import { Agent } from '@anvia/core'
-import { McpClient } from '@anvia/core/mcp'
+import { McpClient } from '@anvia/mcp'
 
 const client = new McpClient({
   name: 'docs-filesystem',
@@ -39,7 +48,7 @@ try {
       prompt: 'List the documentation files.'
   })
 
-  if (response.status === 'completed') {
+  if (response.type === 'response') {
     console.log(response.output)
   }
 } finally {
@@ -48,6 +57,10 @@ try {
 ```
 
 `client.connect()` connects, lists the server's tools, and adapts them into normal Anvia tools. `mcpServers` registers every adapted tool from that server.
+
+The package uses the official split MCP TypeScript SDK v2 and requires protocol revision
+`2026-07-28`. A server that cannot negotiate that revision fails clearly; Anvia does not retry with
+the legacy handshake.
 
 ## 2. Review external capability
 

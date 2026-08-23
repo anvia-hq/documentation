@@ -94,5 +94,5 @@ Read [Memory save policies](/sdk/memory/save-policies) and [Memory sessions](/sd
 
 - [API reference](/packages/memory-prisma/api-reference)
 - [Memory store adapters](/sdk/memory/store-adapters)
-- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/memory-prisma)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/memory-prisma/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/memory-prisma)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/memory-prisma/CHANGELOG.md)

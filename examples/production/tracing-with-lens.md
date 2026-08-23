@@ -137,7 +137,7 @@ try {
 
   // The run can finish before asynchronous batch export.
   await lens.flush();
-  if (response.status === "completed") {
+  if (response.type === "response") {
     console.log(response.output);
     console.log(`Lens trace ID: ${response.trace?.traceId ?? "unavailable"}`);
   }
@@ -274,5 +274,5 @@ run/generation correlation, error recording, `flush()` in a short-lived job, and
 `shutdown()`. Keep the deployment smoke test synthetic and verify its trace ID in the expected Lens
 project after key or network changes.
 
-- Cookbook source: [`10_integrations/08-lens-native.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/10_integrations/08-lens-native.ts)
-- Adapter tests: [`packages/observability-lens/test`](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/observability-lens/test)
+- Cookbook source: [`10_integrations/08-lens-native.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/10_integrations/08-lens-native.ts)
+- Adapter tests: [`packages/observability-lens/test`](https://github.com/anvia-hq/anvia/tree/staging/packages/observability-lens/test)

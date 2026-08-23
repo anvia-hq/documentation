@@ -56,23 +56,25 @@ const pending = await agent.generate({
     prompt: message
 })
 
-if (pending.status === 'suspended' && pending.interaction.type === 'tool-approval') {
+if (pending.type === 'interaction' && pending.interaction.type === 'tool-approval') {
   console.log(pending.interaction.toolName)
   console.log(pending.interaction.input)
   console.log(pending.interaction.reason)
 
-  const result = await agent.generate({
-    continuation: pending.continuation,
-    response: {
+  const result = await agent.resume(
+    pending.continuation,
+    {
       type: 'tool-approval',
       approved: reviewer.approved,
       reason: reviewer.reason,
     },
-  })
+  )
 }
 ```
 
-A stream ends with a suspended `final` result. Start a linked stream phase with `agent.stream({ continuation, response })`; the continuation is JSON-safe but still belongs to the originating agent and interaction.
+A stream ends with a direct `interaction` outcome. Start a linked stream phase with
+`agent.stream({ continuation, response })`; the continuation is JSON-safe but still belongs to the
+originating agent and interaction.
 
 ## 4. Keep authorization inside execution
 

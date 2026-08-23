@@ -37,7 +37,7 @@ const agent = new Agent({
 const response = await agent.generate({
     prompt: 'What time is it?'
 })
-if (response.status === 'completed') console.log(response.output)
+if (response.type === 'response') console.log(response.output)
 ```
 
 Keep the API key and agent execution on the server. A browser should call an authenticated application route rather than construct the provider client itself.

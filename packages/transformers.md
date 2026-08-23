@@ -5,7 +5,7 @@ Transformers.js provides local dense embeddings through Hugging Face feature-ext
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.0.0-rc.2` |
+| Version | `1.0.0-rc.9` |
 | Runtime | ESM, runtimes supported by Transformers.js |
 | Peer | Matching `@anvia/core` release candidate |
 
@@ -85,4 +85,4 @@ Use the same model, pooling, normalization, and preprocessing for ingestion and 
 - [API reference](/packages/transformers/api-reference)
 - [Releases](/packages/transformers/releases)
 - [Embeddings guide](/sdk/knowledges/embeddings)
-- [Source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/embedding-transformers/CHANGELOG.md)
+- [Source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/embedding-transformers/CHANGELOG.md)

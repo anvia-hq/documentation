@@ -125,7 +125,8 @@ Use retrieval indexes for large or frequently changing knowledge collections so 
 
 ## Streams are the application boundary
 
-Agent streams expose structured events such as `turn_start`, `text_delta`, `reasoning_delta`, `tool_call`, `tool_result`, `turn_end`, `interaction_response`, `final`, and `error`.
+Agent streams expose structured events such as `turn_start`, `text_delta`, `reasoning_delta`,
+`tool_call`, `tool_result`, `turn_end`, `memory_compaction`, direct terminal outcomes, and `error`.
 
 ```ts
 for await (const event of agent.stream({
@@ -133,7 +134,9 @@ for await (const event of agent.stream({
 })) {
   if (event.type === 'text_delta') process.stdout.write(event.delta)
   if (event.type === 'tool_result') console.log(event.toolName, event.result)
-  if (event.type === 'final') console.log(event.result.runId, event.result.usage)
+  if (event.type === 'response' || event.type === 'interaction' || event.type === 'blocked') {
+    console.log(event.runId, event.usage)
+  }
 }
 ```
 

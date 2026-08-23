@@ -125,8 +125,8 @@ schema failure, duplicate jobs, cross-tenant access, review rejection, and delet
 
 ## Runnable references
 
-- [Document utilities](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/04-documents.ts)
-- [Extractor pipeline](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/05_pipelines/07-extractor-pipeline.ts)
+- [Document utilities](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/04-documents.ts)
+- [Extractor pipeline](https://github.com/anvia-hq/anvia/blob/staging/cookbook/05_pipelines/07-extractor-pipeline.ts)
 
 These demonstrate the current APIs. The queue and repository boundaries are suggested architecture.
 

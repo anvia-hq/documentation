@@ -6,11 +6,13 @@ Open `http://localhost:4021/ui/mcps` when Studio is running on port `4021`.
 
 Studio does not establish MCP connections from the browser. Your application connects to each server, registers it on an agent, and then passes the agent to Studio.
 
+Install `@anvia/mcp` explicitly; MCP clients and transports are no longer exported by Core.
+
 ## Register an MCP-backed agent
 
 ```ts
 import { Agent } from '@anvia/core/agent'
-import { McpClient } from '@anvia/core/mcp'
+import { McpClient } from '@anvia/mcp'
 import { Studio } from '@anvia/studio'
 
 const counterClient = new McpClient({

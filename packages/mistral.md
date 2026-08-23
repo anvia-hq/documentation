@@ -5,7 +5,7 @@ Mistral’s provider adapter supplies completion, embeddings, OCR, and model lis
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.0.0-rc.2` |
+| Version | `1.0.0-rc.9` |
 | Runtime | ESM, server-side JavaScript |
 | Peer | Matching `@anvia/core` release candidate |
 
@@ -36,7 +36,7 @@ const result = await agent.generate({
     prompt: 'Extract the launch risks from this report.'
 })
 
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
 }
 ```
@@ -99,4 +99,4 @@ const vectors = await embeddings.embedTexts(['first document', 'second document'
 - [API reference](/packages/mistral/api-reference)
 - [Releases](/packages/mistral/releases)
 - [Mistral SDK guide](/sdk/providers/mistral)
-- [Source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-mistral/CHANGELOG.md)
+- [Source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/provider-mistral/CHANGELOG.md)

@@ -84,5 +84,5 @@ For horizontally scaled workers or multiple application instances, use a shared 
 
 - [API reference](/packages/memory-sqlite/api-reference)
 - [Memory store adapters](/sdk/memory/store-adapters)
-- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/memory-sqlite)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/memory-sqlite/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/memory-sqlite)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/memory-sqlite/CHANGELOG.md)

@@ -86,5 +86,5 @@ Read [Configure memory](/sdk/memory/configure) and [Memory compaction](/sdk/memo
 
 - [API reference](/packages/memory-drizzle/api-reference)
 - [Memory store adapters](/sdk/memory/store-adapters)
-- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/memory-drizzle)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/memory-drizzle/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/memory-drizzle)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/memory-drizzle/CHANGELOG.md)

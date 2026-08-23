@@ -12,7 +12,7 @@ If you are choosing between adapters, use the [feature matrix](/packages/feature
 
 | Family | Use it for | Start here |
 | --- | --- | --- |
-| Core runtime | Agents, protocol clients, streaming server responses, and React state/UI | [`@anvia/core`](/packages/core) |
+| Core runtime | Agents, client/MCP protocols, streaming server responses, and React state/UI | [`@anvia/core`](/packages/core) |
 | Model providers | Completion, embedding, image, audio, transcription, and OCR models | [`@anvia/openai`](/packages/openai) |
 | Memory | Durable agent sessions and message history | [`@anvia/memory-sqlite`](/packages/memory-sqlite) |
 | Vector stores | Retrieval indexes for embedded documents | [`@anvia/pgvector`](/packages/pgvector) |

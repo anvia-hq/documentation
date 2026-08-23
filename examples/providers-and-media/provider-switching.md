@@ -72,7 +72,7 @@ const result = await agent.generate({
     prompt: 'What is a model boundary?'
 })
 
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
 }
 ```
@@ -95,11 +95,11 @@ the exact account and model, compare normalized usage and quality, and keep roll
 
 ## Source and extensions
 
-Compare the runnable [OpenAI](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/01_basics/01-text-call.ts),
-[Anthropic](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/11-anthropic-text-call.ts),
-[Gemini](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/01-gemini-text-call.ts),
-[Grok](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/13-grok-live-search.ts),
-and [Mistral](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/04_providers_and_multimodal/02-mistral-text-call.ts)
+Compare the runnable [OpenAI](https://github.com/anvia-hq/anvia/blob/staging/cookbook/01_basics/01-text-call.ts),
+[Anthropic](https://github.com/anvia-hq/anvia/blob/staging/cookbook/04_providers_and_multimodal/11-anthropic-text-call.ts),
+[Gemini](https://github.com/anvia-hq/anvia/blob/staging/cookbook/04_providers_and_multimodal/01-gemini-text-call.ts),
+[Grok](https://github.com/anvia-hq/anvia/blob/staging/cookbook/04_providers_and_multimodal/13-grok-live-search.ts),
+and [Mistral](https://github.com/anvia-hq/anvia/blob/staging/cookbook/04_providers_and_multimodal/02-mistral-text-call.ts)
 examples. Next, build a provider conformance test and an offline quality evaluation.
 
 - [Choose a provider](/sdk/providers/choose-a-provider)

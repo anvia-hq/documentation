@@ -76,5 +76,5 @@ The adapter writes hashes without expiration. Retention, deletion, and stale-doc
 - [API reference](/packages/redis/api-reference)
 - [Vector stores](/sdk/knowledges/vector-stores)
 - [Metadata filters](/sdk/knowledges/metadata-filters)
-- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/vector-redis)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/vector-redis/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/vector-redis)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-redis/CHANGELOG.md)

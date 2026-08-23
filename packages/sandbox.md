@@ -75,4 +75,4 @@ The package requires Node.js 20.12 or newer, a compatible Docker CLI and daemon,
 - [Public API](/packages/sandbox/api-reference)
 - [Sandbox execution guide](/sdk/advanced/sandbox)
 - [Studio sandbox inspector](/studio/sandboxes)
-- [Package changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/tool-sandbox/CHANGELOG.md)
+- [Package changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/tool-sandbox/CHANGELOG.md)

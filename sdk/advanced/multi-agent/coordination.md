@@ -54,7 +54,7 @@ const response = await coordinator.generate({
     }
 })
 
-if (response.status === 'completed') {
+if (response.type === 'response') {
   await incidents.saveDraft({
     incidentId: input.incidentId,
     output: response.output,

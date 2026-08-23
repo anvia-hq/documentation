@@ -149,6 +149,6 @@ use `.parallel()` for a small, known set of branches.
 
 ## Source and extensions
 
-- Source: [`05_pipelines/04-named-parallel.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/05_pipelines/04-named-parallel.ts)
+- Source: [`05_pipelines/04-named-parallel.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/05_pipelines/04-named-parallel.ts)
 - Read [parallel and batch pipelines](/sdk/pipelines/parallel-and-batch).
 - Extend with provider-backed classification, per-branch telemetry, or an explicit partial-result policy.

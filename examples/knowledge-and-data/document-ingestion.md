@@ -102,8 +102,8 @@ version races, source deletion, dimension mismatch, and provenance round trips.
 
 ## Runnable references
 
-- [Document utilities](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/04-documents.ts)
-- [pgvector adapter](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/08-pgvector-store.ts)
+- [Document utilities](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/04-documents.ts)
+- [pgvector adapter](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/08-pgvector-store.ts)
 
 ## Extensions
 

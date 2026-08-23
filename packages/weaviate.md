@@ -75,5 +75,5 @@ Metadata keys beginning with `__anvia_` are reserved. If metadata properties nee
 - [API reference](/packages/weaviate/api-reference)
 - [Vector stores](/sdk/knowledges/vector-stores)
 - [Automatic retrieval](/sdk/knowledges/automatic-retrieval)
-- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/vector-weaviate)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/vector-weaviate/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/vector-weaviate)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-weaviate/CHANGELOG.md)

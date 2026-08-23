@@ -92,7 +92,7 @@ metadata, stale sessions, filter injection, unpublished content, and pagination/
 
 ## Runnable references
 
-- [Filters and LSH](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/02-filters-and-lsh.ts)
+- [Filters and LSH](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/02-filters-and-lsh.ts)
 - [Customer-support RAG application](/examples/applications/customer-support-rag)
 
 ## Extensions

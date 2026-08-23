@@ -30,7 +30,7 @@ const result = await agent.generate({
     prompt: 'Draft a concise reply to this ticket.'
 })
 
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
 }
 ```

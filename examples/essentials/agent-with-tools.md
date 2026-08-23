@@ -83,10 +83,10 @@ const result = await agent.generate({
     prompt: 'Look up order ord_123 and tell me its status and ship date.'
 })
 
-if (result.status === 'suspended') {
-  throw new Error(`Agent suspended for ${result.interaction.type}`)
+if (result.type === 'interaction') {
+  throw new Error(`Agent requested ${result.interaction.type}`)
 }
-if (result.status === 'blocked') throw new Error(`Agent blocked at ${result.stage}`)
+if (result.type === 'blocked') throw new Error(`Agent blocked at ${result.stage}: ${result.reason}`)
 
 console.log(result.output)
 ```

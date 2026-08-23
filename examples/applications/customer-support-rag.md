@@ -296,8 +296,8 @@ app.post("/answer", async (context) => {
     const response = await createSupportAgent(principal).generate({
         prompt: question
     });
-    if (response.status !== "completed") {
-      return context.json({ error: "Unexpected approval request" }, 409);
+    if (response.type !== "response") {
+      return context.json({ error: `Unexpected agent outcome: ${response.type}` }, 409);
     }
     return context.json({ answer: response.output });
   } catch (error) {
@@ -373,9 +373,9 @@ to inspect the exact context without network calls.
 
 ## Runnable references and extensions
 
-- [Embed and search](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/01-embed-and-search.ts)
-- [Filters and LSH](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/02-filters-and-lsh.ts)
-- [RAG search tool](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/05-rag-search-tool.ts)
+- [Embed and search](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/01-embed-and-search.ts)
+- [Filters and LSH](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/02-filters-and-lsh.ts)
+- [RAG search tool](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/05-rag-search-tool.ts)
 
 Those files demonstrate the current primitives independently. This page provides a coherent
 application layout but intentionally omits deployment identity middleware, a durable ingestion

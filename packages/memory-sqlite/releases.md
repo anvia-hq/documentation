@@ -1,6 +1,6 @@
 # Releases
 
-Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 history.
+Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 history.
 
 Notable package releases include:
 
@@ -11,4 +11,4 @@ Notable package releases include:
 - `0.2.0` established the durable database-adapter contract.
 - `0.1.0` introduced the SQLite store.
 
-Dependency and patch details remain authoritative in the [source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/memory-sqlite/CHANGELOG.md). Review it together with [Schema and migrations](/packages/memory-sqlite/schema-and-migrations) before upgrading a managed schema.
+Dependency and patch details remain authoritative in the [source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/memory-sqlite/CHANGELOG.md). Review it together with [Schema and migrations](/packages/memory-sqlite/schema-and-migrations) before upgrading a managed schema.

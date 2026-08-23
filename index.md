@@ -59,20 +59,22 @@ The dependencies remain visible at construction time. Tools, memory, context, gu
 
 ## 4. Generate an answer
 
-`generate()` starts the agent loop and resolves when the run completes, is blocked, or suspends for an approval or question. Checking the status keeps that boundary explicit, even though this first agent has no tools yet.
+`generate()` starts the agent loop and resolves to a response, interaction, or guardrail block.
+Checking `type` keeps that boundary explicit, even though this first agent has no tools yet.
 
 ```ts
 const response = await supportAgent.generate({
     prompt: 'A customer cannot reset their password. What should I check first?'
 })
 
-if (response.status === 'suspended') throw new Error(`Interaction required: ${response.interaction.type}`)
-if (response.status === 'blocked') throw new Error(`Blocked at ${response.stage}`)
+if (response.type === 'interaction') throw new Error(`Interaction required: ${response.interaction.type}`)
+if (response.type === 'blocked') throw new Error(`Blocked at ${response.stage}: ${response.reason}`)
 
 console.log(response.output)
 ```
 
-The completed result includes the final output, normalized messages, token usage, and run metadata. Your application decides how that result is stored or presented to a user.
+The response outcome includes the final output, normalized messages, token usage, and run metadata.
+Your application decides how that result is stored or presented to a user.
 
 ## Stream the same agent
 
@@ -86,9 +88,9 @@ for await (const event of supportAgent.stream({
     process.stdout.write(event.delta)
   }
 
-  if (event.type === 'final') {
+  if (event.type === 'response' || event.type === 'interaction' || event.type === 'blocked') {
     process.stdout.write('\n')
-    console.log(event.result.usage)
+    console.log(event.usage)
   }
 }
 ```

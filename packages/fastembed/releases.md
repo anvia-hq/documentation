@@ -1,6 +1,6 @@
 # Releases
 
-Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 history.
+Current release candidate: `1.0.0-rc.9`. The entries below preserve notable v0 history.
 
 ## Notable changes
 
@@ -14,6 +14,6 @@ Current release candidate: `1.0.0-rc.2`. The entries below preserve notable v0 h
 
 The full changelog also records releases that only track Core dependency updates or workspace layout changes.
 
-- [Full `@anvia/fastembed` changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/embedding-fastembed/CHANGELOG.md)
+- [Full `@anvia/fastembed` changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/embedding-fastembed/CHANGELOG.md)
 - [Compatibility and versioning](/packages/compatibility-and-versioning)
 - [API reference](/packages/fastembed/api-reference)

@@ -37,7 +37,7 @@ const result = await coordinator.generate({
     toolConcurrency: 2
 })
 
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
 }
 ```

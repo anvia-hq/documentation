@@ -55,7 +55,7 @@ const result = await agent.generate({
     prompt: 'Where is order ord_123?'
 })
 
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
 }
 ```
@@ -99,7 +99,7 @@ const result = await triageAgent.generate({
     prompt: incidentText
 })
 
-if (result.status === 'completed') {
+if (result.type === 'response') {
   const incident = incidentSchema.parse(JSON.parse(result.output))
   console.log(incident.severity)
 }

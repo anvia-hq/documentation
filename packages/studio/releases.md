@@ -1,11 +1,11 @@
 # Releases
 
-The current source manifest is `@anvia/studio` **1.0.0-rc.2**. The entries below preserve notable v0 Studio milestones.
+The current source manifest is `@anvia/studio` **1.0.0-rc.9**. The entries below preserve notable v0 Studio milestones.
 
 | Version | Summary |
 | --- | --- |
-| `v1-rc3` source | Adopted linked interaction phases and continuation storage, replaced automatic sandbox discovery with explicit inspectors, and added authorized noVNC browser views with coordinated human-control leases. |
-| `1.0.0-rc.2` | Synchronized Studio with the Anvia 1.0 release-candidate train. |
+| Next RC source | Adopted linked interaction phases and continuation storage, replaced automatic sandbox discovery with explicit inspectors, and added authorized noVNC browser views with coordinated human-control leases. Added token-count detail to memory-compaction session logs. |
+| `1.0.0-rc.9` | Synchronized Studio with the Anvia 1.0 release-candidate train. |
 | `0.7.54` | Updated React, Server, and React UI dependencies for Core `0.26.0` compatibility. |
 | `0.7.53` | Published updated upstream runtime dependencies. |
 | `0.7.52` | Adopted richer evaluation result, totals, usage/cost, negative-control, and optional Lens environment handling. |
@@ -28,4 +28,4 @@ The current source manifest is `@anvia/studio` **1.0.0-rc.2**. The entries below
 - Review route and UI-option behavior when embedding Studio in another server.
 - Re-test approval and question interactions, linked phase history, cancellation, model policy, sandbox registrations, browser-view authorization, and custom client scripts.
 
-Read the complete [Studio changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/tool-studio/CHANGELOG.md).
+Read the complete [Studio changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/tool-studio/CHANGELOG.md).

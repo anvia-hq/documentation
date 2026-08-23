@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import { readFile, readdir } from 'node:fs/promises'
-import { dirname, join, relative, resolve } from 'node:path'
+import { basename, dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -74,11 +74,18 @@ function lineAt(source, offset) {
 }
 
 const packages = await loadPackages()
-const markdownFiles = await collectFiles(docsRoot, (path) => path.endsWith('.md'))
+const documentationFiles = await collectFiles(
+  docsRoot,
+  (path) =>
+    path.endsWith('.md') ||
+    (dirname(path) === join(docsRoot, 'public') &&
+      basename(path).startsWith('llms') &&
+      path.endsWith('.txt')),
+)
 const virtualSources = new Map()
 const sourceMetadata = new Map()
 
-for (const markdownPath of markdownFiles) {
+for (const markdownPath of documentationFiles) {
   const markdown = await readFile(markdownPath, 'utf8')
   for (const [blockIndex, block] of codeBlocks(markdown).entries()) {
     if (!block.code.includes('@anvia/')) continue

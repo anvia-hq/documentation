@@ -5,7 +5,7 @@ OpenAI’s provider adapter covers the broadest set of Anvia model contracts: co
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.0.0-rc.2` |
+| Version | `1.0.0-rc.9` |
 | Runtime | ESM, server-side JavaScript |
 | Peer | Matching `@anvia/core` release candidate |
 
@@ -38,7 +38,7 @@ const result = await agent.generate({
     prompt: 'Explain semantic search in one paragraph.'
 })
 
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
 }
 ```
@@ -105,4 +105,4 @@ Create the provider client once at the server boundary. Keep credentials there, 
 - [API reference](/packages/openai/api-reference)
 - [Releases](/packages/openai/releases)
 - [OpenAI SDK guide](/sdk/providers/openai)
-- [Source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-openai/CHANGELOG.md)
+- [Source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/provider-openai/CHANGELOG.md)

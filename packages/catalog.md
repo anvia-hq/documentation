@@ -8,9 +8,11 @@ All packages below are maintained in the Anvia monorepo. “First-party” descr
 | --- | --- | --- |
 | `@anvia/core` | Agent, model, tool, memory, pipeline, evaluation, and streaming primitives | [Open](/packages/core) |
 | `@anvia/client` | Framework-neutral protocol v3, transports, UI messages, interactions, and stream state | [Open](/packages/client) |
+| `@anvia/mcp` | MCP SDK v2 clients, transports, discovery, result mapping, and connection ownership | [Open](/packages/mcp) |
 | `@anvia/server` | Server-side event stream and UI transport helpers | [Open](/packages/server) |
 | `@anvia/react` | React state hooks over `@anvia/client` transports | [Open](/packages/react) |
-| `@anvia/react-ui` | Composable React chat and completion components | [Open](/packages/react-ui) |
+| `@anvia/react-ui` | Strictly headless React chat and completion primitives | [Open](/packages/react-ui) |
+| `@anvia/cli` | Editable shadcn/Tailwind application components built on React UI primitives | [Open](/packages/cli) |
 
 ## Model providers
 

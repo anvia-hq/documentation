@@ -65,7 +65,7 @@ try {
 
   await lens.flush()
 
-  if (response.status === 'completed') {
+  if (response.type === 'response') {
     console.log(response.output)
     console.log(response.trace?.traceId)
   }

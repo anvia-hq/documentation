@@ -68,7 +68,7 @@ const agent = new Agent({
 const response = await agent.generate({
     prompt: "What is the refund window?"
 });
-if (response.status !== "completed") throw new Error("Unexpected approval request");
+if (response.type !== "response") throw new Error(`Unexpected agent outcome: ${response.type}`);
 expect(response.output).toContain("30 days");
 ```
 
@@ -108,6 +108,6 @@ and live smoke/eval jobs on a controlled schedule or release boundary.
 
 ## Source and extensions
 
-- Static model source: [`10_integrations/08-lens-native.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/10_integrations/08-lens-native.ts)
-- Eval source: [`08_evals/04-agent-eval-target.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/08_evals/04-agent-eval-target.ts)
+- Static model source: [`10_integrations/08-lens-native.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/10_integrations/08-lens-native.ts)
+- Eval source: [`08_evals/04-agent-eval-target.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/08_evals/04-agent-eval-target.ts)
 - Continue to [evaluations](/examples/production/evaluations) and [quality gates](/examples/production/quality-gates).

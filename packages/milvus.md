@@ -76,5 +76,5 @@ Metadata fields are written alongside reserved Anvia fields. Keys beginning with
 - [API reference](/packages/milvus/api-reference)
 - [Vector stores](/sdk/knowledges/vector-stores)
 - [Search tools](/sdk/knowledges/search-tools)
-- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/vector-milvus)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/vector-milvus/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/vector-milvus)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-milvus/CHANGELOG.md)

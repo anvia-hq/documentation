@@ -56,7 +56,7 @@ const result = await agent.generate({
     prompt: 'How long does a password reset link remain valid?'
 })
 
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
 }
 ```

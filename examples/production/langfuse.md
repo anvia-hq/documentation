@@ -64,7 +64,7 @@ try {
   });
 
   await langfuse.flush(); // useful for a short-lived command or job
-  if (response.status === "completed") {
+  if (response.type === "response") {
     console.log(response.output, response.trace?.traceId);
   }
 } finally {
@@ -97,6 +97,6 @@ Use synthetic content in a staging smoke trace.
 
 ## Source and extensions
 
-- Source: [`10_integrations/03-langfuse-tracing.ts`](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/10_integrations/03-langfuse-tracing.ts)
+- Source: [`10_integrations/03-langfuse-tracing.ts`](https://github.com/anvia-hq/anvia/blob/staging/cookbook/10_integrations/03-langfuse-tracing.ts)
 - Explore the [`@anvia/langfuse` package guide](/packages/langfuse/get-started).
 - Extend with [evaluations](/examples/production/evaluations), prompt versions, datasets, and redaction transforms.

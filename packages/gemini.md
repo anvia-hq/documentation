@@ -5,7 +5,7 @@ Gemini’s provider adapter connects Anvia to the Gemini Developer API or Vertex
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.0.0-rc.2` |
+| Version | `1.0.0-rc.9` |
 | Runtime | ESM, server-side JavaScript |
 | Peer | Matching `@anvia/core` release candidate |
 
@@ -36,7 +36,7 @@ const result = await agent.generate({
     prompt: 'Describe this system in three bullets.'
 })
 
-if (result.status === 'completed') {
+if (result.type === 'response') {
   console.log(result.output)
 }
 ```
@@ -100,4 +100,4 @@ Use matching dimensions and a compatible task configuration when indexing and qu
 - [API reference](/packages/gemini/api-reference)
 - [Releases](/packages/gemini/releases)
 - [Gemini SDK guide](/sdk/providers/gemini)
-- [Source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/provider-gemini/CHANGELOG.md)
+- [Source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/provider-gemini/CHANGELOG.md)

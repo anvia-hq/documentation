@@ -98,5 +98,5 @@ Keys beginning with `__anvia_` are reserved in payload metadata. Keep configured
 - [API reference](/packages/qdrant/api-reference)
 - [Embeddings](/sdk/knowledges/embeddings)
 - [Search tools](/sdk/knowledges/search-tools)
-- [Source](https://github.com/anvia-hq/anvia/tree/v1-rc3/packages/vector-qdrant)
-- [Changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/vector-qdrant/CHANGELOG.md)
+- [Source](https://github.com/anvia-hq/anvia/tree/staging/packages/vector-qdrant)
+- [Changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/vector-qdrant/CHANGELOG.md)

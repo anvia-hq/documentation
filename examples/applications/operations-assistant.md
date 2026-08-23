@@ -108,9 +108,9 @@ idempotency, cancellation, and secret redaction.
 
 ## Runnable references
 
-- [Agent as tool](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/07_multi_agent/01-agent-as-tool.ts)
-- [Guarded tools](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/02_tools/08-tool-permission-hook.ts)
-- [RAG search tool](https://github.com/anvia-hq/anvia/blob/v1-rc3/examples/cookbook/06_retrieval/05-rag-search-tool.ts)
+- [Agent as tool](https://github.com/anvia-hq/anvia/blob/staging/cookbook/07_multi_agent/01-agent-as-tool.ts)
+- [Guarded tools](https://github.com/anvia-hq/anvia/blob/staging/cookbook/02_tools/08-tool-permission-hook.ts)
+- [RAG search tool](https://github.com/anvia-hq/anvia/blob/staging/cookbook/06_retrieval/05-rag-search-tool.ts)
 
 These examples demonstrate primitives separately; the complete operations service is a suggested
 architecture, not a published runnable project.

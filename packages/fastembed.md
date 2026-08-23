@@ -5,7 +5,7 @@ FastEmbed provides local dense and sparse embedding models for Anvia retrieval w
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.0.0-rc.2` |
+| Version | `1.0.0-rc.9` |
 | Runtime | ESM, Node.js with FastEmbed native runtime support |
 | Peer | Matching `@anvia/core` release candidate |
 
@@ -81,4 +81,4 @@ Use the same dense model, sparse model, and preprocessing rules for ingestion an
 - [API reference](/packages/fastembed/api-reference)
 - [Releases](/packages/fastembed/releases)
 - [Embeddings guide](/sdk/knowledges/embeddings)
-- [Source changelog](https://github.com/anvia-hq/anvia/blob/v1-rc3/packages/embedding-fastembed/CHANGELOG.md)
+- [Source changelog](https://github.com/anvia-hq/anvia/blob/staging/packages/embedding-fastembed/CHANGELOG.md)

@@ -19,7 +19,7 @@ const response = await agent.generate({
     prompt: 'Has invoice inv_123 been paid?'
 })
 
-if (response.status === 'completed') {
+if (response.type === 'response') {
   console.log(response.output)
 }
 ```

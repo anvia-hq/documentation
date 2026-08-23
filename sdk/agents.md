@@ -31,24 +31,30 @@ The model handles provider communication. The agent options define behavior shar
 
 ## 2. Run the agent
 
-`generate()` starts the model-and-tool loop and resolves when the run completes, is blocked, or suspends for an interaction:
+`generate()` starts the model-and-tool loop and returns one explicit outcome: a response, an
+interaction, or a guardrail block.
 
 ```ts
 const result = await supportAgent.generate({
     prompt: 'What should I check when a customer cannot reset their password?'
 })
 
-if (result.status === 'completed') {
-  console.log(result.output)
-  console.log(result.usage)
-} else if (result.status === 'suspended') {
-  console.log(result.interaction)
-} else {
-  console.log('Blocked at', result.stage)
+switch (result.type) {
+  case 'response':
+    console.log(result.output)
+    break
+  case 'interaction':
+    console.log(result.interaction)
+    break
+  case 'blocked':
+    console.log('Blocked at', result.stage, result.reason)
+    break
 }
 ```
 
-A completed result includes the final output, run ID, accumulated token usage, messages created during the run, and optional trace, source, guardrail, and provider-tool metadata.
+A response includes the final output. Every outcome includes `text`, run ID, accumulated token
+usage, messages created during the run, and optional trace, source, guardrail, provider-tool, and
+memory-compaction metadata. Interactions are expected control flow rather than failed runs.
 
 ## 3. Understand the loop
 
@@ -58,9 +64,9 @@ For each run, Anvia can:
 2. apply input guardrails;
 3. retrieve relevant context and tool definitions;
 4. send a normalized request to the model;
-5. execute requested local tools or suspend for approval or a structured question;
+5. execute requested local tools or return an interaction for approval or a structured question;
 6. add tool results to the transcript and call the model again; and
-7. apply output guardrails, save memory, and return the final result.
+7. apply output guardrails, save memory, and return the terminal outcome.
 
 The application still owns authentication, authorization, services, persistence configuration, deployment, and the response exposed to users. Instructions are not a security boundary; tool handlers and retrieval filters must enforce access.
 
