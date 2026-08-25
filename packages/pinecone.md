@@ -8,7 +8,7 @@
 pnpm add @anvia/pinecone @anvia/core @anvia/openai @pinecone-database/pinecone
 ```
 
-The ESM package includes the Pinecone SDK and should be installed with the matching stable `@anvia/core` release.
+The ESM package includes the Pinecone SDK and should use a version compatible with its declared `@anvia/core` dependency range.
 
 ## Store and search documents
 

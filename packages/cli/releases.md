@@ -1,6 +1,6 @@
 # Releases
 
-The current stable release is `@anvia/cli` **1.0.0**.
+The current stable release is `@anvia/cli` **1.0.2**.
 
 | Version | Summary |
 | --- | --- |

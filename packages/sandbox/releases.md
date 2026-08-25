@@ -1,6 +1,6 @@
 # Releases
 
-The current stable release is `@anvia/sandbox` **1.0.0**. The entries below preserve notable v0 history.
+The current stable release is `@anvia/sandbox` **1.0.3**. The entries below preserve notable v0 history.
 
 | Version | Summary |
 | --- | --- |

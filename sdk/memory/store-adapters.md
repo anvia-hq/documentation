@@ -2,7 +2,8 @@
 
 Anvia provides Prisma, Drizzle, direct Postgres, and SQLite memory stores. Choose the adapter that matches the database and migration workflow the application already operates.
 
-Keep every Anvia package on the same stable release line.
+Memory adapters release independently from Core. Check the adapter's declared Core dependency range
+and its changelog when upgrading.
 
 ## Prisma
 

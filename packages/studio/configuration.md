@@ -1,6 +1,23 @@
 # Configuration
 
-`StudioOptions` configures targets around five boundaries: quick prompts, stores, UI, model catalog, and evaluation suites.
+`StudioOptions` configures targets around quick prompts, stores, UI, model catalog, evaluation
+suites, sandboxes, and graph explorers.
+
+## Graphs
+
+```ts
+const studio = new Studio([agent], {
+  graphs: [{
+    id: 'support',
+    name: 'Support knowledge graph',
+    graph,
+  }],
+})
+```
+
+The registration ID must be non-empty and unique. `graph` implements the provider-neutral
+`GraphExplorer` contract from `@anvia/graph`; Neo4j and Memgraph registrations satisfy it directly.
+See the [Studio graph explorer](/studio/graphs).
 
 ## Stores
 

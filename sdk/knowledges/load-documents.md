@@ -53,7 +53,30 @@ const documents = pages.map((page) => ({
 
 Image-only PDFs need OCR before they can be indexed. Treat PDF bytes as untrusted input and apply size limits, malware scanning, timeouts, and cancellation outside the parser.
 
-## 3. Chunk long text
+## 3. Chunk normalized documents
+
+`chunkTextDocuments()` accepts the shared `{ id, text, metadata? }` document shape and creates
+stable `${documentId}:chunk:${index}` IDs. Without `chunking`, or with `{ strategy: 'none' }`, every
+document produces one chunk.
+
+```ts
+import { chunkTextDocuments } from '@anvia/core/documents'
+
+const chunks = chunkTextDocuments({
+  documents,
+  chunking: {
+    strategy: 'recursive',
+    maxSize: 1_600,
+    overlap: 200,
+    separators: ['\n\n', '\n', '. ', ' '],
+  },
+})
+```
+
+Use this shared helper when the next stage needs explicit chunks. The vector and graph ingestion
+helpers call it internally.
+
+## 4. Chunk one text value manually
 
 Use `chunkText()` with either a fixed-width or recursive separator strategy. Keep chunk IDs stable so a later ingestion run replaces the same records:
 
@@ -82,6 +105,10 @@ const chunks = documents.flatMap((document) =>
 
 `chunkText()` measures JavaScript string length, not model tokens. Choose boundaries and limits that fit the content and embedding model you use.
 
-## 4. Continue to embeddings
+## 5. Continue to ingestion
 
-Pass the normalized values to `embedDocuments()` using `id`, `content`, and `metadata` selectors, then upsert the returned embedded documents into a vector store. See [create embeddings](/sdk/knowledges/embeddings).
+Use `ingestVectorText()` or `ingestVectorDocuments()` to chunk, embed, and upsert raw text through
+one consistent path. Use `ingestGraphText()` or `ingestGraphDocuments()` with a managed knowledge
+graph. Continue with [vector stores](/sdk/knowledges/vector-stores),
+[Knowledge GraphRAG](/sdk/knowledges/graph-rag), or the lower-level
+[embedding helpers](/sdk/knowledges/embeddings).

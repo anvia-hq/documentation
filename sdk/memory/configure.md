@@ -4,7 +4,7 @@ Configure memory in three steps: create a store, attach it to the agent, and con
 
 ## 1. Install one adapter
 
-Keep the memory adapter and core runtime on the same stable release line:
+Install memory-adapter and Core versions whose declared dependency ranges are compatible:
 
 ```bash
 pnpm add @anvia/core @anvia/memory-prisma @prisma/client

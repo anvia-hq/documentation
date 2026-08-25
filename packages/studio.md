@@ -1,6 +1,8 @@
 # `@anvia/studio`
 
-`@anvia/studio` runs the Anvia Studio development UI and its HTTP runtime around registered agents and pipelines. It is the quickest way to exercise tools, inspect schemas and context, replay pipeline runs, and review local traces while developing.
+`@anvia/studio` runs the Anvia Studio development UI and HTTP runtime around registered agents,
+pipelines, and graph explorers. It is the quickest way to exercise tools, inspect schemas and
+context, explore a knowledge graph, replay pipeline runs, and review local traces while developing.
 
 ## Install
 
@@ -52,6 +54,7 @@ Studio is a trusted local development surface. Binding to a public interface can
 - Use `serve()` with an `AbortSignal` when another lifecycle owns startup and shutdown.
 - Use `fetch()` or the exposed Hono `app` to mount Studio inside an existing server.
 - Register model providers and per-agent policies when users should switch models in the Playground.
+- Register Neo4j or Memgraph explorers through `options.graphs` for a bounded, searchable graph view.
 - Provide dedicated stores when sessions, traces, or pipeline replays must survive restarts.
 - Pass sandbox instances only when the application owns their cleanup.
 
@@ -60,4 +63,5 @@ Studio is a trusted local development surface. Binding to a public interface can
 - [Public API](/packages/studio/api-reference)
 - [Studio documentation](/studio/)
 - [Configuration and security](/studio/configure/security-boundaries)
+- [Explore knowledge graphs](/studio/graphs)
 - [Package changelog](https://github.com/anvia-hq/anvia/blob/main/packages/tool-studio/CHANGELOG.md)

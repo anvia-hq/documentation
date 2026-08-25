@@ -8,7 +8,7 @@
 pnpm add @anvia/pgvector @anvia/core @anvia/openai pg pgvector
 ```
 
-The ESM package includes `pg` and `pgvector` and should be installed with the matching stable `@anvia/core` release.
+The ESM package includes `pg` and `pgvector` and should use a version compatible with its declared `@anvia/core` dependency range.
 
 ## Store and search documents
 

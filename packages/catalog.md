@@ -56,7 +56,9 @@ All packages below are maintained in the Anvia monorepo. “First-party” descr
 
 | Package | Backend | Reference |
 | --- | --- | --- |
-| `@anvia/neo4j` | Neo4j schema-first GraphRAG | [Open](/packages/neo4j) |
+| `@anvia/graph` | Provider-neutral schemas, ingestion, retrieval tools, and exploration contracts | [Open](/packages/graph) |
+| `@anvia/neo4j` | Neo4j 2026.01+ GraphRAG adapter | [Open](/packages/neo4j) |
+| `@anvia/memgraph` | Memgraph 3.6+ GraphRAG adapter | [Open](/packages/memgraph) |
 
 ## Observability
 

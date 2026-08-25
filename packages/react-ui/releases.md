@@ -1,6 +1,6 @@
 # Releases
 
-The current stable release is `@anvia/react-ui` **1.0.0**. It is strictly headless and pairs with
+The current stable release is `@anvia/react-ui` **1.0.3**. It is strictly headless and pairs with
 the `@anvia/cli` installer. The entries below preserve notable v0 history.
 
 | Version | Summary |

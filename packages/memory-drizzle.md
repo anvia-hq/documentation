@@ -8,7 +8,7 @@
 pnpm add @anvia/memory-drizzle @anvia/core drizzle-orm
 ```
 
-The package is ESM-only and should be installed with the matching stable `@anvia/core` release and `drizzle-orm >=0.45.2 <1.0.0`. Supply a PostgreSQL Drizzle database instance; the exported tables use `drizzle-orm/pg-core`.
+The package is ESM-only and should use a version compatible with its declared `@anvia/core` dependency range and `drizzle-orm >=0.45.2 <1.0.0`. Supply a PostgreSQL Drizzle database instance; the exported tables use `drizzle-orm/pg-core`.
 
 ## Add the schema
 

@@ -2,25 +2,42 @@
 
 A vector store persists embedded documents and searches raw vectors. `retrieveDocuments()` combines it with an embedding model for text queries; the same store/model pair also powers automatic retrieval and search tools.
 
-## 1. Build an in-memory store
+## 1. Ingest raw text
 
 ```ts
-import { embedDocuments } from '@anvia/core/embeddings';
-import { InMemoryVectorStore, retrieveDocuments } from '@anvia/core/vector-store';
-const { documents: embedded } = await embedDocuments({
-    model: embeddingModel,
-    documents: documents,
-    id: (document) => document.id,
-    content: (document) => document.text,
-    metadata: (document) => ({
-        source: document.source,
-        product: document.product,
-    })
-});
-const store = InMemoryVectorStore.fromDocuments({ documents: embedded });
+import type { TextDocument } from '@anvia/core/documents'
+import {
+  InMemoryVectorStore,
+  ingestVectorDocuments,
+  retrieveDocuments,
+} from '@anvia/core/vector-store'
+
+const store = new InMemoryVectorStore<TextDocument>()
+
+const { documents: embedded } = await ingestVectorDocuments({
+  store,
+  documents: [{
+    id: 'support/reset-links',
+    text,
+    metadata: { product: 'accounts', published: true },
+  }],
+  embeddingModel,
+  chunking: {
+    strategy: 'recursive',
+    maxSize: 1_600,
+    overlap: 200,
+    separators: ['\n\n', '\n', '. ', ' '],
+  },
+})
 ```
 
-The in-memory store is process-local and is best for tests, examples, and small temporary indexes. Its default brute-force strategy checks every stored document.
+`ingestVectorText()` handles one document. `ingestVectorDocuments()` handles a batch. Without a
+chunking option, each source document is embedded as one chunk. With chunking, embeddings remain
+grouped under the source ID, so re-ingestion replaces the complete representation instead of
+leaving stale chunks.
+
+The in-memory store is process-local and is best for tests, examples, and small temporary indexes.
+Its default brute-force strategy checks every stored document.
 
 ## 2. Search the store
 
@@ -42,9 +59,11 @@ Results are ordered from highest to lowest score. Each result contains the stabl
 
 `topK` limits the number of results. `minScore` removes matches below a minimum score. Tune both with real queries because score distributions vary by model and store.
 
-## 3. Replace in-memory documents
+## 3. Replace in-memory documents manually
 
 ```ts
+import { embedDocuments } from '@anvia/core/embeddings'
+
 const { documents: replacements } = await embedDocuments({
     model: embeddingModel,
     documents: changedDocuments,
@@ -56,7 +75,8 @@ await store.upsert({
 });
 ```
 
-`upsert()` replaces an existing in-memory document with the same ID. Stable IDs prevent duplicate old versions from remaining searchable.
+`upsert()` replaces an existing in-memory document with the same ID. Prefer the ingestion helper
+when the input is raw text; it preserves document grouping across chunks automatically.
 
 ## 4. Use a persistent adapter
 

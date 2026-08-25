@@ -40,6 +40,6 @@ Use Anvia request fields for messages, documents, tools, token limits, temperatu
 
 ## Runtime and production
 
-The package is ESM, includes declarations, and should be installed with the matching stable `@anvia/core` release. It depends on the official Anthropic and Anthropic Vertex SDKs. Keep both clients server-side.
+The package is ESM, includes declarations, and should use a version compatible with its declared `@anvia/core` dependency range. It depends on the official Anthropic and Anthropic Vertex SDKs. Keep both clients server-side.
 
 Set explicit model IDs in deployment configuration. Provider aliases can change behavior without a code change; dated IDs give more reproducible runs when the provider supports them.

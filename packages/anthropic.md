@@ -5,7 +5,7 @@ Anthropic’s provider adapter supplies streaming Claude completion models for A
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.0.0` |
+| Version | `1.0.3` |
 | Runtime | ESM, server-side JavaScript |
 | Peer | Matching `@anvia/core` stable release |
 

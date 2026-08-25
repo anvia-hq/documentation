@@ -21,7 +21,7 @@ Every published Anvia package keeps its release history beside its implementatio
 - [`@anvia/grok`](https://github.com/anvia-hq/anvia/blob/main/packages/provider-grok/CHANGELOG.md)
 - [`@anvia/transformers`](https://github.com/anvia-hq/anvia/blob/main/packages/embedding-transformers/CHANGELOG.md)
 
-## Memory and vector stores
+## Memory, vector stores, and knowledge graphs
 
 - [`@anvia/memory-sqlite`](https://github.com/anvia-hq/anvia/blob/main/packages/memory-sqlite/CHANGELOG.md)
 - [`@anvia/memory-postgres`](https://github.com/anvia-hq/anvia/blob/main/packages/memory-postgres/CHANGELOG.md)
@@ -35,6 +35,9 @@ Every published Anvia package keeps its release history beside its implementatio
 - [`@anvia/qdrant`](https://github.com/anvia-hq/anvia/blob/main/packages/vector-qdrant/CHANGELOG.md)
 - [`@anvia/redis`](https://github.com/anvia-hq/anvia/blob/main/packages/vector-redis/CHANGELOG.md)
 - [`@anvia/weaviate`](https://github.com/anvia-hq/anvia/blob/main/packages/vector-weaviate/CHANGELOG.md)
+- [`@anvia/graph`](/packages/graph/releases)
+- [`@anvia/neo4j`](/packages/neo4j/releases)
+- [`@anvia/memgraph`](/packages/memgraph/releases)
 
 ## Observability and tools
 
@@ -45,14 +48,11 @@ Every published Anvia package keeps its release history beside its implementatio
 - [`@anvia/studio`](https://github.com/anvia-hq/anvia/blob/main/packages/tool-studio/CHANGELOG.md)
 - [`@anvia/sandbox`](https://github.com/anvia-hq/anvia/blob/main/packages/tool-sandbox/CHANGELOG.md)
 
-New RC packages do not have a generated package changelog until their synchronized release commit.
-Use their release pages and changesets:
-
-- [`@anvia/browser`](/packages/browser/releases)
-- [`@anvia/neo4j`](/packages/neo4j/releases)
-- [`@anvia/mcp`](/packages/mcp/releases)
-- [`@anvia/cli`](/packages/cli/releases)
+Packages release independently. Read the changelog for each package you install; a dependency-only
+patch can advance an adapter even when its own public behavior did not change.
 
 ## Upgrade workflow
 
-Read the changelog for each directly installed Anvia package and any adapter whose peer dependency changes. Then follow the [upgrade checklist](/packages/compatibility-and-versioning#upgrade-checklist).
+Read the changelog for each directly installed Anvia package and any adapter whose dependency or
+peer-dependency range changes. Then follow the
+[upgrade checklist](/packages/compatibility-and-versioning#upgrade-checklist).

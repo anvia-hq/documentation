@@ -8,7 +8,7 @@
 pnpm add @anvia/lancedb @anvia/core @anvia/openai @lancedb/lancedb
 ```
 
-The ESM package includes `@lancedb/lancedb` and should be installed with the matching stable `@anvia/core` release.
+The ESM package includes `@lancedb/lancedb` and should use a version compatible with its declared `@anvia/core` dependency range.
 
 ## Store and search documents
 

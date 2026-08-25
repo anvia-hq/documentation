@@ -4,7 +4,8 @@ Anvia applications keep provider credentials and agent execution on the server, 
 
 ## 1. Install the application packages
 
-Keep every Anvia package on the same stable release line:
+Anvia packages release independently. Install current stable versions whose declared dependency and
+peer-dependency ranges are compatible:
 
 ```bash
 pnpm add @anvia/core @anvia/client @anvia/openai @anvia/server @anvia/react

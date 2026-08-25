@@ -8,7 +8,7 @@
 pnpm add @anvia/qdrant @anvia/core @anvia/openai @qdrant/js-client-rest
 ```
 
-The ESM package includes the Qdrant REST client and should be installed with the matching stable `@anvia/core` release.
+The ESM package includes the Qdrant REST client and should use a version compatible with its declared `@anvia/core` dependency range.
 
 ## Dense retrieval
 

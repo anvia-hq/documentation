@@ -4,7 +4,8 @@ OCR extracts text and document structure from scanned files and images. In v1, O
 
 ## 1. Install and create the OCR model
 
-Keep the Mistral adapter on the same stable release line as Core.
+The Mistral adapter releases independently from Core. Check its declared Core dependency range when
+upgrading.
 
 ```bash
 pnpm add @anvia/core @anvia/mistral

@@ -13,11 +13,15 @@ class Studio implements AnviaStudio {
   traceObserver(): StudioTraceObserver
   start(options?: StudioServeOptions): this
   serve(options?: StudioServeLifecycleOptions): Promise<void>
+  shutdown(options?: { timeoutMs?: number }): Promise<void>
   close(): void
 }
 ```
 
-`start()` starts a server and returns immediately. `serve()` follows a caller-owned lifecycle and resolves after shutdown. `fetch()` makes the same application usable in runtimes or servers that accept a Fetch handler.
+`start()` starts a server and returns immediately. `serve()` resolves after active runs drain and
+shutdown completes. `shutdown()` exposes the same asynchronous draining for an application-owned
+lifecycle. `close()` is synchronous, aborts active work, and does not wait for observers. `fetch()`
+makes the same application usable in runtimes or servers that accept a Fetch handler.
 
 ```ts
 type StudioServeOptions = {
@@ -25,6 +29,7 @@ type StudioServeOptions = {
   hostname?: string
   log?: boolean
   handleSignals?: boolean
+  shutdownTimeoutMs?: number
 }
 
 type StudioServeLifecycleOptions = Omit<StudioServeOptions, 'handleSignals'> & {
@@ -45,12 +50,15 @@ type StudioOptions = {
   ui?: boolean | StudioUiOptions
   models?: StudioModelConfig
   sandboxes?: readonly StudioSandboxRegistration[]
+  graphs?: readonly StudioGraphRegistration[]
 }
 ```
 
 `StudioUiOptions` configures `path`, `rootRoutes`, `title`, `redirectRoot`, `clientScript`, and `protectShell`. `StudioStores` independently selects session, trace, pipeline-log, and pipeline-run stores; session and pipeline stores may be disabled with `false` where the type permits it.
 
-The target configuration types are `StudioAgent`, `StudioAgentConfig`, `StudioAgentRuntimeSummary`, `StudioPipeline`, `StudioPipelineConfig`, `StudioPipelineDetail`, and `StudioConfig`.
+The target configuration types are `StudioAgent`, `StudioAgentConfig`, `StudioAgentRuntimeSummary`,
+`StudioPipeline`, `StudioPipelineConfig`, `StudioPipelineDetail`, `StudioGraphRegistration`,
+`StudioGraphConfig`, and `StudioConfig`.
 
 ## Models
 
@@ -163,6 +171,7 @@ The remaining public types are grouped by the Studio surface that produces or co
 | Pipeline runs | `StudioPipelineRunRequest`, `StudioPipelineReplayRequest`, `StudioPipelineRunResponse`, `StudioPipelineRunRecord`, `StudioPipelineRunSaveInput`, `StudioPipelineRunListOptions`, `StudioPipelineRunGetOptions`, `StudioPipelineRunStatus`, `StudioPipelineFinalEvent` |
 | Pipeline logs | `StudioPipelineLogEntry`, `StudioPipelineLogAppendInput`, `StudioPipelineLogListOptions`, `StudioPipelineLogLevel`, `StudioPipelineLogCategory`, `StudioPipelineLogEvent` |
 | Knowledge | `StudioAgentKnowledgeConfig`, `StudioKnowledgeSourceKind`, `StudioKnowledgeSourceSummary`, `StudioStaticKnowledgeDocument`, `StudioKnowledgeEvidence`, `StudioKnowledgeEvidenceDocument`, `StudioKnowledgeItem`, `StudioKnowledgeItemKind`, `StudioKnowledgeItemsPage`, `StudioKnowledgeSummary` |
+| Graphs | `StudioGraphRegistration`, `StudioGraphConfig`, `StudioGraphExploreRequest` |
 | Memory inspection | `StudioMemoryScope`, `StudioMemoryAppendOptions`, `StudioMemoryErrorOptions`, `StudioMemoryUserSummary`, `StudioMemoryConversationSummary`, `StudioMemoryConversationsPage`, `StudioMemoryUsersPage`, `StudioMemoryConversationMessages`, `StudioMemoryConversationSteps`, `StudioMemoryMessageRecord`, `StudioMemorySourceKind`, `StudioMemorySourceSummary`, `StudioMemorySourcesPage`, `StudioMemorySourceConversationSummary`, `StudioMemorySourceConversationsPage`, `StudioMemorySourceUsersPage`, `StudioMemorySourceConversationMessages`, `StudioMemorySourceConversationSteps` |
 | Sandboxes | `StudioSandboxInspector`, `StudioSandboxRegistration`, `StudioSandboxCapabilities`, `StudioSandboxSummary`, `StudioSandboxesSummary`, `StudioSandboxFileType`, `StudioSandboxFileEntry`, `StudioSandboxFilesResponse`, `StudioSandboxPort`, `StudioSandboxPortsResponse`, `StudioSandboxProcessStatus`, `StudioSandboxProcess`, `StudioSandboxProcessesResponse`, `StudioSandboxProcessLogsResponse` |
 | Observability | `StudioObservabilityEventType`, `StudioObservabilityEvent`, `AgentTraceInfo`, `AgentTraceOptions` |

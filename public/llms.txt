@@ -11,7 +11,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Agents, tools, and MCP](https://docs.anvia.dev/llms-agents.txt): Models, agents, tools, MCP, skills, multi-agent coordination, pipelines, sandboxing, and streaming.
 - [Full-stack applications](https://docs.anvia.dev/llms-apps.txt): Hono routes, `@anvia/server` streaming, `@anvia/react` client state, `@anvia/react-ui` components, authentication, cancellation, and resumption.
 - [Evaluations and observability](https://docs.anvia.dev/llms-evals.txt): Tracing, Lens, evaluation suites, datasets, release comparison, quality gates, alerts, cost, and testing.
-- [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt): Ingestion, embeddings, vector stores, Neo4j GraphRAG, metadata filters, dynamic context, permission-aware retrieval, and memory boundaries.
+- [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt): Raw-text ingestion, embeddings, vector stores, portable Neo4j/Memgraph GraphRAG, metadata filters, dynamic context, permission-aware retrieval, and memory boundaries.
 
 ## Stable v1 boundaries
 
@@ -20,6 +20,8 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - Use Client Protocol v3 across `@anvia/client`, `@anvia/server`, and `@anvia/react`.
 - Treat `@anvia/react-ui` as strictly headless. Use `@anvia/cli` to copy editable application-owned UI.
 - Install `pdfjs-dist` only in applications that load PDFs; it is an optional Core peer.
+- Treat Anvia package versions independently and verify declared dependency ranges instead of
+  requiring one synchronized version number.
 - Keep retrieval permissions, tool authorization, interaction continuations, and public-event projection on the server.
 - Use Lens and Core evals for trace-correlated, versioned release evidence; deployment policy remains application-owned.
 
@@ -67,6 +69,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Run your first agent in Studio](https://docs.anvia.dev/studio/run-your-first-agent): Initial Studio workflow.
 - [Studio sessions](https://docs.anvia.dev/studio/sessions): Inspect persisted sessions and activity.
 - [Studio pipelines](https://docs.anvia.dev/studio/pipelines): Inspect and run pipelines.
+- [Studio graph explorer](https://docs.anvia.dev/studio/graphs): Inspect bounded Neo4j and Memgraph graph views.
 - [Lens](https://docs.anvia.dev/lens/): Production observability and evaluation.
 - [Install and set up Lens](https://docs.anvia.dev/lens/install-and-setup): Connect an application to Lens.
 - [Your first trace](https://docs.anvia.dev/lens/your-first-trace): Capture and inspect runtime telemetry.
@@ -88,6 +91,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Model providers](https://docs.anvia.dev/sdk/providers): OpenAI, Anthropic, Gemini, Mistral, Grok, and compatible provider APIs.
 - [Memory adapters](https://docs.anvia.dev/sdk/memory/store-adapters): SQLite, PostgreSQL, Drizzle, and Prisma-backed memory.
 - [Vector stores](https://docs.anvia.dev/sdk/knowledges/vector-stores): Qdrant, Pinecone, pgvector, Redis, Chroma, LanceDB, Milvus, and Weaviate.
+- [Knowledge graphs](https://docs.anvia.dev/packages/graph): Portable graph contracts plus Neo4j and Memgraph adapters.
 - [Observability integrations](https://docs.anvia.dev/packages/): Logger, OpenTelemetry, Lens, and Langfuse packages.
 
 ## Examples

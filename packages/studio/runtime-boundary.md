@@ -10,6 +10,7 @@ A caller who can reach the runtime may be able to:
 - invoke registered tools directly;
 - approve or reject protected calls and answer questions;
 - run and replay pipelines;
+- explore registered knowledge graphs and inspect their public properties;
 - inspect sessions, prompts, results, traces, memory, MCP metadata, and sandbox state.
 
 Schema validation and tool approval do not authorize access to the Studio server. Use test accounts, scoped credentials, non-production data, and least-authority tools.
@@ -36,7 +37,10 @@ await studio.serve({
 })
 ```
 
-`serve()` waits for shutdown, closes Studio, then awaits `onShutdown`, including when startup fails. `start()` installs its own `SIGINT` behavior unless `handleSignals: false`; application-owned lifecycles must then call `close()`.
+`serve()` waits for shutdown, aborts and drains active runs, then awaits `onShutdown`, including when
+startup fails. `start()` handles both `SIGINT` and `SIGTERM` unless `handleSignals: false`.
+Application-owned lifecycles should await `shutdown()`; `close()` aborts active work synchronously
+without waiting for observer cleanup.
 
 Studio exposes only sandbox inspectors registered through `StudioOptions.sandboxes`; it does not own or destroy their sandboxes. It also does not close provider clients, database pools, MCP connections, or custom observers. Clean those up at the same process boundary.
 

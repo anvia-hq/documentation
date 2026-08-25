@@ -81,6 +81,11 @@ Rejection prevents that protected tool call from executing and lets the runtime 
 
 ## 4. Understand the limit
 
+Observers receive cancellation as an explicit terminal error with `status: 'cancelled'`, while
+other failures use `status: 'failed'`. On process shutdown, abort and await the active run before
+closing Lens, Langfuse, or OpenTelemetry. Closing the provider first can lose the still-open root
+observation.
+
 Stopping a run prevents future model turns and tool calls. It cannot undo completed writes or external side effects. Write tools still need authorization, idempotency, transactions where appropriate, and audit records.
 
 Use original error types for provider, tool, validation, and timeout failures. Do not relabel operational failures as policy cancellation.

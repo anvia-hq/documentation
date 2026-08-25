@@ -8,7 +8,7 @@
 pnpm add @anvia/chroma @anvia/core @anvia/openai chromadb
 ```
 
-The package is ESM-only, includes `chromadb`, and should be installed with the matching stable `@anvia/core` release.
+The package is ESM-only, includes `chromadb`, and should use a version compatible with its declared `@anvia/core` dependency range.
 
 ## Store and search documents
 

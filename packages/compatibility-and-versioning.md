@@ -1,6 +1,8 @@
 # Compatibility and versioning
 
-Anvia v1 is published as a synchronized package train. Keep matching versions across Anvia packages so Core, providers, transports, UI, storage, and observability adapters share the same public contracts.
+Anvia v1 packages version and publish independently. A Studio, provider, integration, or adapter
+release does not force unrelated packages onto the same version. Applications may combine package
+versions when their declared dependency and peer-dependency ranges are compatible.
 
 ## Check three boundaries
 
@@ -14,18 +16,26 @@ Package pages summarize these boundaries, while the package manifest remains the
 
 ## Stable versions
 
-The current stable package train is `1.0.0` and npm exposes it through the default `latest` tag. Pin exact versions in production environments when upgrades require deliberate review.
+Each package publishes stable releases through its own npm `latest` tag. As of the current
+documentation baseline, Core is `1.0.3`, Studio is `1.0.5`, and the graph packages are `1.0.4`;
+other packages can have different versions. Check the package's release page or npm metadata rather
+than assuming one repository-wide version.
+
+Pin exact versions in production environments when upgrades require deliberate review.
 
 ```json
 {
   "dependencies": {
-    "@anvia/core": "1.0.0",
-    "@anvia/openai": "1.0.0"
+    "@anvia/core": "1.0.3",
+    "@anvia/openai": "1.0.3",
+    "@anvia/studio": "1.0.5"
   }
 }
 ```
 
-Use your workspace's preferred lockfile and update packages intentionally rather than accepting an unreviewed range change.
+Use your workspace's preferred lockfile and update packages intentionally rather than accepting an
+unreviewed range change. An internal dependency-only patch can advance an adapter even when its own
+public behavior did not change.
 
 ## Runtime compatibility
 
@@ -37,6 +47,7 @@ Some adapters require a specific Node.js version, browser runtime, native depend
 - `@anvia/sandbox` requires a supported Docker environment;
 - `@anvia/browser` requires Docker, a compatible browser image, and Playwright-compatible Chromium;
 - `@anvia/neo4j` requires Neo4j 2026.01 or newer and matching vector dimensions;
+- `@anvia/memgraph` requires Memgraph 3.6 or newer and matching vector dimensions;
 - `@anvia/mcp` requires Node.js 20 or newer and MCP protocol `2026-07-28`;
 - `@anvia/cli` requires Node.js 20.18.1 or newer and an existing Next.js or Vite application;
 - Core PDF extraction requires the application to install the optional `pdfjs-dist` peer;
@@ -67,12 +78,14 @@ Anvia `1.0.0` includes the final v1 migration boundary:
 - rename React UI compound namespaces to `*Primitive`, remove package CSS imports, and move styling
   into application code or generated `@anvia/cli` components.
 
-When moving from v0 to v1, update Core and every Anvia adapter together, then follow the [v1 Core API reference](/packages/core/api-reference) and provider-specific configuration pages.
+When moving from v0 to v1, select mutually compatible Core and adapter versions, then follow the
+[v1 Core API reference](/packages/core/api-reference) and provider-specific configuration pages.
 
 ## Upgrade checklist
 
 - Read the relevant entry in [Changelog](/packages/changelog).
-- Keep all Anvia packages on the same stable release train.
+- Check declared internal dependency and peer-dependency ranges; do not infer compatibility from
+  equal or unequal version numbers alone.
 - Compare public types used by your application.
 - Run TypeScript, unit, integration, and evaluation suites.
 - Test migrations against a copy of production data.

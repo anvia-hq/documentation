@@ -8,7 +8,7 @@
 pnpm add @anvia/redis @anvia/core @anvia/openai redis
 ```
 
-The ESM package includes the Redis client and should be installed with the matching stable `@anvia/core` release. The target Redis deployment must support the `FT.*` search commands used by the adapter.
+The ESM package includes the Redis client and should use a version compatible with its declared `@anvia/core` dependency range. The target Redis deployment must support the `FT.*` search commands used by the adapter.
 
 ## Store and search documents
 

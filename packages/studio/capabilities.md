@@ -9,6 +9,7 @@ Studio discovers its surfaces from registered targets and configured stores.
 | Tools | Shows schemas and metadata and can invoke registered tools directly |
 | MCP | Shows server/tool origin and can invoke MCP-backed tools |
 | Pipelines | Exposes graphs, typed input metadata, runs, logs, stored history, and replay |
+| Graphs | Exposes bounded overviews, type filters, public node details, search, and neighborhood expansion for registered `GraphExplorer` instances |
 | Sessions | Creates, lists, updates, loads, and deletes Studio chat sessions |
 | Traces | Records local run/generation/tool trees with status, timing, usage, and request context |
 | Knowledge | Inspects static context, dynamic context, dynamic tools, and retrieval evidence |
@@ -19,7 +20,11 @@ Studio discovers its surfaces from registered targets and configured stores.
 
 ## Capability limits
 
-Studio can only show what the runtime exposes. Knowledge inspection is not a document editor. Memory adapters without an inspector cannot expose their durable conversations. Sandbox inspection is read-only, although the registered agent tools may still mutate the sandbox. Runtime status reports configured capabilities, not dependency health checks.
+Studio can only show what the runtime exposes. Knowledge inspection is not a document editor.
+Graph exploration does not expose raw Cypher or graph writes. Memory adapters without an inspector
+cannot expose their durable conversations. Sandbox inspection is read-only, although the registered
+agent tools may still mutate the sandbox. Runtime status reports configured capabilities, not
+dependency health checks.
 
 Evaluation runtime routes exist for registered suites; the current primary browser navigation is centered on Playground, Pipelines, Sessions, Traces, and inspection surfaces rather than a dedicated Evaluations page.
 

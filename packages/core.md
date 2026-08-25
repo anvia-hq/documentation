@@ -65,9 +65,9 @@ The model, credentials, business data, permissions, storage, and deployment rema
 | Agents | `@anvia/core/agent` | Stateful model-and-tool loops with instructions and runtime policy |
 | Completions | `@anvia/core/completion` | Direct model requests, streaming, messages, and parsed results |
 | Tools | `@anvia/core/tool` | Typed tools, middleware, approvals, structured questions, and dynamic discovery |
-| Documents | `@anvia/core/documents` | Deterministic in-memory text chunking and scoped PDF text extraction |
+| Documents | `@anvia/core/documents` | Shared text-document records, deterministic batch chunking, and scoped PDF text extraction |
 | Memory | `@anvia/core/memory` | Conversation persistence and compaction contracts |
-| Retrieval | `@anvia/core/embeddings`, `@anvia/core/vector-store` | Embedding documents and searching vector indexes |
+| Retrieval | `@anvia/core/embeddings`, `@anvia/core/vector-store` | Raw-text ingestion, embedding documents, and searching vector indexes |
 | Pipelines | `@anvia/core/pipeline` | Typed multi-stage workflows, batches, graphs, and run events |
 | Media | `@anvia/core/image-generation`, `@anvia/core/speech-generation`, `@anvia/core/transcription` | Provider-neutral media requests |
 | Runtime control | `@anvia/core/agent`, `@anvia/core/guardrails` | Lifecycle observation, resumable interactions, and enforced input/output policy |

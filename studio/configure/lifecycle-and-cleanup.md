@@ -1,6 +1,8 @@
 # Lifecycle and cleanup
 
-Use `start()` for a conventional local process. Use `serve()` when your application needs to await shutdown and clean up sandboxes, connections, temporary files, or other resources.
+Use `start()` for a conventional local process. Use `serve()` or `shutdown()` when your application
+must await active-run cancellation and observer finalization before closing observability providers,
+sandboxes, connections, temporary files, or other resources.
 
 ## Start and close Studio
 
@@ -14,19 +16,26 @@ const studio = new Studio([supportAgent]).start({
   hostname: '127.0.0.1',
   port: 4021,
 })
-
-process.once('SIGTERM', () => {
-  studio.close()
-})
 ```
 
-Calling `close()` removes Studio's installed `SIGINT` listener, closes its HTTP server, and releases the current Studio runtime. It is safe to call when the server is already closed.
+By default, `start()` installs both `SIGINT` and `SIGTERM` handlers. A signal stops new work, aborts
+active Agent and Pipeline runs, waits for their cancellation observers, and applies the shutdown
+timeout.
+
+Call `shutdown()` when application code initiates the same graceful path:
+
+```ts
+await studio.shutdown({ timeoutMs: 30_000 })
+```
+
+`close()` remains safe and idempotent, but it is synchronous: it aborts active work without waiting
+for observers to finish. Use it only when graceful delivery is not required.
 
 Calling `start()` again first closes the current server and rebuilds the Studio runtime from the constructor options. In-memory state belongs to the previous runtime and is lost; an external SQLite store preserves its records.
 
 ## Decide who owns process signals
 
-By default, `start()` handles `SIGINT`, calls `close()`, and exits the process. Disable that behavior when an application or framework already coordinates shutdown:
+Disable Studio's signal handlers when an application or framework already coordinates shutdown:
 
 ```ts
 studio.start({
@@ -36,28 +45,27 @@ studio.start({
 })
 ```
 
-With `handleSignals: false`, your application must call `close()`. `start()` does not install a `SIGTERM` handler.
+With `handleSignals: false`, your application must await `shutdown()` or call `close()` itself.
 
 ## Await the full lifecycle with `serve()`
 
-`serve()` starts the server, waits for a shutdown condition, closes Studio in `finally`, then awaits `onShutdown`:
+`serve()` starts the server, waits for a shutdown condition, drains Studio, then awaits `onShutdown`:
 
 ```ts
-const shutdown = new AbortController()
-
-process.once('SIGTERM', () => shutdown.abort())
-
 await studio.serve({
   hostname: '127.0.0.1',
   port: 4021,
-  signal: shutdown.signal,
+  shutdownTimeoutMs: 30_000,
   onShutdown: async () => {
-    console.log('Studio cleanup complete')
+    await Promise.all([lens.close(), langfuse.close(), otelSdk.shutdown()])
   },
 })
 ```
 
-`serve()` finishes when its abort signal fires, the process receives `SIGINT` or `SIGTERM`, or an interactive terminal sends Ctrl+C. Its promise does not resolve until asynchronous `onShutdown` work finishes. Cleanup also runs if server startup fails, such as when the port is already in use.
+`serve()` finishes when its abort signal fires or the process receives `SIGINT` or `SIGTERM`. Its
+promise does not resolve until active-run cancellation observers and asynchronous `onShutdown` work
+finish. Close observability providers in `onShutdown`, after Studio has finalized root observations
+as `cancelled`. Cleanup also runs if server startup fails, such as when the port is already in use.
 
 ## Clean up sandbox sessions explicitly
 

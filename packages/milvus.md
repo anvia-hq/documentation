@@ -8,7 +8,7 @@
 pnpm add @anvia/milvus @anvia/core @anvia/openai @zilliz/milvus2-sdk-node
 ```
 
-The ESM package includes the Milvus Node SDK and should be installed with the matching stable `@anvia/core` release.
+The ESM package includes the Milvus Node SDK and should use a version compatible with its declared `@anvia/core` dependency range.
 
 ## Store and search documents
 

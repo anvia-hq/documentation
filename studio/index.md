@@ -1,6 +1,8 @@
 # Anvia Studio
 
-Anvia Studio is a local browser console for building, running, and debugging Anvia agents and pipelines. Point it at the same runtime objects your application uses, then inspect their behavior without building a temporary interface or test harness.
+Anvia Studio is a local browser console for building, running, and debugging Anvia agents,
+pipelines, and knowledge graphs. Point it at the same runtime objects your application uses, then
+inspect their behavior without building a temporary interface or test harness.
 
 Studio is designed for the development loop:
 
@@ -19,6 +21,7 @@ Studio discovers capabilities from the agents and pipelines you register. The br
 | Tools | Inspect schemas and invoke a tool directly with validated arguments. |
 | Traces | Follow model generations and tool calls for a Studio session. |
 | Pipelines | Read a pipeline graph, run it, inspect logs, and replay saved input. |
+| Graphs | Search a bounded overview, inspect public properties, and expand node neighborhoods. |
 | Knowledge | Inspect registered context, dynamic tools, and retrieval evidence. |
 | Memory | Explore users, conversations, messages, and recorded run steps. |
 | MCPs and sandboxes | Inspect connected MCP tools, active sandbox resources, and registered browser desktops. |
@@ -46,6 +49,7 @@ Use Studio while changing the agent. Use [Lens](/lens/) when the application nee
 | [Install and setup](/studio/install-and-setup) | Add Studio to an Anvia project and prepare a local entry point. |
 | [Run your first agent](/studio/run-your-first-agent) | Register an agent, open the Playground, and inspect a real run. |
 | [How Studio works](/studio/how-studio-works) | Understand targets, discovery, execution, storage, and lifecycle. |
+| [Graph explorer](/studio/graphs) | Register a Neo4j or Memgraph graph and explore it safely. |
 
 ## Development boundary
 

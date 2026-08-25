@@ -35,7 +35,8 @@ Provider-specific support for images, audio, transcription, OCR, tools, reasonin
 | `@anvia/chroma`, `@anvia/lancedb`, `@anvia/milvus` | — | ✓ | — | Depends on adapter |
 | `@anvia/pgvector`, `@anvia/pinecone`, `@anvia/qdrant` | — | ✓ | — | ✓ |
 | `@anvia/redis`, `@anvia/weaviate` | — | ✓ | — | ✓ |
-| `@anvia/neo4j` | — | ✓ | ✓ | ✓ |
+| `@anvia/graph` | — | Contract | Contract | — |
+| `@anvia/neo4j`, `@anvia/memgraph` | — | ✓ | ✓ | ✓ |
 
 ## Observability
 
@@ -48,8 +49,8 @@ Provider-specific support for images, audio, transcription, OCR, tools, reasonin
 
 ## Development
 
-| Package | Inspect agents | Run pipelines | Isolated commands | Visible browser | Persistent workspace |
-| --- | :---: | :---: | :---: | :---: | :---: |
-| `@anvia/studio` | ✓ | ✓ | Through sandbox adapters | Viewer | — |
-| `@anvia/sandbox` | — | — | ✓ | Infrastructure | Optional |
-| `@anvia/browser` | — | — | — | ✓ | Optional profile volume |
+| Package | Inspect agents | Run pipelines | Explore graphs | Isolated commands | Visible browser | Persistent workspace |
+| --- | :---: | :---: | :---: | :---: | :---: | :---: |
+| `@anvia/studio` | ✓ | ✓ | ✓ | Through sandbox adapters | Viewer | — |
+| `@anvia/sandbox` | — | — | — | ✓ | Infrastructure | Optional |
+| `@anvia/browser` | — | — | — | — | ✓ | Optional profile volume |

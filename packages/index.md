@@ -16,7 +16,7 @@ If you are choosing between adapters, use the [feature matrix](/packages/feature
 | Model providers | Completion, embedding, image, audio, transcription, and OCR models | [`@anvia/openai`](/packages/openai) |
 | Memory | Durable agent sessions and message history | [`@anvia/memory-sqlite`](/packages/memory-sqlite) |
 | Vector stores | Retrieval indexes for embedded documents | [`@anvia/pgvector`](/packages/pgvector) |
-| Knowledge graphs | Typed GraphRAG extraction, traversal, and evidence | [`@anvia/neo4j`](/packages/neo4j) |
+| Knowledge graphs | Portable GraphRAG schemas, ingestion, traversal, evidence, and database adapters | [`@anvia/graph`](/packages/graph) |
 | Observability | Logs, traces, evaluations, datasets, and prompts | [`@anvia/otel`](/packages/otel) |
 | Development tools | Local inspection, isolated execution, and visible browsing | [`@anvia/studio`](/packages/studio) |
 

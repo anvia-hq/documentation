@@ -8,7 +8,7 @@
 pnpm add @anvia/memory-postgres @anvia/core
 ```
 
-The package includes `pg` and should be installed with the matching stable `@anvia/core` release.
+The package includes `pg` and should use a version compatible with its declared `@anvia/core` dependency range.
 
 ## Connect a store
 

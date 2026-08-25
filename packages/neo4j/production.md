@@ -2,13 +2,20 @@
 
 ## Own ingestion policy
 
-The application owns file discovery, reads, chunking, source metadata, entity embedding text, model loading, retries, scheduling, and failure policy. Keep model extraction separate from the database transaction so a partial provider failure cannot create a partially extracted graph.
+The application owns file discovery, reads, source metadata, model loading, retries, scheduling, and
+failure policy. `ingestGraphText()` and `ingestGraphDocuments()` provide deterministic shared
+chunking and perform extraction and embedding before the database transaction, so a partial model
+failure cannot create a partially extracted graph. Use `prepareGraphDocuments()` when the
+application needs to orchestrate preparation and writes separately.
 
 Choose `conflict: 'error'` unless the product has an explicit overwrite or keep-existing policy. Choose whether orphaned entities are deleted or retained for every replacement and deletion operation.
 
 ## Bound retrieval
 
 Set explicit seeds, `topK`, hybrid candidate counts, RRF constant, relationship allowlist, direction, depth, node count, relationship count, and evidence count. Validate that every selected vector index uses the embedding model's dimensions.
+
+Bound exploration too. Treat returned element IDs as opaque, short-lived expansion handles rather
+than stable identifiers.
 
 ## Handle transactions and retries
 

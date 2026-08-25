@@ -59,4 +59,4 @@ Completion, images, and transcription accept provider-specific additional parame
 
 ## Runtime
 
-The package is ESM, uses Node binary utilities for media conversion, includes declarations, and should be installed with the matching stable `@anvia/core` release. Validate media and streaming behavior before targeting a non-Node runtime.
+The package is ESM, uses Node binary utilities for media conversion, includes declarations, and should use a version compatible with its declared `@anvia/core` dependency range. Validate media and streaming behavior before targeting a non-Node runtime.

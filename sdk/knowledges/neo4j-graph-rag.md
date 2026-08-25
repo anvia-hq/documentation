@@ -1,4 +1,15 @@
-# Neo4j GraphRAG
+# Neo4j GraphRAG migration notes
+
+The portable GraphRAG APIs now live in `@anvia/graph`. For new code, follow
+[Knowledge GraphRAG](/sdk/knowledges/graph-rag). Existing Neo4j applications should make these
+changes when upgrading to `@anvia/neo4j` 1.0.3 or newer:
+
+- install `@anvia/graph` explicitly;
+- import `defineGraphSchema()`, `extractGraphFacts()`, ingestion helpers, and
+  `createGraphSearchTool()` from `@anvia/graph`;
+- replace the removed `createNeo4jGraphSearchTool()` with `createGraphSearchTool()`;
+- call `graph.retrieve()` for the provider-neutral retrieval contract;
+- optionally replace manual preparation with `ingestGraphText()` or `ingestGraphDocuments()`.
 
 GraphRAG is useful when answers depend on explicit relationships—such as incidents affecting products, people owning services, or controls governing resources—and bounded traversal adds information that flat similarity search would miss.
 
@@ -60,4 +71,6 @@ Choose `{ type: 'chunks', maxChunks }` evidence only for a managed graph. Existi
 
 Use a vector store when independent passages are sufficient and relationships do not materially improve retrieval. Use application queries or tools for live transactional data and authorization. GraphRAG is a retrieval representation, not a source-of-truth replacement.
 
-Continue with the [`@anvia/neo4j` package guide](/packages/neo4j) and [Document ingestion](/examples/knowledge-and-data/document-ingestion).
+The manual extraction/embedding/write composition below remains valid for advanced orchestration.
+Continue with the [`@anvia/neo4j` package guide](/packages/neo4j) and
+[`@anvia/graph` ingestion](/packages/graph/ingestion-and-exploration).

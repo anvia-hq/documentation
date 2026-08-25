@@ -1,12 +1,13 @@
 # Releases
 
-The current stable release is `@anvia/core` **1.0.0**. It makes `pdfjs-dist` optional, moves MCP
-connection ownership into `@anvia/mcp`, introduces explicit Agent outcomes, and makes memory
-compaction token-aware. The source changelog is authoritative; the entries below preserve notable
-v0 compatibility milestones.
+The current stable release is `@anvia/core` **1.0.3**. The source changelog is authoritative; the
+entries below summarize recent v1 changes and preserve notable v0 compatibility milestones.
 
 | Version | Summary |
 | --- | --- |
+| `1.0.3` | Added shared text-document contracts and consistent raw-text ingestion helpers for vector stores and managed knowledge graphs, including reusable graph/vector chunk embeddings. |
+| `1.0.2` | Reported cancelled Agent runs explicitly so observers can finalize them before an observability provider shuts down. |
+| `1.0.1` | Refreshed supported upstream SDK and runtime dependencies and removed the FastEmbed package. |
 | `1.0.0` | Made `pdfjs-dist` an optional peer; moved MCP clients and transports to `@anvia/mcp`; replaced Agent status/final wrappers with explicit outcomes and a stream handle; added token-aware automatic and manual memory compaction; finalized typed interactions, document utilities, and Streamable HTTP security boundaries. |
 | `1.0.0-rc.9` | Prepared the synchronized Anvia 1.0 package train and replaced legacy MCP connection factories with lifecycle-owning clients supporting `stdio`, `streamableHttp`, and `custom` transports. |
 | `0.26.0` | Hardened the legacy remote MCP connection layer against SSRF, including DNS rebinding, redirects, and OAuth metadata requests. |
@@ -29,6 +30,8 @@ v0 compatibility milestones.
 - Replace wrapped Agent `final` event handling with direct terminal outcome events. Choose one `AgentStream` surface: full events, `textStream`, `text`, or `result`.
 - Replace message-count compaction thresholds with `afterTokens` and `recentTokens`; use `agent.compactMemory({ session })` for explicit maintenance.
 - Move file discovery and reads out of Core document helpers; pass text to `chunkText()` and PDF bytes plus an explicit page range to `extractPdfText()`.
+- Prefer `chunkTextDocuments()` for stable batch chunk IDs and `ingestVectorText()` or
+  `ingestVectorDocuments()` for the common raw-text vector path.
 - Install `pdfjs-dist` directly when the application calls `extractPdfText()`; omit it when only text chunking is used.
 - Import `McpClient` and `McpClientGroup` from `@anvia/mcp`, not `@anvia/core/mcp`.
 - Keep Streamable HTTP `ssrfProtection` at its default `'strict'`; use `'disabled'` only for a fixed, application-trusted local or private endpoint.

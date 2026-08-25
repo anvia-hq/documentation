@@ -5,7 +5,7 @@ Transformers.js provides local dense embeddings through Hugging Face feature-ext
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.0.0` |
+| Version | `1.0.3` |
 | Runtime | ESM, runtimes supported by Transformers.js |
 | Peer | Matching `@anvia/core` stable release |
 

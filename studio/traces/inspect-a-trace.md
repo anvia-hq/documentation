@@ -37,12 +37,17 @@ The detail pane changes with the selected tree item.
 
 For an agent run, **Input** separates the instructions, conversation history, and current prompt. **Output** shows the final assistant content. For a generation, the input is the provider request assembled for that turn and the output is its response. For a tool, the input is the parsed argument value and the output is its result.
 
-Use the payload switch to choose:
+Use the payload switch to choose the views available for that field:
 
-- **Formatted** for readable prompts, messages, and output;
-- **JSON** for the complete structured value and metadata tree.
+- **Messages** or **Response** for readable conversation content and structured tool-call
+  disclosures;
+- **Structure** for an expandable value tree;
+- **Table** for searchable metadata fields;
+- **Raw** or **JSON** for the complete original value.
 
-The JSON view is usually the better choice when checking provider fields, call IDs, dynamic tool metadata, or structured results.
+Raw JSON is usually the better choice when checking provider fields, call IDs, dynamic tool
+metadata, or structured results. Large payloads fall back to this view to keep trace inspection
+responsive.
 
 ## Understand errors
 

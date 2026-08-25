@@ -8,7 +8,7 @@
 pnpm add @anvia/memory-prisma @anvia/core @prisma/client
 ```
 
-The package is ESM-only and should be installed with the matching stable `@anvia/core` release and `@prisma/client >=7.9.1 <8.0.0`.
+The package is ESM-only and should use a version compatible with its declared `@anvia/core` dependency range and `@prisma/client >=7.9.1 <8.0.0`.
 
 ## Generate the model file
 

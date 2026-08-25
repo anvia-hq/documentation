@@ -5,9 +5,9 @@ Studio wraps registered Anvia runtime objects with a development HTTP runtime an
 ## Runtime flow
 
 ```text
-Agent or pipeline objects
-          ↓
-    new Studio(targets)
+Agent or pipeline objects + optional graph registrations
+                    ↓
+              new Studio(targets, options)
           ↓
 Capability discovery + local stores + HTTP routes
           ↓
@@ -32,6 +32,15 @@ const studio = new Studio([
 
 Studio infers each target's ID, name, description, and runtime metadata. Passing an object does not copy its business data or credentials into the browser.
 
+Knowledge graphs are explicit option registrations because they are inspection surfaces rather than
+runnable Agent or Pipeline targets:
+
+```ts
+const studio = new Studio([supportAgent], {
+  graphs: [{ id: 'support', name: 'Support graph', graph }],
+})
+```
+
 ## 2. Discover capabilities
 
 Studio reads the registered configuration and enables relevant surfaces automatically.
@@ -44,6 +53,7 @@ Studio reads the registered configuration and enables relevant surfaces automati
 | Context or dynamic tools | Knowledge inspection. |
 | MCP-backed tools | MCP server and tool inspection. |
 | Pipelines | Graph, runs, logs, history, and replay. |
+| Registered graph explorers | Bounded graph overview, filtering, details, and expansion. |
 | Agent memory or Studio sessions | Memory and session inspection. |
 | Explicit sandbox inspectors | Read-only files, ports, and process inspection. |
 | Registered sandbox views | Authorized browser desktops and human-control leases. |
@@ -109,11 +119,15 @@ Use `start()` for a conventional local entry point:
 const studio = new Studio([agent]).start()
 ```
 
-Call `close()` when another part of your program owns shutdown:
+Call `shutdown()` when another part of your program owns shutdown and must wait for active runs and
+their observers:
 
 ```ts
-studio.close()
+await studio.shutdown({ timeoutMs: 30_000 })
 ```
+
+`close()` remains a synchronous compatibility path. It aborts active work but does not await
+observer finalization.
 
 Use `serve()` when an abort signal or async cleanup needs to control the complete server lifecycle:
 
@@ -132,7 +146,8 @@ await studio.serve({
 })
 ```
 
-`serve()` waits for shutdown, closes Studio in `finally`, and then runs `onShutdown`.
+`serve()` handles `SIGINT` and `SIGTERM`, stops accepting work, aborts and drains active Agent and
+Pipeline runs, then runs `onShutdown`. Close caller-owned observability providers in that callback.
 
 ## Studio is not Lens
 

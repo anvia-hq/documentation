@@ -146,7 +146,8 @@ export default defineConfig({
                 { text: 'Metadata filters', link: '/sdk/knowledges/metadata-filters' },
                 { text: 'Automatic retrieval', link: '/sdk/knowledges/automatic-retrieval' },
                 { text: 'Search tools', link: '/sdk/knowledges/search-tools' },
-                { text: 'Neo4j GraphRAG', link: '/sdk/knowledges/neo4j-graph-rag' }
+                { text: 'Knowledge GraphRAG', link: '/sdk/knowledges/graph-rag' },
+                { text: 'Neo4j migration notes', link: '/sdk/knowledges/neo4j-graph-rag' }
               ]
             },
             {
@@ -540,6 +541,7 @@ export default defineConfig({
                 { text: 'Runs, logs, and replay', link: '/studio/pipelines/runs-logs-and-replay' }
               ]
             },
+            { text: 'Graph explorer', link: '/studio/graphs' },
             { text: 'Sessions', link: '/studio/sessions' },
             {
               text: 'Traces',
@@ -1102,6 +1104,18 @@ export default defineConfig({
           text: 'Knowledge graphs',
           items: [
             {
+              text: '@anvia/graph',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/graph' },
+                { text: 'Get started', link: '/packages/graph/get-started' },
+                { text: 'Capabilities', link: '/packages/graph/capabilities' },
+                { text: 'Ingestion and exploration', link: '/packages/graph/ingestion-and-exploration' },
+                { text: 'API', link: '/packages/graph/api-reference' },
+                { text: 'Releases', link: '/packages/graph/releases' }
+              ]
+            },
+            {
               text: '@anvia/neo4j',
               collapsed: true,
               items: [
@@ -1111,6 +1125,18 @@ export default defineConfig({
                 { text: 'Production', link: '/packages/neo4j/production' },
                 { text: 'API', link: '/packages/neo4j/api-reference' },
                 { text: 'Releases', link: '/packages/neo4j/releases' }
+              ]
+            },
+            {
+              text: '@anvia/memgraph',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/memgraph' },
+                { text: 'Get started', link: '/packages/memgraph/get-started' },
+                { text: 'Capabilities', link: '/packages/memgraph/capabilities' },
+                { text: 'Production', link: '/packages/memgraph/production' },
+                { text: 'API', link: '/packages/memgraph/api-reference' },
+                { text: 'Releases', link: '/packages/memgraph/releases' }
               ]
             }
           ]

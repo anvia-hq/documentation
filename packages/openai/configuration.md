@@ -63,4 +63,4 @@ Image, speech, and transcription requests accept `providerOptions`. These object
 
 ## Runtime and production
 
-The package is ESM, includes TypeScript declarations, should be installed with the matching stable `@anvia/core` release, and uses the official `openai` SDK. Keep it in a trusted server runtime. If an edge runtime is required, validate the official SDK, upload APIs, binary handling, and streaming behavior in that exact environment.
+The package is ESM, includes TypeScript declarations, should use a version compatible with its declared `@anvia/core` dependency range, and uses the official `openai` SDK. Keep it in a trusted server runtime. If an edge runtime is required, validate the official SDK, upload APIs, binary handling, and streaming behavior in that exact environment.

@@ -13,7 +13,8 @@ You need:
 
 ## 1. Install core and one provider
 
-Start with the provider-neutral runtime and a single provider adapter. Keep Anvia packages on the same stable release line.
+Start with the provider-neutral runtime and a single provider adapter. Anvia packages release
+independently, so use versions allowed by their declared dependency and peer-dependency ranges.
 
 ```bash
 pnpm add @anvia/core @anvia/openai
@@ -88,7 +89,7 @@ The v1 completion API receives the input first and runtime options second. A suc
 
 ## 5. Keep packages aligned
 
-When adding another Anvia package, install it from the same stable release line:
+When adding another Anvia package, install its current compatible stable release:
 
 ```bash
 pnpm add @anvia/server @anvia/react

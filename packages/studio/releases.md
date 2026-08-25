@@ -1,9 +1,15 @@
 # Releases
 
-The current stable release is `@anvia/studio` **1.0.0**. The entries below preserve notable v0 Studio milestones.
+The current stable release is `@anvia/studio` **1.0.5**. The entries below summarize recent v1
+changes and preserve notable v0 Studio milestones.
 
 | Version | Summary |
 | --- | --- |
+| `1.0.5` | Updated to Core 1.0.3 and Graph 1.0.4 for shared raw-text ingestion contracts. |
+| `1.0.4` | Added a searchable, expandable knowledge-graph explorer for registered Neo4j and Memgraph graphs. |
+| `1.0.3` | Aligned Studio with the Anvia dark-first design system and added independent Messages/Response, Structure, Raw, JSON, and searchable metadata-table trace payload views. |
+| `1.0.2` | Added explicit cancelled-run reporting and graceful draining of active Agent and Pipeline runs before observability providers shut down. |
+| `1.0.1` | Refreshed supported upstream SDK and runtime dependencies. |
 | `1.0.0` | Adopted linked interaction phases and continuation storage, replaced automatic sandbox discovery with explicit inspectors, and added authorized noVNC browser views with coordinated human-control leases. Added token-count detail to memory-compaction session logs. |
 | `1.0.0-rc.9` | Synchronized Studio with the Anvia 1.0 release-candidate train. |
 | `0.7.54` | Updated React, Server, and React UI dependencies for Core `0.26.0` compatibility. |
@@ -22,10 +28,13 @@ The current stable release is `@anvia/studio` **1.0.0**. The entries below prese
 
 ## Upgrade checks
 
-- Align the compatible Core peer and Studio's Server/React/React UI dependencies.
+- Check Studio's declared Core, Graph, Server, React, and React UI dependency ranges; these packages
+  release independently.
 - Back up local SQLite files before a version change when their data matters.
 - Re-test custom stores against current public store contracts.
 - Review route and UI-option behavior when embedding Studio in another server.
-- Re-test approval and question interactions, linked phase history, cancellation, model policy, sandbox registrations, browser-view authorization, and custom client scripts.
+- Re-test approval and question interactions, linked phase history, graceful cancellation, model
+  policy, graph registrations, sandbox registrations, browser-view authorization, and custom client
+  scripts.
 
 Read the complete [Studio changelog](https://github.com/anvia-hq/anvia/blob/main/packages/tool-studio/CHANGELOG.md).

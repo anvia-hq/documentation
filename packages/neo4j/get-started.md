@@ -4,16 +4,15 @@ Define the domain first. Node and relationship property schemas must use strict 
 
 ```ts
 import { Agent } from '@anvia/core/agent'
-import { embedDocuments } from '@anvia/core/embeddings'
 import {
-  Neo4jClient,
-  createNeo4jGraphSearchTool,
-  defineNeo4jGraphSchema,
-  extractGraphFacts,
-} from '@anvia/neo4j'
+  createGraphSearchTool,
+  defineGraphSchema,
+  ingestGraphText,
+} from '@anvia/graph'
+import { Neo4jClient } from '@anvia/neo4j'
 import { z } from 'zod'
 
-const schema = defineNeo4jGraphSchema({
+const schema = defineGraphSchema({
   nodes: {
     Product: {
       description: 'A product or service.',
@@ -65,10 +64,30 @@ const graph = client.managedKnowledgeGraph({
 await graph.ensure({ indexTimeoutMs: 60_000 })
 ```
 
-Extract facts from application-owned chunks, embed chunks and entities, and pass the normalized records to `replaceDocuments()`. Use stable document, chunk, entity, and relationship identities so re-ingestion produces meaningful change counts.
+Ingest raw text with the shared graph helper. It chunks, extracts, embeds, and replaces the source
+document in the managed graph:
 
 ```ts
-const searchGraph = createNeo4jGraphSearchTool({
+await ingestGraphText({
+  graph,
+  document: { id: 'incident-42', text },
+  extractionModel,
+  embeddingModel,
+  chunking: {
+    strategy: 'recursive',
+    maxSize: 1_000,
+    overlap: 100,
+    separators: ['\n\n', '\n', ' '],
+  },
+  conflict: 'error',
+  orphanEntities: 'delete',
+})
+```
+
+Use stable source IDs so re-ingestion replaces the complete previous representation.
+
+```ts
+const searchGraph = createGraphSearchTool({
   name: 'search_support_graph',
   description: 'Search connected incidents and products.',
   graph,
@@ -93,4 +112,5 @@ const searchGraph = createNeo4jGraphSearchTool({
 const agent = new Agent({ id: 'support', model: chatModel, tools: [searchGraph] })
 ```
 
-Continue with the [GraphRAG guide](/sdk/knowledges/neo4j-graph-rag) for ingestion and replacement.
+Continue with the [Knowledge GraphRAG guide](/sdk/knowledges/graph-rag) for ingestion, retrieval,
+and provider switching.

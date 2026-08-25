@@ -1,6 +1,6 @@
 # Anvia Evaluations and Observability
 
-> Current stable v1 context for tracing, evaluation suites, datasets, and release gates. Updated 2026-08-23.
+> Current stable v1 context for tracing, evaluation suites, datasets, and release gates. Updated 2026-08-26.
 
 Use unit and integration tests for deterministic code. Use evaluations for model behavior whose
 wording or reasoning can vary. Observability explains runtime activity; it is not application state.
@@ -32,7 +32,9 @@ const agent = new Agent({
 
 `LensClient` reads server-only `ANVIA_LENS_*` credentials. Use `{ optional: true }` only when a
 missing complete connection should disable telemetry; partial credentials still fail fast. Call
-`flush()` before short-lived processes exit and `close()` during graceful shutdown.
+`flush()` before short-lived processes exit and `close()` during graceful shutdown. On a process
+signal, stop accepting work, abort and await active Agent runs, then close Lens so cancelled root
+observations can finish before the provider flushes.
 
 Use stable opaque user, session, trace, release, and environment identifiers. Review capture mode,
 redaction, retention, and region before sending prompt, response, tool, retrieval, or metadata

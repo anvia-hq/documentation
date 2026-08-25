@@ -18,6 +18,11 @@ try {
 
 Create the Anvia observer after telemetry initialization. In serverless or short-lived workers, ensure the platform gives processors enough time to flush before the invocation ends.
 
+On `SIGINT` or `SIGTERM`, stop accepting work, abort and await active Agent runs, then await
+`sdk.shutdown()`. Core reports those terminal observer errors with `status: 'cancelled'`. Shutting
+down the SDK before the run settles can lose its still-open root span. When Studio owns the runs,
+put `sdk.shutdown()` in `Studio.serve({ onShutdown })`.
+
 ## Ownership boundaries
 
 `@anvia/otel` does not:

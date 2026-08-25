@@ -1,11 +1,14 @@
 # `@anvia/neo4j`
 
-`@anvia/neo4j` adds schema-first GraphRAG for Neo4j 2026.01 and newer. It can extract typed entities and relationships, own a managed document graph, retrieve vector or hybrid seeds, traverse bounded relationships, hydrate provenance-linked chunks, and expose graph search as an Agent tool.
+`@anvia/neo4j` adds schema-first GraphRAG for Neo4j 2026.01 and newer. It implements the
+provider-neutral contracts in [`@anvia/graph`](/packages/graph) for managed raw-text ingestion,
+vector or hybrid retrieval, bounded traversal, provenance evidence, Agent tools, and graph
+exploration.
 
 ## Install
 
 ```bash
-pnpm add @anvia/neo4j @anvia/core zod
+pnpm add @anvia/graph @anvia/neo4j @anvia/core zod
 ```
 
 ## Two registration modes
@@ -14,18 +17,21 @@ pnpm add @anvia/neo4j @anvia/core zod
 - An existing knowledge graph validates caller-owned indexes and exposes read-only retrieval. Application code keeps provisioning and writes.
 
 Both modes require an explicit graph schema and explicit retrieval, traversal, and evidence policy.
+Use `defineGraphSchema()` for portable applications. `defineNeo4jGraphSchema()` remains available as
+a compatibility API.
 
 ## Core flow
 
 ```text
-documents -> chunks -> extractGraphFacts()
-                  -> embed chunks and entities
-                  -> replaceDocuments()
+raw text -> ingestGraphText() or ingestGraphDocuments()
+         -> chunk, extract facts, embed chunks/entities
+         -> replace documents in one managed-graph transaction
 
 query -> embed -> vector or hybrid seeds -> bounded traversal -> evidence
 ```
 
-Model extraction and database writes are intentionally separate. `extractGraphFacts()` performs model calls but no writes; `replaceDocuments()` performs one deterministic transaction but no model calls.
+The convenience helpers perform model preparation before starting the database write. Advanced
+applications can call `prepareGraphDocuments()` and `replaceDocuments()` separately.
 
 ## Next steps
 
@@ -33,4 +39,5 @@ Model extraction and database writes are intentionally separate. `extractGraphFa
 - [Capabilities](/packages/neo4j/capabilities)
 - [Production boundaries](/packages/neo4j/production)
 - [Public API](/packages/neo4j/api-reference)
-- [GraphRAG guide](/sdk/knowledges/neo4j-graph-rag)
+- [Knowledge GraphRAG guide](/sdk/knowledges/graph-rag)
+- [Explore graphs in Studio](/studio/graphs)

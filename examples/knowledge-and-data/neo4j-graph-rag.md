@@ -12,7 +12,9 @@ Build a typed incident graph when users need to ask both semantic and relationsh
 - Give the agent a bounded hybrid graph-search tool with chunk evidence.
 
 ```ts
-const searchGraph = createNeo4jGraphSearchTool({
+import { createGraphSearchTool } from '@anvia/graph'
+
+const searchGraph = createGraphSearchTool({
   name: 'search_incident_graph',
   description: 'Search incidents, affected products, and supporting evidence.',
   graph,

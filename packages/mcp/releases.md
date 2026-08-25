@@ -1,6 +1,6 @@
 # Releases
 
-The current stable release is `@anvia/mcp` **1.0.0**.
+The current stable release is `@anvia/mcp` **1.0.3**.
 
 | Version | Summary |
 | --- | --- |

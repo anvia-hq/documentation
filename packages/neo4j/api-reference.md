@@ -3,7 +3,7 @@
 ## Schema and extraction
 
 ```ts
-const schema = defineNeo4jGraphSchema({ nodes, relationships })
+const schema = defineGraphSchema({ nodes, relationships })
 const facts = await extractGraphFacts({
   model,
   schema,
@@ -15,7 +15,10 @@ const facts = await extractGraphFacts({
 })
 ```
 
-`defineNeo4jGraphSchema()` preserves literal node and relationship names in the inferred types. `extractGraphFacts()` returns `{ output, usage }`, where output contains entities, relationships, and chunk-to-entity mentions.
+Import the provider-neutral `defineGraphSchema()` and `extractGraphFacts()` from `@anvia/graph`.
+`defineNeo4jGraphSchema()` and the adapter extraction export remain available for compatibility.
+Extraction returns `{ output, usage }`, where output contains entities, relationships, and
+chunk-to-entity mentions.
 
 ## Client and registrations
 
@@ -29,13 +32,14 @@ class Neo4jClient implements AsyncDisposable {
 }
 ```
 
-Managed registrations expose `ensure()`, `replaceDocuments()`, and `deleteDocuments()`. Existing registrations expose `validate()` and retrieval but no provisioning or mutation methods.
+Managed registrations expose `ensure()`, `replaceDocuments()`, `deleteDocuments()`, `retrieve()`,
+and `explore()`. Existing registrations expose `validate()`, `retrieve()`, and `explore()` but no
+provisioning or mutation methods.
 
 ## Retrieval and tool
 
 ```ts
-const context = await retrieveGraphContext({
-  graph,
+const context = await graph.retrieve({
   model,
   query,
   search,
@@ -45,7 +49,7 @@ const context = await retrieveGraphContext({
   abortSignal,
 })
 
-const tool = createNeo4jGraphSearchTool({
+const tool = createGraphSearchTool({
   name,
   description,
   graph,
@@ -56,8 +60,22 @@ const tool = createNeo4jGraphSearchTool({
 })
 ```
 
-Search is discriminated as vector or hybrid. Traversal requires an explicit schema relationship allowlist and bounds. Evidence is always explicit as `{ type: 'none' }` or, for managed graphs, `{ type: 'chunks', maxChunks }`.
+Import `createGraphSearchTool()` from `@anvia/graph`. Search is discriminated as vector or hybrid.
+Traversal requires an explicit schema relationship allowlist and bounds. Evidence is always
+explicit as `{ type: 'none' }` or, for managed graphs, `{ type: 'chunks', maxChunks }`.
+
+## Ingestion and exploration
+
+Use `ingestGraphText()`, `ingestGraphDocuments()`, and `prepareGraphDocuments()` from
+`@anvia/graph`. Both graph registration modes implement `GraphExplorer`:
+
+```ts
+await graph.explore({ mode: 'overview', maxNodes: 100 })
+await graph.explore({ mode: 'expand', nodeIds, maxDepth: 1 })
+```
 
 ## Public type families
 
-The package exports schema, entity, relationship, document, chunk, index, client, graph registration, extraction, write-result, retrieval, evidence, traversal, context, and graph-search tool types. `GraphFactConflictError` represents extraction conflicts that cannot be reconciled safely.
+Provider-neutral schema, fact, ingestion, retrieval, tool, exploration, and write contracts live in
+`@anvia/graph`. `@anvia/neo4j` exports Neo4j client, resource, registration, index, and compatibility
+types. `GraphFactConflictError` represents extraction conflicts that cannot be reconciled safely.

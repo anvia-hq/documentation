@@ -258,7 +258,9 @@ const { documents: hybridDocuments } = await embedDocuments({
 
 It also exports dense, sparse, and hybrid model contracts plus distance helpers.
 
-`@anvia/core/vector-store` exports `InMemoryVectorStore`, `VectorStore`, `HybridVectorStore`, retrieval/search/inspection types, `vectorFilter`, and `createVectorSearchTool`.
+`@anvia/core/vector-store` exports `InMemoryVectorStore`, `VectorStore`, `HybridVectorStore`,
+retrieval/search/inspection types, `vectorFilter`, `createVectorSearchTool`, `ingestVectorText`, and
+`ingestVectorDocuments`.
 
 ```ts
 const store = InMemoryVectorStore.fromDocuments({ documents: embedded })
@@ -271,9 +273,28 @@ const results = await retrieveDocuments({
 })
 ```
 
+For raw text, the ingestion helpers share Core's deterministic document chunking and replace the
+complete embedded representation for each stable source ID:
+
+```ts
+await ingestVectorText({
+  store,
+  document: { id: 'incident-42', text, metadata: { tenant: 'acme' } },
+  embeddingModel,
+  chunking: {
+    strategy: 'recursive',
+    maxSize: 1_000,
+    overlap: 100,
+    separators: ['\n\n', '\n', ' '],
+  },
+})
+```
+
 ## Documents
 
-`@anvia/core/documents` exports `chunkText`, `extractPdfText`, and their option/result types.
+`@anvia/core/documents` exports `chunkText`, `chunkTextDocuments`, `extractPdfText`, and their
+option/result types. The shared records are `TextDocument`, `TextDocumentChunk`,
+`TextDocumentMetadata`, and `TextDocumentChunkingOptions`.
 
 The application owns file discovery, storage reads, upload authorization, malware scanning, OCR, and source IDs.
 
