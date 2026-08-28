@@ -15,8 +15,10 @@ import {
 ```ts
 const lens = new LensClient(options)
 const observer = lens.observer(observerOptions)
+const pipelineObserver = lens.pipelineObserver(observerOptions)
 const reporter = lens.evalReporter<Input, Output, Expected>(reporterOptions)
 const datasets = lens.datasetClient(datasetOptions)
+await lens.score(scoreArgs)
 
 await lens.flush()
 await lens.close()
@@ -24,7 +26,16 @@ await lens.close()
 
 Client options include `baseUrl`, `publicKey`, `secretKey`, `serviceName`, `environment`, `release`, `timeoutMs`, capture/redaction defaults, and `optional`. The readonly `enabled` flag is false only when optional mode has no configured connection.
 
-`observer()` returns an `AgentObserver`. `evalReporter()` returns an Anvia `EvalReporter`; its options include `traceObserver`, `publishInvalid`, `includeMetadata`, `includePayloads`, and `onMissingTrace`.
+`observer()` returns an `AgentObserver`. `pipelineObserver()` returns a `PipelineObserver` and shares
+the client's lazy provider and capture defaults. Both accessors return disabled no-op observers in
+optional mode and reject new work after the client closes.
+
+`evalReporter()` returns an Anvia `EvalReporter`; its options include `traceObserver`,
+`publishInvalid`, `includeMetadata`, `includePayloads`, and `onMissingTrace`.
+
+`score()` accepts `LensScoreArgs`, validates the score, and queues a trace-correlated evaluation log
+through the client-owned logs provider. A disabled optional client treats it as a no-op. See
+[Runtime scoring](/packages/lens/runtime-scoring).
 
 ## Managed datasets
 
@@ -43,4 +54,6 @@ The returned `LensDataset` contains `name`, `version`, optional description and 
 
 ## Public types
 
-The package exports client, observer, capture, redaction, evaluation-reporter, and dataset option/result types named with the `Lens*` prefix.
+The package exports client, Agent and Pipeline observer, capture, redaction, evaluation-reporter,
+runtime-scoring, and dataset option/result types named with the `Lens*` prefix, including
+`LensObserverOptions`, `LensPipelineObserverOptions`, and `LensScoreArgs`.

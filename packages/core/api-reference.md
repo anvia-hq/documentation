@@ -325,52 +325,70 @@ Import from `@anvia/core/pipeline`.
 
 ```ts
 const pipeline = new Pipeline({
-    id: 'ticket-triage',
-    inputSchema: ticketSchema,
-    name: 'Ticket triage',
-    description: 'Classifies one support ticket.',
-    metadata: { owner: 'support' },
+  id: 'ticket-triage',
+  inputSchema: ticketSchema,
+  name: 'Ticket triage',
+  description: 'Classifies one support ticket.',
+  metadata: { owner: 'support' },
+  observability: {
+    observers: { telemetry: pipelineObserver },
+    primaryTrace: 'telemetry',
+    errorPolicy: 'ignore',
+  },
 })
-    .step({
+  .step({
     id: "step-1",
     name: 'Normalize',
-    run: ({ input: input }) => normalizeTicket(input)
-})
-    .parallel({
+    run: ({ input }) => normalizeTicket(input),
+  })
+  .parallel({
     id: "parallel-1",
-    branches: { policy: policyPipeline, signals: signalPipeline }
-})
-    .step({
+    branches: { policy: policyPipeline, signals: signalPipeline },
+  })
+  .step({
     id: "step-2",
-    run: ({ input: input }) => mergeResults(input)
-})
-    .agent({
+    run: ({ input }) => mergeResults(input),
+  })
+  .agent({
     id: "agent-1",
     agent: synthesizer,
-    approval: "reject",
-    request({ input: input }) {
-        return { prompt: String(input) };
-    }
-});
-
+    suspension: "reject",
+    request: ({ input }) => ({ prompt: String(input) }),
+  })
 ```
 
 `Pipeline` is immutable; each composition method returns a new typed pipeline. Public composition methods are `step`, `use`, `parallel`, `agent`, and `extract`.
 
 ```ts
-await pipeline.run({
-    input: input,
-    observer
-});
-await pipeline.runBatch({
-    inputs: inputs,
-    concurrency: 4
-});
-const graph = pipeline.graph();
+const result = await pipeline.run({
+  input,
+  trace: { sessionId },
+  observer,
+  failOnObserverError: false,
+})
 
+console.log(result.trace)
+
+await pipeline.runBatch({
+  inputs,
+  concurrency: 4,
+})
+
+const graph = pipeline.graph()
 ```
 
-The subpath exports graph, stage metadata, observer, run-event, and batch option types.
+Constructor-level `observability` configures named run and stage observers. `primaryTrace` selects
+which observer contributes `result.trace`; `errorPolicy` is `'ignore'` by default and can be set to
+`'throw'`. For Agent stages, Core propagates the stage trace only when the Pipeline and Agent
+`primaryTrace` names match.
+
+The `observer` passed to `run()` is the separate `PipelineRunObserver` stage-event sink.
+`failOnObserverError` applies only to that sink.
+
+The subpath exports graph and stage metadata plus `PipelineObserver`, `PipelineRunObservation`,
+`PipelineStageObservation`, their lifecycle argument types, `PipelineObservabilityOptions`,
+`PipelineTraceOptions`, `PipelineTraceInfo`, `PipelineRunObserver`, run-event types, batch options,
+and `PipelineObserverDispatchError`.
 
 ## Media
 

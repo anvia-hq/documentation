@@ -10,7 +10,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 
 - [Agents, tools, and MCP](https://docs.anvia.dev/llms-agents.txt): Models, agents, tools, MCP, skills, multi-agent coordination, pipelines, sandboxing, and streaming.
 - [Full-stack applications](https://docs.anvia.dev/llms-apps.txt): Hono routes, `@anvia/server` streaming, `@anvia/react` client state, `@anvia/react-ui` components, authentication, cancellation, and resumption.
-- [Evaluations and observability](https://docs.anvia.dev/llms-evals.txt): Tracing, Lens, evaluation suites, datasets, release comparison, quality gates, alerts, cost, and testing.
+- [Evaluations and observability](https://docs.anvia.dev/llms-evals.txt): Tracing, Lens, runtime scoring, evaluation suites, datasets, release comparison, quality gates, alerts, cost, and testing.
 - [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt): Raw-text ingestion, embeddings, vector stores, portable Neo4j/Memgraph GraphRAG, metadata filters, dynamic context, permission-aware retrieval, and memory boundaries.
 
 ## Stable v1 boundaries
@@ -47,6 +47,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Knowledge](https://docs.anvia.dev/sdk/knowledges): Document loading, embeddings, vector stores, retrieval, and search tools.
 - [Structured output](https://docs.anvia.dev/sdk/structured-output): Schema-driven completion and agent output.
 - [Pipelines](https://docs.anvia.dev/sdk/pipelines): Typed multi-step workflows, composition, parallelism, and production workers.
+- [Pipeline runs and observability](https://docs.anvia.dev/sdk/pipelines/runs-and-errors): Named run and stage tracing, Agent trace nesting, operational events, and failure policy.
 - [Streaming](https://docs.anvia.dev/sdk/streaming): Completion and agent streams, event types, transports, cancellation, and resumption.
 - [Providers](https://docs.anvia.dev/sdk/providers): Provider adapters, supported capabilities, and provider selection.
 

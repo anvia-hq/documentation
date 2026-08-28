@@ -15,3 +15,7 @@ const tracing = lens.observer({
 Safe capture omits prompt and response bodies. Full capture can include instructions, messages, documents, tool values, and model output. Redaction walks captured values but is a safeguard, not a complete data-loss-prevention system.
 
 Evaluation `includePayloads` and `includeMetadata` are separate reporter controls. Keep both disabled until the corresponding data has an approved export, access, retention, and deletion policy.
+
+Runtime score comments and metadata are separate from observer capture and redaction controls.
+Validate and minimize them before calling `lens.score()`. Keep user and tenant identity in
+application-owned data unless an approved opaque identifier is required for analysis.

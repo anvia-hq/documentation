@@ -1,11 +1,13 @@
 # `@anvia/lens`
 
-`@anvia/lens` is the native adapter between an Anvia application and Lens. It sends traces and evaluation results and reads versioned managed datasets with the same project credentials.
+`@anvia/lens` is the native adapter between an Anvia application and Lens. It sends traces,
+evaluation results, and runtime scores and reads versioned managed datasets with the same project
+credentials.
 
 ## Install
 
 ```bash
-pnpm add @anvia/core @anvia/lens
+pnpm add @anvia/core @anvia/lens zod
 ```
 
 Set the Lens connection in the server environment:
@@ -27,17 +29,25 @@ const lens = new LensClient({
   environment: 'production',
 })
 const tracing = lens.observer({ captureMode: 'safe' })
+const pipelineTracing = lens.pipelineObserver({ captureMode: 'safe' })
 
 const agent = new Agent({
   id: 'support',
   model: model,
-  observability: { observers: { tracing } },
+  observability: {
+    observers: { lens: tracing },
+    primaryTrace: 'lens',
+  },
 })
 ```
 
+Attach `pipelineTracing` through a Pipeline's constructor. Use the same observer name as the Agent's
+`primaryTrace` to store one trace containing Pipeline stages, Agent runs, generations, and tools.
+
 ## Evaluations and datasets
 
-One `LensClient` can create a matching trace observer, evaluation reporter, and managed-dataset client.
+One `LensClient` can create matching Agent and Pipeline observers, an evaluation reporter, and a
+managed-dataset client.
 
 ```ts
 const lens = new LensClient()
@@ -50,6 +60,22 @@ try {
   await lens.close()
 }
 ```
+
+## Runtime scoring
+
+```ts
+await lens.score({
+  id: feedbackId,
+  traceId,
+  name: 'user-feedback',
+  value: liked ? 1 : 0,
+  dataType: 'BOOLEAN',
+  source: 'end_user',
+})
+```
+
+Use runtime scores for end-user feedback or production checks that should remain observable beside
+the originating trace without running an eval suite.
 
 ## Operational patterns
 
@@ -68,6 +94,7 @@ try {
 - [Get started](/packages/lens/get-started)
 - [Tracing](/packages/lens/tracing)
 - [Evals and datasets](/packages/lens/evals-and-datasets)
+- [Runtime scoring](/packages/lens/runtime-scoring)
 - [Data and privacy](/packages/lens/data-and-privacy)
 - [Lifecycle](/packages/lens/lifecycle)
 - [Public API](/packages/lens/api-reference)

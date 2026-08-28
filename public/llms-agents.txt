@@ -1,6 +1,6 @@
 # Anvia Agents, Tools, and MCP
 
-> Current stable v1 implementation context for coding agents. Updated 2026-08-23.
+> Current stable v1 implementation context for coding agents. Updated 2026-08-27.
 
 Anvia is a provider-neutral TypeScript runtime. The host application owns authentication,
 authorization, tenant scope, business services, persistence policy, deployment, and the response
@@ -110,6 +110,9 @@ headers, redirects, tool exposure, and lifecycle in server-owned configuration.
 
 - Construct `Pipeline` directly; there is no `PipelineBuilder` or `.build()` phase in v1.
 - Use deterministic pipeline steps for authorization, data access, branching, and side effects.
+- Configure named Pipeline observers in the constructor. Give Pipeline and Agent observers the same
+  `primaryTrace` name when their spans should form one trace; use the per-run `observer` separately
+  for operational stage events.
 - Use agents only where model reasoning adds value, and bound every loop with turn limits.
 - Load skills from trusted roots and validate their manifests and referenced assets.
 - Expose specialist agents as narrow tools when delegation is clearer than one large agent.
@@ -141,6 +144,7 @@ token use, and latency.
 - MCP: https://docs.anvia.dev/packages/mcp/
 - MCP integration guide: https://docs.anvia.dev/sdk/advanced/mcp
 - Pipelines: https://docs.anvia.dev/sdk/pipelines
+- Pipeline runs and observability: https://docs.anvia.dev/sdk/pipelines/runs-and-errors
 - Multi-agent systems: https://docs.anvia.dev/sdk/advanced/multi-agent
 - Skills: https://docs.anvia.dev/sdk/advanced/skills
 - Streaming: https://docs.anvia.dev/sdk/streaming

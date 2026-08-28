@@ -68,7 +68,7 @@ The model, credentials, business data, permissions, storage, and deployment rema
 | Documents | `@anvia/core/documents` | Shared text-document records, deterministic batch chunking, and scoped PDF text extraction |
 | Memory | `@anvia/core/memory` | Conversation persistence and compaction contracts |
 | Retrieval | `@anvia/core/embeddings`, `@anvia/core/vector-store` | Raw-text ingestion, embedding documents, and searching vector indexes |
-| Pipelines | `@anvia/core/pipeline` | Typed multi-stage workflows, batches, graphs, and run events |
+| Pipelines | `@anvia/core/pipeline` | Typed multi-stage workflows, batches, graphs, run events, and named run/stage observability |
 | Media | `@anvia/core/image-generation`, `@anvia/core/speech-generation`, `@anvia/core/transcription` | Provider-neutral media requests |
 | Runtime control | `@anvia/core/agent`, `@anvia/core/guardrails` | Lifecycle observation, resumable interactions, and enforced input/output policy |
 | Integration contracts | `@anvia/core/mcp`, `@anvia/core/skills`, `@anvia/core/observability` | MCP registration types, reusable instructions, and run telemetry; MCP connections live in `@anvia/mcp` |
