@@ -9,6 +9,9 @@ The Postgres adapter persists ordered messages and failed runs across processes.
 | Schema bootstrap | `store.ensure()` creates `pgcrypto`, tables, and index |
 | Custom names | Prefix or explicit table names |
 | Inspection | Lists sessions and reads persisted transcripts |
-| Compaction | Atomically replaces history with conflict detection |
+| Compaction | Atomically advances a summary checkpoint with conflict detection |
 
-The adapter owns persistence operations, not connection observability, tenant authorization, database backups, or migration orchestration. See the [API reference](/packages/memory-postgres/api-reference).
+Compaction leaves canonical message rows intact. Normal loads and inspection return the complete
+transcript, while model-facing snapshots return the latest summary plus the unsummarized tail. The
+adapter owns persistence operations, not connection observability, tenant authorization, database
+backups, or migration orchestration. See the [API reference](/packages/memory-postgres/api-reference).

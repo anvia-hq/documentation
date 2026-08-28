@@ -1,6 +1,6 @@
 # Anvia RAG, Knowledge, and Retrieval
 
-> Current stable v1 context for ingestion, embeddings, vector stores, GraphRAG, and retrieval policy. Updated 2026-08-26.
+> Current stable v1 context for ingestion, embeddings, vector stores, GraphRAG, and retrieval policy. Updated 2026-08-28.
 
 Anvia calls its retrieval layer knowledge. Ingest outside the request path; at runtime search a
 prepared index and send only relevant, authorized evidence to the model.
@@ -24,14 +24,9 @@ pnpm add @anvia/core @anvia/openai
 Add one embedding adapter and one durable vector adapter for production. The in-memory store is
 appropriate for learning and tests.
 
-PDF loading is optional. Install `pdfjs-dist` in the application that loads PDFs:
-
-```sh
-pnpm add pdfjs-dist
-```
-
-Core keeps PDF.js as an optional peer so applications that do not process PDFs do not pay its install
-cost. Missing PDF.js affects PDF document loading only, not text, JSON, HTML, Markdown, or CSV loaders.
+Core does not parse local files. Parse documents or run OCR in application code, then normalize the
+result into text documents before chunking or ingestion. Provider adapters may separately accept PDF
+attachments for model input; that path does not make Core a file parser.
 
 ## Ingest documents
 

@@ -5,7 +5,8 @@
 ## Outcome
 
 Extract page Markdown from a remote PDF with Mistral OCR. Use OCR for scans and images without
-reliable selectable text; use ordinary text or PDF extraction for text-based documents when possible.
+reliable selectable text; use ordinary text or an application-selected parser for text-based
+documents when possible.
 
 ## Prerequisites
 

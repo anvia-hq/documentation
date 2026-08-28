@@ -39,7 +39,8 @@ export class ProductMemoryStore implements MemoryStore {
 }
 ```
 
-`load()`, `append()`, and `clear()` are required. Preserve every normalized message field and return history in model order.
+`load()`, `append()`, and `clear()` are required. Preserve every normalized message field and return
+canonical history in model order. Compaction must not change what `load()` returns.
 
 The core runtime passes the same context shape to every method:
 
@@ -100,11 +101,11 @@ import type { MemoryCompactionCapability } from '@anvia/core/memory'
 
 const compaction: MemoryCompactionCapability = {
   async snapshot({ scope }) {
-    return loadRevisionAndMessages(scope)
+    return loadRevisionAndModelProjection(scope)
   },
 
   async replacePrefix(input) {
-    return replacePrefixIfRevisionMatches({
+    return advanceCompactionCheckpointIfRevisionMatches({
       scope: input.scope,
       expectedRevision: input.revision,
       messageCount: input.messageCount,
@@ -115,8 +116,23 @@ const compaction: MemoryCompactionCapability = {
 }
 ```
 
-`snapshot()` returns an opaque revision and ordered messages. `replacePrefix()` must atomically compare that revision, replace exactly the requested prefix with the supplied compaction message, and return `{ status: 'committed' }` or `{ status: 'conflict' }`.
+`snapshot()` returns an opaque revision and the ordered model-context projection. With no checkpoint,
+that projection is the canonical history. With a checkpoint, it is the stored summary followed by
+canonical messages after the summarized boundary.
+
+`replacePrefix()` must atomically compare the revision and advance a separate checkpoint so the
+requested projected prefix is represented by `replacement`. Its `messageCount` includes the prior
+summary when a repeated compaction covers that summary. Return `{ status: 'committed' }` or
+`{ status: 'conflict' }` without deleting or rewriting canonical message rows. Keep the checkpoint's
+summary, canonical boundary, and generation or equivalent conflict state together.
+
+Appending messages must preserve the current checkpoint. Clearing a conversation must remove both
+canonical messages and its checkpoint. Validate persisted summaries and reject a checkpoint whose
+boundary no longer exists in canonical history.
 
 Never overwrite a newer transcript after a conflict. Let the core runtime reload and retry according to the configured conflict limit.
 
-Test empty histories, repeated appends, concurrent writers, failed transactions, full-scope deletion, error isolation, malformed stored messages, compaction conflicts, and message-order preservation before using a custom store in production.
+Test empty histories, repeated compactions, append-after-compaction, clear-after-compaction,
+concurrent writers, failed transactions, full-scope deletion, error isolation, malformed checkpoint
+state, compaction conflicts, canonical replay, model projection, and message-order preservation
+before using a custom store in production.

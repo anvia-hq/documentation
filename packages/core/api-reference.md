@@ -225,6 +225,11 @@ interface MemoryStore {
 
 The subpath also exports memory options, scope types, inspector contracts, compaction contracts, `createSummaryMemoryCompactor`, `isMemoryCompactionMessage`, and compaction errors.
 
+`MemoryStore.load()` returns canonical replayable history. `MemoryCompactionCapability.snapshot()`
+returns the model-context projection: canonical history before compaction, then the latest summary
+checkpoint plus the unsummarized tail. `replacePrefix()` advances that checkpoint atomically and
+must not delete or overwrite canonical messages.
+
 Token-aware compaction uses `trigger.afterTokens`, optional `retention.recentTokens`, an optional
 sync or async `tokenCounter`, and a `compactor`. Core exports `estimateMemoryTokens` as the default
 provider-neutral estimate. `MemoryCompactionInfo` records original, compacted, retained, and result
@@ -292,11 +297,13 @@ await ingestVectorText({
 
 ## Documents
 
-`@anvia/core/documents` exports `chunkText`, `chunkTextDocuments`, `extractPdfText`, and their
-option/result types. The shared records are `TextDocument`, `TextDocumentChunk`,
-`TextDocumentMetadata`, and `TextDocumentChunkingOptions`.
+`@anvia/core/documents` exports `chunkText`, `chunkTextDocuments`, and their option/result types. The
+shared records are `TextDocument`, `TextDocumentChunk`, `TextDocumentMetadata`, and
+`TextDocumentChunkingOptions`.
 
-The application owns file discovery, storage reads, upload authorization, malware scanning, OCR, and source IDs.
+The application owns file discovery, storage reads, document parsing or OCR, upload authorization,
+malware scanning, and source IDs. Pass normalized text into Core; provider-specific PDF attachments
+are a separate completion capability.
 
 ## Structured extraction
 

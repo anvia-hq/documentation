@@ -67,7 +67,11 @@ The conventional client path expects delegates named `agentMemorySession`, `agen
 
 Pass `{ delegates }` to `new PrismaMemoryStore(...)` when generated delegate names differ. Supply session and message delegates plus a transaction function; supply the errors delegate unless `errorPolicy: 'ignore'` is configured.
 
-Inspection requires the session delegate's optional `findMany` and `findUnique` methods. Compaction additionally requires `messages.deleteMany`. The basic memory methods continue to work when those optional interfaces are unavailable.
+Inspection requires the session delegate's optional `findMany` and `findUnique` methods. Compaction
+requires `sessions.findUnique` on both the root and transaction delegates. The optional
+`messages.deleteMany` method remains in the public delegate shape for compatibility but compaction
+does not use it or delete canonical messages. The basic memory methods continue to work when those
+optional interfaces are unavailable.
 
 ## Schema and transaction ownership
 
@@ -76,6 +80,9 @@ The package does not migrate the database at runtime. The generated schema defin
 - `AgentMemorySession`
 - `AgentMemoryMessage`
 - `AgentMemoryError`
+
+`AgentMemorySession.compactionState` is a nullable JSON checkpoint. Existing schemas must add this
+field through a Prisma migration before enabling checkpoint-based compaction.
 
 The session scope is unique, message positions are unique per memory session, and child rows cascade when a session is deleted. Pass Prisma transaction options through `transaction`, for example an isolation level supported by your configured connector.
 

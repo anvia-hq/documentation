@@ -5,6 +5,7 @@ entries below summarize recent v1 changes and preserve notable v0 compatibility 
 
 | Version | Summary |
 | --- | --- |
+| `Unreleased` | Removed Core's local PDF text extraction API and its optional `pdfjs-dist` peer dependency. Applications now select and operate their own parser or OCR service before passing normalized text to Core; provider PDF attachments remain supported. |
 | `1.0.3` | Added shared text-document contracts and consistent raw-text ingestion helpers for vector stores and managed knowledge graphs, including reusable graph/vector chunk embeddings. |
 | `1.0.2` | Reported cancelled Agent runs explicitly so observers can finalize them before an observability provider shuts down. |
 | `1.0.1` | Refreshed supported upstream SDK and runtime dependencies and removed the FastEmbed package. |
@@ -29,10 +30,12 @@ entries below summarize recent v1 changes and preserve notable v0 compatibility 
 - Switch on Agent outcome `type`: `response`, `interaction`, or `blocked`. Use `agent.resume(continuation, response)` or pass the same continuation and response to `agent.stream(...)`.
 - Replace wrapped Agent `final` event handling with direct terminal outcome events. Choose one `AgentStream` surface: full events, `textStream`, `text`, or `result`.
 - Replace message-count compaction thresholds with `afterTokens` and `recentTokens`; use `agent.compactMemory({ session })` for explicit maintenance.
-- Move file discovery and reads out of Core document helpers; pass text to `chunkText()` and PDF bytes plus an explicit page range to `extractPdfText()`.
+- Keep file discovery, reads, parsing, and OCR in the application; pass normalized text to
+  `chunkText()` or `chunkTextDocuments()`.
 - Prefer `chunkTextDocuments()` for stable batch chunk IDs and `ingestVectorText()` or
   `ingestVectorDocuments()` for the common raw-text vector path.
-- Install `pdfjs-dist` directly when the application calls `extractPdfText()`; omit it when only text chunking is used.
+- Remove application installs of `pdfjs-dist` that existed only for Core's former PDF extractor.
+  Keep any parser dependency that the application uses directly.
 - Import `McpClient` and `McpClientGroup` from `@anvia/mcp`, not `@anvia/core/mcp`.
 - Keep Streamable HTTP `ssrfProtection` at its default `'strict'`; use `'disabled'` only for a fixed, application-trusted local or private endpoint.
 - Replace Streamable HTTP `requestInit.headers` with the explicit `headers` string record. Do not attempt to override transport-owned protocol fields or combine static `Authorization` with `authProvider`.

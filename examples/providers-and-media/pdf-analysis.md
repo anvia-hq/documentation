@@ -67,8 +67,8 @@ a URL or upload available. A model summary can omit or misread content and is no
 document is authentic. Do not expose permanent public links to private files.
 
 In production, use short-lived signed URLs, timeouts, retention controls, and document-specific
-evaluations. Extract once with `extractPdfText()` or OCR and index chunks when users will query the same file
-repeatedly.
+evaluations. Parse once with an application-selected parser or OCR service and index chunks when
+users will query the same file repeatedly.
 
 ## Source and extensions
 

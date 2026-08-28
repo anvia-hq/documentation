@@ -114,6 +114,9 @@ type PrismaMemoryTransactionOptions = {
 }
 ```
 
-Inspection is available when the optional session lookup methods exist. Atomic compaction additionally requires `messages.deleteMany`.
+Inspection is available when the optional session lookup methods exist. Atomic compaction requires
+`sessions.findUnique` on the root delegate and on delegates supplied to the transaction callback.
+The optional `messages.deleteMany` member remains accepted for source compatibility but is not used
+by checkpoint-based compaction.
 
 Return to the [package guide](/packages/memory-prisma).

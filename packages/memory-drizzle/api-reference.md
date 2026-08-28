@@ -19,7 +19,8 @@ import {
 
 ## Schema exports
 
-- `agentMemorySessions` defines `agent_memory_sessions` and its unique scope key.
+- `agentMemorySessions` defines `agent_memory_sessions`, its unique scope key, and nullable
+  `compactionState` JSONB checkpoint.
 - `agentMemoryMessages` defines ordered message rows with a unique session-position index.
 - `agentMemoryErrors` defines failed-run diagnostics.
 - `drizzleMemorySchema` contains all three tables for use in an application schema.

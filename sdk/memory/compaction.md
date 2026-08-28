@@ -1,6 +1,8 @@
 # Compaction
 
-Compaction replaces an older transcript prefix with a durable system summary while preserving a recent user-led tail. It keeps session context bounded without discarding every established fact.
+Compaction keeps the canonical transcript intact and stores a durable summary checkpoint for the
+model-facing history. After compaction, the model receives the latest summary plus a recent
+user-led tail; replay, inspection, and deletion still operate on the original messages.
 
 ## 1. Create a summary compactor
 
@@ -50,10 +52,15 @@ budget must be smaller than the trigger. Omit `retention` to use one quarter of 
 Conflict retries are disabled by default; set `conflictRetries: { maxAttempts }` to allow that many
 total attempts.
 
+Compaction is opt-in. Omit `memory.compaction` when every canonical message should remain
+model-facing and the context window is managed elsewhere.
+
 ## 3. Understand the trigger
 
-Before a session run, Anvia loads a compaction snapshot. It compacts when stored messages plus the
-incoming prompt exceed `trigger.afterTokens` and an older prefix can be summarized while retaining
+Before a session run, Anvia loads a model-context projection from the store's compaction snapshot.
+Before the first compaction this is the canonical transcript. Afterward it is the latest summary
+checkpoint plus only the unsummarized canonical tail. Anvia compacts when that projection plus the
+incoming prompt exceeds `trigger.afterTokens` and an older prefix can be summarized while retaining
 recent complete user-led turns.
 
 Reported `originalTokenCount` measures the stored snapshot; the incoming prompt participates in
@@ -81,7 +88,17 @@ memory: {
 }
 ```
 
-The summary becomes a system message with framework metadata recording how many original messages it represents. `isMemoryCompactionMessage(message)` identifies that normalized summary later.
+The summary becomes a system message with framework metadata recording how many canonical messages
+it represents. `isMemoryCompactionMessage(message)` identifies that normalized summary later.
+
+Compaction does not append the summary to canonical history or delete the messages it covers.
+`memoryStore.load()` and `memoryStore.inspector` continue to return the complete original transcript.
+Only model-facing history substitutes the checkpoint for the covered prefix.
+
+Long conversations can compact more than once. A later compaction summarizes a prefix of the current
+projection, which may include the previous summary, and advances the same checkpoint. The model sees
+only the newest summary plus the remaining tail; canonical history still contains every original
+message and no synthetic summaries.
 
 ## 4. Know what the summarizer receives
 
@@ -144,12 +161,18 @@ create an agent stream event.
 
 ## 7. Handle concurrent updates
 
-The memory store must expose the optional `MemoryCompactionCapability` capability. A compaction load returns an opaque revision; commit atomically replaces the chosen prefix only when that revision still matches.
+The memory store must expose the optional `MemoryCompactionCapability` capability. `snapshot()`
+returns an opaque revision and the current model-context projection. `replacePrefix()` atomically
+advances the summary checkpoint for the chosen projected prefix only when that revision still
+matches. Despite its compatibility-preserving name, it must not delete or overwrite canonical
+messages.
 
 On a conflict, Anvia reloads when another attempt remains. With `conflictRetries: false` (the default), it makes one attempt. Exhausted conflicts throw `MemoryCompactionConflictError`.
 
 An empty summary, summary-model failure, compactor failure, or storage commit failure throws `MemoryCompactionError`. The error can include usage accumulated before the failure.
 
-Compaction is conversation housekeeping, not an audit archive. Keep original events or regulatory records in systems designed for those requirements.
+Preserving canonical messages makes application replay and inspection possible, but a memory store
+is not automatically an audit archive. Apply an explicit retention and deletion policy, and keep
+regulatory records in systems designed for those requirements.
 
 Continue with [Store adapters](/sdk/memory/store-adapters).

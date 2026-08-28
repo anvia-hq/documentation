@@ -75,6 +75,11 @@ Memory stores model context, not authorization. Your application must verify tha
 
 Stored transcripts can contain private user input, retrieved data, reasoning identifiers, tool arguments, tool results, and model output. Apply tenant isolation, encryption, retention, deletion, export, and audit policy to the full message record.
 
+Compaction does not delete that stored transcript. It maintains a separate summary checkpoint so
+later model requests use the latest summary plus an unsummarized tail while replay and inspection
+continue to expose canonical messages. See [Compaction](/sdk/memory/compaction) for the lifecycle and
+custom-store requirements.
+
 ## Explore memory
 
 - [Configure memory](/sdk/memory/configure) attaches a durable adapter and defines scope.

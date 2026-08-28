@@ -120,8 +120,18 @@ Official adapters:
 - preserve ordered, complete provider-neutral messages;
 - validate stored message shapes by default;
 - record failed runs unless `errorPolicy: 'ignore'` is selected;
-- expose atomic compaction through `store.compaction`; and
+- expose atomic compaction checkpoints through `store.compaction` without deleting canonical
+  messages; and
 - expose read-only conversation inspection for Studio and internal tooling.
+
+After compaction, `store.load()` and the inspector still return complete canonical history. The
+compaction snapshot used to construct model context returns only the latest summary plus the
+unsummarized tail. Official durable adapters store that checkpoint on the session row and avoid
+loading already-summarized rows for later model requests.
+
+The checkpoint field is additive and nullable, but existing databases still need the adapter's
+schema upgrade. Re-run or diff the package schema helper and apply the resulting migration before
+deploying a version that uses checkpoint-based compaction.
 
 Postgres and Drizzle use advisory locking by default for ordered concurrent writes. Scope and locking prevent storage collisions, but authorization remains the application's responsibility.
 

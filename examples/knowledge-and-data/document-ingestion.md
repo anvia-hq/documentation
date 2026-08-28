@@ -4,8 +4,8 @@
 
 ## Outcome
 
-Turn approved text and PDF files into stable, replaceable vector documents with source and page
-provenance. Ingestion runs as an application job, not inside an answer request.
+Turn approved text and application-parsed document pages into stable, replaceable vector documents
+with source and page provenance. Ingestion runs as an application job, not inside an answer request.
 
 ## When to use it
 
@@ -14,8 +14,8 @@ only for small demonstrations.
 
 ## Flow
 
-source event → validate and scan → load pages → normalize/chunk → stable IDs → embed → upsert →
-mark source version active → delete stale IDs.
+source event → validate and scan → parse in application → normalize/chunk → stable IDs → embed →
+upsert → mark source version active → delete stale IDs.
 
 ## Setup
 
@@ -26,33 +26,38 @@ pnpm add @anvia/core @anvia/transformers @anvia/pgvector
 ## Load and normalize
 
 ```ts
-import { readFile } from "node:fs/promises";
-import { chunkText, extractPdfText } from "@anvia/core/documents";
+import { chunkText } from "@anvia/core/documents";
 
-const data = await readFile(approvedPath);
-const { pages } = await extractPdfText({ data });
+type ParsedPage = { pageNumber: number; text: string };
 
-const chunks = pages.flatMap((page) =>
-  chunkText({
-    text: page.text,
-    strategy: "recursive",
-    maxSize: 1_600,
-    overlap: 200,
-    separators: ["\n\n", "\n", ". ", " "],
-  }).map((chunk) => ({
-  id: `${sourceId}@${version}#page=${page.pageNumber}&chunk=${chunk.index}`,
-  text: chunk.text,
-  sourceId,
-  version,
-  pageNumber: page.pageNumber,
-  start: chunk.start,
-  end: chunk.end,
-  })),
-);
+export function chunkParsedPages(options: {
+  sourceId: string;
+  version: string;
+  pages: readonly ParsedPage[];
+}) {
+  return options.pages.flatMap((page) =>
+    chunkText({
+      text: page.text,
+      strategy: "recursive",
+      maxSize: 1_600,
+      overlap: 200,
+      separators: ["\n\n", "\n", ". ", " "],
+    }).map((chunk) => ({
+      id: `${options.sourceId}@${options.version}#page=${page.pageNumber}&chunk=${chunk.index}`,
+      text: chunk.text,
+      sourceId: options.sourceId,
+      version: options.version,
+      pageNumber: page.pageNumber,
+      start: chunk.start,
+      end: chunk.end,
+    })),
+  );
+}
 ```
 
-Tune `chunkText()` for the source and include the chunk number in the ID. Anvia does not infer your
-document semantics, overlap policy, or versioning scheme.
+Supply `pages` from the parser or OCR service selected by the application. Tune `chunkText()` for
+the source and include the chunk number in the ID. Anvia does not infer document semantics, parsing
+policy, overlap policy, or versioning scheme.
 
 ## Embed and upsert
 
@@ -90,9 +95,9 @@ than silently creating an incomplete production corpus.
 
 ## Security and ownership
 
-The application owns source authorization, malware scanning, file paths, licensing, PII handling,
-retention, and deletion. Parsed output is untrusted. Never let a request provide an arbitrary path
-or make the model decide which source version is active.
+The application owns source authorization, parsing, malware scanning, file paths, licensing, PII
+handling, retention, and deletion. Parsed output is untrusted. Never let a request provide an
+arbitrary path or make the model decide which source version is active.
 
 ## Production changes and tests
 

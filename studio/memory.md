@@ -83,12 +83,17 @@ For a selected conversation, Studio presents several views over the same persist
 
 | View | Purpose |
 | --- | --- |
-| **Messages** | The ordered Anvia `Message[]` consumed by the agent. |
+| **Messages** | The ordered canonical Anvia `Message[]` persisted by the memory store. |
 | **Message records** | The message plus its position, run ID, turn, and creation time. |
 | **Derived transcript** | A UI-oriented sequence of user and assistant text, reasoning, and tool calls. |
 | **Assistant responses** | A compact generation ledger derived from assistant-message metadata. |
 
 The generation ledger shows the provider, model, token usage, turn, timestamp, and a response preview when that metadata was persisted. An assistant message without generation metadata remains visible and is labeled **Usage unavailable**; Studio does not estimate missing usage.
+
+When memory compaction is enabled, these inspector views continue to show the original canonical
+messages, including messages covered by a summary checkpoint. They do not show the reduced
+model-facing projection. For subsequent model requests, the runtime uses only the latest summary
+plus the unsummarized tail.
 
 This is useful for questions such as:
 

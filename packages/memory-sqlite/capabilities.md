@@ -9,8 +9,11 @@
 | Failed runs | Stored by default; set `errorPolicy: 'ignore'` to omit them |
 | Validation | Enabled by default before messages cross the persistence boundary |
 | Inspection | Read-only session listing and transcript access |
-| Compaction | Atomic replacement with conflict detection and aggregate usage |
+| Compaction | Atomic summary checkpoint with conflict detection and aggregate usage |
 
-The adapter preserves strict JSON metadata and tool-result names when converting persisted messages. It does not authenticate callers, authorize a tenant, schedule compaction, or back up the database.
+Compaction preserves canonical message rows. Normal loads and inspection return the complete
+transcript, while model-facing snapshots return the latest summary plus the unsummarized tail. The
+adapter preserves strict JSON metadata and tool-result names when converting persisted messages. It
+does not authenticate callers, authorize a tenant, schedule compaction, or back up the database.
 
 See [Memory concepts](/sdk/memory) and the complete [API reference](/packages/memory-sqlite/api-reference).

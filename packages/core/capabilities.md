@@ -7,7 +7,7 @@ Core is split into focused package entry points. The root export contains common
 | Agents | `@anvia/core/agent` | Bounded model/tool loops, sessions, typed interactions and continuations, observability, dynamic context, agent-as-tool |
 | Completions | `@anvia/core/completion` | Provider-neutral requests, streams, messages, usage, documents, structured parsing |
 | Tools | `@anvia/core/tool` | Zod validation, approvals, structured questions, middleware, dynamic discovery, result normalization |
-| Documents | `@anvia/core/documents` | Shared text-document records, deterministic single/batch chunking, and scoped PDF extraction from app-supplied bytes |
+| Documents | `@anvia/core/documents` | Shared text-document records and deterministic single/batch text chunking |
 | Lifecycle | `@anvia/core/agent` | Typed run, turn, generation, tool, finish, and error observation |
 | Guardrails | `@anvia/core/guardrails` | Input/final-output allow, block, and rewrite policies |
 | Memory | `@anvia/core/memory` | Conversation store, inspection, save policy, durable compaction contracts |
@@ -28,8 +28,8 @@ Provider support also varies. A completion adapter may not implement embeddings,
 
 MCP connections and transports live in the optional Node.js package [`@anvia/mcp`](/packages/mcp).
 Client messages, the framed wire protocol, and UI conversion live in
-[`@anvia/client`](/packages/client). Core's document helpers accept app-supplied text or bytes and do
-not discover or read files. Local skill loading still belongs on a server with filesystem access;
+[`@anvia/client`](/packages/client). Core's document helpers accept app-supplied text and do not
+discover, read, or parse files. Local skill loading still belongs on a server with filesystem access;
 `ReadableStream` helpers need Web Streams support.
 
 For exact exports, see the [API reference](/packages/core/api-reference). For composition guidance, use [architecture](/packages/core/architecture) and [patterns](/packages/core/patterns).

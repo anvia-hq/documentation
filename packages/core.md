@@ -65,7 +65,7 @@ The model, credentials, business data, permissions, storage, and deployment rema
 | Agents | `@anvia/core/agent` | Stateful model-and-tool loops with instructions and runtime policy |
 | Completions | `@anvia/core/completion` | Direct model requests, streaming, messages, and parsed results |
 | Tools | `@anvia/core/tool` | Typed tools, middleware, approvals, structured questions, and dynamic discovery |
-| Documents | `@anvia/core/documents` | Shared text-document records, deterministic batch chunking, and scoped PDF text extraction |
+| Documents | `@anvia/core/documents` | Shared text-document records and deterministic single/batch text chunking |
 | Memory | `@anvia/core/memory` | Conversation persistence and compaction contracts |
 | Retrieval | `@anvia/core/embeddings`, `@anvia/core/vector-store` | Raw-text ingestion, embedding documents, and searching vector indexes |
 | Pipelines | `@anvia/core/pipeline` | Typed multi-stage workflows, batches, graphs, run events, and named run/stage observability |
@@ -104,7 +104,10 @@ Schemas validate model-produced arguments; they do not authorize a user or tenan
 | Schema library | Zod 4 |
 | Runtime boundary | Modern JavaScript runtimes; individual entry points may require runtime-specific capabilities |
 
-Core's contracts are broadly portable, but not every entry point has the same environment needs. PDF extraction needs binary access, MCP `stdio` needs a process-capable server runtime, and web-stream adapters need `ReadableStream`. Keep those APIs on the server unless the target runtime explicitly supports them.
+Core's contracts are broadly portable, but not every entry point has the same environment needs. MCP
+`stdio` needs a process-capable server runtime, and web-stream adapters need `ReadableStream`. File
+parsing is application-owned and should remain on a trusted runtime appropriate for the selected
+parser or OCR service.
 
 ## Continue learning
 

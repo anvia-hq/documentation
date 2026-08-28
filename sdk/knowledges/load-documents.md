@@ -1,6 +1,8 @@
 # Load and chunk documents
 
-Anvia keeps document parsing deliberately small: the core package extracts PDF text and chunks text, while your application owns file discovery, storage reads, source IDs, and error handling. Run ingestion in a script, worker, or deployment job—not on every agent request.
+Core chunks normalized text; it does not parse files. Your application owns file discovery, storage
+reads, document parsing or OCR, source IDs, and error handling. Run ingestion in a script, worker,
+or deployment job—not on every agent request.
 
 ## 1. Read application-approved text
 
@@ -20,38 +22,31 @@ const document = {
 
 Do not accept an arbitrary filesystem path or glob from a request. File discovery, access control, retries, and skipped-file reporting belong to the ingestion job.
 
-## 2. Extract PDF pages
+## 2. Normalize parser output
 
-`extractPdfText()` accepts PDF bytes and returns one text value per page. Page numbers are one-based:
-
-PDF parsing uses the optional `pdfjs-dist` peer dependency. Applications that call
-`extractPdfText()` must install it directly; applications that only use text chunking do not need
-PDF.js or its native canvas dependency.
-
-```sh
-pnpm add pdfjs-dist
-```
+Choose a parser or OCR service in the application layer, then convert its output into Core's shared
+text-document shape. Keep page or section provenance in metadata when it matters for citations:
 
 ```ts
-import { readFile } from 'node:fs/promises'
-import { extractPdfText } from '@anvia/core/documents'
+import type { TextDocument } from '@anvia/core/documents'
 
-const path = 'manuals/setup.pdf'
-const data = await readFile(path)
-const { pages } = await extractPdfText({ data })
-
-const documents = pages.map((page) => ({
-  id: `${path}#page=${page.pageNumber}`,
-  text: page.text,
-  metadata: {
-    source: path,
-    mediaType: 'application/pdf',
-    pageNumber: page.pageNumber,
+const documents: TextDocument[] = [
+  {
+    id: 'manuals/setup.pdf#page=1',
+    text: 'Text returned by the application-selected parser.',
+    metadata: {
+      source: 'manuals/setup.pdf',
+      mediaType: 'application/pdf',
+      pageNumber: 1,
+    },
   },
-}))
+]
 ```
 
-Image-only PDFs need OCR before they can be indexed. Treat PDF bytes as untrusted input and apply size limits, malware scanning, timeouts, and cancellation outside the parser.
+Image-only PDFs need OCR before they can be indexed. Treat source bytes and parsed text as untrusted
+input. Apply authorization, size limits, malware scanning, timeouts, and cancellation around the
+application-owned parser. For one-off analysis, a capable provider can instead receive a
+[PDF attachment](/sdk/messages/documents) directly.
 
 ## 3. Chunk normalized documents
 

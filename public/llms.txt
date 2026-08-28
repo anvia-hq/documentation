@@ -19,7 +19,8 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - Use `@anvia/mcp` for MCP SDK v2 clients and transports. Core retains lightweight registration contracts.
 - Use Client Protocol v3 across `@anvia/client`, `@anvia/server`, and `@anvia/react`.
 - Treat `@anvia/react-ui` as strictly headless. Use `@anvia/cli` to copy editable application-owned UI.
-- Install `pdfjs-dist` only in applications that load PDFs; it is an optional Core peer.
+- Parse files or run OCR in application code, then pass normalized text to Core document helpers.
+  Provider adapters may separately support PDF attachments for model input.
 - Treat Anvia package versions independently and verify declared dependency ranges instead of
   requiring one synchronized version number.
 - Keep retrieval permissions, tool authorization, interaction continuations, and public-event projection on the server.

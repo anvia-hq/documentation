@@ -34,36 +34,42 @@ test/fixtures/  test/analyze.test.ts
 pnpm add @anvia/core @anvia/openai zod
 ```
 
+Add the parser or OCR client chosen by the application when local document parsing is required.
+
 ## Load application-approved files
 
 ```ts
 // src/ingestion/load.ts
 import { readFile } from "node:fs/promises";
-import { extractPdfText } from "@anvia/core/documents";
 
-export async function loadDocument(path: string, mime: string) {
-  const data = await readFile(path);
-  if (mime === "application/pdf") {
-    const { pages } = await extractPdfText({ data });
-    return pages.map((page) => ({
-      id: `${path}#page=${page.pageNumber}`,
-      text: page.text,
-      metadata: { source: path, pageNumber: page.pageNumber },
-    }));
-  }
-  if (mime === "text/plain") {
-    return [{
-      id: path,
-      text: data.toString("utf8"),
-      metadata: { source: path },
-    }];
-  }
-  throw new Error("Unsupported document type");
+type ParsedPage = { pageNumber: number; text: string };
+type PdfParser = (data: Uint8Array) => Promise<readonly ParsedPage[]>;
+
+export function createDocumentLoader(parsePdf: PdfParser) {
+  return async function loadDocument(path: string, mime: string) {
+    const data = await readFile(path);
+    if (mime === "application/pdf") {
+      const pages = await parsePdf(data);
+      return pages.map((page) => ({
+        id: `${path}#page=${page.pageNumber}`,
+        text: page.text,
+        metadata: { source: path, pageNumber: page.pageNumber },
+      }));
+    }
+    if (mime === "text/plain") {
+      return [{
+        id: path,
+        text: data.toString("utf8"),
+        metadata: { source: path },
+      }];
+    }
+    throw new Error("Unsupported document type");
+  };
 }
 ```
 
-Only pass a server-resolved quarantine path. Do not let a request choose an arbitrary filesystem
-path.
+`parsePdf` is application-owned and can call a local parser or an OCR service. Only pass a
+server-resolved quarantine path. Do not let a request choose an arbitrary filesystem path.
 
 ## Extract a typed record
 
@@ -114,8 +120,8 @@ model response fails schema validation; approval is a separate authenticated act
 ## Security and ownership
 
 The application owns upload scanning, tenancy, encryption, retention, deletion, reviewer roles,
-and the source-of-truth record. PDF extraction is not a sandbox or malware scanner. Keep originals,
-extracted text, and model drafts under the same access policy.
+and the source-of-truth record. Document parsing is not a sandbox or malware scanner. Keep originals,
+parsed text, and model drafts under the same access policy.
 
 ## Production changes and tests
 

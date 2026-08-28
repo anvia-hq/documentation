@@ -16,3 +16,8 @@ npx @anvia/memory-drizzle init --schema src/db/schema.ts --write
 Use `--append-to-schema` to append a marked block to the existing file. The CLI refuses conflicting exports and existing generated output; `--force` replaces only recognized generated files or marker blocks. Review the result before running Drizzle Kit.
 
 The runtime never applies DDL. Include the generated file in `drizzle.config.ts`, generate a migration, and deploy it before the application. See the [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-drizzle/CHANGELOG.md) when refreshing generated schema.
+
+The session table now includes nullable JSONB `compactionState`, mapped to `compaction_state`. It
+stores the latest summary checkpoint and canonical message boundary; compaction does not remove
+covered messages. Generate and deploy the additive column migration before starting code that uses
+checkpoint-based compaction.
