@@ -39,6 +39,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Anvia SDK', link: '/sdk/' },
+      { text: 'Channels', link: '/channels/' },
       { text: 'Examples', link: '/examples/' },
       { text: 'Studio', link: '/studio/' },
       { text: 'Lens', link: '/lens/' },
@@ -1363,6 +1364,30 @@ export default defineConfig({
             { text: 'Full-stack applications', link: withDocsBase('/llms-apps.txt') },
             { text: 'Evaluations and observability', link: withDocsBase('/llms-evals.txt') },
             { text: 'RAG and retrieval', link: withDocsBase('/llms-rag.txt') }
+          ]
+        }
+      ],
+      '/channels/': [
+        {
+          text: 'Get Started',
+          items: [
+            { text: 'Introduction', link: '/channels/' },
+            { text: 'End-to-end guide', link: '/channels/end-to-end' }
+          ]
+        },
+        {
+          text: 'Core packages',
+          items: [
+            { text: '@anvia/channel', link: '/channels/channel' },
+            { text: '@anvia/channel-agent', link: '/channels/channel-agent' }
+          ]
+        },
+        {
+          text: 'Platform adapters',
+          items: [
+            { text: 'Discord', link: '/channels/discord' },
+            { text: 'Slack', link: '/channels/slack' },
+            { text: 'Telegram', link: '/channels/telegram' }
           ]
         }
       ]

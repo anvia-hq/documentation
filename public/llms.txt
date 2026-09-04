@@ -77,6 +77,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Your first trace](https://docs.anvia.dev/lens/your-first-trace): Capture and inspect runtime telemetry.
 - [Lens observability](https://docs.anvia.dev/lens/observability): Traces, sessions, users, costs, and alerts.
 - [Lens self-hosting](https://docs.anvia.dev/lens/self-hosting/architecture): Self-hosted architecture and operational guidance.
+- [Channels](https://docs.anvia.dev/channels/): Discord, Slack, and Telegram adapters that connect platforms to agents and support proactive delivery.
 - [Build applications](https://docs.anvia.dev/use-cases/build-applications): Connect Anvia runtime behavior to an application.
 - [Observe systems](https://docs.anvia.dev/use-cases/observe-systems): Add runtime observability.
 - [Production operations](https://docs.anvia.dev/use-cases/production): Prepare Anvia-based systems for real users.
