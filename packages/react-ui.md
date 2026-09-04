@@ -83,6 +83,8 @@ Compound components read their controller and item state from context, so the sa
 | `@anvia/react-ui/thread-list` | `ThreadListPrimitive`, `ThreadListItemPrimitive` | Conversation navigation and management actions |
 | `@anvia/react-ui/selection-toolbar` | `SelectionToolbarPrimitive` | Quote and copy actions for selected text |
 | `@anvia/react-ui/stream` | `StreamMarkdown` | Context-free Markdown rendering for app-owned streamed text |
+| `@anvia/react-ui/graph-explorer` | `GraphExplorerPrimitive`, `GraphExplorerNodePrimitive` | Headless graph-explore provider, search, viewport, node list, empty/status parts, refresh, and node expansion |
+| `@anvia/react-ui` | `ContextMeterPrimitive` | Used or remaining model-context display |
 
 ## Common patterns
 

@@ -24,6 +24,7 @@ class RedisVectorClient {
   vectorStore<T, Metadata extends VectorMetadata = VectorMetadata>(
     options: RedisVectorStoreOptions,
   ): RedisVectorStore<T, Metadata>
+  nativeClient(): Promise<RedisClientLike>
   close(): Promise<void>
 }
 ```
@@ -39,6 +40,6 @@ await store.upsert({ documents, providerOptions })
 const results = await store.search({ vector, topK, minScore, filter, providerOptions, abortSignal })
 ```
 
-`filterToRedisQuery(filter, metadataSchema)` converts a supported Anvia filter into a Redis Search query.
+`filterToRedisQuery({ filter, metadataSchema })` converts a supported Anvia filter into a Redis Search query.
 
 Return to the [package guide](/packages/redis).

@@ -26,7 +26,7 @@ class MilvusVectorClient {
 }
 ```
 
-`MilvusVectorClientOptions` accepts an injected `client?: MilvusClientLike`, or `address?: string` and optional `token`. `MilvusVectorStoreOptions` contains `collectionName`, `dimensions`, and optional `metric`. The native `MilvusMetric` values are `'COSINE' | 'L2' | 'IP'`.
+`MilvusVectorClientOptions` accepts an injected `client?: MilvusClientLike`, or `address?: string` and optional `token`. `MilvusVectorStoreOptions` contains `collectionName`, `dimensions`, and optional `metric` taking the core `VectorMetric` values `'cosine' | 'euclidean' | 'dotProduct'` (default `cosine`). The native `MilvusMetric` values `'COSINE' | 'L2' | 'IP'` are the adapter's internal mapping (`euclidean` → `L2`, `dotProduct` → `IP`). `close()` releases a client the adapter created; injected clients are left open.
 
 ## MilvusVectorStore
 

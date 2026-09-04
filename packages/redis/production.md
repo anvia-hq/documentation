@@ -7,6 +7,6 @@
 - Configure Redis persistence and eviction so vector keys are not unexpectedly lost.
 - Monitor memory for vectors, hashes, indexes, and multi-embedding growth.
 
-The adapter-created client is not exposed for explicit close. Lifecycle-managed services should inject one and call the Redis client's shutdown method themselves.
+`RedisVectorClient.close()` quits the adapter-created client, and `nativeClient()` exposes it. Lifecycle-managed services can still inject an already-connected client and own reconnect and shutdown themselves.
 
 No TTL is applied. If retention requires expiration, ensure index consistency and logical-document cleanup are designed together rather than expiring arbitrary chunks.

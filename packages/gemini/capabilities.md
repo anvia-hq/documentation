@@ -4,7 +4,7 @@
 
 | Capability | Factory | Notes |
 | --- | --- | --- |
-| Completion | `completionModel()` | Streaming, tools, structured output, and multimodal messages. |
+| Completion | `completionModel()` | Streaming, tools, tool choice, image and document input, structured output, and reasoning. |
 | Embeddings | `embeddingModel()` | Task type, title, dimensions, and batching. |
 | Native Gemini images | `imageGenerationModel({ api: 'generateContent', modelId })` | Uses `generateContent` and inline image parts. |
 | Imagen images | `imageGenerationModel({ api: 'generateImages', modelId })` | Uses `generateImages`. |

@@ -23,7 +23,7 @@ The adapters do not make every model support every request. Image input, reasoni
 
 ### Chat Completions
 
-`api: 'chat'` selects the Chat Completions adapter. It reports `provider: 'openai-chat'`. The adapter preserves reasoning history used by compatible providers that return fields such as `reasoning_content`.
+`api: 'chat'` selects the Chat Completions adapter. It reports `provider: 'openai'` at the model level, the same provider label as the Responses adapter. The adapter accepts no document input (`documentInput: false`); document parts require the Responses API. It preserves reasoning history used by compatible providers that return fields such as `reasoning_content`.
 
 ## Embedding guarantees
 

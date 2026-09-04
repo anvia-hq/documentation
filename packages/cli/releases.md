@@ -1,9 +1,11 @@
 # Releases
 
-The current stable release is `@anvia/cli` **1.0.2**.
+The current stable release is `@anvia/cli` **1.1.0**.
 
 | Version | Summary |
 | --- | --- |
+| `1.0.2` | Maintenance release; the changelog records no package-specific changes. |
+| `1.0.1` | Maintenance release; the changelog records no package-specific changes. |
 | `1.0.0` | Added shadcn-backed `init` and `add` commands for editable app-owned chat components built on `@anvia/react-ui` primitives. |
 
 The first release contains registry items for a complete chat plus independent thread, message,

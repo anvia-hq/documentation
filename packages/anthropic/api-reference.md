@@ -12,6 +12,7 @@ type AnthropicClientOptions =
 type AnthropicCompletionModelOptions = {
   modelId: AnthropicCompletionModelId
   contextLimits?: ModelContextLimits
+  controls?: Controls
 }
 
 class AnthropicClient implements ModelListingClient {
@@ -24,7 +25,8 @@ class AnthropicClient implements ModelListingClient {
 
 All constructors and factories require an options object. Managed credentials and an injected SDK client are mutually exclusive. The completion model ID is explicit; there is no factory default.
 
-`AnthropicCompletionModelHandle` is a `StreamingCompletionModel<unknown>`. It normalizes Messages API responses, stream events, usage, tool calls, documents, images, and reasoning into Anvia completion contracts.
+`AnthropicCompletionModelHandle` is a `StreamingCompletionModel<unknown, Controls>`. It normalizes Messages API responses, stream events, usage, tool calls, documents, images, and reasoning into Anvia completion contracts.
+`completionModel()` accepts an optional `controls` object on both clients. When omitted, controls resolve from the model ID through the exported `AnthropicControlsFor` type, which tiers a typed reasoning-effort control drawn from `ANTHROPIC_REASONING_EFFORTS` (`low`, `medium`, `high`, `xhigh`, `max`): `claude-fable-5`, `claude-mythos-5`, `claude-opus-4-7`, `claude-opus-4-8`, `claude-opus-5`, and `claude-sonnet-5` accept all five efforts; `claude-mythos-preview`, `claude-opus-4-6`, and `claude-sonnet-4-6` accept up to `max`; `claude-opus-4-5` accepts up to `high`; unknown IDs expose no controls. The selected effort is forwarded as `output_config.effort` on the Messages request.
 
 ## Vertex AI client
 
@@ -36,6 +38,7 @@ type AnthropicVertexClientOptions =
 type AnthropicVertexCompletionModelOptions = {
   modelId: AnthropicCompletionModelId
   contextLimits?: ModelContextLimits
+  controls?: Controls
 }
 
 class AnthropicVertexClient {

@@ -1,9 +1,11 @@
 # Releases
 
-Current stable release: `1.0.3`. The entries below preserve notable v0 history.
+Current stable release: `1.1.1`. The entries below preserve notable v0 history.
 
 Notable releases include:
 
+- `1.1.1` refreshed runtime dependencies alongside the Core 1.1.1 update.
+- `1.0.10` through `1.0.4` refreshed runtime dependencies alongside the Core 1.0.x updates.
 - `0.2.5` refreshed runtime dependencies across provider, vector, observability, UI, and Studio packages.
 - `0.2.4` simplified optional query and result construction without behavior changes.
 - `0.2.3` aligned with refreshed core and schema-first pipeline work.

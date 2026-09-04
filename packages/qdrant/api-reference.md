@@ -5,6 +5,7 @@ All public symbols are exported from `@anvia/qdrant`.
 ```ts
 import {
   QdrantHybridVectorStore,
+  QdrantTenant,
   QdrantVectorClient,
   QdrantVectorStore,
   filterToQdrantFilter,
@@ -29,12 +30,25 @@ class QdrantVectorClient {
     options: QdrantVectorStoreOptions,
   ): QdrantVectorStore<T, Metadata> | QdrantHybridVectorStore<T, Metadata>
   close(): Promise<void>
+  tenant(tenantId: string): QdrantTenant
 }
 ```
 
 `QdrantVectorClientOptions` accepts an injected `client?: QdrantClientLike`, or the official Qdrant client parameters such as `url` and `apiKey` directly.
 
 Dense store options contain `collectionName`, `dimensions`, optional `metric` and `denseVectorName`, and optional `mode: 'dense'`. Hybrid options require `mode: 'hybrid'` and may add `sparseVectorName`.
+
+## Tenants
+
+```ts
+const tenant = client.tenant(tenantId)
+const scoped = tenant.vectorStore({ collectionName, dimensions })
+```
+
+`client.tenant(tenantId)` returns a `QdrantTenant` whose stores scope points under the sha256 digest of
+`tenantId`: physical point IDs derive from the namespace-prefixed logical ID and payloads carry a
+namespace marker, so `upsert`, `search`, `inspect`, `delete`, and `get` on a tenant store only touch its
+own scope. `tenant.namespace` exposes the derived namespace.
 
 ## Stores
 

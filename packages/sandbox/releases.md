@@ -1,10 +1,20 @@
 # Releases
 
-The current stable release is `@anvia/sandbox` **1.0.3**. The entries below preserve notable v0 history.
+The current stable release is `@anvia/sandbox` **1.1.0**. The entries below preserve notable v0 history.
 
 | Version | Summary |
 | --- | --- |
 | `1.0.0` | Replaced implicit session-style lifecycle with explicit image pull, sandbox create/stop/resume/destroy handles; added resource, security, shared-memory, inspection, async-disposal, and browser-runtime support. Studio sandbox exposure is now explicit registration. |
+| `1.0.10` | Updated the Core dependency to `1.0.10`. |
+| `1.0.9` | Updated the Core dependency to `1.0.9`. |
+| `1.0.8` | Updated the Core dependency to `1.0.8`. |
+| `1.0.7` | Updated the Core dependency to `1.0.7`. |
+| `1.0.6` | Updated the Core dependency to `1.0.6`. |
+| `1.0.5` | Updated the Core dependency to `1.0.5`. |
+| `1.0.4` | Updated the Core dependency to `1.0.4`. |
+| `1.0.3` | Updated the Core dependency to `1.0.3`. |
+| `1.0.2` | Updated the Core dependency to `1.0.2`. |
+| `1.0.1` | Updated the Core dependency to `1.0.1`. |
 | `1.0.0-rc.9` | Synchronized Sandbox with the Anvia 1.0 release-candidate train. |
 | `0.6.0` | Added bounded line pagination to session and `read_file` APIs, including continuation metadata and safe default line/byte limits. |
 | `0.5.0` | Added the interactive/scriptable `create-image` CLI for composed Node, Bun, Python, artifact, Playwright, apt, npm, and uv images. |

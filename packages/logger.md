@@ -32,7 +32,7 @@ Use `createPinoLogger` when the application already uses Pino or needs a custom 
 
 ## Capture policy
 
-The observer keeps request bodies, responses, model output, and tool results out of logs unless their corresponding options are enabled. Treat those flags as a data-governance decision: payloads can contain prompts, secrets, or personal data.
+The run-end record always includes the final assistant text. Full payloads — the typed structured output, model requests and responses, and tool results — stay out of logs unless their capture flags are enabled. Treat those flags as a data-governance decision: payloads can contain prompts, secrets, or personal data.
 
 ## Features
 

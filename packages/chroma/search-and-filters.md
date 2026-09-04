@@ -14,4 +14,4 @@ const results = await retrieveDocuments({
 
 `filterToChromaWhere` maps `eq`, `gt`, `lt`, `and`, and `or` to Chroma `$eq`, `$gt`, `$lt`, `$and`, and `$or` expressions. Metadata must use values accepted by both Anvia's vector metadata contract and Chroma.
 
-`searchIds()` avoids returning reconstructed documents. `asTool()` exposes the same index to an agent. Filters narrow retrieval; authorize tenant and document access separately.
+To expose retrieval as an agent tool, build one with `createVectorSearchTool()` from `@anvia/core/vector-store`. Filters narrow retrieval; authorize tenant and document access separately.

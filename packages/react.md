@@ -5,8 +5,10 @@
 ## Install
 
 ```sh
-pnpm add @anvia/client @anvia/react react
+pnpm add @anvia/client @anvia/core @anvia/react react
 ```
+
+`@anvia/core` is a required peer dependency. `@anvia/graph` is an optional peer consumed by the `@anvia/react/graph-explorer` entry point.
 
 ## Build a chat client
 
@@ -49,6 +51,7 @@ The hook converts local `UIMessage` values into core messages, sends a `ClientSt
 
 - `useChat`: messages, events, send/regenerate/stop/reset, suggestions, usage, stream resume, and pending agent interactions.
 - `useCompletion`: prompt and accumulated completion state over a required client transport.
+- `useGraphExplorer` from `@anvia/react/graph-explorer`: graph exploration state over an application-provided `explore` callback, including nodes, relationships, selection, query matching, expansion, and refresh.
 - `useSmoothStreamText` and `useSmoothStreamItems`: display-only pacing for streamed text.
 - `createHttpClientTransport` and `createDirectClientTransport` from `@anvia/client`: HTTP and in-process protocol boundaries.
 

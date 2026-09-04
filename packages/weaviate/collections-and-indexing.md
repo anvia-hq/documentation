@@ -4,6 +4,6 @@ Automatic creation disables vectorizers, applies the selected vector distance, a
 
 For production, create the collection with infrastructure automation, including replication, multi-tenancy mode, vector-index settings, and filterable properties, then call `validate()` at startup.
 
-`vectorSize` is accepted by the connection options but the current adapter does not apply or validate it during collection creation. Ensure embedded vectors match the collection through deployment tests.
+The store's `dimensions` option is enforced locally: construction rejects non-positive values, `upsert()` rejects documents whose embedding vectors do not match the configured dimension, and `search()` rejects query vectors of the wrong length.
 
 Metadata keys beginning with `__anvia_` are rejected. Deterministic object UUIDs help identify physical embeddings, but corpus replacement still needs explicit deletion for IDs no longer produced.

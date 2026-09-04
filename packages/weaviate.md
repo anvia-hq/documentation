@@ -52,7 +52,7 @@ const results = await retrieveDocuments({
 });
 ```
 
-The default client uses `WEAVIATE_HOST` or `localhost:8080` and `WEAVIATE_GRPC_HOST` or `localhost:50051`, with insecure HTTP and gRPC connections. Inject a configured client for any remote or protected deployment.
+Without an injected client, the HTTP host comes from `WEAVIATE_HOST` or `localhost` and the gRPC host from `WEAVIATE_GRPC_HOST` or `localhost`; ports come from `WEAVIATE_HTTP_PORT` and `WEAVIATE_GRPC_PORT`, defaulting to 8080 and 50051 and validated as integers from 1 to 65535. HTTP and gRPC connections are insecure by default. Inject a configured client for any remote or protected deployment.
 
 ## Collection ownership
 

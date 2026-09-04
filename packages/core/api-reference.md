@@ -40,7 +40,7 @@ agent.compactMemory({ session, abortSignal? }): Promise<MemoryCompactionResult>
 agent.asTool(options): Tool
 ```
 
-Run options include `maxTurns`, `retries`, `abortSignal`, `lifecycle`, `guardrails`, `toolConcurrency`, `middlewares`, and `trace`.
+Run options include `maxTurns`, `retries`, `abortSignal`, `lifecycle`, `guardrails`, `toolConcurrency`, `middlewares`, `controls`, and `trace`.
 
 `AgentOutcome` is a discriminated union. All branches share `runId`, `text`, `usage`, `messages`,
 and optional finish, context, trace, guardrail, source, provider-tool, memory-compaction, and resume
@@ -364,7 +364,7 @@ const pipeline = new Pipeline({
   })
 ```
 
-`Pipeline` is immutable; each composition method returns a new typed pipeline. Public composition methods are `step`, `use`, `parallel`, `agent`, and `extract`.
+`Pipeline` is immutable; each composition method returns a new typed pipeline. Public composition methods are `step`, `compose`, `parallel`, `agent`, and `extract`; `compose({ id, pipeline })` nests another pipeline as a single stage.
 
 ```ts
 const result = await pipeline.run({
@@ -442,11 +442,12 @@ Model, request, response, result, and retry types are exported from `@anvia/core
 
 ## MCP and skills
 
-`@anvia/core/mcp` exports only the lightweight `McpServer`, `McpTool`, and registration types used
-by `Agent`. Connection ownership, transports, discovery, result mapping, and cleanup live in the
-optional [`@anvia/mcp`](/packages/mcp) package.
+`@anvia/core/mcp` exports only `isMcpTool` and the lightweight `McpServer`, `McpTool`, and
+`McpServerInfo` types used by `Agent`. Connection ownership, transports, discovery, result mapping,
+and cleanup live in the optional [`@anvia/mcp`](/packages/mcp) package.
 
-The built-in HTTP transport has an explicit configuration boundary:
+The built-in HTTP transport has an explicit configuration boundary. `McpStreamableHttpTransport` is
+exported from `@anvia/mcp`, not from Core:
 
 ```ts
 type McpStreamableHttpTransport = {

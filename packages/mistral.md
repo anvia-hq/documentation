@@ -5,7 +5,7 @@ Mistral’s provider adapter supplies completion, embeddings, OCR, and model lis
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.0.3` |
+| Version | `1.1.1` |
 | Runtime | ESM, server-side JavaScript |
 | Peer | Matching `@anvia/core` stable release |
 

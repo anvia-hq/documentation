@@ -11,6 +11,7 @@ LANGFUSE_PUBLIC_KEY=pk_...
 LANGFUSE_SECRET_KEY=sk_...
 LANGFUSE_BASE_URL=https://cloud.langfuse.com
 LANGFUSE_TRACING_ENVIRONMENT=production
+LANGFUSE_RELEASE=support-api@1.0.0
 LANGFUSE_SERVICE_NAME=support-api
 ```
 

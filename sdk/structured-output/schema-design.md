@@ -8,7 +8,7 @@ The schema is the contract product code will trust after validation. Design it f
 pnpm add zod
 ```
 
-Anvia requires Zod 4: `@anvia/core` depends on `zod ^4.4.3`, and schema conversion uses `z.toJSONSchema()` and `.meta()`, which are Zod-4-only APIs. Zod 3 is not supported.
+Anvia requires Zod 4: `@anvia/core` depends on `zod ^4.5.4`, and schema conversion uses `z.toJSONSchema()` and `.meta()`, which are Zod-4-only APIs. Zod 3 is not supported.
 
 ```ts
 import { z } from 'zod'

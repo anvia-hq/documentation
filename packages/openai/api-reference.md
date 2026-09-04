@@ -1,12 +1,12 @@
 # `@anvia/openai` API reference
 
-The package exports `OpenAIClient`, model option/handle types, known and extensible model-ID types, media model constants, and the same surface under the `openai` namespace.
+The package exports `OpenAIClient`, model option/handle types, known and extensible model-ID types, media model constants, typed reasoning controls, and the same surface under the `openai` namespace.
 
 ## Client
 
 ```ts
 import type OpenAI from 'openai'
-import type { ModelContextLimits } from '@anvia/core/completion'
+import type { CompletionModelControls, ModelContextLimits } from '@anvia/core/completion'
 
 type OpenAIClientOptions =
   | {
@@ -25,11 +25,15 @@ type OpenAIClientOptions =
 class OpenAIClient {
   constructor(options: OpenAIClientOptions)
 
-  completionModel(options: {
-    modelId: OpenAICompletionModelId
+  completionModel<
+    const ModelId extends OpenAICompletionModelId,
+    const Controls extends CompletionModelControls = OpenAIControlsFor<ModelId>,
+  >(options: {
+    modelId: ModelId
     api: 'responses' | 'chat'
     contextLimits?: ModelContextLimits
-  }): OpenAICompletionModel
+    controls?: Controls
+  }): OpenAICompletionModel<Controls>
 
   embeddingModel(options: {
     modelId: OpenAIEmbeddingModelId
@@ -54,14 +58,15 @@ class OpenAIClient {
 }
 ```
 
-All constructors and factories require one options object. `completionModel()` requires an explicit API; `baseUrl` does not select it. The two client forms are mutually exclusive: either provide managed connection options or inject an initialized OpenAI SDK client.
+All constructors and factories require one options object. `completionModel()` requires an explicit API; `baseUrl` does not select it. Omitting `controls` applies per-model reasoning defaults derived from the model ID (`OpenAIControlsFor`). The two client forms are mutually exclusive: either provide managed connection options or inject an initialized OpenAI SDK client.
 
 ## Model IDs and handles
 
 The package exports known-ID unions and extensible IDs for completion, embedding, image generation, speech generation, and transcription. Factory results are exported as contract-oriented handle types:
 
 ```ts
-type OpenAICompletionModel = StreamingCompletionModel<unknown>
+type OpenAICompletionModel<Controls extends CompletionModelControls = CompletionModelControls> =
+  StreamingCompletionModel<unknown, Controls>
 type OpenAIEmbeddingModelHandle = EmbeddingModel
 type OpenAIImageGenerationModelHandle = ImageGenerationModel<unknown>
 type OpenAISpeechGenerationModelHandle = SpeechGenerationModel<unknown>
@@ -76,8 +81,14 @@ Known IDs provide autocomplete while `ModelId<Known>` still permits provider or 
 import {
   DALL_E_2,
   DALL_E_3,
+  GPT_4O_MINI_TRANSCRIBE,
+  GPT_4O_MINI_TTS,
+  GPT_4O_TRANSCRIBE,
+  GPT_4O_TRANSCRIBE_DIARIZE,
   GPT_IMAGE_1,
   GPT_IMAGE_2,
+  GPT_TRANSCRIBE,
+  OPENAI_REASONING_EFFORTS,
   TTS_1,
   TTS_1_HD,
   WHISPER_1,
@@ -86,3 +97,5 @@ import {
 ```
 
 `openai` contains the same client, types, and constants as the root entry point. The package has no public subpath exports.
+
+`OPENAI_REASONING_EFFORTS` enumerates every accepted reasoning effort (`none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`). `OpenAIControlsFor`, `OpenAIReasoningControls`, and `OpenAIReasoningEffort` type the per-model controls surface; `OpenAICompletionModelOptions` mirrors the `completionModel()` options.

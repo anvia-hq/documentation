@@ -74,7 +74,7 @@ The model, credentials, business data, permissions, storage, and deployment rema
 | Integration contracts | `@anvia/core/mcp`, `@anvia/core/skills`, `@anvia/core/observability` | MCP registration types, reusable instructions, and run telemetry; MCP connections live in `@anvia/mcp` |
 | Evaluation | `@anvia/core/evals` | Typed evaluation suites, metrics, reporters, and CLI output |
 
-The root `@anvia/core` entry point re-exports the most common agent, completion, tool, memory, guardrail, lifecycle, and UI-stream APIs. Prefer a capability subpath when it makes ownership clearer or when the symbol is not available from the root.
+The root `@anvia/core` entry point re-exports the most common agent, completion, tool, memory, guardrail, lifecycle, and semantic run/stream event APIs. Prefer a capability subpath when it makes ownership clearer or when the symbol is not available from the root.
 
 ## Common patterns
 
@@ -84,7 +84,7 @@ Create provider clients near the server boundary, then pass their completion, em
 
 ### Use direct completions for one model call
 
-Choose `generateCompletion` or `generateCompletion` when a workflow does not need agent turns or tool execution. See [Completions](/sdk/completions) and [Structured output](/sdk/structured-output).
+Choose `generateCompletion` or `streamCompletion` when a workflow does not need agent turns or tool execution. See [Completions](/sdk/completions) and [Structured output](/sdk/structured-output).
 
 ### Keep persistence behind contracts
 

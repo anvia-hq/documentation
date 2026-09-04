@@ -39,7 +39,7 @@ const storeClient = new MilvusVectorClient({});
 const store = storeClient.vectorStore({
     collectionName: 'support_docs',
     dimensions: 1536,
-    metric: 'COSINE'
+    metric: 'cosine'
 });
 await store.ensure();
 await store.upsert({

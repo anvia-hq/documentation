@@ -5,7 +5,7 @@ Grok’s provider adapter connects Anvia to xAI completions, provider-executed s
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.0.3` |
+| Version | `1.1.1` |
 | Runtime | ESM, server-side JavaScript with `fetch` |
 | Peer | Matching `@anvia/core` stable release |
 
@@ -81,7 +81,7 @@ const image = await grok.imageGenerationModel({ modelId: 'grok-imagine-image-qua
 console.log(image.images[0].data.byteLength)
 ```
 
-Supported width/height ratios map to xAI aspect ratios; unsupported ratios become `auto`. An explicit `providerOptions.aspect_ratio` takes precedence.
+Supported width/height ratios map to xAI aspect ratios; unsupported ratios become `auto`. The computed `aspect_ratio` always wins: the adapter spreads `providerOptions` first and then writes `aspect_ratio` from `width` and `height`, so an explicit `providerOptions.aspect_ratio` is overwritten.
 
 ## Compatibility
 

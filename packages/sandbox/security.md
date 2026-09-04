@@ -24,6 +24,8 @@ const sandbox = await client.createSandbox({
 })
 ```
 
+`resources.sharedMemoryMb` sizes the container's private `/dev/shm` in MB (`--shm-size`); `security.addCapabilities` adds named Linux capabilities (`--cap-add`) when the default `--cap-drop ALL` is too strict; `security.seccompProfile: { type: 'path', path }` applies a seccomp profile from an absolute host path (`--security-opt seccomp=`). Values are validated: `sharedMemoryMb` must be a positive integer, capability arrays must not contain duplicates, and the seccomp path must be absolute. `@anvia/browser` uses these options to keep Chromium's own process sandbox enabled.
+
 Do not mount the Docker socket or sensitive host paths into code that a model can control. Treat access to the Docker daemon itself as privileged host access.
 
 ## Tool policy

@@ -15,6 +15,7 @@ React UI exposes compound component families backed by context from `@anvia/reac
 | Threads | `ThreadListPrimitive`, `ThreadListItemPrimitive` | App-controlled thread navigation and archive/delete actions |
 | Context usage | `ContextMeterPrimitive` | Used or remaining model-context display |
 | Streamed Markdown | `StreamMarkdown` | Context-free rendering for an app-owned growing string |
+| Graph explorer | `GraphExplorerPrimitive`, `GraphExplorerNodePrimitive` | Provider context, search, node list, status and empty states, refresh, and node expansion over a `useGraphExplorer` controller |
 
 ## Headless behavior
 

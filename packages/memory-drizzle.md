@@ -64,13 +64,13 @@ The runtime expects compatible Drizzle table shapes. Changing column semantics i
 
 ## Runtime behavior
 
-- Appends use a Drizzle transaction when the database exposes `transaction`.
-- The default `lock: 'advisory'` acquires a PostgreSQL advisory lock when `execute` is available.
+- Appends require a database exposing `transaction`; the constructor throws `TypeError` without it.
+- The default `lock: 'advisory'` acquires a PostgreSQL advisory lock and requires `execute`; the constructor throws `TypeError` when it is missing.
 - Messages and failed runs are validated and stored by default.
 - The store exposes read-only inspection and compaction interfaces.
 - Default scope contains `sessionId` and `userId`; metadata paths or a custom function can extend it.
 
-For concurrency-sensitive production use, provide a Drizzle database with transaction and execute support. `lock: 'none'` removes the advisory lock and should be paired with an application-level serialization strategy.
+`lock: 'none'` removes the advisory lock and its `execute` requirement, and should be paired with an application-level serialization strategy. The `transaction` requirement applies in every mode.
 
 ## Production patterns
 

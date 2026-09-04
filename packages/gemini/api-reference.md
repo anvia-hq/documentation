@@ -23,6 +23,7 @@ class GeminiClient {
   completionModel(options: {
     modelId: GeminiCompletionModelId
     contextLimits?: ModelContextLimits
+    controls?: Controls
   }): GeminiCompletionModelHandle
   embeddingModel(options: GeminiEmbeddingModelOptions): GeminiEmbeddingModelHandle
   imageGenerationModel(
@@ -38,6 +39,7 @@ class GeminiClient {
 ```
 
 API-key, Vertex AI, and injected-client modes are mutually exclusive. All model factories require an options object and model ID.
+When `controls` is omitted on `completionModel()`, known model IDs receive typed reasoning-effort controls resolved through `geminiControlsForModel` — efforts `minimal`, `low`, `medium`, and `high` (exported as `GEMINI_REASONING_EFFORTS`), tiered per model; unknown IDs expose no controls.
 
 ## Embedding options
 
@@ -57,7 +59,7 @@ type GeminiEmbeddingModelOptions = {
 
 The `api` discriminant selects the provider surface. `generateContent` accepts Gemini image-capable IDs; `generateImages` accepts Imagen IDs. Both return the common `ImageGenerationModel<unknown>` handle.
 
-The package exports `GEMINI_2_5_FLASH_IMAGE`, `GEMINI_3_PRO_IMAGE_PREVIEW`, and `IMAGEN_4_GENERATE` as convenient known IDs.
+The package exports `GEMINI_2_5_FLASH_IMAGE`, `GEMINI_3_1_FLASH_IMAGE`, `GEMINI_3_1_FLASH_LITE_IMAGE`, `GEMINI_3_PRO_IMAGE`, `GEMINI_3_PRO_IMAGE_PREVIEW`, and `IMAGEN_4_GENERATE` as convenient known IDs.
 
 ## Exported types
 

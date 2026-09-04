@@ -7,7 +7,7 @@
 - Exposes canonical PostgreSQL table objects and a replaceable schema object.
 - Supports read-only inspection.
 - Supports atomic summary checkpoints for memory compaction without deleting canonical messages.
-- Uses transactions and, where the database exposes `execute`, advisory locks for scoped writes.
+- Requires transactional writes for every append; uses advisory locks for scoped writes, which require `execute` unless `lock: 'none'`.
 
 The adapter targets PostgreSQL Drizzle schemas; it is not a database-neutral Drizzle adapter. It does not run Drizzle Kit, manage a connection, authenticate tenants, or schedule compaction.
 

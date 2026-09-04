@@ -4,6 +4,7 @@
 
 ```ts
 import { useChat, useCompletion, useSmoothStreamItems, useSmoothStreamText } from '@anvia/react'
+import { useGraphExplorer } from '@anvia/react/graph-explorer'
 import { createHttpClientTransport } from '@anvia/client'
 ```
 
@@ -22,7 +23,7 @@ const chat = useChat({
 
 `transport` is required and follows `ClientTransport<ClientStreamRequest, Data, Metadata>`. Chat status is `'ready' | 'submitted' | 'streaming' | 'waiting' | 'error'`; `waiting` means a suspended interaction is awaiting a response.
 
-The result exposes readonly `messages`, `events`, `contextUsage`, `suggestions`, `status`, `error`, `text`, `streamId`, and `isResuming`, plus:
+The result exposes readonly `messages`, `events`, `runUsage`, `contextUsage`, `suggestions`, `status`, `error`, `text`, `streamId`, and `isResuming`, plus:
 
 ```ts
 chat.setMessages(next)
@@ -42,6 +43,8 @@ await chat.respondToInteraction({
 
 For a structured question, pass `{ type: 'tool-question', answers: [{ questionId, value }] }` as the response. The pending entry contains the complete `AgentInteractionRequest` under `request`.
 
+`runUsage` holds the aggregate `Usage` for the latest run; the hook refreshes it from `run_end` and `error` events while per-message usage stays on each assistant message.
+
 ## `useCompletion`
 
 ```ts
@@ -59,11 +62,38 @@ completion.stop()
 completion.reset()
 ```
 
-The hook also exposes `completion`, `input`, `setInput`, `status`, `error`, `events`, and `contextUsage`.
+The hook also exposes `completion`, `input`, `setInput`, `status`, `error`, `events`, `usage`, and `contextUsage`. `usage` is the `Usage` reported by the latest run and is replaced by each `complete()` call.
 
 ## Stream smoothing
 
 `useSmoothStreamText(content, lifecycle)` paces append-only text. `useSmoothStreamItems(items, { ...lifecycle, adapter })` preserves item ordering while pacing text in keyed items. Both return a `flush()` method.
+
+## `useGraphExplorer`
+
+```ts
+import { useGraphExplorer } from '@anvia/react/graph-explorer'
+
+const explorer = useGraphExplorer({
+  explore,
+  initialResult,
+  initialQuery,
+  searchText,
+})
+```
+
+`explore` is required and matches `GraphExplorer['explore']` from the optional `@anvia/graph` peer. The controller exposes readonly `nodes`, `nodeById`, `relationships`, `truncated`, `selectedNodeId`, `selectedNode`, `query`, `matchedNodeIds`, and `error`, with `status` of `'idle' | 'loading' | 'ready' | 'error'`, plus:
+
+```ts
+await explorer.explore({ mode: 'overview' })
+await explorer.expandNode(nodeId, options)
+await explorer.refresh()
+explorer.selectNode(nodeId)
+explorer.setQuery(query)
+explorer.stop()
+explorer.reset()
+```
+
+Overview results replace the current graph; `expand` results merge by node and relationship ID. Starting a request aborts the previous request, `refresh()` repeats the latest overview with a fresh abort signal, and `expandNode()` inherits the latest successful overview's filters and limits (`nodeTypes`, `relationships`, `includeProvenance`, `maxNodes`, `maxRelationships`) unless overridden. `matchedNodeIds` matches `query` against `searchText` output for local search. The entry point also exports `mergeGraphExploreResults()` and `graphExplorerNodeMatches()`, and the `GraphExplorerController`, `GraphExplorerExpandNodeOptions`, `GraphExplorerStatus`, and `UseGraphExplorerOptions` types.
 
 ## Related client API
 

@@ -40,7 +40,7 @@ const { documents } = await embedDocuments({
 const storeClient = new ChromaVectorClient({});
 const store = storeClient.vectorStore({
     collectionName: 'support_docs',
-    dimensions: embeddings.dimensions!
+    dimensions: 1536
 });
 await store.ensure();
 await store.upsert({
@@ -54,11 +54,11 @@ const results = await retrieveDocuments({
 });
 ```
 
-The index also implements `searchIds()` and `asTool()`. See [Vector stores](/sdk/knowledges/vector-stores) and [Search tools](/sdk/knowledges/search-tools).
+The store implements the SDK's `VectorStore` interface: `ensure()`, `validate()`, `upsert()`, and `search()`. To expose retrieval as an agent tool, build one with `createVectorSearchTool()` from `@anvia/core/vector-store`. See [Vector stores](/sdk/knowledges/vector-stores) and [Search tools](/sdk/knowledges/search-tools).
 
 ## Collection ownership
 
-`ensure()` gets or creates the collection. It supplies `embeddingFunction: null` because Anvia writes precomputed embeddings and defaults collection metadata to cosine space. `validate()` only checks an existing collection.
+`ensure()` gets or creates the collection. It supplies `embeddingFunction: null` because Anvia writes precomputed embeddings, and unless the store was created with a custom `configuration`, it requests an HNSW index in the store's distance space (cosine by default). `validate()` only checks an existing collection.
 
 For production, provision the collection with your infrastructure workflow and use:
 
@@ -68,7 +68,7 @@ const storeClient = new ChromaVectorClient({
 });
 const store = storeClient.vectorStore({
     collectionName: 'support_docs',
-    dimensions: embeddings.dimensions!
+    dimensions: 1536
 });
 await store.validate();
 ```

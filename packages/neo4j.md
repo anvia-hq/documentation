@@ -20,6 +20,15 @@ Both modes require an explicit graph schema and explicit retrieval, traversal, a
 Use `defineGraphSchema()` for portable applications. `defineNeo4jGraphSchema()` remains available as
 a compatibility API.
 
+## Tenant namespaces
+
+`client.tenant(tenantId)` returns a `Neo4jTenant` handle scoped to the deterministic sha256
+namespace of the tenant ID. Its `managedKnowledgeGraph()` provisions the same labels, constraints,
+and indexes as a client-level registration, and stamps a `__anvia_namespace` property on every
+node and relationship so vector search, full-text search, traversal, evidence, and exploration only
+ever see that tenant's rows. Tenant IDs are hashed before they reach a resource name, so shared
+deployments never construct names from user input.
+
 ## Core flow
 
 ```text

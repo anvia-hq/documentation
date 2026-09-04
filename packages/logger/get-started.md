@@ -43,7 +43,7 @@ For local development, replace `createPinoLogger` with `createConsoleLogger`. Bo
 
 ## Choose what to capture
 
-Payload capture is off by default:
+Full payload capture is off by default; the run-end record always includes the final assistant text:
 
 ```ts
 const observer = createLoggerObserver({
@@ -55,7 +55,7 @@ const observer = createLoggerObserver({
 })
 ```
 
-Enable a field only after deciding whether prompts, tool data, model responses, or personal information may enter your logging system.
+Enable a flag only after deciding whether prompts, tool data, model responses, typed output, or personal information may enter your logging system.
 
 ## Next
 

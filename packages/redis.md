@@ -57,7 +57,7 @@ Without an injected client, the adapter connects to `REDIS_URL` or `redis://loca
 
 ## Index ownership
 
-By default, `connect()` checks the index and creates a hash-backed HNSW index when missing. The default key prefix is `anvia:<indexName>:` and the default distance is `COSINE`. The vector field uses `FLOAT32` with the configured dimension.
+By default, `ensure()` checks the index with `FT.INFO` and creates a hash-backed HNSW index when missing. The default key prefix is `anvia:<indexName>:` and the default distance is `COSINE`. The vector field uses `FLOAT32` with the configured dimension.
 
 For production, create and tune the search index through deployment automation, then call `validate()`. Keep `indexName`, prefix, dimension, distance, and field layout consistent with the adapter.
 

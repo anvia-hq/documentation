@@ -17,7 +17,7 @@ Package pages summarize these boundaries, while the package manifest remains the
 ## Stable versions
 
 Each package publishes stable releases through its own npm `latest` tag. As of the current
-documentation baseline, Core is `1.0.3`, Studio is `1.0.5`, and the graph packages are `1.0.4`;
+documentation baseline, Core is `1.1.0`, Studio is `1.1.0`, and the graph packages are `1.1.0`;
 other packages can have different versions. Check the package's release page or npm metadata rather
 than assuming one repository-wide version.
 
@@ -26,9 +26,9 @@ Pin exact versions in production environments when upgrades require deliberate r
 ```json
 {
   "dependencies": {
-    "@anvia/core": "1.0.3",
-    "@anvia/openai": "1.0.3",
-    "@anvia/studio": "1.0.5"
+    "@anvia/core": "1.1.0",
+    "@anvia/openai": "1.1.0",
+    "@anvia/studio": "1.1.0"
   }
 }
 ```
@@ -51,6 +51,7 @@ Some adapters require a specific Node.js version, browser runtime, native depend
 - `@anvia/mcp` requires Node.js 20 or newer and pins MCP protocol `2026-07-28` by default;
 - `@anvia/cli` requires Node.js 20.18.1 or newer and an existing Next.js or Vite application;
 - Core document helpers operate on application-normalized text and do not require a file-parser peer;
+- applications must use Zod 4: `@anvia/core` depends on `zod ^4.5.4`, and schema conversion uses Zod-4-only APIs such as `z.toJSONSchema`;
 - observability adapters require credentials and network access to their backend.
 
 ## Public API boundary

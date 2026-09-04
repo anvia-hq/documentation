@@ -9,9 +9,7 @@ pnpm add @anvia/core @anvia/redis redis
 ```ts
 import { retrieveDocuments } from '@anvia/core/vector-store';
 import { RedisVectorClient } from '@anvia/redis';
-const storeClient = new RedisVectorClient({
-    client
-});
+const storeClient = new RedisVectorClient({});
 const store = storeClient.vectorStore({
     indexName: 'support_docs',
     keyPrefix: 'knowledge:support:',

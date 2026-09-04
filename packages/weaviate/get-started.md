@@ -7,9 +7,7 @@ pnpm add @anvia/core @anvia/weaviate weaviate-client
 ```ts
 import { retrieveDocuments } from '@anvia/core/vector-store';
 import { WeaviateVectorClient } from '@anvia/weaviate';
-const storeClient = new WeaviateVectorClient({
-    client
-});
+const storeClient = new WeaviateVectorClient({});
 const store = storeClient.vectorStore({
     collectionName: 'SupportDocs',
     dimensions: 1536,

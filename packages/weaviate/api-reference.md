@@ -24,6 +24,7 @@ class WeaviateVectorClient {
   vectorStore<T, Metadata extends VectorMetadata = VectorMetadata>(
     options: WeaviateVectorStoreOptions,
   ): WeaviateVectorStore<T, Metadata>
+  nativeClient(): Promise<WeaviateClientLike>
   close(): Promise<void>
 }
 ```

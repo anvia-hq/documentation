@@ -1,10 +1,22 @@
 # Releases
 
-The current stable release is `@anvia/react` **1.0.3**. The entries below preserve notable v0 protocol milestones.
+The current stable release is `@anvia/react` **1.1.0**. The entries below preserve notable v0 protocol milestones.
 
 | Version | Summary |
 | --- | --- |
 | `1.0.0` | Adopted client protocol v3, persisted interaction-aware resume state, added `waiting` status, and replaced separate approval/question methods with `interactions` plus `respondToInteraction()`. |
+| `1.0.12` | Updated the Core, Client, and Graph dependencies. |
+| `1.0.11` | Added renderer-agnostic graph explorer state and headless primitives for loading, expanding, searching, selecting, refreshing, and rendering bounded `@anvia/graph` exploration results, keeping asynchronous controller ownership in React. |
+| `1.0.10` | Hydrated persisted assistant usage, context usage, and sources into replayed UI messages; exposed aggregate run usage as `useChat().runUsage` and completion usage as `useCompletion().usage`. |
+| `1.0.9` | Updated the Core and Client dependencies to `1.0.9`. |
+| `1.0.8` | Updated the Core and Client dependencies to `1.0.8`. |
+| `1.0.7` | Updated the Core and Client dependencies to `1.0.7`. |
+| `1.0.6` | Updated the Core and Client dependencies to `1.0.6`. |
+| `1.0.5` | Updated the Core and Client dependencies to `1.0.5`. |
+| `1.0.4` | Updated the Core and Client dependencies to `1.0.4`. |
+| `1.0.3` | Updated the Core and Client dependencies to `1.0.3`. |
+| `1.0.2` | Updated the Core and Client dependencies to `1.0.2`. |
+| `1.0.1` | Updated the Core and Client dependencies to `1.0.1`. |
 | `1.0.0-rc.9` | Synchronized React with the Anvia 1.0 release-candidate train. |
 | `0.11.5` | Updated the Core dependency to `0.26.0`. |
 | `0.11.4` | Updated the Core dependency to `0.25.1`. |

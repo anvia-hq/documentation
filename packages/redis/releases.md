@@ -1,9 +1,11 @@
 # Releases
 
-Current stable release: `1.0.3`. The entries below preserve notable v0 history.
+Current stable release: `1.1.1`. The entries below preserve notable v0 history.
 
 Notable releases include:
 
+- `1.1.1` refreshed runtime dependencies alongside the Core 1.1.1 update.
+- `1.0.10` through `1.0.4` refreshed runtime dependencies alongside the Core 1.0.x updates.
 - `0.2.7` refreshed upstream runtime dependencies.
 - `0.2.6` simplified optional query and result construction without behavior changes.
 - `0.2.5` and `0.2.4` updated runtime dependencies.

@@ -307,10 +307,44 @@ type ThreadListController = {
 
 `ThreadListProvider` accepts `{ controller, children? }`. `useThreadList()` returns the controller; `useThreadListItem()` returns `{ thread, active }` inside `ThreadListPrimitive.Items`.
 
+## `@anvia/react-ui/graph-explorer`
+
+```ts
+import {
+  GraphExplorerNodePrimitive,
+  GraphExplorerPrimitive,
+  GraphExplorerProvider,
+  graphExplorerNodeLabel,
+  useGraphExplorerContext,
+  useGraphExplorerNode,
+} from '@anvia/react-ui/graph-explorer'
+```
+
+These primitives compose the controller returned by `useGraphExplorer()` in `@anvia/react/graph-explorer`; they render no graph layout themselves.
+
+`GraphExplorerPrimitive` is a compound object with these public parts:
+
+| Part | Role |
+| --- | --- |
+| `GraphExplorerPrimitive.Root` | Container element for the explorer |
+| `GraphExplorerPrimitive.Search` | Input wired to the controller's `setQuery()` |
+| `GraphExplorerPrimitive.Viewport` | Area for application-owned node rendering |
+| `GraphExplorerPrimitive.Nodes` | Iterates the controller's nodes and establishes each node context; `data-state` is `empty` or `populated` |
+| `GraphExplorerPrimitive.Empty` | Renders when no nodes are loaded and status is not `loading` |
+| `GraphExplorerPrimitive.Status` | Renders status text; `data-state` mirrors the controller status |
+| `GraphExplorerPrimitive.Refresh` | Calls the controller's `refresh()`; disabled while loading |
+
+`GraphExplorerPrimitive.Nodes` accepts `keepMounted` and a render-function child `(node, state)`; without children it renders a default `GraphExplorerNodePrimitive.Root` with `Trigger` per node. `GraphExplorerNodePrimitive` exposes `Root`, `Trigger`, and `Expand`: `Root` accepts an optional `nodeId` (inferred inside `Nodes`) and reflects `data-state` selection plus `data-match`, `data-node-id`, and `data-node-type`; `Trigger` selects the node and defaults to `graphExplorerNodeLabel(node)`; `Expand` calls `expandNode(nodeId, options)` and is disabled while loading.
+
+`GraphExplorerProvider` accepts `{ controller, children? }`. `useGraphExplorerContext()` returns the `GraphExplorerController` and throws outside the provider; `useGraphExplorerNode()` returns the `{ node, selected, matched }` item context.
+
+The entry point also exports the `GraphExplorerController`, `GraphExplorerExpandNodeOptions`, `GraphExplorerNodeContextValue`, `GraphExplorerProviderProps`, `GraphExplorerStatus`, and `GraphExplorerNodeRootProps` types.
+
 ## `@anvia/react-ui/stream`
 
 ```ts
 type StreamMarkdownProps = Omit<PrimitiveProps<'div'>, 'children'> & {
+  'data-state'?: string | undefined
   components?: Components
   content: string
   live?: boolean
@@ -322,8 +356,9 @@ const StreamMarkdown: ForwardRefExoticComponent<StreamMarkdownProps>
 ```
 
 Renders GFM Markdown from an app-owned string. Set `live` only while the final block is growing.
-Supplying `remarkPlugins` replaces the default GFM plugin list. The growing tail exposes
-`data-state="revealing"`; the owning application supplies any transition.
+An explicit `data-state` prop overrides the root attribute, which is `streaming` while `live` and
+`idle` otherwise. Supplying `remarkPlugins` replaces the default GFM plugin list. The growing tail
+exposes `data-state="revealing"`; the owning application supplies any transition.
 
 ## `@anvia/react-ui/shared`
 

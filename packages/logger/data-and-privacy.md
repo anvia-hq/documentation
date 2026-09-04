@@ -4,9 +4,9 @@ Treat agent logs as potentially sensitive even when optional payload capture is 
 
 ## Default capture
 
-By default, `createLoggerObserver()` omits:
+The run-end record always includes the final assistant text. By default, `createLoggerObserver()` omits the full payloads:
 
-- Final agent output.
+- Typed structured output.
 - Full model requests and responses.
 - Tool results and structured results.
 

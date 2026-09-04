@@ -13,10 +13,10 @@ const embeddings = await loadTransformersEmbeddingModel({
 
 | Option | Default | Effect |
 | --- | --- | --- |
-| `modelId` | `Xenova/all-MiniLM-L6-v2` | Model passed to the feature-extraction pipeline. |
+| `modelId` | Required; `DEFAULT_TRANSFORMERS_EMBEDDING_MODEL` exports `Xenova/all-MiniLM-L6-v2` as the recommended default | Model passed to the feature-extraction pipeline. Omitting it or passing an empty value throws a `TypeError`. |
 | `pooling` | `'mean'` | Chooses mean or CLS output pooling. |
 | `normalize` | `true` | Requests normalized vectors from the pipeline. |
-| `maxBatchSize` | `16` | Exposed batch-size metadata, clamped to at least one. |
+| `maxBatchSize` | `16` | Exposed batch-size metadata. Values below 1 (or non-integers) throw `TypeError: maxBatchSize must be a positive safe integer`; the adapter does not clamp. |
 
 The current `embedTexts()` implementation calls the extractor once with the full `texts` array. `maxBatchSize` is part of the Anvia model contract but does not split that call inside this adapter. If strict batching is required, split input in application code or inject a pipeline that owns batching.
 

@@ -7,6 +7,6 @@
 - Define idempotent ingestion or replacement around Milvus `insert`.
 - Monitor index build, compaction, storage, and multi-embedding growth.
 
-The adapter creates a default local client when omitted and does not expose a close method. Applications that own shutdown should inject and release the client themselves.
+The adapter creates a default local client when omitted. `close()` releases adapter-created clients, while injected clients remain open under the application's ownership.
 
 Metadata filters are retrieval constraints, not tenant authorization. Keep access checks in the service layer.

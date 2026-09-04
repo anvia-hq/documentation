@@ -9,4 +9,4 @@
 
 The adapter's SQL upsert makes repeated physical IDs replace stored content and embeddings, but a changed chunking strategy can produce obsolete IDs. Include cleanup in corpus-version rollouts.
 
-When the adapter creates its own pool, the store does not expose it for explicit shutdown; inject one in lifecycle-managed services.
+When the adapter creates its own pool, `PgVectorClient.close()` ends it explicitly; inject a pool in lifecycle-managed services where connection setup and teardown belong to the application.

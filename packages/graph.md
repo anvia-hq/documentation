@@ -40,9 +40,14 @@ registration.
 | `extractGraphFacts()` | Extract schema-valid entities, relationships, and source mentions. |
 | `ingestGraphText()` | Chunk, extract, embed, and replace one raw-text source document. |
 | `ingestGraphDocuments()` | Apply the same workflow to a batch of documents. |
+| `ingestGraphTextToStores()` | Orchestrate the managed-graph write and the vector-store upsert for one document. |
+| `ingestGraphDocumentsToStores()` | Orchestrate both writes for a batch of documents. |
+| `GraphIngestionStageError` | Surface the completed graph-stage receipt when the vector write fails. |
 | `prepareGraphDocuments()` | Prepare graph and reusable vector records without writing them. |
 | `createGraphSearchTool()` | Expose any compatible graph retriever as an Agent tool. |
 | `GraphExplorer` | Read bounded overviews and neighborhoods for visualization. |
+| `resolveGraphExploreOptions()` | Validate and bound the shared explore options. |
+| `@anvia/graph/explore` | Subpath export serving `resolveGraphExploreOptions()` and its resolved option types. |
 
 ## Continue
 

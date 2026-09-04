@@ -4,6 +4,7 @@
 
 - Chat: `useChat` manages UI messages, protocol events, send/regenerate/stop/reset, suggestions, context usage, stream resume, and interaction responses.
 - Completion: `useCompletion` manages input, completion text, events, usage, submit/stop/reset.
+- Graph exploration: `useGraphExplorer` from the `@anvia/react/graph-explorer` entry point manages overview, expansion, and refresh requests over an application-provided `explore` callback, with result merging, selection, and client-side query matching.
 - Smoothing: `useSmoothStreamText` and `useSmoothStreamItems` pace display without mutating stored state.
 - Transport: supply a `ClientTransport` from `@anvia/client`, normally `createHttpClientTransport()`.
 - Resume: the hook stores v3 cursor, message, interaction, and request state; `@anvia/server` and durable storage own replay.

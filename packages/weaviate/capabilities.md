@@ -3,11 +3,11 @@
 - Dense near-vector search using precomputed embeddings.
 - Weaviate v3 collections API integration.
 - Batch object ingestion with deterministic UUIDs.
-- Cosine, dot, L2, Manhattan, or Hamming distance configuration.
+- Cosine, dot, or L2-squared distance configuration.
 - Equality, comparison, `and`, and `or` filter translation.
 - Multi-embedding logical result collapsing.
-- `search`, `searchIds`, and `asTool()` integration.
+- `search` plus `createVectorSearchTool()` tool integration from `@anvia/core/vector-store`.
 
-The adapter creates only baseline Anvia properties. It does not manage collection aliases, replication, tenancy, property indexing, backups, client shutdown, or data deletion.
+The adapter creates only baseline Anvia properties. It does not manage collection aliases, replication, tenancy, property indexing, backups, or data deletion. `close()` closes the adapter-created client; injected clients are left open.
 
-Batch ingestion creates objects; confirm repeated-UUID behavior for your deployed Weaviate version instead of assuming a provider-level update. See [API reference](/packages/weaviate/api-reference).
+Batch ingestion uses replacement semantics: `upsert()` deletes existing objects by `__anvia_document_id` before inserting, so re-upserting a document replaces its physical embeddings. See [API reference](/packages/weaviate/api-reference).

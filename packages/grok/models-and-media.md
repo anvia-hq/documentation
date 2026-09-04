@@ -17,7 +17,7 @@ const chat = new GrokClient({ apiKey }).completionModel({
 
 Choose Responses for provider tools and native source normalization. Choose Chat only for workflows that require that endpoint and do not use provider-executed tools.
 
-`grok-4.5` is the current xAI model ID for coding, agentic tasks, and knowledge work. It supports both Responses and Chat Completions; the v1 examples prefer Responses for web search, X search, code execution, and other provider tools.
+`grok-4.5` remains a supported ID for coding, agentic tasks, and knowledge work, and newer IDs are available: `grok-4.6`, `grok-4.6-latest`, the `grok-4.20` variants (`grok-4.20`, `grok-4.20-non-reasoning`, `grok-4.20-0309-non-reasoning`, `grok-4.20-0309-reasoning`, `grok-4.20-multi-agent-0309`), `grok-4.3` and `grok-4.3-latest`, and `grok-build-0.1`. All support both Responses and Chat Completions; the v1 examples prefer Responses for web search, X search, code execution, and other provider tools.
 
 ## Image generation
 

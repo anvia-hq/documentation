@@ -44,8 +44,9 @@ try {
 Each client pins MCP protocol `2026-07-28` by default. Set `versionNegotiation` on a client that
 must talk to a 2025-era server.
 
-Static HTTP headers are sent only to the exact endpoint, never to OAuth traffic, and are not
-forwarded across redirects. A static `authorization` header cannot be combined with `authProvider`.
+Static HTTP headers are sent only to the exact endpoint, never to OAuth traffic, and an endpoint
+redirect fails the request instead of forwarding credentials. A static `authorization` header cannot
+be combined with `authProvider`.
 
 For a trusted local or private-network HTTP server, set `ssrfProtection: 'disabled'`. Do not derive
 that setting from user or model input. See [MCP transports](/sdk/advanced/mcp/transports) for the

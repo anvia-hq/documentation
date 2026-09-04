@@ -4,7 +4,7 @@
 
 | Capability | Support |
 | --- | --- |
-| Responses completion and streaming | Yes, default |
+| Responses completion and streaming | Yes (`api: 'responses'`) |
 | Chat Completions and streaming | Yes |
 | Local Anvia tools | Yes |
 | xAI provider tools | Responses only |
@@ -17,7 +17,7 @@
 
 ## Completion adapters
 
-The handle created with `api: 'responses'` delegates normalized Responses behavior to the OpenAI adapter and adds Grok provider-tool and source normalization. The `api: 'chat'` handle delegates Chat Completions behavior but does not accept provider-executed tools.
+Every completion model requires an explicit `api: 'responses' | 'chat'`; neither API is a default. The handle created with `api: 'responses'` delegates normalized Responses behavior to the OpenAI adapter and adds Grok provider-tool and source normalization. The `api: 'chat'` handle delegates Chat Completions behavior but does not accept provider-executed tools.
 
 Known Grok IDs expose context limits. Provider-specific request fields can pass through completion `providerOptions`.
 
@@ -27,7 +27,7 @@ Web search, X search, code interpreter, file search, and remote MCP return Anvia
 
 ## Images
 
-The image adapter requests base64 by default and also accepts provider URL output when `fetch` is available. Width and height map to supported xAI ratios; unknown ratios become `auto`, and explicit provider `aspect_ratio` wins.
+The image adapter requests base64 by default and also accepts provider URL output when `fetch` is available. Width and height map to supported xAI ratios; unknown ratios become `auto`. The computed ratio is applied after `providerOptions` are spread, so it overrides an explicit `providerOptions.aspect_ratio`.
 
 ## Speech
 

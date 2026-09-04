@@ -28,7 +28,7 @@ const results = await retrieveDocuments({
 
 Documents must already contain embeddings. The default URI is `~/.anvia/lancedb`; use an explicit durable URI or injected connection in deployed services.
 
-Despite the method name, this adapter writes with LanceDB `table.add()`. Design refresh and deletion workflows before re-ingesting the same corpus.
+Despite the method name, ingestion ends in a LanceDB `table.add()` call. Re-upserting a document ID deletes its previous rows first, so stable IDs update in place; remove documents that leave the corpus with an explicit delete.
 
 ## Next
 

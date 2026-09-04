@@ -7,6 +7,6 @@
 - Monitor vector count, metadata size, request units, and provider limits.
 - Calibrate score thresholds per metric and corpus.
 
-The adapter does not delete superseded chunks, rotate namespaces, or close an injected client. Those are application and infrastructure responsibilities.
+`upsert()` deletes the stored records of each incoming document ID before re-inserting, so changed chunking replaces cleanly within ingested documents. Cross-document and corpus cleanup, namespace rotation, and closing an injected client remain application and infrastructure responsibilities.
 
 Provider filtering is not authorization. Validate tenant access before constructing a query even when every request includes a tenant filter.

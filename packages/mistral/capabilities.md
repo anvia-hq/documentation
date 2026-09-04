@@ -34,4 +34,4 @@ The package does not currently map chat image parts or document file parts, even
 
 ## Errors
 
-Provider SDK failures propagate. The adapter additionally rejects invalid embedding shapes, malformed tool JSON, empty OCR bytes or filenames, upload responses without a file ID, and unusable OCR response fields. Model-listing failures become `ModelListingError`.
+Provider SDK failures propagate. The adapter additionally rejects invalid embedding shapes, malformed tool JSON, empty OCR bytes or filenames, and upload responses without a file ID. Model-listing failures become `ModelListingError`.

@@ -6,7 +6,7 @@
 
 | Factory | Best for | Output |
 | --- | --- | --- |
-| `createConsoleLogger()` | Development and simple runtimes | Native console methods |
+| `createConsoleLogger()` | Development and simple runtimes | One JSON string per record via `console.log` (or a custom writer) |
 | `createPinoLogger()` | Structured production logging | Pino JSON records |
 
 Both support `trace`, `debug`, `info`, `warn`, `error`, `fatal`, and `child(bindings)`.
@@ -15,12 +15,12 @@ Both support `trace`, `debug`, `info`, `warn`, `error`, `fatal`, and `child(bind
 
 The observer records:
 
-- Run start, completion, failure, usage, and message count.
+- Run start, completion (always with the final assistant text), failure, usage, and message count.
 - Generation start, completion, failure, provider, model, usage, and first-delta timing.
 - Tool start, stream events, completion, failure, and skipped status.
 - Trace, user, session, turn, and call identifiers when the runtime provides them.
 
-Tool arguments are recorded on tool start. Full generation requests, responses, final output, and tool results require explicit capture flags.
+Tool arguments are recorded on tool start, and the run-end record always includes the final assistant text. The typed structured output, full generation requests and responses, and tool results require explicit capture flags.
 
 ## Boundaries
 

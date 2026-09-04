@@ -16,4 +16,6 @@ const results = await retrieveDocuments({
 
 Search requests use the collection metric chosen at connection time. Score interpretation therefore depends on Milvus and the metric. Test ranking and thresholds on representative data.
 
-Never pass unrestricted user-supplied metadata keys into a filter, and enforce authorization separately.
+`filterToMilvusExpr` validates filter input before building an expression. Keys must match the identifier pattern `^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$` (letters, digits, and underscores, with dots for nested fields), no dot-separated segment may be a reserved Milvus expression keyword such as `and`, `or`, `in`, `like`, `text_match`, or `phrase_match`, and numeric values must be finite. Since 1.0.10, invalid input throws a descriptive error instead of forwarding attacker-shaped strings to Milvus.
+
+Filters are retrieval constraints, not authorization; keep access checks in the service layer.

@@ -1,8 +1,13 @@
 # Search and filters
 
 ```ts
-import { retrieveDocuments } from "@anvia/core/vector-store";
-import { vectorFilter } from '@anvia/core/vector-store';
+import { retrieveDocuments, vectorFilter } from "@anvia/core/vector-store";
+import { RedisVectorClient } from '@anvia/redis';
+const store = new RedisVectorClient({}).vectorStore({
+    indexName: 'support_docs',
+    dimensions: 1536,
+    metadataSchema: { tenantId: 'tag', revision: 'numeric' }
+});
 const results = await retrieveDocuments({
     store: store,
     model: embeddings,
@@ -12,8 +17,8 @@ const results = await retrieveDocuments({
 });
 ```
 
-`filterToRedisQuery` translates string equality to a quoted field query, booleans to tag values, numbers to exact ranges, comparisons to open numeric ranges, and compounds to RediSearch intersection or union syntax.
+`filterToRedisQuery` translates string equality to RediSearch TAG syntax `@key:{escaped}`; stored tag values carry typed prefixes (`s:` strings, `d:` numbers, `b:1`/`b:0` booleans, `n:` null), so `eq('tenantId', 'acme')` becomes `@tenantId:{s\:acme}`. Numeric equality becomes an exact range and `gt`/`lt` become open numeric ranges. Compounds translate to RediSearch intersection (`and`) or union (`or`) syntax.
 
-Metadata fields must be represented by compatible index fields. Automatic creation defines Anvia's baseline fields; provision additional filterable schema as required by your Redis design.
+Filter fields must be declared in the store's `metadataSchema`. Automatic index creation defines only the reserved `__anvia_document_id` TAG field plus the schema-declared fields, and filtering an undeclared key throws a `TypeError` naming `vectorStore({ metadataSchema })`. Tag fields support equality; numeric fields support equality and ranges, and numeric filters require finite numbers.
 
 Search uses KNN over the configured vector field. Filters narrow candidates but do not authorize documents.

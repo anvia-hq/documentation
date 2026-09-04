@@ -16,6 +16,6 @@ const memory = new DrizzleMemoryStore({
 })
 ```
 
-The schema object must provide `agentMemorySessions`, `agentMemoryMessages`, and `agentMemoryErrors` with the columns expected by the adapter. `lock` defaults to advisory locking where `db.execute` is available; `'none'` opts out.
+The schema object must provide `agentMemorySessions`, `agentMemoryMessages`, and `agentMemoryErrors` with the columns expected by the adapter. `lock` defaults to `advisory`, which requires `db.execute` and throws `TypeError` when it is missing; `'none'` opts out of the advisory lock.
 
-The database object must provide the Drizzle query and insert/delete methods in the public `DrizzleDatabaseLike` contract. Transaction support is used when available. Connection pooling and shutdown remain owned by the application.
+The database object must provide the Drizzle query and insert/delete methods in the public `DrizzleDatabaseLike` contract, including `transaction`; the constructor throws `TypeError` without it. Connection pooling and shutdown remain owned by the application.

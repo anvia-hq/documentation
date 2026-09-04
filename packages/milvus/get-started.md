@@ -24,7 +24,7 @@ const results = await retrieveDocuments({ store, model: embeddings, query, topK:
 
 Documents must already contain dense embeddings. Without a client, the adapter connects to `localhost:19530`; inject a configured client for any remote deployment.
 
-`ensure()` creates and loads a missing collection, while `validate()` requires the existing collection to match the configured dimensions and metric.
+`ensure()` creates and loads a missing collection, while `validate()` requires the collection to exist and its vector field to match the configured `dimensions`, then loads it. The metric is not compared against the existing collection.
 
 ## Next
 

@@ -10,7 +10,11 @@ import {
   type OtelObserverOptions,
   type OtelPipelineObserverOptions,
   type OtelScoreArgs,
+  type OtelScoreDataType,
+  type OtelScoreOutcome,
+  type OtelScorer,
   type OtelScorerOptions,
+  type OtelScoreSource,
 } from '@anvia/otel'
 ```
 

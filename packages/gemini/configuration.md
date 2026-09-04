@@ -26,7 +26,7 @@ const gemini = new GeminiClient({
 })
 ```
 
-Although `project` and `location` are optional in the TypeScript option shape, the Anvia constructor requires non-empty values when it creates the Google client. They may be omitted only when an initialized `client` is supplied.
+`projectId` and `location` are required in the `vertexAi` option shape, and the Anvia constructor rejects blank values for either when it creates the Google client. They are only omitted when an initialized `client` is supplied.
 
 ## Inject a Google client
 

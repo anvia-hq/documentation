@@ -22,6 +22,11 @@ Managed graphs use Memgraph-native vector search, Tantivy text search, and bound
 The application retains ownership of source discovery, credentials, retry policy, authorization,
 and any application-native Cypher.
 
+The orchestrated helpers from `@anvia/graph` work with Memgraph's managed graphs:
+`ingestGraphTextToStores()` and `ingestGraphDocumentsToStores()` call `replaceDocuments()` on a
+`ManagedMemgraphKnowledgeGraph` and then upsert the reusable chunk embeddings into a vector store,
+returning a receipt that records both stages.
+
 ## Continue
 
 - [Get started](/packages/memgraph/get-started)

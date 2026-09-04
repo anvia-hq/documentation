@@ -5,7 +5,7 @@ OpenAI’s provider adapter covers the broadest set of Anvia model contracts: co
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.0.3` |
+| Version | `1.1.1` |
 | Runtime | ESM, server-side JavaScript |
 | Peer | Matching `@anvia/core` stable release |
 
@@ -56,7 +56,7 @@ The required `api` model option selects OpenAI Responses or Chat Completions. A 
 | Transcription | `transcriptionModel({ modelId })` | Explicit model |
 | Model inventory | `listModels()` | Provider model list |
 
-Both completion adapters normalize messages, tool calls, reasoning, usage, structured output, and streaming events into Anvia contracts. The Responses adapter is the native OpenAI path; the Chat adapter supports OpenAI-compatible endpoints and preserves provider-specific reasoning history when required.
+Both completion adapters normalize messages, tool calls, reasoning, usage, structured output, and streaming events into Anvia contracts. The Responses adapter is the native OpenAI path; the Chat adapter supports OpenAI-compatible endpoints and preserves provider-specific reasoning history when required. Reasoning effort is a typed control: `completionModel({ modelId, api, controls })` accepts a per-model effort override, and individual requests can pass `controls` on top of the model defaults (see Configuration).
 
 ## Common patterns
 

@@ -1,11 +1,15 @@
 # Releases
 
-The current stable release is `@anvia/core` **1.0.3**. The source changelog is authoritative; the
+The current stable release is `@anvia/core` **1.1.0**. The source changelog is authoritative; the
 entries below summarize recent v1 changes and preserve notable v0 compatibility milestones.
 
 | Version | Summary |
 | --- | --- |
-| `Unreleased` | Removed Core's local PDF text extraction API and its optional `pdfjs-dist` peer dependency. Applications now select and operate their own parser or OCR service before passing normalized text to Core; provider PDF attachments remain supported. |
+| `1.0.10` | Enforced the exact `maxTurns` boundary in the Agent execution loop; runs now stop after the configured turn limit instead of allowing extra completion attempts. |
+| `1.0.9` | Added typed completion model controls with provider-neutral reasoning effort support, Agent defaults, per-run overrides, Studio selectors and persistence, and normalized observability attributes. |
+| `1.0.8` | Improved evaluation developer experience with structural exact matching, explicit target status, structured invalid errors, per-case timing/usage/cost diagnostics, typed case requirements and CI expectations, progress events, timeouts, abort signals, independent target and metric concurrency, filtering, sharding, fail-fast execution, and rerun case selection. |
+| `1.0.7` | Preserved canonical memory messages during compaction and stored the latest summary as a separate model-context checkpoint; memory loads and inspection remain fully replayable, and compacted model requests receive the summary plus only the unsummarized tail. |
+| `1.0.6` | Removed Core's local PDF text extraction API and its optional `pdfjs-dist` peer dependency. Applications now select and operate their own parser or OCR service before passing normalized text to Core; provider PDF attachments remain supported. |
 | `1.0.3` | Added shared text-document contracts and consistent raw-text ingestion helpers for vector stores and managed knowledge graphs, including reusable graph/vector chunk embeddings. |
 | `1.0.2` | Reported cancelled Agent runs explicitly so observers can finalize them before an observability provider shuts down. |
 | `1.0.1` | Refreshed supported upstream SDK and runtime dependencies and removed the FastEmbed package. |
@@ -41,5 +45,6 @@ entries below summarize recent v1 changes and preserve notable v0 compatibility 
 - Replace Streamable HTTP `requestInit.headers` with the explicit `headers` string record. Do not attempt to override transport-owned protocol fields or combine static `Authorization` with `authProvider`.
 - Re-run type checking and tests for tool calls, streams, memory persistence, and custom observers after a Core upgrade.
 - Check whether new provider-neutral fields require adapter updates even when application code does not use them directly.
+- Pass typed completion model controls through `AgentOptions.controls` or per-run `controls`; Core rejects control values the selected model does not support.
 
 Read the complete [Core changelog](https://github.com/anvia-hq/anvia/blob/main/packages/core/CHANGELOG.md) and verify the installed version with your package manager before applying migration assumptions.

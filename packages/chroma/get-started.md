@@ -21,7 +21,7 @@ const storeClient = new ChromaVectorClient({
 });
 const store = storeClient.vectorStore({
     collectionName: 'support_docs',
-    dimensions: embeddings.dimensions!
+    dimensions: 1536
 });
 await store.validate();
 await store.upsert({

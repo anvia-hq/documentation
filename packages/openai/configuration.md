@@ -42,7 +42,35 @@ const response = await model.completion({
 })
 ```
 
-Only send fields supported by the selected OpenAI API and model. `providerOptions` is a pass-through, not cross-provider validation.
+Only send fields supported by the selected OpenAI API and model. `providerOptions` is a pass-through, not cross-provider validation, and its mapping differs by adapter:
+
+- Responses (`api: 'responses'`) forwards `providerOptions.reasoning` to the request.
+- Chat Completions (`api: 'chat'`) does not read `providerOptions.reasoning`. On that API, `reasoning_effort` is set exclusively from the request's `controls.reasoningEffort`.
+
+## Typed reasoning controls
+
+`completionModel()` accepts a `controls` override typed per model:
+
+```ts
+const model = openai.completionModel({
+  modelId: 'gpt-5.6-sol',
+  api: 'responses',
+  controls: { reasoningEffort: 'xhigh' },
+})
+```
+
+Effort choices are validated per model family through `OpenAIControlsFor`. The exported union `OPENAI_REASONING_EFFORTS` covers `none | minimal | low | medium | high | xhigh | max`. The `gpt-5.6` family allows `none | low | medium | high | xhigh | max` with `medium` as the default; other families expose narrower sets — for example `gpt-5.3` allows `low` to `xhigh`, the `-pro` variants restrict `gpt-5-pro` to `high`, and legacy `o`-series models allow `low | medium | high`. Omitting `controls` applies these model-specific defaults.
+
+Requests override the model-level value. Every `generateCompletion` call and agent run accepts a `controls` object, and `controls.reasoningEffort` wins over both the factory controls and `providerOptions`:
+
+```ts
+const response = await model.completion({
+  chatHistory,
+  controls: { reasoningEffort: 'low' },
+})
+```
+
+On the Responses API a request-level effort is merged into the outgoing `reasoning` object, overriding any `providerOptions.reasoning.effort`. On Chat Completions it is the only source for `reasoning_effort`.
 
 ## Embedding options
 
@@ -59,7 +87,7 @@ const embeddings = openai.embeddingModel({
 
 ## Media options
 
-Image, speech, and transcription requests accept `providerOptions`. These objects are merged into the provider request, so provider fields can override adapter defaults. Use this intentionally and test the resulting media type and output shape.
+Image, speech, and transcription requests accept `providerOptions`. These objects are spread into the provider request first, and the adapter then sets its normalized fields (`model`, `prompt`, and `size` for images), so normalized fields win over matching `providerOptions` keys. Use `providerOptions` for additional provider fields, and test the resulting media type and output shape.
 
 ## Runtime and production
 

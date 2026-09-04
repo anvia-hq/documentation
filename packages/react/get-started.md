@@ -1,7 +1,7 @@
 # Get started
 
 ```sh
-pnpm add @anvia/client @anvia/react react
+pnpm add @anvia/client @anvia/core @anvia/react react
 ```
 
 ```tsx

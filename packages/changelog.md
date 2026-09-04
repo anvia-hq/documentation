@@ -47,6 +47,7 @@ Every published Anvia package keeps its release history beside its implementatio
 - [`@anvia/langfuse`](https://github.com/anvia-hq/anvia/blob/main/packages/observability-langfuse/CHANGELOG.md)
 - [`@anvia/studio`](https://github.com/anvia-hq/anvia/blob/main/packages/tool-studio/CHANGELOG.md)
 - [`@anvia/sandbox`](https://github.com/anvia-hq/anvia/blob/main/packages/tool-sandbox/CHANGELOG.md)
+- [`@anvia/browser`](https://github.com/anvia-hq/anvia/blob/main/packages/tool-browser/CHANGELOG.md)
 
 Packages release independently. Read the changelog for each package you install; a dependency-only
 patch can advance an adapter even when its own public behavior did not change.

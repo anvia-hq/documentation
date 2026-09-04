@@ -37,7 +37,9 @@ const response = await agent.generate({
 })
 ```
 
-Run options override or extend behavior for one execution: turn count, transient completion retries, lifecycle callbacks, guardrails, tool concurrency, middleware, and trace context. Each call creates a fresh run.
+Run options override or extend behavior for one execution: turn count, transient completion retries, typed completion `controls`, lifecycle callbacks, guardrails, tool concurrency, middleware, and trace context. Each call creates a fresh run.
+
+`controls` sets typed completion model controls (such as reasoning effort) for the run. Agents can declare default `controls`; per-run values override the defaults one control at a time.
 
 ## Sessions and persistence
 

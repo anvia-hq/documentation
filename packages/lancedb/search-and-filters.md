@@ -12,8 +12,8 @@ const results = await retrieveDocuments({
 });
 ```
 
-The adapter translates `eq`, `gt`, `lt`, `and`, and `or` to a Lance SQL expression. It escapes string literals, renders booleans as `TRUE` or `FALSE`, and uses `IS NULL` for equality with `null`.
+The adapter runs vector search first and applies the filter afterwards with core's `matchesVectorFilter`, matching `eq`, `gt`, `lt`, `and`, and `or` against each candidate's metadata. When a filter eliminates candidates, the store widens its candidate limit until `topK` results survive, the table runs out of rows, or `minScore` excludes the remainder.
 
-Filter keys become identifiers in the expression, so use application-defined metadata names rather than arbitrary user input. Retrieval filters do not replace authorization.
+Filters match against the metadata stored at ingestion, so give filtered documents metadata up front. Retrieval filters do not replace authorization.
 
-Search scores are `1 - distance` and are meaningful only for the selected distance and corpus.
+Search scores are `1 - distance` for cosine (the default) and `-distance` for L2 and dot distances; they are meaningful only for the selected distance and corpus.

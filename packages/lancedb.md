@@ -62,14 +62,14 @@ If neither `client` nor `uri` is supplied, the adapter connects to `~/.anvia/lan
 
 `ensure()` creates and validates a missing table. Production applications should pre-provision it, call `validate()` at startup, and own indexing, backups, and optimization through their LanceDB deployment process.
 
-The adapter writes reserved `__anvia_` columns for the logical document ID, serialized document, and vector. Metadata keys beginning with `__anvia_` are rejected. Repeated ingestion adds rows through LanceDB's `add()` API; plan deduplication and cleanup around your ingestion workflow.
+The adapter writes reserved `__anvia_` columns for the hashed row ID (`__anvia_id`), logical document ID, serialized document, JSON metadata, and vector. Metadata keys beginning with `__anvia_` are rejected. Upserting a document ID replaces its rows: the adapter deletes existing rows for those IDs before calling LanceDB's `add()`.
 
 ## Production patterns
 
 - Use an explicit durable URI or injected connection; do not depend on a home-directory default in containers.
-- Keep `vectorSize` aligned with the embedding model.
+- Keep `dimensions` aligned with the embedding model; `validate()` checks the stored vector column against it.
 - Provision and tune indexes outside request handling for larger datasets.
-- Use stable source IDs and an intentional replace/delete strategy when refreshing a corpus.
+- Re-upserting stable source IDs replaces their rows; delete document IDs that leave the corpus explicitly.
 - Monitor table growth when documents produce more than one embedding.
 
 Learn the common workflow in [Load documents](/sdk/knowledges/load-documents) and [Vector stores](/sdk/knowledges/vector-stores).

@@ -49,9 +49,11 @@ const result = await pipeline.run({
 console.log(result.trace?.traceId)
 ```
 
-`createOtelPipelineObserver()` emits a Pipeline root span and nested spans for composed, parallel,
-Agent, extraction, and custom stages. `createOtelObserver()` emits the Agent run, model generation,
-tool, child-agent, and error spans below an Agent stage.
+`createOtelPipelineObserver()` emits a Pipeline root span named `pipeline.<name>` (or `pipeline.<id>`
+when the pipeline has no name) and one span per stage named `<kind>.<id>`, where `<kind>` is the
+stage's `PipelineStageKind`: `input`, `step`, `pipeline`, `parallel`, `branch`, `agent`, `extractor`,
+or `output`. `createOtelObserver()` emits the Agent run, model generation, tool, child-agent, and
+error spans below an Agent stage.
 
 If the Pipeline and Agent `primaryTrace` names differ, Core does not propagate the stage parent and
 the Agent observer starts its own trace. The name is application-defined; use the same key for

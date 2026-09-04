@@ -1,11 +1,15 @@
 # Releases
 
-The current stable release is `@anvia/studio` **1.0.5**. The entries below summarize recent v1
+The current stable release is `@anvia/studio` **1.1.1**. The entries below summarize recent v1
 changes and preserve notable v0 Studio milestones.
 
 | Version | Summary |
 | --- | --- |
-| `1.0.5` | Updated to Core 1.0.3 and Graph 1.0.4 for shared raw-text ingestion contracts. |
+| `1.1.1` | Bumped upstream runtime dependencies, aligned zod to 4.5.4 across workspaces, and updated to Core, Graph, React, React UI, Client, and Server 1.1.1. |
+| `1.0.15` | Updated to Core 1.0.10, Client 1.0.11, Graph 1.0.12, React 1.0.12, React UI 1.0.12, and Server 1.0.11. |
+| `1.0.14` | Updated to React 1.0.11 and React UI 1.0.11 (graph-explorer primitives). |
+| `1.0.13` | Updated to Client, React, React UI, and Server 1.0.10. |
+| `1.0.6` | Updated Core, Graph, React, React UI, and Server dependencies through the 1.0.4–1.0.9 train (typed completion model controls, canonical-memory compaction, evals DX). |
 | `1.0.4` | Added a searchable, expandable knowledge-graph explorer for registered Neo4j and Memgraph graphs. |
 | `1.0.3` | Aligned Studio with the Anvia dark-first design system and added independent Messages/Response, Structure, Raw, JSON, and searchable metadata-table trace payload views. |
 | `1.0.2` | Added explicit cancelled-run reporting and graceful draining of active Agent and Pipeline runs before observability providers shut down. |

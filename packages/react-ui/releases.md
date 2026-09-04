@@ -1,11 +1,23 @@
 # Releases
 
-The current stable release is `@anvia/react-ui` **1.0.3**. It is strictly headless and pairs with
+The current stable release is `@anvia/react-ui` **1.1.0**. It is strictly headless and pairs with
 the `@anvia/cli` installer. The entries below preserve notable v0 history.
 
 | Version | Summary |
 | --- | --- |
 | `1.0.0` | Renamed compound exports to explicit `*Primitive` namespaces, removed package CSS and `data-anvia-*`, standardized the semantic DOM contract on ARIA, `data-state`, and `data-role`, and aligned human-input actions with the unified pending-interaction controller. |
+| `1.0.12` | Updated the Client, Graph, and React dependencies. |
+| `1.0.11` | Added renderer composition for bounded `@anvia/graph` exploration results on top of the shared headless explorer primitives. |
+| `1.0.10` | Updated the Client and React dependencies to `1.0.10`. |
+| `1.0.9` | Updated the Client and React dependencies to `1.0.9`. |
+| `1.0.8` | Updated the Client and React dependencies to `1.0.8`. |
+| `1.0.7` | Updated the Client and React dependencies to `1.0.7`. |
+| `1.0.6` | Updated the Client and React dependencies to `1.0.6`. |
+| `1.0.5` | Updated the Client and React dependencies to `1.0.5`. |
+| `1.0.4` | Updated the Client and React dependencies to `1.0.4`. |
+| `1.0.3` | Updated the Client and React dependencies to `1.0.3`. |
+| `1.0.2` | Updated the Client and React dependencies to `1.0.2`. |
+| `1.0.1` | Refreshed upstream SDK and runtime dependencies to their latest supported releases. |
 | `1.0.0-rc.9` | Synchronized the package with the Anvia 1.0 release-candidate train. |
 | `0.7.1` | Published updated upstream runtime dependencies. |
 | `0.7.0` | Added the `ContextMeter` and model-aware active context usage display. |

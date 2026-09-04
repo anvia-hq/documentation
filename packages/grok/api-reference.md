@@ -1,12 +1,12 @@
 # `@anvia/grok` API reference
 
-The package exports `GrokClient`, model IDs and handle types, provider-tool factories, model constants, image helpers, and the same surface under the `grok` namespace. It has no public subpath exports.
+The package exports `GrokClient`, model IDs and handle types, provider-tool factories, model constants, typed reasoning controls, image helpers, and the same surface under the `grok` namespace. It has no public subpath exports.
 
 ## Client
 
 ```ts
 import type OpenAI from 'openai'
-import type { ModelContextLimits } from '@anvia/core/completion'
+import type { CompletionModelControls, ModelContextLimits } from '@anvia/core/completion'
 
 type GrokClientOptions =
   | {
@@ -34,11 +34,15 @@ type GrokClientOptions =
 class GrokClient {
   constructor(options: GrokClientOptions)
 
-  completionModel(options: {
-    modelId: GrokCompletionModelId
+  completionModel<
+    const ModelId extends GrokCompletionModelId,
+    const Controls extends CompletionModelControls = GrokControlsFor<ModelId>,
+  >(options: {
+    modelId: ModelId
     api: 'responses' | 'chat'
     contextLimits?: ModelContextLimits
-  }): GrokCompletionModelHandle
+    controls?: Controls
+  }): GrokCompletionModelHandle<Controls>
 
   imageGenerationModel(options: {
     modelId: GrokImageGenerationModelId
@@ -50,7 +54,7 @@ class GrokClient {
 }
 ```
 
-All model IDs and the completion API are explicit. When injecting an OpenAI SDK client, supply `http` separately because Grok media endpoints also need credentials and transport settings.
+All model IDs and the completion API are explicit. Omitting `controls` applies per-model reasoning defaults derived from the model ID (`GrokControlsFor`). When injecting an OpenAI SDK client, supply `http` separately because Grok media endpoints also need credentials and transport settings.
 
 ## Provider tools
 
@@ -68,7 +72,7 @@ const tools = { webSearch, xSearch, codeInterpreter, fileSearch, mcp }
 
 ## Other exports
 
-The package exports known and extensible completion/image model IDs, the corresponding model handle and option types, `XAI_BASE_URL`, Grok model constants, and:
+The package exports known and extensible completion/image model IDs, the corresponding model handle and option types, `XAI_BASE_URL`, Grok model constants, typed reasoning controls, and:
 
 ```ts
 function imageResponseFromGrok(
@@ -81,3 +85,5 @@ function aspectRatio(width: number, height: number): string
 ```
 
 Use `imageResponseFromGrok()` only when adapting raw xAI image responses yourself; ordinary applications should call the image-generation model contract.
+
+Typed reasoning controls: `GROK_REASONING_EFFORTS` enumerates `none | low | medium | high | xhigh`, and `GrokControlsFor`, `GrokReasoningControls`, and `GrokReasoningEffort` type the per-model surface. The `grok-4.6` family (`grok-4.6`, `grok-4.6-latest`, `grok-4.20-multi-agent-0309`) allows `low` to `xhigh` with `high` as the default; `grok-4.5` allows `low | medium | high`, also defaulting to `high`; `grok-4.3` and `grok-4.3-latest` allow `none` to `high` with no default. Other model IDs expose no reasoning controls.

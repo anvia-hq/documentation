@@ -7,6 +7,6 @@
 - Monitor and back up message and error tables as potentially sensitive data.
 - Test custom schema objects against every package upgrade.
 
-If a custom Drizzle wrapper lacks transactions or raw `execute`, the adapter cannot provide the same concurrency guarantees as a full PostgreSQL Drizzle client. Make that limitation explicit in deployment tests.
+The constructor throws `TypeError` for a wrapper without `transaction`, and for the default `lock: 'advisory'` without raw `execute`. A wrapper lacking `execute` must use `lock: 'none'` and provide its own serialization; make that limitation explicit in deployment tests.
 
 Compaction is exposed by the store but remains opt-in and model-driven at the SDK layer. See [Compaction](/sdk/memory/compaction).

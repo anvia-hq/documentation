@@ -5,7 +5,7 @@
 - Cosine, Euclidean, or dot-product metric configuration.
 - Equality, range, `and`, and `or` metadata filters.
 - Multiple embeddings collapsed into one logical document result.
-- `search`, `searchIds`, and `asTool()` integration.
+- `search` retrieval through the core `VectorStore` interface, with `retrieveDocuments` and `createVectorSearchTool` integration from `@anvia/core/vector-store`.
 
 Metadata keys beginning with `__anvia_` are reserved for document reconstruction.
 

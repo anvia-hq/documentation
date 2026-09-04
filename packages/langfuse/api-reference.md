@@ -19,6 +19,7 @@ const prompts = langfuse.promptClient(promptOptions)
 const datasets = langfuse.datasetClient(datasetOptions)
 
 await langfuse.score({ traceId, name, value })
+langfuse.scoreQueueDepth() // number of scores queued for delivery
 await langfuse.flush()
 await langfuse.close()
 ```

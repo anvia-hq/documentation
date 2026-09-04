@@ -36,7 +36,7 @@ const response = await model.completion({
 })
 ```
 
-Provider-tool factories are preferable to manually authored `providerOptions.tools` because they validate xAI-specific configuration. Legacy raw tools are still merged by the Responses adapter.
+Provider-tool factories are preferable to manually authored `providerOptions.tools` because they validate xAI-specific configuration. Raw `providerOptions.tools` are not merged: the Responses adapter discards them and rebuilds `tools` from the request's canonical `tools` plus provider tools, so the factories always take precedence.
 
 ## Media transport
 

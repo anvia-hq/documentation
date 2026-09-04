@@ -5,7 +5,7 @@ Core is split into focused package entry points. The root export contains common
 | Capability | Entry point | Package responsibility |
 | --- | --- | --- |
 | Agents | `@anvia/core/agent` | Bounded model/tool loops, sessions, typed interactions and continuations, observability, dynamic context, agent-as-tool |
-| Completions | `@anvia/core/completion` | Provider-neutral requests, streams, messages, usage, documents, structured parsing |
+| Completions | `@anvia/core/completion` | Provider-neutral requests, streams, messages, usage, documents, structured parsing, typed model controls |
 | Tools | `@anvia/core/tool` | Zod validation, approvals, structured questions, middleware, dynamic discovery, result normalization |
 | Documents | `@anvia/core/documents` | Shared text-document records and deterministic single/batch text chunking |
 | Lifecycle | `@anvia/core/agent` | Typed run, turn, generation, tool, finish, and error observation |
@@ -13,7 +13,7 @@ Core is split into focused package entry points. The root export contains common
 | Memory | `@anvia/core/memory` | Conversation store, inspection, save policy, durable compaction contracts |
 | Retrieval | `@anvia/core/embeddings`, `@anvia/core/vector-store` | Raw-text ingestion, dense/sparse embedding helpers, filters, in-memory search, search-tool contracts |
 | Pipelines | `@anvia/core/pipeline` | Typed composition, parallel branches, batch execution, graphs, run observers |
-| Extraction | `@anvia/core/extractor` | Agent-backed schema extraction with retry support |
+| Extraction | `@anvia/core/extractor` | Completion-backed schema extraction with retry support |
 | Media | `@anvia/core/image-generation`, `speech-generation`, `transcription` | Provider-neutral helpers and model interfaces |
 | MCP registration and skills | `@anvia/core/mcp`, `@anvia/core/skills` | Lightweight MCP server/tool contracts and validated local skill loading |
 | Observability | `@anvia/core/observability` | Run, generation, tool, trace, and streaming observer contracts |

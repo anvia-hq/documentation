@@ -1,9 +1,20 @@
 # Releases
 
-The current stable release is `@anvia/client` **1.0.3**.
+The current stable release is `@anvia/client` **1.1.0**.
 
 | Version | Summary |
 | --- | --- |
+| `1.0.11` | Updated the Core dependency to `1.0.10`. |
+| `1.0.10` | Hydrated persisted assistant usage, context usage, and sources into replayed UI messages while keeping per-generation usage separate from aggregate run usage, and exposed aggregate run usage as `useChat().runUsage` and completion usage as `useCompletion().usage`. |
+| `1.0.9` | Updated the Core dependency to `1.0.9`. |
+| `1.0.8` | Updated the Core dependency to `1.0.8`. |
+| `1.0.7` | Updated the Core dependency to `1.0.7`. |
+| `1.0.6` | Updated the Core dependency to `1.0.6`. |
+| `1.0.5` | Declared and verified Bun 1.3.14 runtime compatibility for Client and Server streaming. |
+| `1.0.4` | Updated the Core dependency to `1.0.4`. |
+| `1.0.3` | Updated the Core dependency to `1.0.3`. |
+| `1.0.2` | Updated the Core dependency to `1.0.2`. |
+| `1.0.1` | Updated the Core dependency to `1.0.1`. |
 | `1.0.0` | Introduced the `anvia.client.v3` request/event contract, typed `interaction_response` requests, public interaction state, and server-owned continuation boundaries. Added original, compacted, retained, and result token counts to memory-compaction events and terminal metadata. |
 | `1.0.0-rc.9` | Synchronized the framework-neutral client layer with the Anvia 1.0 release-candidate train. |
 
