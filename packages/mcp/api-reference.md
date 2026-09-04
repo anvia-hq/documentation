@@ -22,8 +22,13 @@ class McpClient {
 }
 ```
 
-`McpClientOptions` contains a stable `name`, one transport, and optional tool filtering or prefix
-configuration. Construction is lazy. One connected client owns one remote transport.
+`McpClientOptions` contains a stable `name`, one transport, optional `versionNegotiation`, and
+optional tool filtering or prefix configuration. Construction is lazy. One connected client owns
+one remote transport.
+
+`versionNegotiation` is a client option, not a transport option. The default pins `2026-07-28`
+without fallback. Use `mode: "auto"` to allow fallback, `mode: "legacy"` for the 2025-era
+initialize handshake, or `{ mode: { pin: "2026-07-28" } }` to make the pin explicit.
 
 ## Client group
 

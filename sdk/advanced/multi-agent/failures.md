@@ -9,6 +9,7 @@ const research = researchAgent.asTool({
   name: 'research',
   description: 'Research one focused question and return sources.',
   maxTurns: 3,
+  suspension: 'reject',
 })
 
 const coordinator = new Agent({

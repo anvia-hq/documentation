@@ -4,7 +4,7 @@ An agent run is where stable agent configuration meets one application request. 
 
 ## Runtime objects
 
-An `Agent` owns the model, instructions, context, tools, memory registration, policies, observers, and default limits.
+An `Agent` owns the model, instructions, context, tools, memory registration, policies, observability, and default limits.
 
 A `session` scope adds a durable conversation identity to a run when the agent has memory configured.
 
@@ -35,7 +35,7 @@ For a normal run, Anvia:
 4. evaluates input guardrails and commits accepted input to memory;
 5. retrieves context documents and dynamic tool definitions for the current turn;
 6. builds the normalized completion request and applies request middleware;
-7. calls the model, using the run's opt-in retry policy for transient failures;
+7. calls the model, using the inherited or run-level retry policy for transient failures;
 8. applies response middleware and records usage and step lifecycle data;
 9. executes requested local tools, pausing first when approval is required;
 10. stores assistant and tool messages, then starts another model turn; and
@@ -92,7 +92,7 @@ Use observers for tracing and telemetry integrations. Lifecycle callbacks are ap
 - `text_delta`, `reasoning_delta`, and optional `tool_call_delta`;
 - `tool_call`, `tool_result`, and nested `agent_tool_event`;
 - `source`, `provider_tool_call`, and `guardrail_decision`;
-- `turn_end`, `interaction_response`, `memory_compaction`, terminal outcomes, and `error`.
+- `turn_end`, `steering_applied`, `interaction_response`, `memory_compaction`, terminal outcomes, and `error`.
 
 A stream segment ends directly with `response`, `interaction`, or `blocked`. When approval or a
 structured answer is required, start the next phase with `agent.stream({ continuation, response })`.

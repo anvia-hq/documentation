@@ -44,7 +44,7 @@ const result = await generateCompletion({
 console.log(result.output.priority)
 ```
 
-Use an agent `outputSchema` when tools, retrieval, memory, or multiple turns are needed before the final JSON response. Agent output remains text, so the application must parse and validate it after the run.
+Use an agent `outputSchema` when tools, retrieval, memory, or multiple turns are needed before the final object. Anvia validates that schema before returning a `response` outcome; `response.output` is already typed.
 
 Use `extract()` when structured fields already exist in source text and a required submission tool is more appropriate than provider-native output schemas.
 

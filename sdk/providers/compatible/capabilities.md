@@ -6,11 +6,12 @@ An OpenAI-compatible endpoint is compatible only for the request paths it implem
 
 ```ts
 const model = compatible.completionModel({
-    modelId: modelId
+    modelId: modelId,
+    api: 'chat'
 })
 
 console.log(model.provider)
-console.log(model.defaultModel)
+console.log(model.modelId)
 console.log(model.capabilities)
 ```
 

@@ -94,7 +94,8 @@ if (!modelId) {
 }
 
 export const supportModel = compatible.completionModel({
-    modelId: modelId
+    modelId: modelId,
+    api: 'chat'
 })
 ```
 

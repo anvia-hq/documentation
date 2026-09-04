@@ -27,11 +27,12 @@ const policyReview = policyAgent.asTool({
   name: 'policy_review',
   description: 'Review a draft customer response for policy risk.',
   maxTurns: 2,
+  suspension: 'reject',
   stream: true,
 })
 ```
 
-`name` is the stable tool name. `description` tells the coordinator when to delegate. `maxTurns` overrides the child run limit for this tool call. `stream: true` forwards child runtime events through a streamed parent run.
+`name` is the stable tool name. `description` tells the coordinator when to delegate. `maxTurns` overrides the child run limit for this tool call. `suspension: 'reject'` is required; agent tools cannot suspend. `stream: true` forwards child runtime events through a streamed parent run.
 
 Without `stream: true`, the parent still receives the final child output as its tool result.
 
@@ -60,7 +61,7 @@ Tell the coordinator to include only the facts and draft the specialist needs. U
 
 ## 5. Avoid approval inside an agent tool
 
-An agent used through `asTool()` requires `suspension: 'reject'`. If the child reaches a `suspended` approval or question result, Anvia cancels that child phase and reports an agent-tool error.
+An agent used through `asTool()` requires `suspension: 'reject'`. If the child reaches an `interaction` outcome, Anvia cancels that child phase and reports an agent-tool error.
 
 Run interaction-capable work directly at an application boundary, or expose the side effect as a protected parent tool whose interaction the product can continue.
 

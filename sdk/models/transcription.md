@@ -40,7 +40,8 @@ import { transcriptionModel } from './models'
 const transcript = await transcribe({
     audio: {
         data: audio,
-        filename: audioPath
+        filename: audioPath,
+        mediaType: 'audio/wav'
     },
     model: transcriptionModel,
     language: 'en',
@@ -51,7 +52,7 @@ const transcript = await transcribe({
 console.log(transcript.text)
 ```
 
-A useful filename helps the provider infer the media type. Language, prompt, temperature, provider parameters, and retry behavior are optional.
+A useful filename helps the provider infer the media type; pass an explicit `mediaType` on the audio object when the filename is ambiguous. Language, prompt, temperature, provider options, retries, and `abortSignal` are optional.
 
 ## 4. Handle the result safely
 

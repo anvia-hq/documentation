@@ -31,11 +31,9 @@ Static tools fit capabilities that are:
 
 Dynamic tools fit a large long-tail catalog where only a few capabilities are relevant to one prompt.
 
-## 3. Understand name precedence
+## 3. Keep names unique across sources
 
-If a static tool and an indexed tool have the same name, the static tool wins. Its definition is retained in the model request, and its concrete implementation is retained in agent lookup.
-
-Tool names must be unique across separate indexes. The agent rejects construction when two indexes register the same name.
+Tool names must be unique across every Agent tool source: static tools, tool indexes, skills, MCP servers, and provider tools. Construction does not pick a winner; any name collision throws a `Tool name collision` `TypeError`.
 
 Use these checks as collision protection, not as a versioning mechanism. Keep names unique and test the assembled catalog.
 

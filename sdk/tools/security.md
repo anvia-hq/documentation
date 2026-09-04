@@ -41,6 +41,10 @@ Keep each action narrow. Make retried operations idempotent where possible, vali
 Use [human approval](/studio/playground/approvals-and-questions) for high-risk side effects, but
 never use approval as the only permission or policy check.
 
+## Layer the enforcement points
+
+`requiresApproval` on a tool declares when that tool must pause for approval. A run's `hooks.onToolCall` hook is a wider gate: it sees every tool call before a handler executes and can skip the call, terminate the run, or force an approval request. Middleware transforms input and output data but is not a policy gate, so keep authorization in the handler and use each layer for what it is for. See [middleware](/sdk/tools/middleware) and the [hooks overview](/sdk/advanced/hooks).
+
 ## Before shipping
 
 - Keep the input schema narrow and documented.

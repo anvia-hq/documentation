@@ -19,6 +19,7 @@ OpenAI and Grok provide v1 speech-generation adapters. Available voices, formats
 ## 2. Generate speech
 
 Pass the model, text, voice, optional speed, and provider options in one object.
+Pass `retries` to override retry behavior and `abortSignal` to cancel generation.
 
 ```ts
 import { writeFile } from 'node:fs/promises'

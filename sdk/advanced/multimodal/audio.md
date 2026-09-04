@@ -58,7 +58,7 @@ const asset = await mediaStore.put({
   mediaType: speech.audio.mediaType ?? 'audio/mpeg',
   metadata: {
     voice: input.voice,
-    model: audioModel.defaultModel ?? 'unknown',
+    model: audioModel.modelId ?? 'unknown',
   },
 })
 ```

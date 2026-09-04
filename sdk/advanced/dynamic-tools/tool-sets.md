@@ -28,7 +28,7 @@ Tool names are the link between search results, model-facing definitions, and im
 
 `createToolIndex()` deduplicates repeated names before embedding; the last tool with a name wins. Prefer rejecting duplicates in your own catalog builder so an accidental replacement cannot pass unnoticed.
 
-An agent also rejects a name registered by more than one tool index. A static tool may share a name with an indexed tool, but the static tool wins both model exposure and execution lookup.
+An agent rejects a name registered by more than one source. A name shared by two tool indexes, or by an indexed tool and a static tool, skill, MCP server, or provider tool, throws a `Tool name collision` `TypeError` at construction.
 
 ## 3. Understand registration and exposure
 

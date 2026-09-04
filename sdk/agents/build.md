@@ -62,7 +62,7 @@ console.log(result.runId)
 console.log(result.usage.totalTokens)
 ```
 
-The status checks remain important as capabilities are added. `generate()` can return a `suspended` result when a configured tool needs approval or a structured human answer.
+The status checks remain important as capabilities are added. `generate()` returns `type: 'interaction'` when a configured tool needs approval or a structured human answer. That is expected control flow, not a failed run.
 
 ## 4. Stream the same agent
 

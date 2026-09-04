@@ -37,7 +37,6 @@ const result = await generateImage({
     providerOptions: {
         config: {
             imageConfig: {
-                aspectRatio: '1:1',
                 imageSize: '1K',
             },
         },
@@ -49,7 +48,7 @@ await writeFile('agent-diagram.png', result.images[0].data)
 
 The adapter requests text and image modalities, extracts inline image data, and returns `Uint8Array` bytes. Width and height are reduced to an aspect-ratio string.
 
-Gemini `config` is shallow-merged. Supplying `config.imageConfig` replaces the generated object, so include `aspectRatio` whenever overriding it.
+The adapter merges your `config` keys in and then writes its generated fields, so `responseModalities` and the computed `imageConfig.aspectRatio` always win. `aspectRatio` is always recomputed from the request `width` and `height`, so a user-supplied `aspectRatio` has no effect; other `imageConfig` keys such as `imageSize` pass through.
 
 ## 3. Generate with Imagen
 
@@ -69,7 +68,6 @@ const result = await generateImage({
     height: 900,
     providerOptions: {
         config: {
-            aspectRatio: '16:9',
             numberOfImages: 2,
         },
     }
@@ -78,7 +76,7 @@ const result = await generateImage({
 console.log(result.images.length)
 ```
 
-Verify option names and supported aspect ratios against the exact model and API mode.
+Verify option names and supported aspect ratios (expressed through `width` and `height`) against the exact model and API mode.
 
 ## 4. Transcribe audio
 

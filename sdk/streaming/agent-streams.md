@@ -17,7 +17,7 @@ for await (const event of stream.events) {
       break
 
     case 'tool_call':
-      console.log('\nTool:', event.toolCall.function.name)
+      console.log('\nTool:', event.toolCall.toolName)
       break
 
     case 'tool_result':

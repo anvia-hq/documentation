@@ -44,7 +44,7 @@ const [embeddedChunks, embeddedEntities] = await Promise.all([
     model: embeddingModel,
     documents: [...facts.output.entities],
     id: (entity) => entity.key,
-    content: (entity) => formatEntityForEmbedding(entity),
+    content: (entity) => `${entity.type}\n${JSON.stringify(entity.properties)}`,
   }),
 ])
 
@@ -58,6 +58,10 @@ const changes = await graph.replaceDocuments({
   orphanEntities: 'delete',
 })
 ```
+
+When composing manually, you own the entity text. The ingestion helpers accept
+`entityText: (entity) => string` for the same purpose and default to the entity type followed by
+its sorted properties.
 
 Stable identities determine whether logical resources are created, updated, deleted, or unchanged. Replacing one document removes its previous chunks and provenance, while facts supported by other documents remain.
 

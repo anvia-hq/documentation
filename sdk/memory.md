@@ -67,7 +67,7 @@ await supportAgent.generate({
 })
 ```
 
-Passing `session` to an agent without a configured memory store does not persist history. A scoped run accepts `prompt`, not a `messages` transcript, because it loads history from the store.
+Passing `session` to an agent without a configured memory store throws `TypeError: Agent "x" cannot use a session without a memory store.` A scoped run accepts `prompt`, not a `messages` transcript, because it loads history from the store.
 
 ## 4. Keep the product boundary explicit
 

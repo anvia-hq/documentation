@@ -11,8 +11,9 @@ and connection cleanup. `@anvia/core` keeps only the lightweight registration co
 pnpm add @anvia/core @anvia/mcp
 ```
 
-The package requires Node.js 20 or newer, the official split MCP TypeScript SDK v2, and MCP protocol
-revision `2026-07-28`. There is no legacy handshake fallback.
+The package requires Node.js 20 or newer and the official split MCP TypeScript SDK v2. `McpClient`
+pins MCP protocol revision `2026-07-28` by default. Set `versionNegotiation: { mode: "auto" }` or
+`{ mode: "legacy" }` to connect to 2025-era servers.
 
 ## Connect a server
 

@@ -21,7 +21,7 @@ OpenAI requires `api: 'responses' | 'chat'` when creating a completion model. A 
 
 ## 2. Send one completion
 
-The v1 API receives the input first and an options object second.
+Pass the input and request options in one object.
 
 ```ts
 import { generateCompletion } from '@anvia/core'
@@ -38,7 +38,7 @@ console.log(result.text)
 console.log(result.usage)
 ```
 
-The result contains visible text, normalized assistant content, usage, and the complete normalized provider response.
+The result contains visible text, normalized assistant content, usage, and the original provider `rawResponse`.
 
 ## 3. Stream a completion
 
@@ -82,6 +82,21 @@ const {
 ```
 
 Capabilities are adapter-level declarations, not a guarantee that every provider model ID or account supports the feature. Test the exact configuration used by the application.
+
+Reasoning-capable adapters also advertise typed request controls on the model. Inspect `model.controls` before sending `controls` on a completion or agent run:
+
+```ts
+const reasoningEffort = model.controls?.reasoningEffort
+
+if (reasoningEffort) {
+  console.log(reasoningEffort.options)
+  console.log(reasoningEffort.defaultValue)
+}
+```
+
+Pass values per call with `controls: { reasoningEffort: 'high' }` on `generateCompletion()` or an agent run; model-level `controls` only advertise the typed options.
+
+OpenAI, Anthropic, Gemini, and Grok advertise `reasoningEffort`. Mistral does not. Allowed values depend on the exact model ID. Invalid names or values are rejected before the provider call. Omitting a control leaves the Agent default in place when one is configured; otherwise the provider chooses.
 
 ## 5. Reuse the model in an agent
 

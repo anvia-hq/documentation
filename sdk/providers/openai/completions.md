@@ -45,6 +45,35 @@ console.log(result.text)
 
 Use an [agent](/sdk/agents) when the run needs tools, memory, dynamic context, lifecycle policy, or multiple turns. Use [parsed completion](/sdk/structured-output/parsed-completion) when one request must return schema-validated data.
 
+## Reasoning effort
+
+OpenAI completion models advertise a typed `reasoningEffort` control. Inspect `model.controls` for the allowed values; `gpt-5.6-*` currently accepts `none`, `low`, `medium`, `high`, `xhigh`, and `max`.
+
+```ts
+const result = await generateCompletion({
+    prompt: 'Write one concise internal incident summary.',
+    model,
+    controls: { reasoningEffort: 'medium' },
+})
+```
+
+An Agent can set the same default and override it per run:
+
+```ts
+const agent = new Agent({
+  id: 'support',
+  model,
+  controls: { reasoningEffort: 'medium' },
+})
+
+await agent.generate({
+    prompt: 'Solve this.',
+    controls: { reasoningEffort: 'high' },
+})
+```
+
+Omitting `reasoningEffort` leaves the Agent default, or the provider default when none is configured. Invalid values are rejected before the OpenAI call. Use `providerOptions` only for OpenAI fields that are not represented as typed controls.
+
 ## Supported contract features
 
 The default Responses adapter declares streaming, tools, tool choice, image input, file-document input, output schemas, reasoning content, and provider-executed tools. Chat declares streaming, tools, tool choice, image input, output schemas, and reasoning, but not file documents or provider-executed tools.

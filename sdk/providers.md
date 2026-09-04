@@ -65,7 +65,8 @@ A provider client may expose several independent contracts:
 
 ```ts
 const chat = openai.completionModel({
-    modelId: 'gpt-5.6-sol'
+    modelId: 'gpt-5.6-sol',
+    api: 'responses',
 })
 const embeddings = openai.embeddingModel({
     modelId: 'text-embedding-3-small'

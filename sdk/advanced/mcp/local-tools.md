@@ -24,23 +24,18 @@ Use MCP tools for reviewed remote lookup or constrained remote capability. Use l
 ## 2. Register an allow-listed subset
 
 ```ts
-const docsTools = await allowMcpTools(
-  docsServer.tools,
-  new Set(['search_docs', 'read_doc']),
-)
+const allowed = new Set(['search_docs', 'read_doc'])
+const docsSubset = docsServer.tools.filter((tool) => allowed.has(tool.name))
 
 const agent = new Agent({
   id: 'support',
   model,
-  tools: [
-    ...docsTools,
-    createCustomerLookupTool(scope),
-    createTicketTool(scope),
-  ],
+  mcpServers: [{ name: docsServer.name, tools: docsSubset }],
+  tools: [createCustomerLookupTool(scope), createTicketTool(scope)],
 })
 ```
 
-This avoids registering the full server through `mcpServers`.
+MCP tools cannot be mixed into `tools`; construction rejects them. Filter the server snapshot and register the `{ name, tools }` subset through `mcpServers`, so unreviewed remote capability stays unexposed while local tools keep their own registration.
 
 ## 3. Keep routing distinct
 

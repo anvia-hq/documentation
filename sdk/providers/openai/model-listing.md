@@ -24,7 +24,8 @@ export function selectCompletionModel(modelId: string) {
   }
 
   return openai.completionModel({
-      modelId: modelId
+      modelId: modelId,
+      api: 'responses'
   })
 }
 ```

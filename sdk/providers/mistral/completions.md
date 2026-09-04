@@ -73,7 +73,7 @@ Consume the stream through its terminal event so usage, tool results, observers,
 
 The adapter maps text instructions and message history, temperature, maximum output tokens, streaming text and tool-call deltas, tools, tool choice, output schemas, and provider-specific parameters.
 
-It rejects chat image and document inputs before making the provider request. Use [Mistral OCR](/sdk/providers/mistral/ocr) as a separate extraction step for scanned documents and images.
+It rejects chat image inputs and data or URL document inputs before making the provider request. A file part carrying `{ type: 'text', text }` data is the exception: the adapter silently flattens it into the prompt text. Use [Mistral OCR](/sdk/providers/mistral/ocr) as a separate extraction step for scanned documents and images.
 
 ## Provider-specific parameters
 

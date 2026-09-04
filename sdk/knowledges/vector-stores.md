@@ -37,7 +37,13 @@ grouped under the source ID, so re-ingestion replaces the complete representatio
 leaving stale chunks.
 
 The in-memory store is process-local and is best for tests, examples, and small temporary indexes.
-Its default brute-force strategy checks every stored document.
+Its default brute-force strategy checks every stored document. Pass an LSH `index` strategy to the
+constructor to narrow the candidate set before scoring once the index outgrows it:
+`index: { type: 'lsh', numTables, numHyperplanes, seed? }`.
+
+Stores may also implement `inspect()`, which pages stored documents with `limit` plus optional
+`cursor` and `filter` — useful for debugging and rebuilds. The in-memory store and the Qdrant
+adapter implement it.
 
 ## 2. Search the store
 
@@ -99,6 +105,43 @@ await store.upsert({
 ```
 
 Changing the embedding model or dimensions requires a compatible collection and normally a complete re-embedding job.
+
+## 5. Search with dense and sparse vectors
+
+Hybrid retrieval adds a sparse lexical channel to dense similarity. A `HybridVectorStore` extends
+the `VectorStore` interface with `searchHybrid()`, which ranks against both a dense query vector and
+a `sparseVector` and fuses the two rankings. `fusion` selects `'rrf'` (reciprocal rank fusion, the
+default) or `'dbsf'`. The [Qdrant](/packages/qdrant) adapter implements it; opt in with
+`mode: 'hybrid'`:
+
+```ts
+import { QdrantVectorClient } from '@anvia/qdrant'
+
+const qdrant = new QdrantVectorClient({})
+const hybridStore = qdrant.vectorStore({
+  collectionName: 'support_docs',
+  dimensions: 1024,
+  mode: 'hybrid',
+})
+```
+
+Retrieve through `retrieveDocuments()` by passing `models: { dense, sparse }` instead of `model`;
+the sparse model embeds the query with `embedSparseQuery()`:
+
+```ts
+const results = await retrieveDocuments({
+  store: hybridStore,
+  models: { dense: embeddingModel, sparse: sparseModel },
+  fusion: 'rrf',
+  query: 'How long does a password reset link last?',
+  topK: 3,
+})
+```
+
+Documents upserted into a hybrid store must carry `sparseEmbeddings` aligned 1:1 with `embeddings`;
+the hybrid [`embedDocuments()`](/sdk/knowledges/embeddings) overload produces them. The same
+`models`/`fusion` pair configures hybrid [search tools](/sdk/knowledges/search-tools) and
+[automatic retrieval](/sdk/knowledges/automatic-retrieval).
 
 Anvia provides adapters for [pgvector](/packages/pgvector), [Qdrant](/packages/qdrant), [Pinecone](/packages/pinecone), [Chroma](/packages/chroma), [LanceDB](/packages/lancedb), [Milvus](/packages/milvus), [Redis](/packages/redis), and [Weaviate](/packages/weaviate).
 

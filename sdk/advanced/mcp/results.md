@@ -6,9 +6,13 @@ Anvia maps MCP responses to the string result used by ordinary tools.
 
 Text content is returned directly. Multiple content items are concatenated in server order.
 
-Image content becomes a `data:<media-type>;base64,...` URL.
+Image content becomes a structured file content part: `{ type: 'file', data: { type: 'data', data }, mediaType }`. The base64 payload stays data; it is not wrapped in a `data:` URL.
 
 Text and binary resources retain their media type, URI, and text or blob in a serialized string.
+
+`audio` and `resource_link` content are unsupported: the adapted tool throws `Unsupported MCP tool result content type`.
+
+When the server returns empty `content` alongside `structuredContent`, the structured value is JSON-serialized into a single text part.
 
 A response containing `{ toolResult }` returns the string directly or JSON-serializes a non-string value when possible.
 

@@ -9,6 +9,7 @@ const policyReview = policyAgent.asTool({
   name: 'policy_review',
   description: 'Review a draft answer for policy risk.',
   maxTurns: 2,
+  suspension: 'reject',
   stream: true,
 })
 ```

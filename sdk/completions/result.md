@@ -1,6 +1,6 @@
 # Completion result
 
-`generateCompletion()` returns convenient top-level fields for normal application code and the complete normalized response for integrations that need more detail.
+`generateCompletion()` returns a flat result: visible text, content blocks, usage, and the original provider payload. There is no nested `response` object.
 
 ## 1. Read visible text
 
@@ -27,17 +27,20 @@ for (const item of result.content) {
     console.log(item.text)
   }
 
-  if (item.type === 'tool_call') {
-    console.log(item.function.name, item.function.arguments)
+  if (item.type === 'tool-call') {
+    console.log(item.toolName, item.input)
   }
 
   if (item.type === 'reasoning') {
     console.log(item.text)
   }
+  if (item.type === 'file') {
+    console.log(item.mediaType, item.data)
+  }
 }
 ```
 
-Assistant content can contain text, tool calls, reasoning, or images. Check the discriminating `type` before reading fields that belong to a specific block.
+Assistant content can contain text, tool calls, reasoning, images, or files. Check the discriminating `type` before reading fields that belong to a specific block.
 
 A direct completion does not execute a returned local tool call. Treat it as a request for application code to handle, or use an [agent](/sdk/agents) when the runtime should execute tools and continue the model loop.
 
@@ -58,23 +61,25 @@ The common counters are normalized across providers. `details` contains addition
 
 Usage is suitable for metrics, budgets, and cost estimation. Apply the selected provider's current pricing outside the core runtime rather than assuming one universal token price.
 
-## 4. Use the normalized response
+## 4. Use the rest of the result
 
-`result.response` contains the same assistant choice and usage plus lower-level response information:
+The same object also exposes lower-level fields:
 
 ```ts
-const response = result.response
-
-console.log(response.messageId)
-console.log(response.contextUsage?.remainingTokens)
-console.log(response.sources)
-console.log(response.providerToolCalls)
+console.log(result.messageId)
+console.log(result.contextUsage?.remainingTokens)
+console.log(result.sources)
+console.log(result.providerToolCalls)
+console.log(result.finishReason)
 ```
 
-The response fields are:
+The result fields are:
 
-- `choice`: normalized assistant content;
+- `output`: parsed schema value when `outputSchema` is set, otherwise the same string as `text`;
+- `text`: visible assistant text;
+- `content`: normalized assistant content blocks;
 - `usage`: normalized token accounting;
+- `finishReason` and `providerFinishReason`: why the provider stopped, when known;
 - `contextUsage`: known context-window occupancy, when model metadata is available;
 - `messageId`: the provider message identifier, when supplied;
 - `sources`: normalized citations from supported providers;
@@ -85,7 +90,7 @@ Prefer normalized fields in product code. Keep `rawResponse` at provider-integra
 
 ## 5. Read the final streaming response
 
-Streaming emits incremental events and finishes with the same normalized response shape:
+Streaming emits incremental events and finishes with a `final` event whose `result` is the same `CompletionResult` shape:
 
 ```ts
 import { streamCompletion } from '@anvia/core'
@@ -109,5 +114,23 @@ for await (const event of streamCompletion({
 ```
 
 Other stream events can carry reasoning deltas, tool-call deltas, complete tool calls, sources, provider tool calls, and message IDs. Consume only the event types the application needs and always handle `error` explicitly.
+
+Passing `outputSchema` to `streamCompletion()` yields a typed result as well: the `final` event carries `result.output` parsed and validated against the schema before the event is emitted:
+
+```ts
+import { z } from 'zod'
+
+for await (const event of streamCompletion({
+    prompt: 'Extract the incident title.',
+    model,
+    outputSchema: z.object({ title: z.string() })
+})) {
+  if (event.type === 'final') {
+    console.log(event.result.output.title)
+  }
+}
+```
+
+Parsing or validation failures produce a `CompletionStructuredOutputError` with a `phase` of `'truncated'`, `'content-filter'`, `'parse'`, or `'schema'`. In a stream the error arrives as the `error` event; `generateCompletion()` rejects with the same error. See [Structured output](/sdk/structured-output) for schema design and failure handling.
 
 Continue with [When to use completions](/sdk/completions/when-to-use).

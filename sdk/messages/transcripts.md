@@ -49,7 +49,7 @@ const result = await supportAgent.generate({
 })
 ```
 
-The last message becomes the active prompt and all earlier messages become history. The result's `messages` field contains messages created during this run, beginning with the active prompt; it does not repeat the preceding input history.
+The last message becomes the active prompt and all earlier messages become history. The transcript must end with a user message; otherwise the agent throws `TypeError: Agent input transcript must end with a user message.`
 
 Use this form when application code intentionally manages the transcript. Use a memory session when Anvia should load and append conversation history automatically.
 

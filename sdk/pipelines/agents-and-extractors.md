@@ -27,9 +27,9 @@ const supportSummary = new Pipeline({
   })
 ```
 
-`.agent()` requires an explicit `request` mapper and returns the completed agent output. The stage requires `suspension: 'reject'` and rejects blocked or suspended child runs.
+`.agent()` requires an explicit `request` mapper and returns the completed agent output. The stage requires `suspension: 'reject'` and rejects `blocked` or `interaction` child outcomes.
 
-Pipeline agent stages cannot cross an interaction boundary. If the agent returns `suspended`, the pipeline cancels that child phase and rejects. Run interaction-capable agents outside the pipeline when a person or policy engine must continue them.
+Pipeline agent stages cannot cross an interaction boundary. If the agent returns `type: 'interaction'` or `type: 'blocked'`, the pipeline cancels that child phase and rejects. Run interaction-capable agents outside the pipeline when a person or policy engine must continue them.
 
 ## 2. Add an extractor stage
 

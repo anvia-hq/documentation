@@ -19,7 +19,7 @@ Verify relevance, catalog freshness, and execution safety before shipping.
 - Test common wording and domain synonyms.
 - Test ambiguous, empty, and irrelevant prompts.
 - Verify restricted definitions never reach an ineligible model request.
-- Check static and indexed name collisions intentionally.
+- Expect static and indexed name collisions to fail construction.
 - Check duplicate names across separate indexes fail during construction.
 - Measure the combined visible-tool count across all indexes.
 
@@ -39,7 +39,7 @@ Verify relevance, catalog freshness, and execution safety before shipping.
 - An unrelated request leaves weak matches below the minScore.
 - An ineligible operator never receives the sensitive definition.
 - A mistakenly broad filter is still stopped by handler authorization.
-- A static/indexed name collision keeps the static tool.
+- A static/indexed name collision fails agent construction.
 - A tool-result topic change retrieves the newly relevant tool on the next turn.
 - A rebuilt catalog reflects updated descriptions, schemas, metadata, and implementations.
 

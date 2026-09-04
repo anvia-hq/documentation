@@ -65,7 +65,7 @@ The route authenticates the caller, resolves the tenant ID, and passes it into t
 
 A prompt instruction is not an authorization boundary. Documents the model must never see must be excluded by the index, its adapter, or a trusted filter.
 
-Apply the same access scope to every path into the index. If it is also exposed with `index.asTool()`, configure an equivalent trusted filter on that tool.
+Apply the same access scope to every path into the index. If the store is also exposed as a model tool with `createVectorSearchTool()`, pass an equivalent trusted `filter` in that tool's options.
 
 `vectorFilter.and()` and `vectorFilter.or()` each combine two filters, so nest them for additional conditions. Equality, greater-than, and less-than expressions are available; test the exact value types and operations against the chosen vector-store adapter.
 

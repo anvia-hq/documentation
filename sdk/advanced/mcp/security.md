@@ -19,36 +19,17 @@ Do not combine a static `Authorization` header with `authProvider`. Do not put u
 ## 1. Allow-list remote tools
 
 ```ts
-import type { AnyTool } from '@anvia/core'
-
-async function allowMcpTools(
-  tools: readonly AnyTool[],
-  allowedNames: ReadonlySet<string>,
-) {
-  const reviewed: AnyTool[] = []
-
-  for (const tool of tools) {
-    const definition = await tool.definition('')
-
-    if (allowedNames.has(definition.name)) {
-      reviewed.push(tool)
-    }
-  }
-
-  return reviewed
-}
-
-const docsTools = await allowMcpTools(
-  docsServer.tools,
-  new Set(['search_docs', 'read_doc']),
-)
+const allowed = new Set(['search_docs', 'read_doc'])
+const reviewed = docsServer.tools.filter((tool) => allowed.has(tool.name))
 
 const agent = new Agent({
   id: 'docs-assistant',
   model,
-  tools: docsTools,
+  mcpServers: [{ name: docsServer.name, tools: reviewed }],
 })
 ```
+
+MCP tools must be registered through `mcpServers`; `Agent.tools` rejects them at construction. Filtering the server snapshot and registering the `{ name, tools }` subset keeps unreviewed capability out of the agent while keeping one server identity for provenance and cleanup.
 
 Review descriptions, schemas, result shapes, and remote behavior as well as names. Re-review after server upgrades.
 
@@ -66,9 +47,9 @@ Prompt instructions are not the only enforcement layer.
 
 ## 4. Prevent name collisions explicitly
 
-Tool names form the model-facing routing contract. Audit names across local tools, MCP servers, and skills before agent construction.
+Tool names form the model-facing routing contract. Audit names across local tools, skills, MCP servers, provider tools, and tool indexes before agent construction.
 
-Agent registration de-duplicates by name, and a later source can replace an earlier tool with the same name. Do not rely on construction to report collisions.
+Construction does not de-duplicate or replace tools: any name shared across these sources throws a `Tool name collision` `TypeError`. Rename one of the colliding tools, or namespace a server's names with the client's `tools: { prefix }` option.
 
 ## 5. Filter remote output
 

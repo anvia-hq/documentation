@@ -51,6 +51,10 @@ const result = await generateCompletion({
 
 `maxTokens`, tools, and tool choice are mapped to Anthropic request fields by the adapter. Claude Sonnet 5 and Claude Opus 5 use adaptive thinking; avoid non-default `temperature`, `top_p`, and `top_k` values because these model generations reject manual sampling changes.
 
+Reasoning-capable Anthropic models also advertise a typed `reasoningEffort` control. Inspect `model.controls` for the allowed values, then pass `controls: { reasoningEffort: 'high' }` on the completion or Agent run. Invalid values are rejected before the provider call.
+
+The factory also accepts `controls`, which replaces the model-derived control set, and `contextLimits`, which overrides the built-in limits-table entry for the selected model ID; a custom or newly released ID has no table entry, so pass `contextLimits` when it needs context-usage accounting.
+
 ## Pass Anthropic-specific parameters
 
 Use `providerOptions` only for an Anthropic Messages API option that has no Anvia field:
@@ -66,7 +70,7 @@ const result = await generateCompletion({
 })
 ```
 
-The adapter forwards these values to the provider request. They are provider-specific and may override normalized fields when the same provider key is supplied. Keep them in the model integration layer, type-check their shape against Anthropic's SDK, and add a live test for every parameter the application depends on.
+The adapter spreads these values into the request first and then applies its normalized fields, so `model`, `max_tokens`, `messages`, and `tools` always win over a matching provider key, and `system`, `temperature`, `tool_choice`, and the reasoning `effort` value win whenever the normalized request supplies them. Keys the adapter never sets, such as `stop_sequences`, pass through unchanged. Keep them in the model integration layer, type-check their shape against Anthropic's SDK, and add a live test for every parameter the application depends on.
 
 ## Choose by workload
 

@@ -31,7 +31,7 @@ const agent = new Agent({
 })
 ```
 
-The final agent output remains JSON text. Parse and validate `response.output` after checking that the run completed.
+Check that the run completed as `type: 'response'`. `response.output` is already schema-validated; invalid structured output rejects the run.
 
 ## Use an extractor for fields already in text
 

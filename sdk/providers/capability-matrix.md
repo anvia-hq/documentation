@@ -43,7 +43,7 @@ const model = client.completionModel({
 })
 
 console.log(model.provider)
-console.log(model.defaultModel)
+console.log(model.modelId)
 console.log(model.capabilities)
 ```
 

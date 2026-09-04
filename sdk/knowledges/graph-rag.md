@@ -42,14 +42,48 @@ source document atomically in the managed graph. `ingestGraphDocuments()` handle
 `prepareGraphDocuments()` performs the model work without writing when an application needs custom
 orchestration.
 
-`result.vectorDocuments` reuses the chunk embeddings in Core-compatible vector-document groups:
+`result.vectorDocuments` reuses the chunk embeddings in Core-compatible vector-document groups, so
+an application can upsert them itself.
+
+Prefer the orchestrated helpers when both stores must stay in sync. `ingestGraphTextToStores()` and
+`ingestGraphDocumentsToStores()` accept a `vectorStore` writer, perform the graph write and the
+vector upsert in one call, and return the prepared documents plus a `GraphIngestionReceipt`:
 
 ```ts
-await vectorStore.upsert({ documents: result.vectorDocuments })
+import { ingestGraphTextToStores } from '@anvia/graph'
+
+const { receipt } = await ingestGraphTextToStores({
+  graph,
+  vectorStore,
+  document: {
+    id: 'incident-42',
+    text,
+    metadata: { tenant: 'acme' },
+  },
+  extractionModel,
+  embeddingModel,
+  conflict: 'error',
+  orphanEntities: 'delete',
+  revision: 'incident-42:v7',
+})
 ```
 
-The graph and vector writes remain separate transactions. Record ingestion state when both must be
-reconciled.
+The receipt lists document, entity, relationship, and vector-document IDs with the `graphWrite` and
+`vectorWrite` statuses. Persist it as the ingestion job result. If the vector write fails after the
+graph transaction has committed, the helper throws `GraphIngestionStageError` with
+`stage: 'vector'` and the receipt attached; re-run the job with `conflict: 'overwrite'`, because
+stable document IDs make both writes idempotent.
+
+Other ingestion options: `revision` stamps the receipt for queue reconciliation; `entityText`
+customizes the text embedded for each entity (by default, the entity type followed by its sorted
+properties); `factConflicts` resolves property-level extraction conflicts per entity or
+relationship with a `default` strategy — `reject`, `prefer-first`, `prefer-last`, or a custom
+resolver function — plus per-property overrides.
+
+To share one deployment across tenants, create scoped handles before ingestion:
+`neo4jClient.tenant(tenantId).managedKnowledgeGraph(...)` and
+`qdrantClient.tenant(tenantId).vectorStore(...)` isolate graph and vector data under per-tenant
+namespaces.
 
 ## Give an Agent graph retrieval
 

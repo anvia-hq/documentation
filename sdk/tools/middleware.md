@@ -43,7 +43,7 @@ const response = await agent.generate({
 | --- | --- |
 | `onCompletionRequest` | Before a provider-neutral request reaches the model. |
 | `onCompletionResponse` | After the model responds and before the runtime continues. |
-| `onToolInput` | After approval and before the tool handler runs. |
+| `onToolInput` | After tool-call hooks and before approval; the approval prompt shows the middleware-transformed input. |
 | `onToolOutput` | Before tool output is sent back to the model. |
 
 Agent-level middleware runs before run-level middleware.

@@ -43,7 +43,7 @@ const server = await client.connect()
 
 The HTTP transport also accepts an MCP SDK `authProvider`, `reconnectionOptions`, and `sessionId`. The transport union contains only `stdio`, `streamableHttp`, and `custom` variants.
 
-All built-in transports require MCP protocol `2026-07-28`; there is no legacy protocol fallback.
+Protocol version is configured on `McpClient` through `versionNegotiation`, not on the transport. The default pins `2026-07-28` without fallback. Use `mode: "auto"` or `mode: "legacy"` on the client when a 2025-era server needs it.
 
 ### Configure static endpoint headers
 
@@ -54,10 +54,12 @@ The transport owns its HTTP method, body, abort signal, session state, and proto
 - `Accept`
 - `Content-Type`
 - `Last-Event-ID`
+- `MCP-Method`
+- `MCP-Name`
 - `MCP-Protocol-Version`
 - `MCP-Session-ID`
 
-Header names are checked case-insensitively. A static `Authorization` header cannot be combined with `authProvider`; use exactly one authentication mechanism. If a value must change per request or requires a different scope, create a reviewed `custom` transport and own that complete security boundary.
+Header names are checked case-insensitively, and names beginning with `mcp-param-` are also owned by the transport. A static `Authorization` header cannot be combined with `authProvider`; use exactly one authentication mechanism. If a value must change per request or requires a different scope, create a reviewed `custom` transport and own that complete security boundary.
 
 ### Connect to a trusted local or private server
 

@@ -6,7 +6,7 @@ Use a completion for work such as summarization, rewriting, classification, or d
 
 ## 1. Send one request
 
-The v1 API receives the input first and an options object second:
+Pass the input and request options in one object:
 
 ```ts
 import { generateCompletion } from '@anvia/core'
@@ -28,7 +28,7 @@ const result = await generateCompletion({
 console.log(result.text)
 ```
 
-`result.text` is the visible text assembled from the normalized assistant content. The same result also exposes content blocks, token usage, and the complete normalized provider response.
+`result.text` is the visible text assembled from the normalized assistant content. The same result also exposes content blocks, token usage, and the original provider `rawResponse`.
 
 ## 2. Choose the completion helper
 

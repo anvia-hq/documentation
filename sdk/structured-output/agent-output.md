@@ -48,9 +48,15 @@ console.log(response.output.needsHuman)
 ```
 
 Anvia validates the provider output with the supplied schema before returning a response. Invalid
-structured output rejects the run.
+structured output is retried within the configured budget before the run rejects.
 
-## 3. Validate streamed output at the end
+## 3. Understand repair retries
+
+Before rejecting the run, the runtime tries to repair invalid structured output. It appends a correction user prompt to the conversation — including the failed output as a bounded preview — and re-requests the response within the agent's `retries` budget. Truncation failures use a shorter-output variant of the correction prompt and omit the failed output. Markdown JSON fences around the response are tolerated and stripped as a compatibility fallback before parsing.
+
+With no `retries` configured, the first invalid output rejects the run immediately. When the budget is exhausted, the run rejects with `AgentStructuredOutputError`; `attempt` is the failed attempt and `maxAttempts` is the configured budget.
+
+## 4. Validate streamed output at the end
 
 Text deltas are incomplete JSON and must not be parsed as they arrive. Accumulate UI text if
 needed, then use the validated `output` on the terminal `response` event:

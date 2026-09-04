@@ -60,7 +60,27 @@ The default concurrency is `1`. Increase it gradually and observe provider rate 
 
 Anvia verifies that the provider returns one vector per input text. A mismatched result count throws instead of silently attaching vectors to the wrong documents.
 
-## 4. Design metadata for retrieval
+## 4. Embed dense and sparse vectors together
+
+Pass `models: { dense, sparse }` instead of `model` to embed each text once per channel. The sparse
+model implements `SparseEmbeddingModel`, and results carry `sparseEmbeddings` aligned 1:1 with
+`embeddings`:
+
+```ts
+const { documents: embedded } = await embedDocuments({
+    models: { dense: embeddingModel, sparse: sparseModel },
+    documents: articles,
+    id: (article) => article.slug,
+    content: (article) => `${article.title}\n\n${article.body}`,
+});
+```
+
+Hybrid [vector stores](/sdk/knowledges/vector-stores) search both channels with rank fusion. To
+encode texts manually, `embedSparseTexts({ model, texts })` embeds passages and
+`embedSparseQuery({ model, query })` embeds a search query; sparse models may encode queries
+differently from passages.
+
+## 5. Design metadata for retrieval
 
 Vector metadata is flat. Values may be strings, numbers, booleans, or `null`:
 

@@ -2,9 +2,12 @@
 
 `McpClient` owns one MCP transport. `connect()` returns an immutable server snapshot with adapted tools; the client owns cleanup.
 
-Construction performs no I/O. A successful connection negotiates MCP protocol `2026-07-28`, lists
+Construction performs no I/O. A successful connection negotiates the MCP protocol, lists
 every page of tools once, and returns a frozen registration snapshot. Reconnect and rebuild the
 Agent when the remote tool catalog changes.
+
+By default the client pins protocol `2026-07-28` without fallback. Set `versionNegotiation` on
+`McpClient` when a 2025-era server needs `mode: "auto"` or `mode: "legacy"`.
 
 ## 1. Connect through stdio
 
@@ -31,6 +34,23 @@ Construction is lazy. `connect()` starts the process, connects the MCP client, l
 
 If tool listing fails after connection, Anvia attempts to close the client before rethrowing the listing error.
 
+Pass `versionNegotiation` on the same client options when the server cannot speak the pinned modern revision:
+
+```ts
+const filesystemClient = new McpClient({
+  name: 'docs-filesystem',
+  transport: {
+    type: 'stdio',
+    command: 'npx',
+    args: [
+      '@modelcontextprotocol/server-filesystem',
+      '/workspace/docs',
+    ],
+  },
+  versionNegotiation: { mode: 'auto' },
+})
+```
+
 ## 2. Inspect before registration
 
 ```ts
@@ -53,7 +73,20 @@ const agent = new Agent({
 })
 ```
 
-This registers every listed tool. Pass an allow-listed subset through `tools` when the server exposes more capability than the agent needs.
+This registers every listed tool. To expose a subset, filter the snapshot's `tools` and register it back through `mcpServers` as a plain `{ name, tools }` object:
+
+```ts
+const allowed = new Set(['search_docs', 'read_doc'])
+const reviewed = filesystem.tools.filter((tool) => allowed.has(tool.name))
+
+const agent = new Agent({
+  id: 'docs-operator',
+  model,
+  mcpServers: [{ name: filesystem.name, tools: reviewed }],
+})
+```
+
+MCP tools cannot be passed through `Agent.tools`; construction rejects them. The subset stays tied to the server's name, so agent construction still checks it against every other tool source for collisions.
 
 ## 4. Own cleanup
 

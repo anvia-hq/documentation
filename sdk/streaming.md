@@ -51,8 +51,7 @@ for await (const event of events) {
 }
 ```
 
-An agent stream covers the complete runtime loop and ends with a direct `response`, `interaction`,
-or `blocked` outcome, or with a thrown failure.
+An agent stream covers the complete runtime loop and ends with a direct `response`, `interaction`, or `blocked` outcome. On failure it yields an `error` event with cumulative usage and the iterator completes normally; the same failure rejects the `stream.result` promise. See [Errors and cancellation](/sdk/streaming/errors-and-cancellation).
 
 ## 3. Continue through the section
 

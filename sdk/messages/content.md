@@ -32,7 +32,7 @@ Use `{ type: 'data', data: base64 }` when the application already has encoded by
 
 ## 2. Build assistant content
 
-`AssistantMessage.content` supports text, images, reasoning, and tool calls:
+`AssistantMessage.content` supports text, images, files, reasoning, and tool calls:
 
 ```ts
 import type { AssistantMessage } from '@anvia/core'
@@ -95,7 +95,7 @@ const toolMessage: ToolMessage = {
 }
 ```
 
-Tool-result content supports text and base64 image blocks. Adapter support for image tool results varies.
+Tool-result content supports text and file parts, where the file `data` accepts `{ type: 'url', url }`, base64 `{ type: 'data', data }`, or `{ type: 'text', text }` for plain-text content. Adapter support for file tool results varies.
 
 ## 4. Inspect blocks safely
 

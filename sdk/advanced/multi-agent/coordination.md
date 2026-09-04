@@ -27,11 +27,13 @@ const coordinator = new Agent({
       name: 'log_analysis',
       description: 'Analyze supplied logs and return likely causes.',
       maxTurns: 3,
+      suspension: 'reject',
     }),
     policyAgent.asTool({
       name: 'policy_review',
       description: 'Review a proposed response for policy risk.',
       maxTurns: 2,
+      suspension: 'reject',
     }),
   ],
 })

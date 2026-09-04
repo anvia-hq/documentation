@@ -1,6 +1,6 @@
 # Per-run controls
 
-Every agent run starts with `generate(input, options)` or `stream(input, options)`. Constructor options define stable behavior; run options control one execution.
+Every agent run starts with `generate(options)` or `stream(options)`. Constructor options define stable behavior; run options control one execution.
 
 ## 1. Configure one generated response
 
@@ -9,6 +9,7 @@ const result = await supportAgent.generate({
     prompt: input.message,
     maxTurns: 3,
     toolConcurrency: 2,
+    controls: { reasoningEffort: 'high' },
     retries: {
         maxAttempts: 3,
         initialDelayMs: 100,
@@ -25,7 +26,9 @@ const result = await supportAgent.generate({
 Supported run options are:
 
 - `maxTurns` for this run's loop limit;
-- `retries` for opt-in completion retries within each turn;
+- `retries` to inherit, replace, or disable (`false`) the constructor retry policy;
+- `controls` to override constructor defaults such as `reasoningEffort`;
+- `abortSignal` to cancel the run;
 - `toolConcurrency` for parallel local tool execution;
 - `lifecycle` for callbacks added to the agent lifecycle;
 - `guardrails` for additional run policies;
@@ -137,6 +140,6 @@ const result = await sessionAgent.generate({
 });
 ```
 
-A session accepts a string or one normalized message. It loads its own history, so it does not accept a `Message[]` transcript.
+The `session` value must be a scope object like the one above (`sessionId` plus optional `userId` and `metadata`); anything else throws. A session run takes its input through `prompt` — a string or one user message — because it loads its history from the store, so a `Message[]` transcript cannot be combined with a persisted session.
 
 Continue with [Runtime lifecycle](/sdk/agents/runtime-lifecycle).

@@ -82,7 +82,7 @@ for await (const event of weatherAgent.stream({
     prompt: 'Check Jakarta weather.'
 })) {
   if (event.type === 'tool_call') {
-    console.log('Calling:', event.toolCall.function.name)
+    console.log('Calling:', event.toolCall.toolName)
   }
 
   if (event.type === 'tool_result') {

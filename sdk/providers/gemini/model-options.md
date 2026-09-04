@@ -18,6 +18,8 @@ Known Gemini model IDs are included for editor autocomplete, while custom string
 
 Every Gemini model factory requires an explicit ID. This keeps traces, evaluations, rollbacks, and ingestion versions reproducible.
 
+Pass `contextLimits` to override the built-in limits-table entry for the selected ID; a custom or newly released ID has no table entry, so supply limits there when context-usage accounting matters. The completion factory also accepts `controls`, which replaces the model-derived reasoning controls.
+
 ## Use portable completion options
 
 Prefer Anvia's normalized fields when they cover the behavior:
@@ -52,7 +54,7 @@ const result = await generateCompletion({
 })
 ```
 
-Completion `providerOptions.config` is shallow-merged over the adapter's generated configuration. A provider-specific key can therefore override a normalized field after mapping. Keep these values in a narrow integration module, verify their current Google SDK names, and add a live test for every option the product depends on.
+The adapter applies its generated configuration after `providerOptions.config`, so adapter-mapped keys win on conflict and provider-supplied `tools` are dropped. Provider-only keys such as `stopSequences` pass through, and `thinkingConfig` entries the adapter does not manage survive the reasoning-effort merge. Keep these values in a narrow integration module, verify their current Google SDK names, and add a live test for every option the product depends on.
 
 ## List available models
 

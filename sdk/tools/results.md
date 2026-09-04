@@ -71,6 +71,10 @@ const renderChart = createTool({
 })
 ```
 
+## Recognize runtime output variants
+
+Your handler returns text, JSON, or rich content. The runtime can also deliver three further output variants on a tool result: `execution-denied` with the approval rejection reason, and `error-text` or `error-json` when a handler failure is converted into model-visible output. They come from the runtime, not from `execute`.
+
 ## Keep results safe
 
 Return safe text for expected misses and throw unexpected failures. Redact secrets, payment details, internal notes, and customer data before they reach the model or a browser stream.

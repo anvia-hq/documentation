@@ -79,7 +79,7 @@ const result = await sessionAgent.generate({
 
 The session ID scopes stored conversation history. `userId` and JSON `metadata` are passed to the memory store as part of the conversation context. They do not replace authorization inside tools or retrieval.
 
-Calling `session()` on an agent without configured memory throws. See [Memory sessions](/sdk/memory/sessions) for configuration and lifecycle.
+Passing the `session` run option to `generate()` or `stream()` on an agent without configured memory throws `TypeError: Agent "X" cannot use a session without a memory store.` See [Memory sessions](/sdk/memory/sessions) for configuration and lifecycle.
 
 ## 4. Attach observability context per run
 

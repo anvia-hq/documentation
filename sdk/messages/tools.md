@@ -19,7 +19,7 @@ const assistant: AssistantMessage = {
 }
 ```
 
-The arguments must be a strict JSON value. `id` is Anvia's normalized tool-content identifier. `callId` preserves a distinct provider call identifier when the adapter supplies one.
+The arguments must be a strict JSON value. `toolCallId` is Anvia's normalized tool-content identifier. `callId` preserves a distinct provider call identifier when the adapter supplies one.
 
 ## 2. Add the matching result
 
@@ -39,7 +39,7 @@ const tool: ToolMessage = {
 }
 ```
 
-Use the same `id` and, when present, the same `callId` as the assistant tool call. Provider adapters serialize the provider-facing identifier as `callId ?? id`.
+Use the same `toolCallId` and, when present, the same `callId` as the assistant tool call. Provider adapters serialize the provider-facing identifier as `callId ?? toolCallId`.
 
 Choose an explicit output discriminant such as `text`, `json`, `content`, `execution-denied`, `error-text`, or `error-json`. Values must be strict JSON where required.
 

@@ -7,14 +7,14 @@ Treat an `Agent` as reusable runtime configuration. Put behavior that is safe an
 The constructor can define:
 
 - `id`, `name`, and `description` for stable identity and metadata;
-- `model`, `instructions`, `temperature`, `maxTokens`, and `providerOptions` for generation;
+- `model`, `instructions`, `temperature`, `maxTokens`, `controls`, and `providerOptions` for generation;
 - `context` for static documents and retrieval indexes;
 - `tools`, `mcpServers`, and `skills` for reusable capabilities;
-- `toolChoice` and `maxTurns` for default runtime limits;
+- `toolChoice`, `maxTurns`, and `retries` for default runtime limits;
 - `outputSchema` for structured final output;
 - `memory` for session-backed history;
 - `guardrails` and `middlewares` for policy and request transformation; and
-- `lifecycle` and `observers` for application callbacks and telemetry.
+- `lifecycle` and `observability` for application callbacks and telemetry.
 
 ```ts
 const supportAgent = new Agent({
@@ -24,11 +24,13 @@ const supportAgent = new Agent({
   context: [supportPolicy],
   tools: [searchHelpCenter],
   maxTurns: 4,
+  controls: { reasoningEffort: 'medium' },
+  retries: { maxAttempts: 3 },
   observability: { observers: { logger } },
 })
 ```
 
-These values become the defaults for every run. Use the run options described in [Per-run controls](/sdk/agents/per-run-controls) only for supported request-specific values such as tracing, retries, lifecycle callbacks, guardrails, middleware, tool concurrency, or a tighter turn limit.
+These values become the defaults for every run. A run with no `retries` value inherits the constructor setting; `false` disables retries for that run; an object replaces the policy. Use the run options described in [Per-run controls](/sdk/agents/per-run-controls) only for supported request-specific values such as tracing, retries, typed `controls`, lifecycle callbacks, guardrails, middleware, tool concurrency, or a tighter turn limit.
 
 ## 2. Create a scoped factory
 

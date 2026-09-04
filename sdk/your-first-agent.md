@@ -50,14 +50,31 @@ const response = await supportAgent.generate({
     prompt: 'What information do you need to investigate a failed checkout?'
 })
 
-if (response.type === 'interaction') throw new Error(`Interaction required: ${response.interaction.type}`)
-if (response.type === 'blocked') throw new Error(`Blocked at ${response.stage}: ${response.reason}`)
+if (response.type === 'interaction') {
+  const resumed = await supportAgent.resume(
+    response.continuation,
+    { type: 'tool-approval', approved: true }
+  )
 
-console.log(response.output)
+  if (resumed.type === 'response') {
+    console.log(resumed.output)
+  }
+} else if (response.type === 'blocked') {
+  throw new Error(`Blocked at ${response.stage}: ${response.reason}`)
+} else {
+  console.log(response.output)
+}
 ```
 
 This agent has no guardrails or interaction-capable tools, so the expected type is `response`. The
 checks keep the code correct when capabilities are added later.
+
+An interaction pauses the run: the outcome carries the pending `interaction` request and a
+`continuation`. `Agent.resume(continuation, response)` (or `generate({ continuation, response })`)
+submits the answer and continues the run. A resumed outcome has a fresh `runId` and a
+`resumedFrom: { runId, interactionId }` link to the paused run. The response shape matches the
+request: `{ type: 'tool-approval', approved }` for approvals, `{ type: 'tool-question', answers }`
+for questions.
 
 ## 3. Read the run result
 
@@ -110,6 +127,11 @@ for await (const event of supportAgent.stream({
 ```
 
 The same stream may later include reasoning, tool calls, tool results, interaction responses, turn boundaries, and errors.
+
+`stream()` returns an `AgentStream` handle with more than iteration: `.textStream` yields only text
+chunks, `.text` and `.result` resolve to the final text and outcome as promises, and `.result`
+rejects if the run fails. `steer(input)` queues additional input mid-run and returns a
+`{ id, status: 'queued' }` receipt; `cancel(reason?)` stops the run.
 
 ## Choose the next capability
 

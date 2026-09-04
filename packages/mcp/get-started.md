@@ -41,6 +41,9 @@ try {
 }
 ```
 
+Each client pins MCP protocol `2026-07-28` by default. Set `versionNegotiation` on a client that
+must talk to a 2025-era server.
+
 Static HTTP headers are sent only to the exact endpoint, never to OAuth traffic, and are not
 forwarded across redirects. A static `authorization` header cannot be combined with `authProvider`.
 

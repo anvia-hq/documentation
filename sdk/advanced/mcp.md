@@ -58,13 +58,52 @@ try {
 
 `client.connect()` connects, lists the server's tools, and adapts them into normal Anvia tools. `mcpServers` registers every adapted tool from that server.
 
-The package uses the official split MCP TypeScript SDK v2 and requires protocol revision
-`2026-07-28`. A server that cannot negotiate that revision fails clearly; Anvia does not retry with
-the legacy handshake.
+Use `McpClientGroup` to connect several servers. `connect({ clients, abortSignal })` connects every client and closes the others when one fails; the returned group exposes `servers` for `mcpServers` and `close()` for cleanup:
+
+```ts
+const group = await McpClientGroup.connect({ clients: [docsClient, crmClient] })
+
+try {
+  const agent = new Agent({ id: 'docs-operator', model, mcpServers: group.servers })
+} finally {
+  await group.close()
+}
+```
+
+Set `tools: { prefix: 'crm_' }` on a client to namespace its tool names, such as `crm_get_customer`. Duplicate tool names across servers fail agent construction.
+
+The package uses the official split MCP TypeScript SDK v2. By default, `McpClient` pins protocol
+revision `2026-07-28` with no fallback. A server that cannot negotiate that revision fails clearly.
+
+To connect to a 2025-era server, set `versionNegotiation` on the client, not the transport:
+
+```ts
+const client = new McpClient({
+  name: 'legacy-crm',
+  transport: {
+    type: 'streamableHttp',
+    url: 'https://mcp.example.com/api',
+  },
+  versionNegotiation: { mode: 'auto' },
+})
+```
+
+`mode: "auto"` allows protocol fallback. `mode: "legacy"` uses the 2025-era initialize handshake. Omit the option, or pin `{ mode: { pin: '2026-07-28' } }`, when every server already supports the modern revision.
 
 ## 2. Review external capability
 
-For privileged or changing servers, allow-list `server.tools` and pass only the reviewed subset through `tools`.
+For privileged or changing servers, review `server.tools` after connecting, then register only the reviewed subset. MCP tools must be registered through `mcpServers`; `Agent.tools` rejects them at construction. Filter the frozen snapshot and register the subset as a plain `{ name, tools }` object:
+
+```ts
+const allowed = new Set(['search_docs', 'read_doc'])
+const reviewed = filesystem.tools.filter((tool) => allowed.has(tool.name))
+
+const agent = new Agent({
+  id: 'docs-assistant',
+  model,
+  mcpServers: [{ name: filesystem.name, tools: reviewed }],
+})
+```
 
 An MCP connection does not grant product authorization. Keep credentials server-side, resolve user and tenant scope in application code, constrain broad file or command servers, and filter remote output before public transport.
 

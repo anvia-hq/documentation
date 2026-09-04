@@ -2,7 +2,7 @@
 
 | Capability | Behavior |
 | --- | --- |
-| Protocol | Requires MCP `2026-07-28`; no legacy fallback |
+| Protocol | Pins MCP `2026-07-28` by default; `versionNegotiation` on `McpClient` can enable auto fallback or the legacy handshake |
 | SDK | Official split MCP TypeScript SDK v2 packages |
 | Transports | `stdio`, `streamableHttp`, and caller-owned `custom` |
 | Discovery | Complete paginated tool listing at connection time |

@@ -33,7 +33,7 @@ const classifyNote = new Pipeline({
 
 ```
 
-The nested pipeline validates its own input when `.compose()` runs it. Its ID and metadata are represented as a pipeline node in the parent graph.
+The nested pipeline validates its own input when `.compose()` runs it. In the parent graph, the compose stage becomes a `pipeline` node labeled with the nested pipeline's name (or ID, if unnamed) and carrying its ID as `pipelineId` — the nested pipeline's own metadata and description are not embedded in that node. The nested pipeline's stages appear beneath it as a child sub-graph.
 
 ## 2. Adapt a service with a nested pipeline
 

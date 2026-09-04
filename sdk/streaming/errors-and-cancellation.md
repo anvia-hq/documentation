@@ -4,28 +4,27 @@ Handle stream failures at the consumer boundary and cancel work when its output 
 
 ## 1. Handle an agent failure once
 
-An agent stream yields an `error` event with cumulative usage, then throws the same failure when the iterator advances:
+An agent stream yields an `error` event with cumulative usage, then the iterator completes normally. The same failure rejects the `stream.result` promise, so funnel the awaited result through the same try/catch:
 
 ```ts
-let failedUsage
+const stream = agent.stream({ prompt: message })
 
 try {
-  for await (const event of agent.stream({
-      prompt: message
-  })) {
+  for await (const event of stream) {
     if (event.type === 'error') {
-      failedUsage = event.usage
+      await logger.error('Agent stream failed', {
+        error: event.error,
+        usage: event.usage,
+      })
+
       continue
     }
 
     await handleRuntimeEvent(event)
   }
-} catch (error) {
-  await logger.error('Agent stream failed', {
-    error,
-    usage: failedUsage,
-  })
 
+  await stream.result
+} catch (error) {
   await ui.fail('The request could not be completed.')
 }
 ```

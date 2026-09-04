@@ -32,18 +32,18 @@ TypeScript infers the parsed schema type for `ticket`. Invalid input rejects `ru
 ## 2. Run the pipeline
 
 ```ts
-const ticket = await normalizeTicket.run({
+const result = await normalizeTicket.run({
     input: {
         customer: 'Acme Co.',
         subject: 'Checkout failure',
         body: 'Checkout fails after payment authorization.',
     }
 });
-console.log(ticket.subject);
+console.log(result.output.subject);
 
 ```
 
-The return type is inferred from the last stage. Keep route-specific transport validation in the route, and use the pipeline schema for the workflow contract every caller must satisfy.
+`run()` resolves to a `{ runId, output, trace? }` result. `output` holds the last stage's return value, so its type is inferred from that stage; `runId` identifies the execution in logs and traces, and `trace` is present only when the run was traced. Keep route-specific transport validation in the route, and use the pipeline schema for the workflow contract every caller must satisfy.
 
 ## 3. Use schema transforms and defaults
 

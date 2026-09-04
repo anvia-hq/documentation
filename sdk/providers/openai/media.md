@@ -53,7 +53,7 @@ await mediaStore.put({
 
 The adapter maps base64 output to `Uint8Array`. It rejects URL-only image responses because the Core image response contract requires bytes.
 
-Provider `providerOptions` are applied after normalized fields, so keep them in trusted allow-listed configuration.
+The adapter applies its normalized fields (`model`, `prompt`, `size`) after `providerOptions`, so they win on conflict; provider keys the adapter never sets pass through unchanged. Keep `providerOptions` in trusted allow-listed configuration.
 
 ## 3. Generate speech
 

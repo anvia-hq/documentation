@@ -90,8 +90,12 @@ The options object can include:
 - `temperature` and `maxTokens` for provider-supported generation controls;
 - `tools` and `toolChoice` for compatible tool-calling models;
 - `outputSchema` for a provider JSON schema;
-- `providerOptions` for provider-specific JSON values; and
-- `retries` for opt-in retry behavior.
+- `controls` for typed, model-advertised values such as `reasoningEffort`;
+- `providerOptions` for provider-specific JSON values;
+- `retries` for opt-in retry behavior; and
+- `abortSignal` to cancel the provider call.
+
+`tools` also accepts provider-executed tools: values with `kind: 'provider'` that provider packages expose as typed factories and that the provider runs in its own environment. The model must declare `capabilities.providerTools`, and Anvia rejects the request before it is sent otherwise. Results surface as `providerToolCalls` on the result and `provider_tool_call` stream events rather than through local tool execution.
 
 Attach documents with stable IDs so providers and traces can distinguish them:
 
@@ -128,6 +132,26 @@ const result = await generateCompletion({
 ```
 
 The default retry policy covers common connection failures, rate limits, request timeouts, conflicts, and server errors. Authentication errors, invalid input, and aborted requests are not retried by default. Supply `shouldRetry` only when the application needs a narrower policy.
+
+Retries only apply while nothing has been delivered. In `streamCompletion()`, once any provider event has been exposed to the consumer, retries stop and the failure surfaces as-is.
+
+## 6. Set typed model controls
+
+Pass values advertised by `model.controls`. Reasoning-capable OpenAI, Anthropic, Gemini, and Grok models accept `reasoningEffort`; inspect the model's options before choosing a value:
+
+```ts
+const controller = new AbortController()
+
+const result = await generateCompletion({
+    prompt: 'Summarize this incident.',
+    model,
+    retries: { maxAttempts: 3, initialDelayMs: 100, maxDelayMs: 1000 },
+    abortSignal: controller.signal,
+    controls: { reasoningEffort: 'medium' },
+})
+```
+
+Omitting a control means “Default”: the provider chooses. Invalid control names and values are rejected before the provider call. `providerOptions` remains the escape hatch for a strict JSON object that the adapter forwards as-is.
 
 ## Handle failures at the boundary
 

@@ -79,7 +79,22 @@ const { documents: embedded } = await embedDocuments({
 
 Returning multiple strings from `content` creates aligned vectors for the same document. The vector store can preserve the original record and metadata alongside them.
 
-## 5. Protect the retrieval boundary
+## 5. Embed sparse and hybrid vectors
+
+Sparse models add a lexical channel for keyword-aware retrieval. A `SparseEmbeddingModel` implements `embedTexts()` for indexing passages plus a separate `embedQuery()` because sparse encoders such as SPLADE treat queries differently from documents. Call them through `embedSparseTexts()` and `embedSparseQuery()` from `@anvia/core/embeddings`.
+
+`embedDocuments()` accepts `models: { dense, sparse }` to produce both channels in one pass. Each returned document carries a `sparseEmbeddings` array aligned 1:1 with its `embeddings`.
+
+```ts
+const { documents } = await embedDocuments({
+  models: { dense: embeddingModel, sparse: sparseModel },
+  documents: articles,
+  id: (article) => article.slug,
+  content: (article) => [article.title, article.body],
+})
+```
+
+## 6. Protect the retrieval boundary
 
 Embedding is not authorization. Before embedding or searching:
 

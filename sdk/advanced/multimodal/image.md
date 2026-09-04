@@ -42,8 +42,8 @@ const assets = await Promise.all(
         'image/png',
       metadata: {
         index,
-        provider: imageModel.provider ?? 'unknown',
-        model: imageModel.defaultModel ?? 'unknown',
+        provider: imageModel.provider,
+        model: imageModel.modelId ?? 'unknown',
       },
     }),
   ),

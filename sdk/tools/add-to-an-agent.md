@@ -26,6 +26,8 @@ if (response.type === 'response') {
 
 The model chooses whether to call a tool and supplies its arguments. The runtime executes the handler, returns its result to the model, and continues until the agent produces a final answer or reaches its turn limit.
 
+The `tools` array also accepts provider tools, which the model provider executes itself instead of Anvia's local runtime, and a `ToolIndex` for dynamic discovery: build one with `createToolIndex({ model, tools, topK })` and the agent exposes only the tools most relevant to each prompt. See [Dynamic tools](/sdk/advanced/dynamic-tools).
+
 ## Build user-scoped tools
 
 Create the tools from the current application scope when handlers depend on user or tenant state.

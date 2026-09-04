@@ -48,7 +48,7 @@ Some adapters require a specific Node.js version, browser runtime, native depend
 - `@anvia/browser` requires Docker, a compatible browser image, and Playwright-compatible Chromium;
 - `@anvia/neo4j` requires Neo4j 2026.01 or newer and matching vector dimensions;
 - `@anvia/memgraph` requires Memgraph 3.6 or newer and matching vector dimensions;
-- `@anvia/mcp` requires Node.js 20 or newer and MCP protocol `2026-07-28`;
+- `@anvia/mcp` requires Node.js 20 or newer and pins MCP protocol `2026-07-28` by default;
 - `@anvia/cli` requires Node.js 20.18.1 or newer and an existing Next.js or Vite application;
 - Core document helpers operate on application-normalized text and do not require a file-parser peer;
 - observability adapters require credentials and network access to their backend.
@@ -73,7 +73,7 @@ The v1 API uses declarative `new Agent({...})` construction and direct `agent.ge
 Anvia `1.0.0` established the final v1 migration boundary. For a current v1 target:
 
 - import MCP clients and transports from `@anvia/mcp`; Core retains registration contracts only;
-- verify MCP servers support protocol `2026-07-28` because there is no legacy fallback;
+- verify MCP servers support protocol `2026-07-28`, or configure `versionNegotiation` on `McpClient` for 2025-era servers;
 - move PDF parsing or OCR into application code and pass normalized text into Core document helpers;
 - rename React UI compound namespaces to `*Primitive`, remove package CSS imports, and move styling
   into application code or generated `@anvia/cli` components.

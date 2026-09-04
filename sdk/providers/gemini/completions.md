@@ -89,12 +89,23 @@ The adapter sends a JSON response MIME type and the JSON schema to Google. Anvia
 
 ## Reasoning content
 
-Provider-specific thinking configuration belongs at the Gemini model boundary:
+Gemini completion models advertise a typed `reasoningEffort` control. Inspect `model.controls` for the allowed values, then pass it on the request:
+
+```ts
+const result = await generateCompletion({
+    prompt: 'Summarize the deployment risk.',
+    model,
+    controls: { reasoningEffort: 'medium' },
+})
+```
+
+Provider-specific thinking configuration such as including thought content still belongs at the Gemini model boundary:
 
 ```ts
 const reasoningAgent = new Agent({
   id: 'analyst',
   model: model,
+  controls: { reasoningEffort: 'medium' },
   providerOptions: {
     config: {
       thinkingConfig: {

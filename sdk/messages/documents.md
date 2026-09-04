@@ -55,7 +55,7 @@ const result = await generateCompletion({
 })
 ```
 
-Use `{ type: 'url', url }` when the provider can access the URL. Use `{ type: 'data', data }` for bounded in-memory base64 content.
+Use `{ type: 'url', url }` when the provider can access the URL. Use `{ type: 'data', data }` for bounded in-memory base64 content. Use `{ type: 'text', text }` when the application already holds the document as plain text.
 
 File attachments require `model.capabilities.documentInput`. Anvia checks the declared adapter capability, while the provider still decides which model IDs, media types, file sizes, and URL sources are accepted.
 

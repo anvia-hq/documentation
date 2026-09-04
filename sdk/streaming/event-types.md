@@ -16,9 +16,9 @@ Completion and agent streams share provider-generation events. Agent streams add
 
 `message_id` contains the provider message identifier.
 
-`final` contains the normalized `CompletionResponse`.
+`final` contains the completed `CompletionResult`, the same value `generateCompletion()` resolves with.
 
-`error` contains the provider or stream failure and may include authoritative usage.
+`error` contains the provider or stream failure and cumulative usage, empty when no provider attempt reported usage.
 
 ## Agent lifecycle events
 
@@ -49,7 +49,7 @@ attempts, and summarizer usage.
 interaction includes the request and JSON-safe continuation required to start a linked phase; a
 blocked outcome includes guardrail stage, reason, and optional safe message.
 
-`error` contains the failure and cumulative authoritative usage. The agent stream then throws the same failure when consumption continues.
+`error` contains the failure and cumulative authoritative usage. The iterator then completes normally; the same failure rejects the `stream.result` and `stream.text` promises.
 
 ## Project events for each surface
 

@@ -4,10 +4,10 @@ Invalid JSON and schema mismatches are expected model-workflow failures. Convert
 
 ## 1. Handle parsed-completion failures
 
-`generateCompletion()` rejects when the model lacks output-schema support, the provider call fails, the returned text is invalid JSON, or local Zod validation fails:
+`generateCompletion()` rejects when the model lacks output-schema support, the provider call fails, or structured output cannot be parsed or validated. JSON and schema failures throw `CompletionStructuredOutputError`; Zod issues are the `cause` of the schema phase, not the thrown value:
 
 ```ts
-import { z } from 'zod'
+import { CompletionStructuredOutputError, generateCompletion } from '@anvia/core'
 
 try {
   const result = await generateCompletion({
@@ -18,9 +18,12 @@ try {
 
   return { status: 'classified', ticket: result.output }
 } catch (error) {
-  if (error instanceof z.ZodError) {
-    await logger.warn('Ticket schema validation failed', {
-      issues: error.issues,
+  if (error instanceof CompletionStructuredOutputError) {
+    await logger.warn('Ticket classification failed', {
+      phase: error.phase,
+      finishReason: error.finishReason,
+      outputLength: error.outputLength,
+      cause: error.cause,
     })
   } else {
     await logger.warn('Ticket classification failed', { error })
@@ -30,34 +33,41 @@ try {
 }
 ```
 
-Keep detailed errors in protected diagnostics. Do not expose provider responses, source documents, or sensitive field values in a public error message.
+`phase` is `'parse' | 'schema' | 'truncated' | 'content-filter'`. The error also exposes `outputLength`, `usage`, `finishReason`, and `providerFinishReason` for structured diagnostics. Keep detailed errors in protected diagnostics. Do not expose provider responses, source documents, or sensitive field values in a public error message.
 
-## 2. Validate agent output safely
+## 2. Handle agent structured-output failures
 
-Agent output crosses a JSON boundary and then a schema boundary:
+An agent `outputSchema` is validated by the runtime before a `response` outcome is returned. Do not parse `response.output` a second time. Invalid structured output rejects the run with `AgentStructuredOutputError`:
 
 ```ts
-function parseTicketOutput(output: string) {
-  let json: unknown
+import { AgentStructuredOutputError } from '@anvia/core'
 
-  try {
-    json = JSON.parse(output)
-  } catch {
-    return { ok: false as const, reason: 'invalid_json' }
+try {
+  const result = await agent.generate({
+      prompt: message
+  })
+
+  if (result.type !== 'response') {
+    return handleNonResponse(result)
   }
 
-  const parsed = ticketSchema.safeParse(json)
-  if (!parsed.success) {
-    return {
-      ok: false as const,
-      reason: 'invalid_schema',
-      issues: parsed.error.issues,
-    }
+  return { status: 'classified', ticket: result.output }
+} catch (error) {
+  if (error instanceof AgentStructuredOutputError) {
+    await logger.warn('Agent structured output failed', {
+      phase: error.phase,
+      attempt: error.attempt,
+      maxAttempts: error.maxAttempts,
+      cause: error.cause,
+    })
+    return { status: 'needs_review' }
   }
 
-  return { ok: true as const, data: parsed.data }
+  throw error
 }
 ```
+
+The runtime first retries invalid output within the agent's `retries` budget by appending a correction user prompt to the conversation, so `attempt` is the failed attempt within a budget of `maxAttempts`. The error also exposes `outputLength`, `normalizedLength`, `outputFormat` (`'raw' | 'json-fence' | 'unlabeled-fence'`), `attemptUsage`, `usage`, and `providerFinishReason`.
 
 Do not use partially parsed fields when the complete object fails validation.
 
@@ -86,5 +96,7 @@ try {
   throw error
 }
 ```
+
+The error also exposes `attempts`, the number of extraction attempts made, and `usage`, the cumulative token usage across attempts.
 
 Choose whether a failed item should be retried later, reviewed by a person, or rejected according to product policy. Never persist unvalidated model output as a fallback.

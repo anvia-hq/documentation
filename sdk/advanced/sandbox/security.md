@@ -26,6 +26,8 @@ const sandbox = await client.createSandbox({
 
 Enable bridge networking only for a reviewed workflow. Never mount the Docker socket, cloud credential directories, broad host paths, or the application repository into an untrusted workspace.
 
+`resources.sharedMemoryMb` sizes the container's private `/dev/shm`. `security.addCapabilities` grants specific Linux capabilities after `dropCapabilities`, and `security.seccompProfile: { type: 'path', path }` installs a seccomp profile from an absolute host path. Add these only for workloads that require them, such as keeping Chromium's own process sandbox enabled.
+
 ## Separate runtime and tool limits
 
 ```ts

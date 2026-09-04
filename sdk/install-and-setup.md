@@ -26,6 +26,7 @@ Other provider adapters use the same runtime boundary:
 pnpm add @anvia/anthropic
 pnpm add @anvia/gemini
 pnpm add @anvia/mistral
+pnpm add @anvia/grok
 ```
 
 Add packages such as `@anvia/server`, `@anvia/react`, memory adapters, or observability integrations only when the application needs those capabilities.
@@ -85,7 +86,7 @@ console.log(result.text)
 console.log(result.usage)
 ```
 
-The v1 completion API receives the input first and runtime options second. A successful result contains visible `text`, normalized `content`, token `usage`, and the normalized provider `response`.
+Pass input and request options in one object. A successful result contains visible `text`, normalized `content`, token `usage`, and the original provider `rawResponse`.
 
 ## 5. Keep packages aligned
 

@@ -19,6 +19,7 @@ OpenAI, Gemini, and Grok provide v1 image-generation adapters. Each provider may
 ## 2. Generate an image
 
 Pass the model, prompt, dimensions, and provider options in one object.
+Pass `retries` to override retry behavior and `abortSignal` to cancel generation.
 
 ```ts
 import { writeFile } from 'node:fs/promises'

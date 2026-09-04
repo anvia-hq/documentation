@@ -19,7 +19,7 @@ Use system messages when behavior belongs inside a manually managed transcript. 
 
 ## 2. User messages
 
-A user message accepts a string or an array of text, image, and document blocks:
+A user message accepts a string or an array of text, image, and file blocks:
 
 ```ts
 import type { UserMessage } from '@anvia/core'
@@ -46,7 +46,7 @@ A string is normalized to one `text` block. File and image support depends on th
 
 ## 3. Assistant messages
 
-An assistant message stores model output such as text, images, reasoning, and tool calls:
+An assistant message stores model output such as text, images, files, reasoning, and tool calls:
 
 ```ts
 import type { AssistantMessage } from '@anvia/core'

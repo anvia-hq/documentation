@@ -49,6 +49,8 @@ export function createSupportModel(
 
 Callers that need only completion behavior should depend on `CompletionModel`, not a concrete provider class.
 
+The factories also accept `contextLimits`, an explicit `{ contextWindow, maxInputTokens, maxOutputTokens }` override resolved against each provider's built-in per-model limits table. The OpenAI, Anthropic, Gemini, and Grok factories also accept `controls`, which replaces the model-derived controls.
+
 ## 3. Keep agent factories provider-neutral
 
 ```ts
@@ -73,7 +75,8 @@ Reuse long-lived clients when the upstream SDK supports it. Construct them per r
 
 ```ts
 const answerModel = openai.completionModel({
-    modelId: answerModelId
+    modelId: answerModelId,
+    api: 'responses'
 })
 const judgeModel = anthropic.completionModel({
     modelId: judgeModelId

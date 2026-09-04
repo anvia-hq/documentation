@@ -28,6 +28,18 @@ const agent = new Agent({
 
 For each model turn, Anvia takes retrieval text from the current prompt, embeds it, searches the store, applies `topK`, `minScore`, and `filter`, then sends the matching documents to the model. Tool results and steering messages can therefore produce different retrieval on a later turn.
 
+For a [hybrid store](/sdk/knowledges/vector-stores), pass `models` instead of `model`:
+
+```ts
+const hybridDocsContext = createVectorContext({
+    store: hybridDocsIndex,
+    models: { dense: embeddingModel, sparse: sparseModel },
+    fusion: 'rrf',
+    topK: 4,
+    minScore: 0.74,
+});
+```
+
 ## 2. Scope retrieval per caller
 
 Build the agent or context index from trusted request state when the filter depends on the caller:
