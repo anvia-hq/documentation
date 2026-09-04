@@ -1,4 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
-  <title id="title">Anvia sparkle</title>
-  <path fill="#000" d="M32 3c2.2 18.8 10.2 26.8 29 29-18.8 2.2-26.8 10.2-29 29C29.8 42.2 21.8 34.2 3 32 21.8 29.8 29.8 21.8 32 3Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1568 1568" role="img" aria-labelledby="title">
+  <title id="title">Anvia A</title>
+  <rect width="1568" height="1568" fill="#0a0a0a"/>
+  <g fill="#f7f7f8">
+    <rect x="430" y="280" width="970" height="970" rx="96"/>
+    <rect x="190" y="520" width="312" height="730" rx="96"/>
+  </g>
+  <g fill="#0a0a0a">
+    <rect x="510" y="530" width="580" height="260" rx="96"/>
+    <rect x="520" y="960" width="570" height="390" rx="96"/>
+  </g>
 </svg>
