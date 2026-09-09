@@ -1,10 +1,12 @@
 # Releases
 
-The current stable release is `@anvia/core` **1.1.0**. The source changelog is authoritative; the
+The current stable release is `@anvia/core` **1.1.2**. The source changelog is authoritative; the
 entries below summarize recent v1 changes and preserve notable v0 compatibility milestones.
 
 | Version | Summary |
 | --- | --- |
+| `1.1.2` | Moved `zod` to `peerDependencies` (`^4.4.0`) in packages that expose zod types in their public API, so consumers compile and run against a single shared zod copy instead of installing a second, potentially conflicting dependency. |
+| `1.1.1` | Bumped upstream runtime dependencies to their latest versions and aligned zod to 4.5.4 across all packages and workspaces. |
 | `1.0.10` | Enforced the exact `maxTurns` boundary in the Agent execution loop; runs now stop after the configured turn limit instead of allowing extra completion attempts. |
 | `1.0.9` | Added typed completion model controls with provider-neutral reasoning effort support, Agent defaults, per-run overrides, Studio selectors and persistence, and normalized observability attributes. |
 | `1.0.8` | Improved evaluation developer experience with structural exact matching, explicit target status, structured invalid errors, per-case timing/usage/cost diagnostics, typed case requirements and CI expectations, progress events, timeouts, abort signals, independent target and metric concurrency, filtering, sharding, fail-fast execution, and rerun case selection. |

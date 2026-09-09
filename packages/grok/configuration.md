@@ -19,7 +19,7 @@ const grok = new GrokClient({
 | `client` | Reuses an initialized OpenAI-compatible SDK client. |
 | `fetch` | Supplies transport for SDK, image URLs, TTS, and STT. |
 
-When an injected client is used, pass the required `http` object with the media credential and optional base URL, headers, and fetch implementation. Select Responses or Chat explicitly on `completionModel({ modelId, api })`.
+When an injected client is used, pass the required `http` object with the media credential and optional base URL, headers, and fetch implementation. `completionModel({ modelId, api })` accepts `api: 'responses' | 'chat'` and defaults to `'chat'`.
 
 ## Completion options
 

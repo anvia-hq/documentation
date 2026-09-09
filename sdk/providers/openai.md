@@ -20,7 +20,9 @@ Use `imageGenerationModel()`, `speechGenerationModel()`, and `transcriptionModel
 
 Use `listModels()` for administrative [model inventory](/sdk/providers/openai/model-listing).
 
-OpenAI completion models require `api: 'responses' | 'chat'` on `completionModel({ modelId, api })`. `baseUrl` does not select the API; choose it explicitly for the target endpoint. The differences are covered in [Responses and Chat](/sdk/providers/openai/responses-and-chat).
+OpenAI completion models accept `api: 'responses' | 'chat'` on `completionModel({ modelId, api })`. `api` is optional and defaults to `'chat'` (Chat Completions); pass `'responses'` for the Responses API. `baseUrl` changes only the endpoint — it does not select the API. The differences are covered in [Responses and Chat](/sdk/providers/openai/responses-and-chat).
+
+`gpt-6-astra` is in the known model list with context limits and `reasoningEffort` controls restricted to its documented set (`low`, `medium`, `high`, `xhigh`, `max`).
 
 ## What the provider owns
 

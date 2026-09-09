@@ -17,7 +17,7 @@
 
 ## Completion adapters
 
-Every completion model requires an explicit `api: 'responses' | 'chat'`; neither API is a default. The handle created with `api: 'responses'` delegates normalized Responses behavior to the OpenAI adapter and adds Grok provider-tool and source normalization. The `api: 'chat'` handle delegates Chat Completions behavior but does not accept provider-executed tools.
+Every completion model accepts `api: 'responses' | 'chat'`, defaulting to `'chat'` (Chat Completions). The handle created with `api: 'responses'` delegates normalized Responses behavior to the OpenAI adapter and adds Grok provider-tool and source normalization. The `api: 'chat'` handle delegates Chat Completions behavior but does not accept provider-executed tools; select Responses explicitly (`api: 'responses'`) when a workflow needs Grok provider tools.
 
 Known Grok IDs expose context limits. Provider-specific request fields can pass through completion `providerOptions`.
 

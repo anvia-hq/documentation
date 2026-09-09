@@ -35,7 +35,7 @@ if (result.type === 'response') {
 }
 ```
 
-`completionModel({ modelId, api })` requires `api: 'responses' | 'chat'`. It returns an Anvia `StreamingCompletionModel`, so the same object works with agents and direct completion APIs.
+`completionModel({ modelId, api })` accepts `api: 'responses' | 'chat'` and defaults to `'chat'`. It returns an Anvia `StreamingCompletionModel`, so the same object works with agents and direct completion APIs.
 
 ## Stream a run
 

@@ -235,6 +235,17 @@ export default defineConfig({
               ]
             },
             {
+              text: 'Agent teams',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/sdk/advanced/multi-agent/agent-teams' },
+                { text: 'Communication', link: '/sdk/advanced/multi-agent/agent-teams/communication' },
+                { text: 'Hierarchy and spawning', link: '/sdk/advanced/multi-agent/agent-teams/hierarchy' },
+                { text: 'Streaming and steering', link: '/sdk/advanced/multi-agent/agent-teams/streaming' },
+                { text: 'Approvals', link: '/sdk/advanced/multi-agent/agent-teams/approvals' }
+              ]
+            },
+            {
               text: 'MCP',
               collapsed: true,
               items: [
@@ -584,6 +595,7 @@ export default defineConfig({
             { text: 'Memory', link: '/studio/memory' },
             { text: 'Sandboxes', link: '/studio/sandboxes' },
             { text: 'Browser desktop', link: '/studio/browser' },
+            { text: 'Team runs', link: '/studio/team-runs' },
             { text: 'Runtime status', link: '/studio/runtime-status' }
           ]
         },
@@ -621,7 +633,8 @@ export default defineConfig({
                 { text: 'Configure tracing', link: '/lens/connect/anvia/configure-tracing' },
                 { text: 'Trace context', link: '/lens/connect/anvia/trace-context' },
                 { text: 'Capture and privacy', link: '/lens/connect/anvia/capture-and-privacy' },
-                { text: 'Flush and shutdown', link: '/lens/connect/anvia/flush-and-shutdown' }
+                { text: 'Flush and shutdown', link: '/lens/connect/anvia/flush-and-shutdown' },
+                { text: 'Versioned prompts', link: '/lens/connect/anvia/versioned-prompts' }
               ]
             },
             {

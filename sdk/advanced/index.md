@@ -9,6 +9,7 @@ Use advanced capabilities when an agent needs runtime control, specialized coord
 | [Dynamic context](/sdk/advanced/dynamic-context) | Request-time facts, retrieval, and permissions. |
 | [Lifecycle and run control](/sdk/advanced/hooks) | Lifecycle callbacks, cancellation, and tool control. |
 | [Multi-agent systems](/sdk/advanced/multi-agent) | Specialist agents, coordination, and boundaries. |
+| [Agent teams](/sdk/advanced/multi-agent/agent-teams) | Dynamic team membership, messaging, and hierarchy. |
 | [MCP](/sdk/advanced/mcp) | Remote tool servers, transports, and trust. |
 | [Skills](/sdk/advanced/skills) | Reusable instructions, references, and tools. |
 | [Dynamic tools](/sdk/advanced/dynamic-tools) | Runtime tool retrieval through searchable indexes. |

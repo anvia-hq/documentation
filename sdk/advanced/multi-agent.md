@@ -13,6 +13,8 @@ User request
 
 The coordinator chooses whether to delegate, writes a focused child prompt, receives the child output as a tool result, and owns the final response.
 
+When membership should be dynamic — the coordinator decides how many instances to start and members talk to each other — use an [Agent team](/sdk/advanced/multi-agent/agent-teams) instead of fixed agent tools.
+
 ## 1. Create a specialist tool
 
 ```ts
@@ -72,5 +74,6 @@ Keep one agent when the work shares the same instructions, tools, and policy. Ea
 - [Define memory boundaries](/sdk/advanced/multi-agent/memory)
 - [Coordinate specialist work](/sdk/advanced/multi-agent/coordination)
 - [Handle failures and limits](/sdk/advanced/multi-agent/failures)
+- [Run a dynamic team](/sdk/advanced/multi-agent/agent-teams)
 - [Know when not to use multiple agents](/sdk/advanced/multi-agent/when-not-to-use)
 - [Review the production checklist](/sdk/advanced/multi-agent/production-checklist)

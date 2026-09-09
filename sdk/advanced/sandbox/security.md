@@ -45,6 +45,8 @@ const tools = createDockerSandboxTools({
 
 Tool selection and policies constrain what the model may request. The selected image, runtime limits, resource controls, security flags, and network policy constrain the container.
 
+In allow mode, shell interpreters (`sh`, `bash`, `zsh`, and similar) are blocked by default because they can execute arbitrary commands through their arguments and bypass the allow list. Opt in with `allowShellInterpreters: true` only when the workflow genuinely needs a shell, and prefer the structured `command` plus `args` contract. For kernel-level isolation beyond the default runtime, pass `containerRuntime: 'runsc'` (gVisor) at sandbox creation; the runtime must already be registered in the daemon.
+
 ## Put approval before sensitive operations
 
 `createDockerSandboxTools()` does not add approval requirements. When one operation must pause for review, expose a purpose-built tool with `requiresApproval` and call `sandbox.runtime` inside its handler. Approval does not replace authorization or sandbox policy.
