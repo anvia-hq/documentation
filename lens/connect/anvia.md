@@ -79,5 +79,6 @@ The request succeeds independently of when the batch exporter delivers its trace
 | Group requests into users and sessions | [Trace context](/lens/connect/anvia/trace-context) |
 | Control whether payloads leave the application | [Capture and privacy](/lens/connect/anvia/capture-and-privacy) |
 | Deliver buffered telemetry reliably | [Flush and shutdown](/lens/connect/anvia/flush-and-shutdown) |
+| Fetch, compile, and attribute Lens-managed prompts | [Versioned prompts](/lens/connect/anvia/versioned-prompts) |
 
 Evaluation reporting and managed datasets use the same project connection, but they have their own workflow. Continue to [Evaluations](/lens/evaluations) when the goal is measuring quality rather than observing live traffic.

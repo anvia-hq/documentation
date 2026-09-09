@@ -143,6 +143,26 @@ Trace records use `StudioTrace`, `StudioTraceSummary`, `StudioTraceObservation`,
 
 `AgentRunStreamEvent` combines core agent events with Studio approval, question, session-log, pipeline-log, and pipeline-final events.
 
+## Team runs
+
+Registered `AgentTeam` targets gain live run routes. Team IDs occupy a separate namespace from agent IDs.
+
+```ts
+const studio = new Studio([agent, team])
+
+// Config exposure
+GET /teams                    // -> StudioTeamConfig[]
+GET /teams/:teamId            // -> StudioTeamConfig
+
+// Run lifecycle (JSONL event stream)
+POST /teams/:teamId/runs                                          // { prompt } | { messages }
+POST /teams/:teamId/runs/:runId/steer                             // { prompt } | user-only { messages }
+POST /teams/:teamId/runs/:runId/cancel                            // {}
+POST /teams/:teamId/runs/:runId/interactions/:interactionId       // AgentInteractionResponse
+```
+
+`StudioTeamRunRequest` is `{ prompt }` or `{ messages }` (at most 256 messages, last must be a user message). `StudioTeamRunEvent` is `{ type: 'team_run_started', teamId, runId }`, then core `AgentTeamEvent`s, then a terminal outcome or `{ type: 'error', error }`. The Studio control ID also arrives in the `x-anvia-team-run-id` response header. Disconnecting or shutting down cancels the run; completed runs return 404 on later control requests.
+
 ```ts
 type StudioErrorCode =
   | 'bad_request'
@@ -161,6 +181,7 @@ The remaining public types are grouped by the Studio surface that produces or co
 
 | Surface | Public types |
 | --- | --- |
+| Team runs | `StudioTeamConfig`, `StudioTeamRunRequest`, `StudioTeamRunEvent` |
 | Capabilities and status | `StudioCapability`, `StudioCapabilityConfig`, `StudioStatusSummary`, `StudioStores`, `StudioConfig` |
 | Evaluations | `StudioEvalSuite`, `StudioEvalSuiteConfig`, `StudioEvalCasePreview`, `StudioEvalMetricSummary`, `StudioEvalRunRequest`, `StudioEvalRunResponse` |
 | Tools and MCP | `StudioAgentToolSource`, `StudioAgentToolApprovalMetadata`, `StudioAgentToolMetadata`, `StudioAgentToolsSummary`, `StudioToolRunRequest`, `StudioToolRunResponse`, `StudioAgentMcpToolMetadata`, `StudioAgentMcpServerMetadata`, `StudioAgentMcpsSummary` |

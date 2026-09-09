@@ -4,7 +4,7 @@
 
 | Capability | Implementation | Notes |
 | --- | --- | --- |
-| Completion | Responses and Chat Completions adapters | Both stream and support tools; select one with the required `api` model option. |
+| Completion | Responses and Chat Completions adapters | Both stream and support tools; `api` selects one and defaults to `'chat'`. |
 | Embeddings | `OpenAIEmbeddingModel` | Batches inputs and restores provider results to input order. |
 | Images | `imageGenerationModel({ modelId })` | Requires base64 image output; URL-only responses are rejected. |
 | Speech | `OpenAISpeechGenerationModel` | Returns bytes and a media type inferred from response format. |
@@ -23,7 +23,9 @@ The adapters do not make every model support every request. Image input, reasoni
 
 ### Chat Completions
 
-`api: 'chat'` selects the Chat Completions adapter. It reports `provider: 'openai'` at the model level, the same provider label as the Responses adapter. The adapter accepts no document input (`documentInput: false`); document parts require the Responses API. It preserves reasoning history used by compatible providers that return fields such as `reasoning_content`.
+`api: 'chat'` (the default) selects the Chat Completions adapter. It reports `provider: 'openai'` at the model level, the same provider label as the Responses adapter. The adapter accepts no document input (`documentInput: false`); document parts require the Responses API. It preserves reasoning history used by compatible providers that return fields such as `reasoning_content`.
+
+`gpt-6-astra` is a known model ID with context limits and reasoning-effort controls restricted to `low`, `medium`, `high`, `xhigh`, and `max`.
 
 ## Embedding guarantees
 

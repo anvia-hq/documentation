@@ -9,6 +9,7 @@ Use multiple agents when a child creates a real boundary: different instructions
 | A coordinator should decide whether to delegate | [Agent as a tool](/sdk/advanced/multi-agent/agent-as-tool) |
 | The same specialists must run in a known order | [Pipeline](/sdk/pipelines) |
 | Independent specialists can run together | Pipeline parallel branches or application orchestration |
+| Membership is dynamic: spawn on demand, message, recurse | [Agent teams](/sdk/advanced/multi-agent/agent-teams) |
 
 The model should choose a child only when adaptive routing is useful. If every request must call the same agents, deterministic composition is easier to test and operate.
 

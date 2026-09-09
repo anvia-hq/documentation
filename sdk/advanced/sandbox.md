@@ -69,6 +69,16 @@ Use `createDockerSandboxTools()` only for capabilities the model may choose. Use
 
 Start with the smallest tool tuple required by the workflow.
 
+### Container runtime
+
+`createSandbox()` accepts `containerRuntime` — the runtime name registered in the Docker daemon (for example `runsc` for gVisor). The runtime must already be registered (`runsc install` followed by a daemon restart); creation fails with a `runtime_not_found` error otherwise. Omit the option to use the daemon default. `resumeSandbox()` keeps the container's original runtime.
+
+Under gVisor, workspace files persist through `stop()`/`resumeSandbox()` because they live on a Docker volume, but changes to the container's writable rootfs outside the workspace do not survive a resume, and `security.seccompProfile` is not enforced the way it is on the default runtime because the gVisor sentry mediates application syscalls itself.
+
+### Command policy defaults
+
+In allow mode, the command policy blocks shell interpreters (`sh`, `bash`, `zsh`, and similar) by default, because they can execute arbitrary commands through their arguments and bypass the allow list. Opt in explicitly with `allowShellInterpreters: true` when the workflow genuinely needs a shell, and prefer the structured `command` plus `args` contract.
+
 ## 3. Continue through the section
 
 - [Create a sandbox](/sdk/advanced/sandbox/create)

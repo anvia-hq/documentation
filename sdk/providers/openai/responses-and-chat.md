@@ -1,6 +1,6 @@
 # Responses and Chat
 
-`OpenAIClient` can create completion models backed by OpenAI's Responses API or Chat Completions API. The selection belongs to the model factory, not the client, and is always explicit.
+`OpenAIClient` can create completion models backed by OpenAI's Responses API or Chat Completions API. The selection belongs to the model factory. `api` is optional and defaults to `'chat'`; pass `api: 'responses'` when the workflow needs the Responses surface.
 
 ## Select the API per model
 
@@ -11,14 +11,14 @@ const openai = new OpenAIClient({
   apiKey: process.env.OPENAI_API_KEY!,
 })
 
+// Chat Completions handle — the default when `api` is omitted.
+const chatModel = openai.completionModel({
+  modelId: 'gpt-5.6-sol',
+})
+
 const responsesModel = openai.completionModel({
   modelId: 'gpt-5.6-sol',
   api: 'responses',
-})
-
-const chatModel = openai.completionModel({
-  modelId: 'gpt-5.6-sol',
-  api: 'chat',
 })
 ```
 

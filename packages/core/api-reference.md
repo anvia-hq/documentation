@@ -74,6 +74,45 @@ Pass `session: { sessionId, userId?, metadata? }` with a prompt to load and pers
 
 Use `createVectorContext({ store, model, topK, minScore?, filter?, format? })` to register prompt-time vector retrieval in an agent's `context` array.
 
+Set `trace.promptRef` on `generate()` or `stream()` to identify the prompt used by a run. The contract is `{ name: string; version?: number }`; completion-request middleware can override it per generation or clear it with `null`.
+
+## Agent teams
+
+Import from `@anvia/core` or `@anvia/core/agent`. See the [Agent teams guide](/sdk/advanced/multi-agent/agent-teams) for behavior and production boundaries.
+
+```ts
+const team = new AgentTeam({
+  id: 'research-team',
+  model,
+  instructions: 'Delegate research, review it, answer.',
+  members: [researcher, reviewer],
+  communication: { siblings: false },
+  spawning: [{ from: researcher, to: [researcher] }],
+  limits: {
+    maxDepth: 3,
+    maxConcurrentAgents: 4,
+    maxAgentInstances: 12,
+    maxTotalTurns: 100,
+    maxBufferedEvents: 1024,
+  },
+})
+```
+
+Important methods and handles:
+
+```ts
+team.generate(options): Promise<AgentTeamOutcome<Output>>
+team.stream(options): AgentTeamStream<Output>
+```
+
+Run options take exactly one of `prompt` or `messages`, plus ordinary agent run settings (except `toolConcurrency`) and an optional `resolveInteraction(request: AgentTeamInteraction)`.
+
+The runtime injects reserved coordination tools — `spawn_<member.id>`, `send_message`, `wait_for_agent`, `list_agents`, and `cancel_agent` (spawn-permitted instances only). Configured member tools must not use these names, and member IDs must form valid spawn tool names (1–58 letters, digits, underscores, or hyphens).
+
+`AgentTeamOutcome` extends the Agent outcome union with `teamRunId`, aggregate `usage`, and a `members` array of `AgentTeamMemberSummary` (`instanceId`, `agentId`, `name`, `parentInstanceId?`, `depth`, `status`, `usage`, outcome or error). `AgentTeamStream` mirrors `AgentStream` with `events`, `textStream`, `text`, `result`, `steer(input)`, and `cancel(reason?)`, emitting `AgentTeamEvent`s attributed with `teamRunId` and `instanceId`.
+
+Errors: `AgentTeamLimitError` (turn budget, event buffer overflow) and `AgentTeamInteractionError` (missing or failing interaction resolver).
+
 ## Direct completions
 
 Import from `@anvia/core` or `@anvia/core/completion`.

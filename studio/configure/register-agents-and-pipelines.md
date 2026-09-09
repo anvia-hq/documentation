@@ -12,7 +12,7 @@ new Studio([
 ]).start({ port: 4021 })
 ```
 
-Studio accepts built `Agent` and `Pipeline` instances. It runs those same objects; registering a target does not create a second agent or pipeline definition.
+Studio accepts built `Agent`, `AgentTeam`, and `Pipeline` instances. It runs those same objects; registering a target does not create a second agent or pipeline definition. Teams additionally get live HTTP run controls — see [Team runs](/studio/team-runs).
 
 ## Register one agent
 
