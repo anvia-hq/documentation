@@ -12,8 +12,13 @@ await channel.start(async (event) => {
   if (event.type === 'action') {
     console.log(event.actionId)
   }
+  if (event.type === 'command') {
+    console.log(event.name, event.text)
+  }
 })
 ```
+
+Lifecycle events arrive too: `message-edited` carries the new text and attachments, `message-deleted` carries only the message ID, and `reaction` carries the emoji and a `removed` flag.
 
 Socket envelopes are acknowledged before handler execution, so Slack does not re-deliver while the handler runs. Duplicate deliveries are suppressed with a bounded in-memory set of event IDs, and bot-authored events are filtered before the application handler runs. Handler failures are reported through `onError` without disconnecting.
 

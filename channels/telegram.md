@@ -23,7 +23,7 @@ Create a bot with [BotFather](https://t.me/BotFather), copy its token into a sec
 - long polling for workers, local development, and processes without a public HTTP route;
 - webhook delivery for an existing HTTPS application server.
 
-The token format (`<bot id>:<hash>`) is validated when the adapter is constructed. Pass either `polling` or `webhook`, never both. Telegram cannot deliver through `getUpdates` while a webhook is configured, so remove the webhook before switching a bot back to polling. See the official [Telegram Bot API](https://core.telegram.org/bots/api) for bot creation, webhook registration, and delivery requirements.
+The token format (`<bot id>:<hash>` — digits, a colon, then letters/digits/`_`/`-`) is validated when the adapter is constructed from a `token`. With `telegram({ api })` there is no token to validate: a custom `TelegramBotApi` takes over API access entirely and forbids the other options. Pass either `polling` or `webhook`, never both. Telegram cannot deliver through `getUpdates` while a webhook is configured, so remove the webhook before switching a bot back to polling. See the official [Telegram Bot API](https://core.telegram.org/bots/api) for bot creation, webhook registration, and delivery requirements.
 
 ## Run an agent on the channel
 

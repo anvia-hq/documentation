@@ -12,7 +12,7 @@ const gateway: DiscordGateway = existingGatewayAdapter
 const channel = new DiscordChannel({ gateway })
 ```
 
-The custom gateway must emit runtime-validated `DiscordGatewayEvent` values, implement the REST operations required by the interface (`send`, `edit`, `delete`, `showTyping`, `react`), and drain in-flight handlers during `stop()`. `DiscordJsGateway` is a reference implementation.
+The custom gateway must emit runtime-validated `DiscordGatewayEvent` values, implement the `start`/`stop` lifecycle plus the REST operations required by the interface (`send`, `edit`, `delete`, `showTyping`, `react`, `unreact`), and drain in-flight handlers during `stop()`. `DiscordJsGateway` is a reference implementation.
 
 ## Shutdown
 

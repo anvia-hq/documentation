@@ -13,7 +13,8 @@ Start with `discord()` unless you are replacing its transport.
 | Use the built-in raw `discord.js` transport directly | `DiscordJsGateway`                                      |
 | Implement a replacement transport                    | `DiscordGateway` interface                              |
 | Normalize a validated gateway value                  | `normalizeDiscordEvent()`                               |
-| Normalize only messages or actions                   | `normalizeDiscordMessage()`, `normalizeDiscordAction()` |
+| Normalize messages, actions, or commands      | `normalizeDiscordMessage()`, `normalizeDiscordAction()`, `normalizeDiscordCommand()` |
+| Render command options as text               | `discordCommandOptionText()`                  |
 | Validate Discord IDs in application configuration    | `isDiscordSnowflake()`, `validateDiscordSnowflake()`    |
 
 The low-level exports are extension points. A normal bot should not call a normalizer manually or construct `DiscordJsGateway` itself.
@@ -56,7 +57,7 @@ const service = createChannelAgent({ channel, agent })
 await service.start()
 ```
 
-The default filter handles direct messages plus guild messages that mention or reply to the bot. Use `service.stop()`, not `channel.stop()`, when the service started the adapter.
+The channel-agent default filter handles direct messages plus guild messages that mention or reply to the bot (see [Channel agent](/channels/channel-agent)). Use `service.stop()`, not `channel.stop()`, when the service started the adapter.
 
 ## Continue with
 

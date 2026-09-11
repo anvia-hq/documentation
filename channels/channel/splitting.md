@@ -16,7 +16,7 @@ const parts = splitChannelMessage({ message, maximumLength: 2_000 })
 Splitting behavior:
 
 - Boundaries prefer readability: the last newline before the limit, then the last space, then a hard cut.
-- A split never divides a surrogate pair; a `maximumLength` too small to hold one Unicode character throws a `RangeError`.
+- `maximumLength` must be a positive safe integer (`TypeError` otherwise); a `maximumLength` too small to hold one Unicode character throws a `RangeError`.
 - Empty text throws a `TypeError`; a media-only message (`text: ''` plus attachments) becomes a single part.
 - `replyToMessageId` is copied to every part.
 - `actions` and `attachments` are placed only on the final part.
@@ -41,12 +41,13 @@ The validators throw a `TypeError` for malformed values and a `RangeError` for l
 
 - At most 5 actions per message (`MAX_CHANNEL_ACTIONS`).
 - Action labels contain between 1 and 80 characters (`MAX_CHANNEL_ACTION_LABEL_LENGTH`).
-- Action IDs are non-empty, unique within a message, and at most 64 UTF-8 bytes (`MAX_CHANNEL_ACTION_ID_BYTES`; `isChannelActionId()` checks this).
+- Action IDs are non-empty and unique within a message (`TypeError` when empty or duplicated) and at most 64 UTF-8 bytes (`RangeError` when overlong; `isChannelActionId()` checks the shape).
+- Action `style` is `'default'`, `'primary'`, or `'danger'` (default when omitted); anything else throws a `TypeError`.
 - At most 10 outbound attachments per logical message (`MAX_CHANNEL_ATTACHMENTS`).
-- Attachment `url` sources must use HTTPS; `data` sources must be valid base64.
+- Attachment `url` sources must use HTTPS; `data` sources must be valid base64. `mediaType` must be non-empty, `filename` non-empty when present, and `size` a non-negative safe integer when present.
 - When present, `actions` and `attachments` must be non-empty arrays.
 
-Use the exported `MAX_CHANNEL_*` constants when an application UI needs to enforce the same limits.
+`validateChannelMessage()` checks only actions and attachments — it does not validate text length, which is the adapter's `splitMessage()` job. Use the exported `MAX_CHANNEL_*` constants when an application UI needs to enforce the same limits.
 
 ## Continue with
 

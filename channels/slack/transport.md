@@ -10,7 +10,7 @@ import { SlackChannel } from '@anvia/slack'
 const channel = new SlackChannel({ transport: existingSlackTransport })
 ```
 
-The transport must parse and validate external payloads into `SlackSocketEvent` values (use `parseSlackSocketEvent()` and `parseSlackSocketInteraction()`), acknowledge Slack envelopes promptly, implement the Web API operations (`send`, `edit`, `delete`, `react`, `loadAttachment`), and drain active handlers during shutdown. `SlackSocketTransport` is a reference implementation.
+The transport must parse and validate external payloads into `SlackSocketEvent` values (use `parseSlackSocketEvent()`, `parseSlackSocketInteraction()`, and `parseSlackSocketCommand()` — without the last, slash commands are silently dropped), acknowledge Slack envelopes promptly, implement the `start`/`stop` lifecycle plus the Web API operations (`send`, `edit`, `delete`, `react`, `removeReaction`, `loadAttachment`), and drain active handlers during shutdown. `SlackSocketTransport` is a reference implementation.
 
 ## Shutdown
 

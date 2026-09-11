@@ -49,6 +49,8 @@ export class AcmeChannel implements Channel<AcmeEvent> {
 }
 ```
 
-Implement `loadAttachment()` when normalized incoming messages expose attachment metadata, and never put authenticated download URLs or platform credentials into a normalized event.
+Implement `loadAttachment()` when normalized incoming messages expose attachment metadata. It receives the original `message` event plus the attachment metadata and an optional `AbortSignal`, and resolves to `{ type: 'url' }` or `{ type: 'data' }` bytes. Never put authenticated download URLs or platform credentials into a normalized event.
+
+`splitMessage()` must return at least one message — returning an empty array makes `sendChannelMessage()` throw instead of delivering nothing.
 
 `edit()` is optional: omit it for text-only adapters and gate calls on `capabilities.messageEdits === true && channel.edit !== undefined`. When `edit` is omitted, a channel-agent service skips live editing and delivers the completed response through `send` instead. See [Channel agent](/channels/channel-agent) for the bridge that connects an adapter to an agent.

@@ -13,6 +13,9 @@ await channel.start(async (event) => {
     case 'action':
       console.log(event.actionId)
       break
+    case 'command':
+      console.log(event.name, event.text)
+      break
     case 'message-edited':
     case 'message-deleted':
     case 'reaction':
@@ -24,7 +27,7 @@ await channel.start(async (event) => {
 
 Bot-authored events are filtered before the handler runs. System messages and messages without content or attachments are dropped during normalization. Gateway reaction events from uncached messages are fetched before delivery. Handler failures are reported through `onError` without terminating the Gateway.
 
-Gateway health surfaces through `onError`: shard disconnects, reconnect attempts, and invalidated sessions (for example a revoked token) are all reported while `discord.js` keeps the connection alive. Events emitted during an outage gap are lost.
+Gateway health surfaces through `onError`: shard disconnects, reconnect attempts, and invalidated sessions (for example a revoked token) are all reported while `discord.js` keeps the connection alive. Events emitted during an outage gap are lost; sessions are not resumed from before the outage.
 
 Actions arrive as button interactions. The gateway acknowledges each interaction with `deferUpdate` before the handler runs, so the button stops showing "thinking" immediately; use `channel.edit()` to update the message afterwards.
 

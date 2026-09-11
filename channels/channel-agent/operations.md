@@ -4,17 +4,20 @@ The bridge observes every failure through `onError` without interrupting deliver
 
 ## Errors
 
-`onError(error, context)` observes every failure with a `context.stage` of `filter`, `prepare`, `acknowledge`, `interaction`, `agent`, or `delivery`. Observed errors never interrupt delivery: the user receives `errorMessage` (default `Sorry, I couldn't process that message.`, disable with `errorMessage: false`). An outcome with no text and no attachments is answered with `emptyResponseMessage`.
+`onError(error, context)` observes every failure with a `context.stage` of `filter`, `prepare`, `acknowledge`, `interaction`, `agent`, or `delivery`. Observed errors never interrupt delivery: the user receives `errorMessage` (default `Sorry, I couldn't process that message.`, disable with `errorMessage: false`). An outcome with no text and no attachments is answered with `emptyResponseMessage` (default `I couldn't produce a response.`).
+
+No failure reply is sent when the run's signal was already aborted, or when even the placeholder message could not be delivered — those failures are only observed through `onError`.
 
 ## Graceful shutdown
 
-`service.stop()` aborts in-flight and queued runs, stops the adapter, and drains queued conversations. Stop the service before closing the databases it may still use:
+`service.stop()` signals in-flight runs to abort and waits for (drains) queued conversation work before stopping the adapter — queued work is not discarded, it runs to its abort check. Stop the service before closing the databases it may still use:
 
 ```ts
 try {
   await service.stop()
 } finally {
   interactionStore.close()
+  // await memoryClient.close() // when the agent uses a closable memory store
 }
 ```
 

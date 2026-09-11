@@ -70,6 +70,8 @@ const service = createChannelAgent({
 })
 ```
 
+Behaviour and limits: only events that pass `shouldHandle` are acknowledged (filtered, bot-authored, and lifecycle events never get reactions); all three standard adapters support reactions; a failed acknowledgement is reported through `onError` with the `acknowledge` stage and never interrupts the run; `false` (or omitting the option) disables acknowledgements.
+
 ## Continue with
 
 - [Streaming and delivery](/channels/channel-agent/delivery) — how the final answer reaches the channel.

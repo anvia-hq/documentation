@@ -4,7 +4,7 @@ The bridge streams the agent's answer through live message edits, then splits th
 
 ## Streaming and long messages
 
-Streaming is on by default; it turns off only when you set `streaming.enabled: false` or the model advertises `capabilities.streaming: false`. While a run streams, the service edits the placeholder message at most once per `editIntervalMs` (default 750 ms) and only the first message part. Placeholder delivery requires `channel.edit`; without it the service buffers and sends only the final response.
+Streaming is on by default; it turns off only when you set `streaming.enabled: false` or the model advertises `capabilities.streaming: false`. While a run streams, the service edits the placeholder message at most once per `editIntervalMs` (default 750 ms) and only the first message part. Placeholder delivery requires `channel.edit`; without it the service buffers and sends only the final response. When the adapter supports it, the service also triggers the platform typing indicator while the run works; typing failures are observed, never fatal.
 
 Disable the placeholder to skip the provisional message entirely:
 

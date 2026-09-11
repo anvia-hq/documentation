@@ -21,13 +21,13 @@ try {
 
 The client exposes `getMe`, `getUpdates`, `sendMessage`, `sendAttachment`, `editMessageText`, `answerCallbackQuery`, `deleteMessage`, `sendChatAction`, `setMessageReaction`, and `downloadFile`. Options beyond the token:
 
-- `baseUrl` targets a local Bot API server; HTTPS is required except for `localhost`, `127.0.0.1`, or `::1` over HTTP.
+- `baseUrl` targets a custom (usually self-hosted) Bot API server; any HTTPS URL is accepted, while plain HTTP works only for `localhost`, `127.0.0.1`, or `::1`.
 - `fetch` replaces the Fetch implementation for proxies and test doubles.
 - `maximumAttachmentBytes` caps upload and download sizes (20 MiB by default).
 
 Failures surface as `TelegramApiError` carrying `method`, the Bot API `errorCode` when present, and `retryAfterSeconds` for rate limits. Request failures never embed the request URL, so the token cannot leak into error messages.
 
-Mutating Bot API calls retry up to three times on HTTP 429, honoring Telegram's `retry_after` hint while respecting the abort signal. For steadier pacing on top of retries, wrap the adapter with [`createRateLimitedChannel()`](/channels/channel/capabilities).
+Five calls retry on HTTP 429 (up to three attempts, honoring Telegram's `retry_after` hint, abort-aware): `sendMessage`, URL-based `sendAttachment`, `editMessageText`, `deleteMessage`, and `setMessageReaction`. `answerCallbackQuery`, `sendChatAction`, `getMe`, `getUpdates`, downloads, and multipart (base64) uploads never retry. For steadier pacing on top of retries, wrap the adapter with [`createRateLimitedChannel()`](/channels/channel/capabilities).
 
 ## Integrate a custom receive transport
 

@@ -28,11 +28,11 @@ if (channel.capabilities?.reactionRemovals === true && channel.unreact !== undef
 }
 ```
 
-`capabilities.actions` is the only required flag; `outboundAttachments` lists accepted attachment kinds, and `replies`, `typing`, `reactions`, `reactionRemovals`, `delete`, and `messageEdits` gate the optional operations. The standard adapters advertise their exact support; a custom text-only adapter may omit `capabilities` entirely.
+`capabilities.actions` is the only required flag; `outboundAttachments` lists accepted attachment kinds (`'image'`, `'audio'`, `'video'`, `'file'`), and `replies`, `typing`, `reactions`, `reactionRemovals`, `delete`, and `messageEdits` gate the optional operations (`replies` gates `replyToMessageId` support). The standard adapters advertise their exact support; a custom text-only adapter may omit `capabilities` entirely.
 
 ## Pace outbound calls
 
-Wrap any adapter with `createRateLimitedChannel()` to serialize outbound calls (send, edit, delete, typing, reactions) with a minimum spacing between them:
+Wrap any adapter with `createRateLimitedChannel()` to serialize outbound calls (send, edit, delete, typing, reactions, and reaction removals) with a minimum spacing between them:
 
 ```ts
 import { createRateLimitedChannel } from '@anvia/channel'
@@ -40,7 +40,7 @@ import { createRateLimitedChannel } from '@anvia/channel'
 const paced = createRateLimitedChannel({ channel, minimumIntervalMs: 1_000 })
 ```
 
-Inbound behavior (`start`, `stop`, attachments, splitting) and the advertised capabilities pass straight through. Discord and Slack SDK clients already rate-limit internally, so the wrapper is most useful for raw-REST adapters such as Telegram, or for application code that fans out many proactive messages.
+`minimumIntervalMs` must be a positive integer (`TypeError` otherwise). A failed call never blocks later ones — the chain survives failures. Inbound behavior (`start`, `stop`, `loadAttachment`, `splitMessage`) and the advertised capabilities pass straight through unpaced. Discord and Slack SDK clients already rate-limit internally, so the wrapper is most useful for raw-REST adapters such as Telegram, or for application code that fans out many proactive messages.
 
 ## Continue with
 

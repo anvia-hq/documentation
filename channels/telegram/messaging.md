@@ -21,7 +21,7 @@ await sendChannelMessage({
 })
 ```
 
-Numeric chat IDs may be negative, and public channel targets may use an `@username`. Message IDs and topic IDs must be positive safe integers represented as strings in the shared channel API; the address `threadId` targets a forum topic. Text longer than 4,096 characters is split into parts before delivery. The portable payload rules live in [@anvia/channel](/channels/channel).
+Numeric chat IDs may be negative, and public channel targets may use an `@username` (leading letter, at least 5 characters). Message IDs and topic IDs must be positive safe integers represented as strings in the shared channel API; the address `threadId` targets a forum topic. Text longer than 4,096 characters is split into parts when sending via `sendChannelMessage()` (which calls the adapter's `splitMessage()`); direct `channel.send()` rejects over-long text with a `RangeError` — call `channel.splitMessage()` first. The portable payload rules live in [@anvia/channel](/channels/channel).
 
 ## Actions and callback queries
 
@@ -69,7 +69,7 @@ await channel.edit(sent, { text: 'Release candidate is live.' })
 await channel.delete(sent)
 ```
 
-`sent` is a `SentChannelMessage` from `channel.send()` or an element of the array returned by `sendChannelMessage()`. Editing is text-only: a message with attachments or a reply target cannot be edited, and editing a message without actions clears its inline keyboard. `react()` sets a single emoji reaction, replacing the bot's previous reaction on that message. `showTyping()` sends the `typing` chat action and honors the address `threadId`.
+`sent` is a `SentChannelMessage` from `channel.send()` or an element of the array returned by `sendChannelMessage()`. Editing is text-only: a message with attachments or a reply target cannot be edited, and editing a message without actions clears its inline keyboard. `react()` sets a single emoji reaction, replacing the bot's previous reaction on that message. `unreact()` takes the same arguments but ignores the emoji value — it always clears the bot's reaction. `showTyping()` sends the `typing` chat action and honors the address `threadId`.
 
 ## Continue with
 

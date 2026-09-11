@@ -4,7 +4,7 @@ Outbound delivery in `@anvia/channel` has two layers: `sendChannelMessage()` for
 
 ## Send a portable message
 
-Use `sendChannelMessage()` at application boundaries when a worker or webhook pushes output without a matching inbound event. It takes one options object, validates the payload, asks the adapter to split it, and sends the parts sequentially:
+Use `sendChannelMessage()` for any complete portable message — proactive output or a reply to an inbound event. It takes one options object, validates the payload, asks the adapter to split it, and sends the parts sequentially:
 
 ```ts
 import { sendChannelMessage } from '@anvia/channel'
@@ -35,7 +35,7 @@ const messages = await sendChannelMessage({
 
 Reply metadata lands on every part; actions and attachments ride on the final part. A media-only message uses `text: ''` and at least one attachment.
 
-If a later part fails to send, `sendChannelMessage()` throws `PartialDeliveryError` carrying the `sent` prefix, the `failedPart`, and its zero-based `failedIndex`, so callers can resume without resending delivered parts.
+If a later part fails to send, `sendChannelMessage()` throws `PartialDeliveryError` carrying the `sent` prefix, the `failedPart`, and its zero-based `failedIndex`, so callers can resume without resending delivered parts. It extends `Error` (`name: 'PartialDeliveryError'`, message `Channel message delivery failed after N delivered part(s)`) and chains the original failure as `cause` — use `instanceof` to distinguish a partial send from other failures.
 
 ## URL-backed attachments
 

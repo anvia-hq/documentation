@@ -10,6 +10,7 @@ This tutorial assembles a complete channel application — platform adapter, and
 | Receive events and run application code | one adapter | `channel.start(handler)` |
 | Receive events and run an Anvia agent | one adapter, `@anvia/channel-agent`, `@anvia/core` | `createChannelAgent()` |
 | Build a reusable custom adapter | `@anvia/channel` | `Channel` interface |
+| Use your own platform transport | adapter package | `DiscordGateway`, `SlackTransport`, or the Telegram API client |
 
 Do not add `@anvia/channel-agent` to a sender-only worker, and do not use raw platform clients when a standard adapter already owns the connection.
 

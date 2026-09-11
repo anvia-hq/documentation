@@ -20,11 +20,11 @@ await sendChannelMessage({
 })
 ```
 
-`sendChannelMessage` splits text longer than 2000 characters into multiple Discord messages and returns the sent parts. Actions become message buttons: `style` maps `'primary'` and `'danger'` to the matching Discord button color, and the action `id` is delivered back as the `actionId` of an action event.
+`sendChannelMessage` splits text longer than 2000 characters into multiple Discord messages and returns the sent parts. Actions become one row of message buttons: `style` maps `'primary'` and `'danger'` to the matching Discord button color and anything else (including an omitted style) to secondary grey. The action `id` becomes the button `custom_id` and is delivered back as the `actionId` of an action event.
 
 Generated text is sent with Discord mentions disabled (`allowed_mentions` parses nothing), preventing unexpected `@everyone`, role, or user notifications.
 
-Command responses land in place: a deferred chat-input command interaction stays open and the next send to that channel edits the deferred reply through the interaction webhook instead of posting a separate dangling message.
+Command responses land in place: a deferred chat-input command interaction stays open and the *next* send to that channel is *attempted* as an edit of the deferred reply through the interaction webhook (single-use). If that edit fails — the reply was consumed, expired, or errored — the message is posted normally instead and the failure is reported through `onError`.
 
 ## Threads and replies
 
@@ -38,6 +38,7 @@ await channel.send(
     platform: event.platform,
     conversationId: event.conversation.id,
     threadId: event.conversation.threadId,
+    // accountId: event.accountId, // preserve for multi-bot setups
   },
   { text: 'Replying inside the same thread.', replyToMessageId: event.raw.id },
 )

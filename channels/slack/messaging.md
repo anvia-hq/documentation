@@ -24,7 +24,7 @@ await sendChannelMessage({
 })
 ```
 
-Text is posted first with `chat.postMessage` (link previews disabled), then files are uploaded sequentially with `files.uploadV2`. A multi-file delivery may be partially visible if a later upload fails; use idempotent application retries. `sendChannelMessage` splits text longer than 4000 characters into multiple messages and returns the sent parts.
+Text is posted first with `chat.postMessage` (link previews disabled), then files are uploaded sequentially with `files.uploadV2`. A multi-file delivery may be partially visible if a later upload fails; use idempotent application retries. `sendChannelMessage` splits text longer than 4000 characters into multiple messages and returns the sent parts. Direct `channel.send()` does not split: text over 4000 characters throws a `RangeError`, as does an empty message with no attachments.
 
 Actions become Slack `actions` blocks with one button per action; the action `id` is returned as the `actionId` of an action event, and `style: 'primary' | 'danger'` maps to the matching Slack button color.
 
@@ -65,7 +65,7 @@ await channel.react(sent, 'eyes')
 await channel.delete(sent)
 ```
 
-`edit()` accepts text-only changes; attachments and reply targets cannot be edited and throw a `TypeError`. `react()` strips surrounding colons from the emoji name before calling `reactions.add`. `unreact()` removes the bot's own reaction through `reactions.remove`.
+`edit()` accepts text-only changes; attachments and reply targets cannot be edited and throw a `TypeError`. `react()` strips surrounding colons from the emoji name before calling `reactions.add`. `unreact()` removes the bot's own reaction through `reactions.remove`, stripping colons the same way.
 
 The adapter reports `actions`, `replies`, `reactions`, `reactionRemovals`, `delete`, and `messageEdits`, with outbound attachments of every kind. `capabilities.typing` is absent: Slack has no general bot typing-indicator API, so there is no `showTyping`. Use the [channel agent](/channels/channel-agent) placeholder message when users need progress feedback.
 

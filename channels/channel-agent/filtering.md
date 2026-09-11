@@ -4,7 +4,7 @@ The bridge decides which events reach the agent and which conversation history e
 
 ## Filter incoming events
 
-The default filter (`defaultShouldHandleChannelEvent`) handles non-bot messages that arrive as direct messages or mention the bot. Bot-authored events, action events, and lifecycle events such as edits and reactions never start agent runs.
+The default filter (`defaultShouldHandleChannelEvent`) handles non-bot messages that arrive as direct messages or mention the bot. Bot-authored events and lifecycle events such as edits and reactions never start agent runs. Action events never start *new* runs — they resume a paused approval or question via `agent.resume()` (see [Approvals and interactions](/channels/channel-agent/interactions)).
 
 Override `shouldHandle` for product-specific routing:
 
@@ -26,7 +26,7 @@ The bridge chooses the `session` scope passed to every run; the agent's memory s
 
 | Product behavior | `createSession` value |
 | --- | --- |
-| Each sender has private history in a group | omit it (default) or use `channelConversationUserSession` |
+| Each sender has private history in a group | omit it (the default, `defaultChannelAgentSession`) or use `channelConversationUserSession` |
 | Everyone in one channel or thread shares history | `channelConversationSession` |
 | No memory for an event | custom function returning `undefined` |
 | Custom tenant or user mapping | custom function returning your `MemoryScope` |

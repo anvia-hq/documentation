@@ -29,7 +29,7 @@ const channel = telegram({
 await channel.start(handler)
 ```
 
-`start()` validates the token with `getMe`, then runs the background polling loop. The polling defaults are `timeoutSeconds: 30`, `retryDelayMs: 1_000`, and `limit: 100` (the limit must stay within Telegram's 1–100 range). Successfully handled updates advance the offset; handler failures are reported through `onError` and the update is retried.
+`start()` validates the token with `getMe`, then runs the background polling loop. The polling defaults are `timeoutSeconds: 30`, `retryDelayMs: 1_000`, and `limit: 100` (the limit must stay within Telegram's 1–100 range). The loop subscribes with `allowed_updates: ["message", "edited_message", "message_reaction", "callback_query"]` — other update kinds are never delivered (see [Receive scope](/channels/telegram/events)). Successfully handled updates advance the offset; handler failures are reported through `onError` and the update is retried.
 
 Poll failures retry with exponential backoff: `retryDelayMs`, doubling per consecutive failure up to 30 seconds, resetting after a successful poll. Rate-limit responses (`429`) wait exactly the `retry_after` seconds the API returns instead. `onError` receives `context.operation` (`'poll'` or `'handle'`) and `context.errorCode` for Bot API errors, so applications can treat fatal codes such as `401` differently from transient ones.
 

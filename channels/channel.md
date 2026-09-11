@@ -39,7 +39,7 @@ const address: ChannelAddress = {
 ```
 
 - `platform` must match the adapter.
-- `accountId` distinguishes two bot/application accounts on the same platform and is optional.
+- `accountId` distinguishes two bot/application accounts on the same platform and is optional — copy it from the inbound event when replying; omit it for proactive delivery unless you address a second account.
 - `conversationId` is the channel, chat, or direct-message conversation.
 - `threadId` is the platform thread/topic identifier when present.
 

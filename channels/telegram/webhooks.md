@@ -26,7 +26,7 @@ await channel.receiveWebhook(payload, secret)
 return new Response(null, { status: 204 })
 ```
 
-In webhook mode `start()` still validates the token with `getMe` but starts no loop; updates arrive only through `receiveWebhook()`, which rejects when the channel is not running, the secret does not match, or the body does not parse. Return a non-2xx response when it rejects so Telegram can retry. The package does not register the external webhook URL: that remains deployment configuration because the adapter does not know the application's public route. Concurrent redeliveries of one update share the same in-flight handler execution, and an update that has already been handled is dropped.
+In webhook mode `start()` still validates the token with `getMe` but starts no loop; updates arrive only through `receiveWebhook()`, which rejects when the channel is not running, the secret does not match, or the body does not parse. A `callback_query` update is auto-answered before your handler runs — if answering fails, the handler never runs and `receiveWebhook()` rejects. Return a non-2xx response when it rejects so Telegram can retry. The package does not register the external webhook URL: that remains deployment configuration because the adapter does not know the application's public route. Concurrent redeliveries of one update share the same in-flight handler execution, and an update that has already been handled is dropped.
 
 ## Continue with
 

@@ -12,9 +12,9 @@ Start with `slack()` unless the host application already owns a Slack transport.
 | Inject an existing transport                    | `new SlackChannel({ transport })`                          |
 | Use the built-in Socket Mode transport directly | `SlackSocketTransport`                                     |
 | Implement a replacement transport               | `SlackTransport` interface                                 |
-| Parse raw Socket Mode payloads                  | `parseSlackSocketEvent()`, `parseSlackSocketInteraction()` |
+| Parse raw Socket Mode payloads                  | `parseSlackSocketEvent()`, `parseSlackSocketInteraction()`, `parseSlackSocketCommand()` |
 | Normalize validated Slack values                | `normalizeSlackEvent()`                                    |
-| Normalize only messages or actions              | `normalizeSlackMessage()`, `normalizeSlackAction()`        |
+| Normalize messages, actions, or commands        | `normalizeSlackMessage()`, `normalizeSlackAction()`, `normalizeSlackCommand()` |
 | Validate Slack IDs or message timestamps        | `isSlackId()`, `isSlackTimestamp()`, `validateSlackId()`, `validateSlackTimestamp()` |
 
 Normal applications need only `slack()` and `sendChannelMessage()`. The parsing helpers are for custom transports and tests.
