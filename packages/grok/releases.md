@@ -1,11 +1,13 @@
 # Releases
 
-Current stable release: `1.1.1`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Current stable release: `1.1.3`. The entries below summarize the 1.0 line and preserve notable v0 history.
 
 ## Recent changes
 
 | Version | Type | Summary |
 | --- | --- | --- |
+| `1.1.3` | Patch | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
+| `1.1.2` | Patch | completionModel() api now optional, defaulting to Chat Completions; gpt-6-astra added to the known model list (Grok provider tools stay Responses-only). |
 | `1.1.1` | Patch | Bumped upstream runtime dependencies to their latest versions, aligned zod to `4.5.4` across all packages and workspaces, and updated Core and OpenAI adapter dependencies to `1.1.1`. |
 | `1.0.10` | Patch | Updated Core and OpenAI adapter dependencies to `1.0.10`. |
 | `1.0.9` | Patch | Added typed completion model controls with provider-neutral reasoning effort support, Agent defaults, per-run overrides, Studio selectors and persistence, and normalized observability attributes. |

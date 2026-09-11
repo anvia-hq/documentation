@@ -1,9 +1,11 @@
 # Releases
 
-The current stable release is `@anvia/browser` **1.1.1**.
+The current stable release is `@anvia/browser` **1.1.3**.
 
 | Version | Summary |
 | --- | --- |
+| `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents, and updated to the Sandbox `1.1.3` contract. |
+| `1.1.2` | Updated to the Core `1.1.2` and Sandbox `1.1.2` contracts. |
 | `1.1.1` | Bumped upstream runtime dependencies and aligned zod to 4.5.4 across packages. |
 | `1.0.12` | Updated to the Core and Sandbox 1.0.10 contracts. |
 | `1.0.11` | Isolated automation-worker IPC from Node watch dependency messages and preserved bounded protocol and readiness failure diagnostics. |

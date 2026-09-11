@@ -1,11 +1,14 @@
 # Releases
 
-The current stable release is `@anvia/react-ui` **1.1.0**. It is strictly headless and pairs with
+The current stable release is `@anvia/react-ui` **1.1.3**. It is strictly headless and pairs with
 the `@anvia/cli` installer. The entries below preserve notable v0 history.
 
 | Version | Summary |
 | --- | --- |
 | `1.0.0` | Renamed compound exports to explicit `*Primitive` namespaces, removed package CSS and `data-anvia-*`, standardized the semantic DOM contract on ARIA, `data-state`, and `data-role`, and aligned human-input actions with the unified pending-interaction controller. |
+| `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
+| `1.1.2` | Updated the Client, Graph, and React dependencies. |
+| `1.1.1` | Bumped upstream runtime dependencies and aligned zod to `4.5.4`. |
 | `1.0.12` | Updated the Client, Graph, and React dependencies. |
 | `1.0.11` | Added renderer composition for bounded `@anvia/graph` exploration results on top of the shared headless explorer primitives. |
 | `1.0.10` | Updated the Client and React dependencies to `1.0.10`. |

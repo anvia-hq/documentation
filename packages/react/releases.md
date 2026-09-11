@@ -1,10 +1,13 @@
 # Releases
 
-The current stable release is `@anvia/react` **1.1.0**. The entries below preserve notable v0 protocol milestones.
+The current stable release is `@anvia/react` **1.1.3**. The entries below preserve notable v0 protocol milestones.
 
 | Version | Summary |
 | --- | --- |
 | `1.0.0` | Adopted client protocol v3, persisted interaction-aware resume state, added `waiting` status, and replaced separate approval/question methods with `interactions` plus `respondToInteraction()`. |
+| `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
+| `1.1.2` | Updated the Core, Graph, and Client dependencies. |
+| `1.1.1` | Updated the Core, Graph, and Client dependencies to `1.1.1`. |
 | `1.0.12` | Updated the Core, Client, and Graph dependencies. |
 | `1.0.11` | Added renderer-agnostic graph explorer state and headless primitives for loading, expanding, searching, selecting, refreshing, and rendering bounded `@anvia/graph` exploration results, keeping asynchronous controller ownership in React. |
 | `1.0.10` | Hydrated persisted assistant usage, context usage, and sources into replayed UI messages; exposed aggregate run usage as `useChat().runUsage` and completion usage as `useCompletion().usage`. |

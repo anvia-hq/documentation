@@ -1,12 +1,14 @@
 # Releases
 
-Current stable release: `1.1.1`. The entries below summarize recent v1 changes and preserve notable
+Current stable release: `1.1.3`. The entries below summarize recent v1 changes and preserve notable
 v0 history.
 
 ## Notable history
 
 | Version | Change |
 | --- | --- |
+| `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
+| `1.1.2` | Updated to the shared Core 1.1.2 contracts. |
 | `1.1.1` | Bumped upstream runtime dependencies, aligned zod to 4.5.4 across workspaces, and updated to the shared Core 1.1.1 contracts. |
 | `1.0.11` | Updated to the shared Core 1.0.10 contracts. |
 | `1.0.10` | Added typed completion model controls with provider-neutral reasoning effort support, Agent defaults, per-run overrides, Studio selectors and persistence, and normalized observability attributes. |
