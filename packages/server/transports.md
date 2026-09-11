@@ -21,7 +21,7 @@ createEventStreamResponse({
 })
 ```
 
-The serializer also receives the final server error event when iteration throws.
+The serializer also receives the final server error event when iteration throws. Well-known diagnostic fields (`code`, `retryable`, JSON-safe `details`) survive on JSONL and SSE error events — including errors from runtime-specific subclasses whose prototype fields `JSON.stringify` would drop — and non-JSON-safe thrown values degrade to a `{ message }` payload. The `errorEvent` helper is public.
 
 ## Server-Sent Events
 

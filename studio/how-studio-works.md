@@ -48,6 +48,7 @@ Studio reads the registered configuration and enables relevant surfaces automati
 | Registered capability | Studio can expose |
 | --- | --- |
 | One or more agents | Playground and Agents. |
+| One or more AgentTeam targets | Team playground with live members, messages, and attributed approvals; plus HTTP team runs. |
 | Static or dynamic tools | Tool inventory and direct invocation. |
 | Tools with `requiresApproval` | Interactive approval handling. |
 | Context or dynamic tools | Knowledge inspection. |

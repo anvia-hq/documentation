@@ -2,6 +2,8 @@
 
 `@anvia/lens` can retrieve versioned prompts from a Lens workspace, compile them with variables, and attribute agent runs to the exact prompt version they used.
 
+Availability: the prompt SDK is merged on anvia@main but not yet released — `@anvia/lens` 1.1.3 does not include it. Verify your installed version.
+
 ## Fetch a prompt
 
 Create a prompt client from the shared `LensClient`. Runtime credentials retrieve prompts but cannot mutate them; committing a version in Lens does not deploy it — move a label to deploy or roll back.
