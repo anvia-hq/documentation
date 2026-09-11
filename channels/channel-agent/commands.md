@@ -34,6 +34,16 @@ const service = createChannelAgent({
 
 Every field of a per-command handler is optional: anything omitted falls back to the shared `createPrompt`, `createSession`, and `renderOutcome` behavior, and `shouldHandle` adds an extra filter for that name on top of the shared one.
 
+## Register the command on each platform
+
+The bridge only handles invocations the platform delivers — register the command itself first:
+
+- **Slack**: register the command under Slash Commands in your app config and run the app in Socket Mode; the payload arrives as a `slash_commands` envelope and is acknowledged automatically.
+- **Discord**: register the application command (through the developer portal or a registration script). The gateway handles chat-input interactions; the reply is delivered as a regular channel message.
+- **Telegram**: commands (`/ask@botname`, `/ask`) are messages with a `bot_command` entity; the adapter emits a `command` event for those addressed to this bot. Publish the command list through BotFather or `setMyCommands`.
+
+Bot-authored commands are always ignored, and commands run through the same pipeline as messages: filtering, acknowledgement reactions, sessions, streaming, and interactions all apply.
+
 ## Acknowledgement reactions
 
 React to the incoming message while the agent works on it. A string is shorthand for the acceptance reaction; `false` disables acknowledgements:
