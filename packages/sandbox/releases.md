@@ -1,9 +1,12 @@
 # Releases
 
-The current stable release is `@anvia/sandbox` **1.1.0**. The entries below preserve notable v0 history.
+The current stable release is `@anvia/sandbox` **1.1.3**. The entries below preserve notable v0 history.
 
 | Version | Summary |
 | --- | --- |
+| `1.1.3` | Block shell interpreters by default in allow-mode command policies, plus the peer-range fix. |
+| `1.1.2` | Added containerRuntime option to DockerSandboxClient.createSandbox() for running sandboxes on gVisor (e.g. runsc); creation fails with runtime_not_found unless registered. |
+| `1.1.1` | Bumped upstream runtime dependencies and aligned zod to 4.5.4 across packages. |
 | `1.0.0` | Replaced implicit session-style lifecycle with explicit image pull, sandbox create/stop/resume/destroy handles; added resource, security, shared-memory, inspection, async-disposal, and browser-runtime support. Studio sandbox exposure is now explicit registration. |
 | `1.0.10` | Updated the Core dependency to `1.0.10`. |
 | `1.0.9` | Updated the Core dependency to `1.0.9`. |

@@ -1,6 +1,6 @@
 # Team runs
 
-Studio can serve registered [Agent teams](/sdk/advanced/multi-agent/agent-teams) over HTTP with attributed JSONL event streams, coordinator steering, cancellation, and application-owned interaction responses. Team runs are a live runtime API; the browser console does not yet render team runs.
+Studio can serve registered [Agent teams](/sdk/advanced/multi-agent/agent-teams) over HTTP with attributed JSONL event streams, coordinator steering, cancellation, and application-owned interaction responses. The same runs are visible in the browser console; see [Run a team](/studio/playground/run-a-team).
 
 ## Register a team
 

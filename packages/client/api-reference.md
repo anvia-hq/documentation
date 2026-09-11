@@ -16,6 +16,7 @@ These functions project native Core events into public `ClientStreamEvent` value
 
 ```ts
 import {
+  isJsonValue,
   parseClientStreamRequest,
   parseClientStreamEvent,
   parseClientStreamFrame,
@@ -24,7 +25,7 @@ import {
 } from '@anvia/client'
 ```
 
-Use runtime parsers at every untrusted network or persistence boundary.
+Use runtime parsers at every untrusted network or persistence boundary. `isJsonValue` is the same JSON-safety guard the client protocol uses, exported so server and application serializers can validate payloads with identical rules.
 
 ## Transports
 

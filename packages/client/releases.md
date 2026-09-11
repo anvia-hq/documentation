@@ -1,9 +1,10 @@
 # Releases
 
-The current stable release is `@anvia/client` **1.1.0**.
+The current stable release is `@anvia/client` **1.2.0**.
 
 | Version | Summary |
 | --- | --- |
+| `1.2.0` | Exported the `isJsonValue` JSON-safety guard so servers and applications can validate stream payloads with the same rules the client protocol uses. |
 | `1.0.11` | Updated the Core dependency to `1.0.10`. |
 | `1.0.10` | Hydrated persisted assistant usage, context usage, and sources into replayed UI messages while keeping per-generation usage separate from aggregate run usage, and exposed aggregate run usage as `useChat().runUsage` and completion usage as `useCompletion().usage`. |
 | `1.0.9` | Updated the Core dependency to `1.0.9`. |

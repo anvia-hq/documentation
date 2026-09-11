@@ -1,10 +1,13 @@
 # Releases
 
-The current stable release is `@anvia/core` **1.1.2**. The source changelog is authoritative; the
+The current stable release is `@anvia/core` **1.2.2**. The source changelog is authoritative; the
 entries below summarize recent v1 changes and preserve notable v0 compatibility milestones.
 
 | Version | Summary |
 | --- | --- |
+| `1.2.2` | Sanitized tool error messages returned to the model: only the error name and message are forwarded, never stack traces, file paths, or other data carried by custom Error subclasses. |
+| `1.2.1` | Preserved error diagnostics in `toReadableStream` error lines: well-known fields such as `code` and `details` are copied explicitly, and non-JSON-safe thrown values degrade to a `{ message }` payload instead of serializing as `{}`. |
+| `1.2.0` | Added `AgentTeam` for coordinator-led collaboration between Agent definitions, with dynamic instances, attributed messaging, retained follow-ups, streaming, steering, and shared limits — plus opt-in sibling communication and recursive spawning. Registered AgentTeam targets in Studio with attributed JSONL team runs (`agent_queued` events included). Preserved ESM module boundaries for tree shaking and omitted stack traces from `toReadableStream` error events. |
 | `1.1.2` | Moved `zod` to `peerDependencies` (`^4.4.0`) in packages that expose zod types in their public API, so consumers compile and run against a single shared zod copy instead of installing a second, potentially conflicting dependency. |
 | `1.1.1` | Bumped upstream runtime dependencies to their latest versions and aligned zod to 4.5.4 across all packages and workspaces. |
 | `1.0.10` | Enforced the exact `maxTurns` boundary in the Agent execution loop; runs now stop after the configured turn limit instead of allowing extra completion attempts. |

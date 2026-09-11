@@ -1,9 +1,10 @@
 # Releases
 
-The current stable release is `@anvia/server` **1.1.0**. The entries below preserve notable v0 transport milestones.
+The current stable release is `@anvia/server` **1.1.4**. The entries below preserve notable v0 transport milestones.
 
 | Version | Summary |
 | --- | --- |
+| `1.1.4` | Kept `code`, `retryable`, and JSON-safe `details` on JSONL/SSE error events (including prototype-defined fields `JSON.stringify` drops), degraded non-JSON-safe throws to `{ message }`, and exported `errorEvent`. |
 | `1.0.11` | Updated the Client dependency to `1.0.11`. |
 | `1.0.10` | Updated the Client dependency to `1.0.10`. |
 | `1.0.9` | Updated the Client dependency to `1.0.9`. |

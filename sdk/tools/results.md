@@ -78,3 +78,5 @@ Your handler returns text, JSON, or rich content. The runtime can also deliver t
 ## Keep results safe
 
 Return safe text for expected misses and throw unexpected failures. Redact secrets, payment details, internal notes, and customer data before they reach the model or a browser stream.
+
+When a handler throws, the runtime sanitizes the failure before it becomes model-visible output: only the error name and message are forwarded, never stack traces, file paths, or anything else carried by custom Error subclasses. Treat even the sanitized message as untrusted model input — keep credentials and internal paths out of thrown messages.

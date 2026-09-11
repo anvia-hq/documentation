@@ -1,11 +1,13 @@
 # Releases
 
-Current stable release: `1.1.1`. The entries below preserve notable v0 history.
+Current stable release: `1.1.3`. The entries below preserve notable v0 history.
 
 ## Notable history
 
 | Version | Change |
 | --- | --- |
+| `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
+| `1.1.2` | Updated the Core dependency to `1.1.2`. |
 | `1.1.1` | Updated the Core dependency to `1.1.1`. |
 | `1.0.10` | Updated the Core dependency to `1.0.10`. |
 | `1.0.9` | Updated the Core dependency to `1.0.9`. |

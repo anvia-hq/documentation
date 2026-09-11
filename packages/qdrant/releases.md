@@ -1,9 +1,11 @@
 # Releases
 
-Current stable release: `1.1.1`. The entries below preserve notable v0 history.
+Current stable release: `1.1.3`. The entries below preserve notable v0 history.
 
 Notable releases include:
 
+- `1.1.3` declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents.
+- `1.1.2` refreshed runtime dependencies alongside the Core 1.1.2 update.
 - `1.1.1` refreshed runtime dependencies alongside the Core 1.1.1 update.
 - `1.0.11` and `1.0.10` refreshed runtime dependencies alongside Core updates.
 - `1.0.9` added configurable property-level graph extraction conflict resolution, durable ingestion receipts with optional graph-plus-vector orchestration, explorer source provenance, and shared-resource tenant namespaces for managed Neo4j graphs and Qdrant stores.

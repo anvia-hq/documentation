@@ -540,6 +540,7 @@ export default defineConfig({
               items: [
                 { text: 'Overview', link: '/studio/playground' },
                 { text: 'Run an agent', link: '/studio/playground/run-an-agent' },
+                { text: 'Run a team', link: '/studio/playground/run-a-team' },
                 { text: 'Models and attachments', link: '/studio/playground/models-and-attachments' },
                 { text: 'Approvals and questions', link: '/studio/playground/approvals-and-questions' }
               ]

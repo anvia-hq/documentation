@@ -1,9 +1,10 @@
 # Releases
 
-Current stable release: `1.1.1`. The entries below preserve notable v0 history.
+Current stable release: `1.2.0`. The entries below preserve notable v0 history.
 
 Notable package releases include:
 
+- `1.2.0` added Bun support: `bun:sqlite` loads automatically under Bun with the `foreign_keys` pragma enforced, `node:sqlite` remains the fallback, and caller-owned databases inject through the structural `SqliteMemoryDatabaseLike` surface.
 - `1.1.1` refreshed runtime dependencies alongside the Core 1.1.1 update.
 - `0.3.0` added durable memory compaction with atomic conflict detection and aggregate usage accounting.
 - `0.2.4` added read-only inspection used by SDK and Studio workflows.

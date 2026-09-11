@@ -4,7 +4,7 @@
 
 Use an agent team when membership is dynamic: the coordinator should choose how many specialists to start, when to start them, and whether to recurse into subproblems. If the same specialists always run in a known order, use [Agent as a tool](/sdk/advanced/multi-agent/agent-as-tool) or a [Pipeline](/sdk/pipelines) instead.
 
-Availability: `AgentTeam` ships from `@anvia/core/agent` in the next minor release of `@anvia/core` (it is merged on main behind pending changesets; verify your installed version). Studio exposes live team runs over HTTP; see [Team runs](/studio/team-runs).
+Availability: `AgentTeam` ships from `@anvia/core/agent` since `@anvia/core` **1.2.0**. Studio exposes live team runs over HTTP and renders teams in its playground; see [Team runs](/studio/team-runs).
 
 ## 1. Build a team
 

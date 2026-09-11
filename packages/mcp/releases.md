@@ -1,9 +1,12 @@
 # Releases
 
-The current stable release is `@anvia/mcp` **1.1.0**.
+The current stable release is `@anvia/mcp` **1.1.3**.
 
 | Version | Summary |
 | --- | --- |
+| `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
+| `1.1.2` | Updated the Core dependency to `1.1.2`. |
+| `1.1.1` | Bumped upstream runtime dependencies and aligned zod to 4.5.4 across packages. |
 | `1.0.11` | Updated the Core dependency to `1.0.10`. |
 | `1.0.10` | Allow `versionNegotiation` on `McpClient` so applications can connect to 2025-era servers with `mode: "auto"` or `mode: "legacy"`. The default remains a strict `2026-07-28` pin with no fallback. |
 | `1.0.9` | Updated the Core dependency to `1.0.9`. |

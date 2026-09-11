@@ -29,6 +29,6 @@ A missing, throwing, or invalid resolver fails the team with `AgentTeamInteracti
 
 Route every interaction through your own authenticated UI or policy layer. Attribute incoming messages to their sender, treat their content as untrusted data, and never let an agent-to-agent message stand in for user consent. The application decides who may approve; the team runtime only enforces that approval goes through the resolver.
 
-Teams currently live in one process for one execution. Each run creates fresh instances, member conversations are retained only within the execution, and durable persistence or checkpoint/resume is not provided. Team events are an SDK contract: Studio serves team runs and their interactions over HTTP (see [Team runs](/studio/team-runs)), but the browser console does not yet render teams and transport adapters have no dedicated team UI.
+Teams currently live in one process for one execution. Each run creates fresh instances, member conversations are retained only within the execution, and durable persistence or checkpoint/resume is not provided. Studio serves team runs over HTTP with a matching playground view (see [Team runs](/studio/team-runs)); transport adapters have no dedicated team UI.
 
 For comparison with single-agent interactions, see [Interactions and continuations](/sdk/agents/interactions).
