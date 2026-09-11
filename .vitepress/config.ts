@@ -1392,16 +1392,68 @@ export default defineConfig({
         {
           text: 'Core packages',
           items: [
-            { text: '@anvia/channel', link: '/channels/channel' },
-            { text: '@anvia/channel-agent', link: '/channels/channel-agent' }
+            {
+              text: '@anvia/channel',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/channels/channel' },
+                { text: 'Send messages', link: '/channels/channel/sending' },
+                { text: 'Handle events', link: '/channels/channel/events' },
+                { text: 'Splitting and validation', link: '/channels/channel/splitting' },
+                { text: 'Capabilities and rate limits', link: '/channels/channel/capabilities' },
+                { text: 'Custom adapters', link: '/channels/channel/custom-adapter' }
+              ]
+            },
+            {
+              text: '@anvia/channel-agent',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/channels/channel-agent' },
+                { text: 'Filtering and memory', link: '/channels/channel-agent/filtering' },
+                { text: 'Prompts and attachments', link: '/channels/channel-agent/prompts' },
+                { text: 'Streaming and delivery', link: '/channels/channel-agent/delivery' },
+                { text: 'Commands and acknowledgements', link: '/channels/channel-agent/commands' },
+                { text: 'Approvals and interactions', link: '/channels/channel-agent/interactions' },
+                { text: 'Shutdown and errors', link: '/channels/channel-agent/operations' }
+              ]
+            }
           ]
         },
         {
           text: 'Platform adapters',
           items: [
-            { text: 'Discord', link: '/channels/discord' },
-            { text: 'Slack', link: '/channels/slack' },
-            { text: 'Telegram', link: '/channels/telegram' }
+            {
+              text: 'Discord',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/channels/discord' },
+                { text: 'Messaging', link: '/channels/discord/messaging' },
+                { text: 'Receiving events', link: '/channels/discord/receiving' },
+                { text: 'Custom gateway', link: '/channels/discord/gateway' }
+              ]
+            },
+            {
+              text: 'Slack',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/channels/slack' },
+                { text: 'Messaging', link: '/channels/slack/messaging' },
+                { text: 'Receiving events', link: '/channels/slack/receiving' },
+                { text: 'Custom transport', link: '/channels/slack/transport' }
+              ]
+            },
+            {
+              text: 'Telegram',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/channels/telegram' },
+                { text: 'Polling', link: '/channels/telegram/polling' },
+                { text: 'Webhooks', link: '/channels/telegram/webhooks' },
+                { text: 'Messaging', link: '/channels/telegram/messaging' },
+                { text: 'Receiving events', link: '/channels/telegram/events' },
+                { text: 'Client and transport', link: '/channels/telegram/client' }
+              ]
+            }
           ]
         }
       ]
