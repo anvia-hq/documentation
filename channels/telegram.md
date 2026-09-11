@@ -164,7 +164,7 @@ Outbound files may use base64 data or HTTPS URLs. URL sources are validated by t
 
 ## Edits, deletes, reactions, and typing
 
-The adapter implements the full optional `Channel` surface, and `channel.capabilities` advertises `actions`, `replies`, `typing`, `reactions`, `delete`, `messageEdits`, and outbound `image`, `audio`, `video`, and `file` attachments:
+The adapter implements the full optional `Channel` surface, and `channel.capabilities` advertises `actions`, `replies`, `typing`, `reactions`, `reactionRemovals`, `delete`, `messageEdits`, and outbound `image`, `audio`, `video`, and `file` attachments:
 
 ```ts
 const address = { platform: 'telegram', conversationId: '-1001234567890', threadId: '42' }
@@ -214,6 +214,8 @@ The client exposes `getMe`, `getUpdates`, `sendMessage`, `sendAttachment`, `edit
 - `maximumAttachmentBytes` caps upload and download sizes (20 MiB by default).
 
 Failures surface as `TelegramApiError` carrying `method`, the Bot API `errorCode` when present, and `retryAfterSeconds` for rate limits. Request failures never embed the request URL, so the token cannot leak into error messages.
+
+Mutating Bot API calls retry up to three times on HTTP 429, honoring Telegram's `retry_after` hint while respecting the abort signal. For steadier pacing on top of retries, wrap the adapter with [`createRateLimitedChannel()`](/channels/channel#pace-outbound-calls).
 
 ## Integrate a custom receive transport
 

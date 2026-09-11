@@ -162,6 +162,64 @@ const service = createChannelAgent({
 
 A rich final message with attachments is sent first and the placeholder is then deleted, which requires the adapter's `delete` capability. Attachment-capable adapters without delete support never get a placeholder in the first place.
 
+## Slash commands
+
+The Discord, Slack, and Telegram adapters emit a shared `ChannelCommandEvent` for platform slash-command invocations (`/ask …`), carrying the command `name` without the slash and the argument `text`. The service ignores them by default; opt in with `commands: true`:
+
+```ts
+const service = createChannelAgent({
+  channel,
+  agent,
+  commands: true,
+})
+```
+
+An accepted command runs the agent with the prompt `/<name> <text>`; bot-authored commands are always ignored. For per-name control, pass options instead of `true`:
+
+```ts
+const service = createChannelAgent({
+  channel,
+  agent,
+  commands: {
+    shouldHandle: async (event) => event.name !== 'admin',
+    commands: {
+      ask: {
+        createPrompt: ({ event }) => `Research carefully: ${event.text}`,
+        createSession: () => undefined, // run /ask without memory
+      },
+    },
+  },
+})
+```
+
+Every field of a per-command handler is optional: anything omitted falls back to the shared `createPrompt`, `createSession`, and `renderOutcome` behavior, and `shouldHandle` adds an extra filter for that name on top of the shared one.
+
+## Acknowledgement reactions
+
+React to the incoming message while the agent works on it. A string is shorthand for the acceptance reaction; `false` disables acknowledgements:
+
+```ts
+const service = createChannelAgent({
+  channel,
+  agent,
+  acknowledge: '👀',
+})
+```
+
+Both reactions require `channel.capabilities.reactions` and `channel.react`. For the full lifecycle, pass options: `completeReaction` is added once a final response is delivered, and `clearOnCompletion` (default `true` when a completion reaction is configured) removes the acceptance reaction again wherever the adapter supports removals:
+
+```ts
+const service = createChannelAgent({
+  channel,
+  agent,
+  acknowledge: {
+    reaction: '👀',
+    completeReaction: '✅',
+    clearOnCompletion: true,
+  },
+})
+```
+
 ## Approvals and questions
 
 When an Anvia run pauses for tool approval or a tool question, the service stores the continuation and renders a prompt. Native buttons are attached when `channel.capabilities.actions` is true — Approve and Deny for approvals, one button per choice for a single-choice question with at most five options — and text replies remain the fallback everywhere.
@@ -201,7 +259,7 @@ Pending interactions fail safely:
 
 ## Errors
 
-`onError(error, context)` observes every failure with a `context.stage` of `filter`, `prepare`, `interaction`, `agent`, or `delivery`. Observed errors never interrupt delivery: the user receives `errorMessage` (default `Sorry, I couldn't process that message.`, disable with `errorMessage: false`). An outcome with no text and no attachments is answered with `emptyResponseMessage`.
+`onError(error, context)` observes every failure with a `context.stage` of `filter`, `prepare`, `acknowledge`, `interaction`, `agent`, or `delivery`. Observed errors never interrupt delivery: the user receives `errorMessage` (default `Sorry, I couldn't process that message.`, disable with `errorMessage: false`). An outcome with no text and no attachments is answered with `emptyResponseMessage`.
 
 ## Graceful shutdown
 
@@ -228,6 +286,8 @@ Make shutdown idempotent when registering both `SIGINT` and `SIGTERM` handlers. 
 | `createSession` | Memory scope factory; defaults to sender-isolated sessions |
 | `renderOutcome` | Final response renderer; returns a string or `ChannelMessage` |
 | `streaming` | `enabled`, `placeholder`, `editIntervalMs` |
+| `acknowledge` | Acceptance/completion reactions: a reaction string, full options, or `false` |
+| `commands` | Slash-command handling: `true`, per-name options, or `false` (default) |
 | `multimodal` | Attachment limits, or `false` to reject file input |
 | `interactions` | Store, rendering, parsing, timeout, and cancel behavior, or `false` to disable |
 | `errorMessage` | Failure reply shown to users, or `false` to send nothing |

@@ -194,9 +194,25 @@ if (channel.capabilities?.delete === true && channel.delete !== undefined) {
 if (channel.capabilities?.messageEdits === true && channel.edit !== undefined) {
   await channel.edit(sentMessage, { text: 'Dashboard snapshot (updated)' })
 }
+
+if (channel.capabilities?.reactionRemovals === true && channel.unreact !== undefined) {
+  await channel.unreact(sentMessage, '👀')
+}
 ```
 
-`capabilities.actions` is the only required flag; `outboundAttachments` lists accepted attachment kinds, and `replies`, `typing`, `reactions`, `delete`, and `messageEdits` gate the optional operations. The standard adapters advertise their exact support; a custom text-only adapter may omit `capabilities` entirely.
+`capabilities.actions` is the only required flag; `outboundAttachments` lists accepted attachment kinds, and `replies`, `typing`, `reactions`, `reactionRemovals`, `delete`, and `messageEdits` gate the optional operations. The standard adapters advertise their exact support; a custom text-only adapter may omit `capabilities` entirely.
+
+## Pace outbound calls
+
+Wrap any adapter with `createRateLimitedChannel()` to serialize outbound calls (send, edit, delete, typing, reactions) with a minimum spacing between them:
+
+```ts
+import { createRateLimitedChannel } from '@anvia/channel'
+
+const paced = createRateLimitedChannel({ channel, minimumIntervalMs: 1_000 })
+```
+
+Inbound behavior (`start`, `stop`, attachments, splitting) and the advertised capabilities pass straight through. Discord and Slack SDK clients already rate-limit internally, so the wrapper is most useful for raw-REST adapters such as Telegram, or for application code that fans out many proactive messages.
 
 ## Build a custom adapter
 
@@ -208,7 +224,7 @@ Implement `Channel<RawEvent>` and keep every platform SDK type inside the adapte
 - `stop()` detaches listeners and drains in-flight deliveries.
 - `send(address, message)` delivers one already-bounded message.
 
-`capabilities`, `loadAttachment(event, attachment, signal?)`, `edit(sent, message)`, `delete(sent)`, `showTyping(address)`, and `react(sent, reaction)` are optional.
+`capabilities`, `loadAttachment(event, attachment, signal?)`, `edit(sent, message)`, `delete(sent)`, `showTyping(address)`, `react(sent, reaction)`, and `unreact(sent, reaction)` are optional.
 
 ```ts
 import { splitChannelMessage } from '@anvia/channel'

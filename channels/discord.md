@@ -135,9 +135,11 @@ await channel.react(sent, '👍')
 await channel.delete(sent)
 ```
 
-`edit()` rejects messages carrying `replyToMessageId` because Discord reply targets cannot be edited. `react()` accepts any non-empty emoji string and uses the "own reaction" REST endpoint.
+`edit()` rejects messages carrying `replyToMessageId` because Discord reply targets cannot be edited. `react()` accepts any non-empty emoji string and uses the "own reaction" REST endpoint. `unreact()` removes the bot's own reaction through the matching removal endpoint.
 
-The adapter capabilities reflect this: `actions`, `replies`, `typing`, `reactions`, `delete`, and `messageEdits` are all enabled, with outbound attachments of every kind.
+Command responses land in place: a deferred chat-input command interaction stays open and the next send to that channel edits the deferred reply through the interaction webhook instead of posting a separate dangling message.
+
+The adapter capabilities reflect this: `actions`, `replies`, `typing`, `reactions`, `reactionRemovals`, `delete`, and `messageEdits` are all enabled, with outbound attachments of every kind.
 
 ## Agent integration
 

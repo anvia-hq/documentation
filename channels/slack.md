@@ -133,11 +133,11 @@ await channel.react(sent, 'eyes')
 await channel.delete(sent)
 ```
 
-`edit()` accepts text-only changes; attachments and reply targets cannot be edited and throw a `TypeError`. `react()` strips surrounding colons from the emoji name before calling `reactions.add`.
+`edit()` accepts text-only changes; attachments and reply targets cannot be edited and throw a `TypeError`. `react()` strips surrounding colons from the emoji name before calling `reactions.add`. `unreact()` removes the bot's own reaction through `reactions.remove`.
 
 ## Capability notes
 
-The adapter reports `actions`, `replies`, `reactions`, `delete`, and `messageEdits`, with outbound attachments of every kind. `capabilities.typing` is absent: Slack has no general bot typing-indicator API, so there is no `showTyping`. Use the [channel agent](/channels/channel-agent) placeholder message when users need progress feedback.
+The adapter reports `actions`, `replies`, `reactions`, `reactionRemovals`, `delete`, and `messageEdits`, with outbound attachments of every kind. `capabilities.typing` is absent: Slack has no general bot typing-indicator API, so there is no `showTyping`. Use the [channel agent](/channels/channel-agent) placeholder message when users need progress feedback.
 
 ## Agent integration
 

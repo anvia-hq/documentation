@@ -48,7 +48,7 @@ process.once('SIGTERM', () => {
 })
 ```
 
-The bridge handles default message filtering, stable conversation sessions, multimodal prompts, streaming edits, long-message splitting, native actions, and paused approval or question flows. See [Channel-agent bridge](/channels/channel-agent).
+The bridge handles default message filtering, stable conversation sessions, multimodal prompts, streaming edits, long-message splitting, native actions, and paused approval or question flows. It also handles platform slash commands (opt-in per command), acknowledgement reactions while the agent works, and reaction cleanup on completion. See [Channel-agent bridge](/channels/channel-agent).
 
 ## Send proactively
 
