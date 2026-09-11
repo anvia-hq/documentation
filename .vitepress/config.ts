@@ -1422,38 +1422,20 @@ export default defineConfig({
         {
           text: 'Platform adapters',
           items: [
-            {
-              text: 'Discord',
-              collapsed: true,
-              items: [
-                { text: 'Overview', link: '/channels/discord' },
-                { text: 'Messaging', link: '/channels/discord/messaging' },
-                { text: 'Receiving events', link: '/channels/discord/receiving' },
-                { text: 'Custom gateway', link: '/channels/discord/gateway' }
-              ]
-            },
-            {
-              text: 'Slack',
-              collapsed: true,
-              items: [
-                { text: 'Overview', link: '/channels/slack' },
-                { text: 'Messaging', link: '/channels/slack/messaging' },
-                { text: 'Receiving events', link: '/channels/slack/receiving' },
-                { text: 'Custom transport', link: '/channels/slack/transport' }
-              ]
-            },
-            {
-              text: 'Telegram',
-              collapsed: true,
-              items: [
-                { text: 'Overview', link: '/channels/telegram' },
-                { text: 'Polling', link: '/channels/telegram/polling' },
-                { text: 'Webhooks', link: '/channels/telegram/webhooks' },
-                { text: 'Messaging', link: '/channels/telegram/messaging' },
-                { text: 'Receiving events', link: '/channels/telegram/events' },
-                { text: 'Client and transport', link: '/channels/telegram/client' }
-              ]
-            }
+            { text: 'Discord overview', link: '/channels/discord' },
+            { text: 'Discord messaging', link: '/channels/discord/messaging' },
+            { text: 'Discord receiving events', link: '/channels/discord/receiving' },
+            { text: 'Discord custom gateway', link: '/channels/discord/gateway' },
+            { text: 'Slack overview', link: '/channels/slack' },
+            { text: 'Slack messaging', link: '/channels/slack/messaging' },
+            { text: 'Slack receiving events', link: '/channels/slack/receiving' },
+            { text: 'Slack custom transport', link: '/channels/slack/transport' },
+            { text: 'Telegram overview', link: '/channels/telegram' },
+            { text: 'Telegram polling', link: '/channels/telegram/polling' },
+            { text: 'Telegram webhooks', link: '/channels/telegram/webhooks' },
+            { text: 'Telegram messaging', link: '/channels/telegram/messaging' },
+            { text: 'Telegram receiving events', link: '/channels/telegram/events' },
+            { text: 'Telegram client and transport', link: '/channels/telegram/client' }
           ]
         }
       ]
