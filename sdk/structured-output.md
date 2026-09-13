@@ -3,14 +3,14 @@
 Structured output turns a model response into application data that has crossed a local schema-validation boundary.
 
 ```text
-Model response -> JSON parsing -> Zod validation -> application data
+Model response -> JSON parsing -> schema validation -> application data
 ```
 
 A provider may use the schema to guide generation, but product code should trust only the value produced after local validation.
 
 ## 1. Define the contract
 
-Anvia uses Zod schemas for parsed completions, agent output schemas, extractors, tool inputs and outputs, and pipeline inputs:
+Anvia uses Zod schemas for agent output schemas, extractors, tool inputs and outputs, and pipeline inputs. Parsed completions (`generateCompletion()` / `streamCompletion()`) accept any [Standard Schema](https://standardschema.dev): Zod, Valibot, ArkType, and other implementing libraries (see [Schema design](/sdk/structured-output/schema-design)):
 
 ```ts
 import { z } from 'zod'

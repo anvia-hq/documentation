@@ -1,10 +1,11 @@
 # Releases
 
-The current stable release is `@anvia/core` **1.2.2**. The source changelog is authoritative; the
+The current stable release is `@anvia/core` **1.3.0**. The source changelog is authoritative; the
 entries below summarize recent v1 changes and preserve notable v0 compatibility milestones.
 
 | Version | Summary |
 | --- | --- |
+| `1.3.0` | Accepted any Standard Schema as the `outputSchema` of `generateCompletion` and `streamCompletion`: Zod keeps its behavior, Valibot works end to end with the optional `@valibot/to-json-schema` peer, and other libraries are supported through `~standard.jsonSchema` (schemas without conversion support fail before any model call). Transformed schemas are supported with the input representation sent to providers; validation runs synchronously through `~standard.validate`, so async schemas are rejected with `CompletionStructuredOutputError`. Exported `StandardSchemaV1`, `StandardJSONSchemaV1`, and `isStandardSchema`. Agent output schemas, extractors, and tool schemas remain Zod-only. |
 | `1.2.2` | Sanitized tool error messages returned to the model: only the error name and message are forwarded, never stack traces, file paths, or other data carried by custom Error subclasses. |
 | `1.2.1` | Preserved error diagnostics in `toReadableStream` error lines: well-known fields such as `code` and `details` are copied explicitly, and non-JSON-safe thrown values degrade to a `{ message }` payload instead of serializing as `{}`. |
 | `1.2.0` | Added `AgentTeam` for coordinator-led collaboration between Agent definitions, with dynamic instances, attributed messaging, retained follow-ups, streaming, steering, and shared limits — plus opt-in sibling communication and recursive spawning. Registered AgentTeam targets in Studio with attributed JSONL team runs (`agent_queued` events included). Preserved ESM module boundaries for tree shaking and omitted stack traces from `toReadableStream` error events. |

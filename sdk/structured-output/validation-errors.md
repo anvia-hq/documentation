@@ -4,7 +4,7 @@ Invalid JSON and schema mismatches are expected model-workflow failures. Convert
 
 ## 1. Handle parsed-completion failures
 
-`generateCompletion()` rejects when the model lacks output-schema support, the provider call fails, or structured output cannot be parsed or validated. JSON and schema failures throw `CompletionStructuredOutputError`; Zod issues are the `cause` of the schema phase, not the thrown value:
+`generateCompletion()` rejects when the model lacks output-schema support, the provider call fails, or structured output cannot be parsed or validated. JSON and schema failures throw `CompletionStructuredOutputError`; the schema library's issues are the `cause` of the schema phase, not the thrown value. Schemas that validate asynchronously are rejected the same way, in the `schema` phase:
 
 ```ts
 import { CompletionStructuredOutputError, generateCompletion } from '@anvia/core'

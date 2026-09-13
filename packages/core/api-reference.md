@@ -145,7 +145,7 @@ const result = await generateCompletion({
 console.log(result.output)
 ```
 
-`generateCompletion` converts a Zod schema to provider JSON Schema, parses the returned JSON, and validates it locally.
+`generateCompletion` converts the `outputSchema` to provider JSON Schema (Zod natively, Valibot via the optional `@valibot/to-json-schema` peer, other Standard Schema libraries via `~standard.jsonSchema`), parses the returned JSON, and validates it locally through `~standard.validate`. Core also exports `StandardSchemaV1`, `StandardJSONSchemaV1`, and `isStandardSchema`.
 
 ```ts
 for await (const event of streamCompletion({

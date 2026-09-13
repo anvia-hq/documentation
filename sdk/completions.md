@@ -56,7 +56,7 @@ for await (const event of streamCompletion({
 }
 ```
 
-Use `generateCompletion()` when the result must match a Zod schema:
+Use `generateCompletion()` when the result must match a schema (Zod, or any Standard Schema library — see [Schema design](/sdk/structured-output/schema-design)):
 
 ```ts
 import { generateCompletion } from '@anvia/core'

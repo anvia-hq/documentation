@@ -27,16 +27,16 @@ console.log(result.output.customer)
 console.log(result.output.priority)
 ```
 
-`result.output` is inferred from the Zod schema. The result also includes `text`, structured assistant `content`, token `usage`, and the original provider `rawResponse`.
+`result.output` is inferred from the schema. The result also includes `text`, structured assistant `content`, token `usage`, and the original provider `rawResponse`. The schema need not be Zod: any Standard Schema works here (see [Schema design](/sdk/structured-output/schema-design)).
 
 ## 2. Understand the validation path
 
 Anvia performs four steps:
 
-1. Converts the Zod schema to provider JSON Schema.
+1. Converts the schema to provider JSON Schema (Zod natively, Valibot via `@valibot/to-json-schema`, others via `~standard.jsonSchema`).
 2. Verifies that the model supports output schemas.
 3. Sends one completion request.
-4. Parses the returned text as JSON and validates it with the same Zod schema.
+4. Parses the returned text as JSON and validates it against the same schema.
 
 The promise rejects if the provider returns invalid JSON or a value that fails the schema. Never fall back to using `result.text` as trusted product data after validation fails.
 
