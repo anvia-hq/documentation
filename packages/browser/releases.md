@@ -1,9 +1,10 @@
 # Releases
 
-The current stable release is `@anvia/browser` **1.1.3**.
+The current stable release is `@anvia/browser` **1.1.4**.
 
 | Version | Summary |
 | --- | --- |
+| `1.1.4` | Updated upstream runtime dependencies, aligned the browser image and Playwright host pins, and updated to Sandbox `1.1.4`. |
 | `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents, and updated to the Sandbox `1.1.3` contract. |
 | `1.1.2` | Updated to the Core `1.1.2` and Sandbox `1.1.2` contracts. |
 | `1.1.1` | Bumped upstream runtime dependencies and aligned zod to 4.5.4 across packages. |

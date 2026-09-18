@@ -52,3 +52,4 @@ When replying to an incoming event, copy these fields from `event.platform`, `ev
 - [Splitting and validation](/channels/channel/splitting) — text limits and portable payload rules.
 - [Capabilities and rate limits](/channels/channel/capabilities) — optional operations and pacing.
 - [Build a custom adapter](/channels/channel/custom-adapter) — implement `Channel<RawEvent>`.
+- [Releases](/channels/channel/releases) — current version and package history.

@@ -1409,7 +1409,8 @@ export default defineConfig({
                 { text: 'Handle events', link: '/channels/channel/events' },
                 { text: 'Splitting and validation', link: '/channels/channel/splitting' },
                 { text: 'Capabilities and rate limits', link: '/channels/channel/capabilities' },
-                { text: 'Custom adapters', link: '/channels/channel/custom-adapter' }
+                { text: 'Custom adapters', link: '/channels/channel/custom-adapter' },
+                { text: 'Releases', link: '/channels/channel/releases' }
               ]
             },
             {
@@ -1422,7 +1423,8 @@ export default defineConfig({
                 { text: 'Streaming and delivery', link: '/channels/channel-agent/delivery' },
                 { text: 'Commands and acknowledgements', link: '/channels/channel-agent/commands' },
                 { text: 'Approvals and interactions', link: '/channels/channel-agent/interactions' },
-                { text: 'Shutdown and errors', link: '/channels/channel-agent/operations' }
+                { text: 'Shutdown and errors', link: '/channels/channel-agent/operations' },
+                { text: 'Releases', link: '/channels/channel-agent/releases' }
               ]
             }
           ]
@@ -1433,7 +1435,8 @@ export default defineConfig({
             { text: 'Overview', link: '/channels/discord' },
             { text: 'Messaging', link: '/channels/discord/messaging' },
             { text: 'Receiving events', link: '/channels/discord/receiving' },
-            { text: 'Custom gateway', link: '/channels/discord/gateway' }
+            { text: 'Custom gateway', link: '/channels/discord/gateway' },
+            { text: 'Releases', link: '/channels/discord/releases' }
           ]
         },
         {
@@ -1442,7 +1445,8 @@ export default defineConfig({
             { text: 'Overview', link: '/channels/slack' },
             { text: 'Messaging', link: '/channels/slack/messaging' },
             { text: 'Receiving events', link: '/channels/slack/receiving' },
-            { text: 'Custom transport', link: '/channels/slack/transport' }
+            { text: 'Custom transport', link: '/channels/slack/transport' },
+            { text: 'Releases', link: '/channels/slack/releases' }
           ]
         },
         {
@@ -1453,7 +1457,8 @@ export default defineConfig({
             { text: 'Webhooks', link: '/channels/telegram/webhooks' },
             { text: 'Messaging', link: '/channels/telegram/messaging' },
             { text: 'Receiving events', link: '/channels/telegram/events' },
-            { text: 'Client and transport', link: '/channels/telegram/client' }
+            { text: 'Client and transport', link: '/channels/telegram/client' },
+            { text: 'Releases', link: '/channels/telegram/releases' }
           ]
         }
       ]

@@ -30,6 +30,8 @@ const observer = createOtelObserver({
   captureMaxBytes,
   transformInput,
   transformOutput,
+  transformError,
+  transformMetadata,
 })
 ```
 
@@ -47,6 +49,8 @@ const pipelineObserver = createOtelPipelineObserver({
   captureMaxBytes,
   transformInput,
   transformOutput,
+  transformError,
+  transformMetadata,
 })
 ```
 
@@ -57,7 +61,7 @@ the same capture and tracer controls as `createOtelObserver()`. Configure it und
 ## `createOtelScorer`
 
 ```ts
-const scorer = createOtelScorer({ logger, loggerName, loggerVersion })
+const scorer = createOtelScorer({ logger, loggerName, loggerVersion, transformMetadata })
 scorer.score(scoreArgs)
 ```
 
@@ -86,6 +90,7 @@ const reporter = createOtelEvalReporter({
   captureMaxBytes,
   transformInput,
   transformOutput,
+  transformMetadata,
   onMissingTrace,
 })
 ```

@@ -64,3 +64,4 @@ The channel-agent default filter handles direct messages plus guild messages tha
 - [Discord messaging](/channels/discord/messaging) — send, threads, attachments, edits, and reactions.
 - [Receive Discord events](/channels/discord/receiving) — Gateway input and normalization.
 - [Custom Discord gateway](/channels/discord/gateway) — own the connection and shut down cleanly.
+- [Releases](/channels/discord/releases) — current version and package history.

@@ -39,7 +39,7 @@ const supportAgent = new Agent({
     savePolicy: 'turn',
     compaction: {
       trigger: { afterTokens: 32_000 },
-      retention: { recentTokens: 8_000 },
+      retention: { recentTurns: 2 },
       conflictRetries: { maxAttempts: 2 },
       compactor: compactMemory,
     },
@@ -47,10 +47,14 @@ const supportAgent = new Agent({
 })
 ```
 
-`trigger.afterTokens` and `retention.recentTokens` must be positive safe integers, and the retained
-budget must be smaller than the trigger. Omit `retention` to use one quarter of the trigger budget.
-Conflict retries are disabled by default; set `conflictRetries: { maxAttempts }` to allow that many
-total attempts.
+`trigger.afterTokens` must be a positive safe integer. `retention.recentTurns` must be a
+nonnegative safe integer and keeps that many complete user-led turns unsummarized. Omit
+`retention` to keep one recent turn. Conflict retries are disabled by default; set
+`conflictRetries: { maxAttempts }` to allow that many total attempts.
+
+The deprecated `retention: { recentTokens }` form remains available for migrating an existing
+token-budget policy. It must be a positive safe integer smaller than `afterTokens`. Do not specify
+`recentTurns` and `recentTokens` together.
 
 Compaction is opt-in. Omit `memory.compaction` when every canonical message should remain
 model-facing and the context window is managed elsewhere.
@@ -66,9 +70,10 @@ recent complete user-led turns.
 Reported `originalTokenCount` measures the stored snapshot; the incoming prompt participates in
 the automatic trigger but is not part of the prefix being replaced.
 
-The compacted prefix ends immediately before the oldest retained user message. Anvia keeps as many
-recent complete turns as fit in `recentTokens`; the newest turn is always retained even when it
-exceeds that budget. It never splits a user-led turn merely to hit an exact token number. If no
+The compacted prefix ends immediately before the oldest retained user message. With
+`recentTurns`, Anvia keeps exactly that many complete user-led turns; the default is one. It never
+splits a user-led turn. With deprecated `recentTokens`, Anvia keeps as many recent complete turns
+as fit in that budget and always retains the newest turn even when it exceeds the budget. If no
 complete older prefix can be compacted, compaction is skipped.
 
 The default `estimateMemoryTokens()` is a fast provider-neutral estimate based on message role and
@@ -81,7 +86,7 @@ memory: {
   store: memoryStore,
   compaction: {
     trigger: { afterTokens: 100_000 },
-    retention: { recentTokens: 20_000 },
+    retention: { recentTurns: 3 },
     tokenCounter: (messages) => tokenizer.count(serializeMessages(messages)),
     compactor: compactMemory,
   },

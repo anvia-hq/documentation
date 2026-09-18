@@ -41,3 +41,19 @@ pnpm dlx @anvia/cli update --overwrite
 ```
 
 Without `--overwrite`, `update` is a preview: it reports each file as `up-to-date`, `modified` (the installed copy differs from the registry), or `missing`. With `--overwrite` it writes registry content over out-of-date and missing files — but only for already-installed components; it never installs new items, use `add` for that. Locally edited copies are overwritten, so commit or stash changes first. Unknown item names get did-you-mean suggestions.
+
+## Install Agent Skills
+
+Install the bundled Anvia knowledge for a coding agent, inspect the available skills, and update
+them when the CLI changes:
+
+```sh
+pnpm dlx @anvia/cli skills list
+pnpm dlx @anvia/cli skills init
+pnpm dlx @anvia/cli skills update       # preview
+pnpm dlx @anvia/cli skills update --force
+```
+
+The canonical files live under `skills/<name>/`. Add `--claude`, `--cursor`, or `--agents` to
+generate the corresponding integration; `--codex` aliases `--agents`. Use `--dir <path>` to choose
+a different canonical directory and `--cwd <path>` to target another project.

@@ -1,6 +1,7 @@
 # Changelog
 
-Every published Anvia package keeps its release history beside its implementation. Use these source changelogs for exact fixes, additions, breaking changes, and migration notes.
+Every versioned Anvia package keeps its release history beside its implementation. Use these source
+changelogs for exact fixes, additions, breaking changes, and migration notes.
 
 ## Core runtime
 
@@ -49,8 +50,17 @@ Every published Anvia package keeps its release history beside its implementatio
 - [`@anvia/sandbox`](https://github.com/anvia-hq/anvia/blob/main/packages/tool-sandbox/CHANGELOG.md)
 - [`@anvia/browser`](https://github.com/anvia-hq/anvia/blob/main/packages/tool-browser/CHANGELOG.md)
 
-Packages release independently. Read the changelog for each package you install; a dependency-only
-patch can advance an adapter even when its own public behavior did not change.
+## Channels workspace
+
+- [`@anvia/channel`](/channels/channel/releases)
+- [`@anvia/channel-agent`](/channels/channel-agent/releases)
+- [`@anvia/discord`](/channels/discord/releases)
+- [`@anvia/slack`](/channels/slack/releases)
+- [`@anvia/telegram`](/channels/telegram/releases)
+
+SDK packages release independently. Channels packages currently version inside their private source
+workspace. Read the changelog for each package you install; a dependency-only patch can advance an
+adapter even when its own public behavior did not change.
 
 ## Upgrade workflow
 

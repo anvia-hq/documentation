@@ -1,11 +1,12 @@
 # Releases
 
-Current stable release: `1.1.3`. The entries below preserve notable v0 history.
+Current stable release: `1.1.4`. The entries below preserve notable v0 history.
 
 ## Notable history
 
 | Version | Change |
 | --- | --- |
+| `1.1.4` | Added newline-delimited JSON file output through `filePath`, synchronous writes and parent-directory creation by default, configurable append behavior, and flushable Console/Pino logger types. Invalid output-target combinations now throw instead of silently discarding a destination. |
 | `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
 | `1.1.2` | Updated the Core dependency to `1.1.2`. |
 | `1.1.1` | Updated the Core dependency to `1.1.1`. |

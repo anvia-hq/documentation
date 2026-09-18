@@ -12,6 +12,19 @@ const tenantLogger = appLogger.child({ tenantId })
 const observer = createLoggerObserver({ logger: tenantLogger })
 ```
 
+For process-local newline-delimited JSON with crash-resistant synchronous writes:
+
+```ts
+const fileLogger = createPinoLogger({
+  filePath: './var/log/anvia.ndjson',
+})
+
+await fileLogger.flush()
+```
+
+`sync` and parent-directory creation default to `true`; files are appended by default. Set
+`sync: false` for higher throughput and call `flush()` during graceful shutdown.
+
 ## Operational checklist
 
 - Send JSON logs to stdout unless the hosting platform requires another destination.
@@ -21,4 +34,6 @@ const observer = createLoggerObserver({ logger: tenantLogger })
 - Use trace identifiers to correlate logs with an external tracing system.
 - Test log serialization with real error causes and large tool arguments.
 
-`Logger` methods return `void`; the observer does not wait for a remote log sink. Durable delivery and flushing are responsibilities of the selected logger transport and process lifecycle.
+Logging methods return `void`; the observer does not wait for a remote sink. Both built-in factories
+return a `FlushableLogger`. Custom `Logger` implementations may expose the optional `flush()` method;
+durable delivery remains the selected transport's and process lifecycle's responsibility.

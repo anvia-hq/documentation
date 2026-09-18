@@ -269,11 +269,13 @@ returns the model-context projection: canonical history before compaction, then 
 checkpoint plus the unsummarized tail. `replacePrefix()` advances that checkpoint atomically and
 must not delete or overwrite canonical messages.
 
-Token-aware compaction uses `trigger.afterTokens`, optional `retention.recentTokens`, an optional
-sync or async `tokenCounter`, and a `compactor`. Core exports `estimateMemoryTokens` as the default
-provider-neutral estimate. `MemoryCompactionInfo` records original, compacted, retained, and result
-token/message counts, attempts, and summary-model usage. `agent.compactMemory({ session })` forces
-an eligible prefix compaction and returns `type: 'compacted'` or `type: 'skipped'`.
+Token-aware compaction uses `trigger.afterTokens`, optional `retention.recentTurns` (default `1`),
+an optional sync or async `tokenCounter`, and a `compactor`. Deprecated
+`retention.recentTokens` remains available as a mutually exclusive migration path. Core exports
+`estimateMemoryTokens` as the default provider-neutral estimate. `MemoryCompactionInfo` records
+original, compacted, retained, and result token/message counts, attempts, and summary-model usage.
+`agent.compactMemory({ session })` forces an eligible prefix compaction and returns
+`type: 'compacted'` or `type: 'skipped'`.
 
 ## Embeddings and vector stores
 
@@ -520,6 +522,25 @@ const localMcp = new McpClient({
 See [MCP transport configuration](/sdk/advanced/mcp/transports#streamable-http) for header scoping and SSRF guidance.
 
 `@anvia/core/skills` exports `skill.local(...)`, `loadSkills(...)`, `SkillSet`, and validation types.
+
+## Redaction
+
+`@anvia/core/redaction` exports the shared PII-redaction implementation used by the Lens and
+Langfuse adapters:
+
+```ts
+import { createRedactor, DEFAULT_PATTERNS } from '@anvia/core/redaction'
+
+const redactor = createRedactor({ replacement: '<redacted>' })
+const safeValue = redactor.redact(value)
+```
+
+The subpath also exports `Redactor`, `RedactionOptions`, and `RedactionPattern`. A redactor returns
+non-mutating copies and provides `redactString()`, `redactObject()`, `redactMessages()`, and
+`patternNames()`. Custom `patterns` replace the defaults rather than extending them. Default patterns
+cover email addresses, validated payment cards, IPv4 addresses, standalone phone-number runs, JWTs,
+common API-key prefixes, and bearer tokens. Traversal marks circular references and values deeper
+than 16 levels instead of exporting them unchanged.
 
 ## Observability
 

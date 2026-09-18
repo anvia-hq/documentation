@@ -24,13 +24,18 @@ await lens.flush()
 await lens.close()
 ```
 
-Client options include `baseUrl`, `publicKey`, `secretKey`, `serviceName`, `environment`, `release`, `timeoutMs`, capture/redaction defaults, and `optional`. The readonly `enabled` flag is false only when optional mode has no configured connection.
+Client options include `baseUrl`, `publicKey`, `secretKey`, `serviceName`, `environment`, `release`,
+`timeoutMs`, `captureMode`, `captureMaxBytes`, `redactInputs`, `redactOutputs`, `redactErrors`,
+`redactMetadata`, custom `redaction`, and `optional`. `baseUrl` is validated eagerly as an absolute
+HTTP(S) URL without a query or fragment. The readonly `enabled` flag is false only when optional
+mode has no configured connection.
 
 `observer()` returns an `AgentObserver`. `pipelineObserver()` returns a `PipelineObserver` and shares
 the client's lazy provider and capture defaults. Both accessors return disabled no-op observers in
 optional mode and reject new work after the client closes.
 
-`evalReporter()` returns an Anvia `EvalReporter`; its options include `traceObserver`,
+`evalReporter()` returns an Anvia `EvalReporter`. It inherits the client's capture and redaction
+policy and accepts those settings as per-reporter overrides alongside `traceObserver`,
 `publishInvalid`, `includeMetadata`, `includePayloads`, and `onMissingTrace`.
 
 `score()` accepts `LensScoreArgs`, validates the score, and queues a trace-correlated evaluation log

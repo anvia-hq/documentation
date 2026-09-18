@@ -1,9 +1,10 @@
 # Releases
 
-The current stable release is `@anvia/memgraph` **1.1.3**.
+The current stable release is `@anvia/memgraph` **1.1.4**.
 
 | Version | Summary |
 | --- | --- |
+| `1.1.4` | Updated to the Graph `1.1.4` dependency line. |
 | `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
 | `1.1.2` | Updated the Core dependency to `1.1.2` and the Graph dependency to `1.1.2`. |
 | `1.1.1` | Bumped upstream runtime dependencies and aligned zod to 4.5.4, updating the Core dependency to `1.1.1` and the Graph dependency to `1.1.1`. |

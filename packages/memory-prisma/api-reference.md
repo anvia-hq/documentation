@@ -1,6 +1,9 @@
 # @anvia/memory-prisma API reference
 
-The package exports the Prisma memory store and its delegate contracts. It also provides the `anvia-memory-prisma` executable used by `npx @anvia/memory-prisma init`; the CLI is not a JavaScript subpath export.
+The package exports the Prisma 7 memory store and its delegate contracts. The
+`@anvia/memory-prisma/v8` entrypoint exports a Prisma 8 PostgreSQL store. The package also provides
+the `anvia-memory-prisma` executable used by `npx @anvia/memory-prisma init`; the CLI is not a
+JavaScript subpath export.
 
 ```ts
 import {
@@ -118,5 +121,19 @@ Inspection is available when the optional session lookup methods exist. Atomic c
 `sessions.findUnique` on the root delegate and on delegates supplied to the transaction callback.
 The optional `messages.deleteMany` member remains accepted for source compatibility but is not used
 by checkpoint-based compaction.
+
+## Prisma 8 entrypoint
+
+```ts
+import {
+  PrismaMemoryStore,
+  type PrismaMemoryModelNames,
+  type PrismaMemoryStoreOptions,
+} from '@anvia/memory-prisma/v8'
+```
+
+`PrismaMemoryStoreOptions` requires a caller-owned `@prisma/orm-postgres` client and accepts
+`schema`, custom `models` names, `scopeKey`, `errorPolicy`, message validation, and transaction
+options. Call `validate()` after construction and close the client from the application lifecycle.
 
 Return to the [package guide](/packages/memory-prisma).

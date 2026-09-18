@@ -1,9 +1,10 @@
 # Releases
 
-The current stable release is `@anvia/cli` **1.2.0**.
+The current stable release is `@anvia/cli` **1.3.0**.
 
 | Version | Summary |
 | --- | --- |
+| `1.3.0` | Added `anvia skills init`, `skills update`, and `skills list` for installing verified Anvia Agent Skills into an application's `skills/` directory. Target flags support Claude Code, Cursor, and AGENTS.md/Codex integration. |
 | `1.2.0` | Added `anvia update`: previews installed components as up-to-date, modified, or missing against the registry, and rewrites out-of-date files with `--overwrite` (never installs new items). Includes programmatic `inspectInstalledItems` / `updateInstalledItems` exports with did-you-mean suggestions. |
 | `1.0.2` | Maintenance release; the changelog records no package-specific changes. |
 | `1.0.1` | Maintenance release; the changelog records no package-specific changes. |

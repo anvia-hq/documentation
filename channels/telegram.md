@@ -43,3 +43,4 @@ Use the default polling mode for the simplest executable. For a web service, con
 - [Telegram messaging](/channels/telegram/messaging) — send, buttons, attachments, edits, and reactions.
 - [Receive Telegram events](/channels/telegram/events) — normalized updates, reactions, and edits.
 - [Telegram client and transport](/channels/telegram/client) — validated client and custom transports.
+- [Releases](/channels/telegram/releases) — current version and package history.

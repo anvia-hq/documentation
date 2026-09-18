@@ -1,12 +1,13 @@
 # Releases
 
-Current stable release: `1.1.3`. The entries below summarize recent v1 changes and preserve notable
+Current stable release: `1.2.0`. The entries below summarize recent v1 changes and preserve notable
 v0 history.
 
 ## Notable history
 
 | Version | Change |
 | --- | --- |
+| `1.2.0` | Added `transformError` and `transformMetadata` hooks so error messages, exception stacks, trace/run/tool/score metadata, and evaluation metadata can be redacted or dropped before export. |
 | `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
 | `1.1.2` | Updated to the shared Core 1.1.2 contracts. |
 | `1.1.1` | Bumped upstream runtime dependencies, aligned zod to 4.5.4 across workspaces, and updated to the shared Core 1.1.1 contracts. |
