@@ -1290,6 +1290,7 @@ export default defineConfig({
           text: 'Choosing Anvia',
           items: [
             { text: 'Why Anvia?', link: '/faqs/choosing/why-anvia' },
+            { text: 'Is Anvia free?', link: '/faqs/choosing/free-and-open-source' },
             { text: 'Capabilities', link: '/faqs/choosing/capability-overview' },
             { text: 'Other SDKs', link: '/faqs/choosing/using-with-other-sdks' },
             { text: 'Portability', link: '/faqs/choosing/provider-and-platform-independence' }
