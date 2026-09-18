@@ -15,7 +15,8 @@ Build with Anvia through recipes, reusable patterns, and complete application wa
 
 ### Build an application
 
-Start with [streaming React chat](/examples/applications/streaming-react-chat), then choose a product pattern:
+Start with [streaming React chat](/examples/applications/streaming-react-chat), then follow the
+[golden path](/examples/golden-path) end to end, or choose a product pattern:
 
 - [Customer-support assistant](/examples/applications/customer-support-rag) with authenticated, permission-aware retrieval.
 - [Research assistant](/examples/applications/research-assistant) with parallel specialists and a structured report.

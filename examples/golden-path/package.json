@@ -1,0 +1,31 @@
+{
+  "name": "anvia-golden-path",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Golden-path Anvia application: SDK agent, Discord channel bridge, and Lens telemetry.",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env --import=tsx src/index.ts",
+    "monitor": "node --env-file-if-exists=.env --import=tsx src/monitor.ts",
+    "test": "node --import=tsx --test test/smoke.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anvia/channel": "^0.4.0",
+    "@anvia/channel-agent": "^0.4.1",
+    "@anvia/core": "^1.5.0",
+    "@anvia/discord": "^0.3.0",
+    "@anvia/lens": "^1.2.0",
+    "@anvia/memory-sqlite": "^1.2.0",
+    "@anvia/openai": "^1.1.5",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

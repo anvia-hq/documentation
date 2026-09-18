@@ -15,6 +15,9 @@ export default defineConfig({
   appearance: 'force-dark',
   base: docsBase,
   outDir: '.vitepress/dist',
+  // The golden-path example is a runnable project with its own README and
+  // sources; only the tutorial page belongs to the site.
+  srcExclude: ['examples/golden-path/**'],
   title: 'Anvia',
   description: 'Documentation for Anvia v1',
   head: [
@@ -441,6 +444,10 @@ export default defineConfig({
             { text: 'Structured output', link: '/examples/essentials/structured-output' },
             { text: 'Conversation memory', link: '/examples/essentials/conversation-memory' }
           ]
+        },
+        {
+          text: 'Golden path',
+          items: [{ text: 'SDK, Discord, and Lens', link: '/examples/golden-path' }]
         },
         {
           text: 'Agents and tools',
