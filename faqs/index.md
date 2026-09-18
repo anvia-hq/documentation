@@ -8,7 +8,7 @@ Understand what Anvia provides, where it fits in a TypeScript application, and h
 | --- | --- |
 | What is Anvia? | A composable TypeScript runtime for provider-neutral AI behavior inside application code. [Learn the boundary](/faqs/understanding/what-is-anvia). |
 | Why use it? | To share explicit contracts across models, agents, tools, memory, retrieval, pipelines, streaming, and observability without giving a framework ownership of the surrounding application. [Why Anvia](/faqs/choosing/why-anvia). |
-| Is Anvia free? | Yes. The runtime, local development workflow, and self-hosted deployment path require no Anvia account or payment. Lens is an optional commercial product for production operations. [Understand what is open](/faqs/choosing/free-and-open-source). |
+| Is Anvia free? | Yes. The runtime packages and Studio use the MIT license, while self-hosted Lens is free software under AGPL-3.0-only. [Understand what is open](/faqs/choosing/free-and-open-source). |
 | How does it compare with other TypeScript tools? | The best choice depends on whether the product needs a model/UI toolkit, an integrated agent framework, an autonomous harness, or an application-owned runtime. [Compare the stacks](/faqs/comparisons/). |
 | Do I need Studio or Lens? | No. Both are optional products around the SDK: Studio is a local development console, while Lens is an observability and evaluation workspace. [Understand the products](/faqs/studio-and-lens/do-i-need-studio-or-lens). |
 | Is it production-ready? | The runtime provides production-oriented controls, but the application still owns deployment, authentication, authorization, data policy, and operational reliability. [Read the production answer](/faqs/production/is-anvia-production-ready). |
