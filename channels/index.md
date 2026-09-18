@@ -93,3 +93,4 @@ await sendChannelMessage({
 - [Channel core](/channels/channel) — shared contracts, splitting, validation, and custom adapters.
 - [Channel-agent bridge](/channels/channel-agent) — connect any adapter to an agent.
 - [Discord](/channels/discord), [Slack](/channels/slack), [Telegram](/channels/telegram) — platform guides.
+- Package releases: [`@anvia/channel`](/channels/channel/releases), [`@anvia/channel-agent`](/channels/channel-agent/releases), [`@anvia/discord`](/channels/discord/releases), [`@anvia/slack`](/channels/slack/releases), and [`@anvia/telegram`](/channels/telegram/releases).

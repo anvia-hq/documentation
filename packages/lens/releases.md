@@ -1,12 +1,13 @@
 # Releases
 
-Current stable release: `1.1.3`. The entries below summarize recent v1 changes and preserve notable
+Current stable release: `1.2.0`. The entries below summarize recent v1 changes and preserve notable
 v0 history.
 
 ## Notable history
 
 | Version | Change |
 | --- | --- |
+| `1.2.0` | Applied client capture policy and per-reporter overrides to evaluation payloads, enforced bounded payload serialization, and validated Lens base URLs eagerly. Added error and metadata redaction surfaces through OpenTelemetry and centralized PII redaction in `@anvia/core/redaction`. |
 | `1.1.3` | Updated to the shared Core 1.1.3 and OpenTelemetry 1.1.3 contracts. |
 | `1.1.2` | Updated to the shared Core 1.1.2 and OpenTelemetry 1.1.2 contracts. |
 | `1.1.1` | Bumped upstream runtime dependencies, aligned zod to 4.5.4 across workspaces, and updated to the shared Core and OpenTelemetry 1.1.1 contracts. |

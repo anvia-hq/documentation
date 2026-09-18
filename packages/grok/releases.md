@@ -1,11 +1,13 @@
 # Releases
 
-Current stable release: `1.1.3`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Current stable release: `1.1.5`. The entries below summarize the 1.0 line and preserve notable v0 history.
 
 ## Recent changes
 
 | Version | Type | Summary |
 | --- | --- | --- |
+| `1.1.5` | Patch | Updated to OpenAI adapter `1.1.5`, including the Azure AI Foundry terminal tool-argument stream fix. |
+| `1.1.4` | Patch | Updated upstream runtime and schema dependencies and aligned the OpenAI adapter dependency. |
 | `1.1.3` | Patch | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
 | `1.1.2` | Patch | completionModel() api now optional, defaulting to Chat Completions; gpt-6-astra added to the known model list (Grok provider tools stay Responses-only). |
 | `1.1.1` | Patch | Bumped upstream runtime dependencies to their latest versions, aligned zod to `4.5.4` across all packages and workspaces, and updated Core and OpenAI adapter dependencies to `1.1.1`. |

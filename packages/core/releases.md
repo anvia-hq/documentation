@@ -1,10 +1,14 @@
 # Releases
 
-The current stable release is `@anvia/core` **1.3.0**. The source changelog is authoritative; the
+The current stable release is `@anvia/core` **1.5.0**. The source changelog is authoritative; the
 entries below summarize recent v1 changes and preserve notable v0 compatibility milestones.
 
 | Version | Summary |
 | --- | --- |
+| `1.5.0` | Added deterministic `recentTurns` memory-compaction retention. Omitted retention now keeps one complete user-led turn instead of 25% of `afterTokens`; deprecated `recentTokens` remains available as an explicit migration path. |
+| `1.4.0` | Centralized PII redaction in `@anvia/core/redaction` for Lens and Langfuse, with safer card and phone matching, bounded traversal, circular-reference handling, bearer-token detection, and broader key-prefix defaults. |
+| `1.3.2` | Clarified the default think-tool description to encourage step-by-step planning and reassessment. |
+| `1.3.1` | Updated runtime dependencies and raised schema peer floors to Zod `^4.6.5` and optional `@valibot/to-json-schema` `^1.8.0`. |
 | `1.3.0` | Accepted any Standard Schema as the `outputSchema` of `generateCompletion` and `streamCompletion`: Zod keeps its behavior, Valibot works end to end with the optional `@valibot/to-json-schema` peer, and other libraries are supported through `~standard.jsonSchema` (schemas without conversion support fail before any model call). Transformed schemas are supported with the input representation sent to providers; validation runs synchronously through `~standard.validate`, so async schemas are rejected with `CompletionStructuredOutputError`. Exported `StandardSchemaV1`, `StandardJSONSchemaV1`, and `isStandardSchema`. Agent output schemas, extractors, and tool schemas remain Zod-only. |
 | `1.2.2` | Sanitized tool error messages returned to the model: only the error name and message are forwarded, never stack traces, file paths, or other data carried by custom Error subclasses. |
 | `1.2.1` | Preserved error diagnostics in `toReadableStream` error lines: well-known fields such as `code` and `details` are copied explicitly, and non-JSON-safe thrown values degrade to a `{ message }` payload instead of serializing as `{}`. |
@@ -39,7 +43,7 @@ entries below summarize recent v1 changes and preserve notable v0 compatibility 
 - Upgrade provider, memory, vector, Server, and React packages together when their changelogs reference the new Core version.
 - Switch on Agent outcome `type`: `response`, `interaction`, or `blocked`. Use `agent.resume(continuation, response)` or pass the same continuation and response to `agent.stream(...)`.
 - Replace wrapped Agent `final` event handling with direct terminal outcome events. Choose one `AgentStream` surface: full events, `textStream`, `text`, or `result`.
-- Replace message-count compaction thresholds with `afterTokens` and `recentTokens`; use `agent.compactMemory({ session })` for explicit maintenance.
+- Replace message-count compaction thresholds with `afterTokens` and `recentTurns`; use deprecated `recentTokens` only while migrating an existing token-budget policy. Use `agent.compactMemory({ session })` for explicit maintenance.
 - Keep file discovery, reads, parsing, and OCR in the application; pass normalized text to
   `chunkText()` or `chunkTextDocuments()`.
 - Prefer `chunkTextDocuments()` for stable batch chunk IDs and `ingestVectorText()` or

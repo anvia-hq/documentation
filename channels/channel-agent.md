@@ -66,3 +66,4 @@ Both functions return a `ChannelAgentService`, and both must be stopped.
 - [Approvals and interactions](/channels/channel-agent/interactions) — paused tool approvals and questions.
 - [Shutdown and errors](/channels/channel-agent/operations) — error stages and graceful shutdown.
 - [End-to-end guide](/channels/end-to-end) — assemble the adapter, bridge, and agent in one program.
+- [Releases](/channels/channel-agent/releases) — current version and package history.

@@ -1,11 +1,12 @@
 # Releases
 
-The current stable release is `@anvia/react-ui` **1.1.3**. It is strictly headless and pairs with
+The current stable release is `@anvia/react-ui` **1.1.5**. It is strictly headless and pairs with
 the `@anvia/cli` installer. The entries below preserve notable v0 history.
 
 | Version | Summary |
 | --- | --- |
-| `1.0.0` | Renamed compound exports to explicit `*Primitive` namespaces, removed package CSS and `data-anvia-*`, standardized the semantic DOM contract on ARIA, `data-state`, and `data-role`, and aligned human-input actions with the unified pending-interaction controller. |
+| `1.1.5` | Showed response actions and metrics only on the final assistant response of a completed exchange, including the shared `Message.Actions` group, and aligned fallback metrics with user exchanges. |
+| `1.1.4` | Updated upstream runtime and schema dependencies across the workspace. |
 | `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
 | `1.1.2` | Updated the Client, Graph, and React dependencies. |
 | `1.1.1` | Bumped upstream runtime dependencies and aligned zod to `4.5.4`. |
@@ -21,6 +22,7 @@ the `@anvia/cli` installer. The entries below preserve notable v0 history.
 | `1.0.3` | Updated the Client and React dependencies to `1.0.3`. |
 | `1.0.2` | Updated the Client and React dependencies to `1.0.2`. |
 | `1.0.1` | Refreshed upstream SDK and runtime dependencies to their latest supported releases. |
+| `1.0.0` | Renamed compound exports to explicit `*Primitive` namespaces, removed package CSS and `data-anvia-*`, standardized the semantic DOM contract on ARIA, `data-state`, and `data-role`, and aligned human-input actions with the unified pending-interaction controller. |
 | `1.0.0-rc.9` | Synchronized the package with the Anvia 1.0 release-candidate train. |
 | `0.7.1` | Published updated upstream runtime dependencies. |
 | `0.7.0` | Added the `ContextMeter` and model-aware active context usage display. |

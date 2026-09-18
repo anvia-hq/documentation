@@ -1,9 +1,10 @@
 # Releases
 
-The current stable release is `@anvia/graph` **1.1.3**.
+The current stable release is `@anvia/graph` **1.1.4**.
 
 | Version | Summary |
 | --- | --- |
+| `1.1.4` | Updated upstream runtime and schema dependencies across the workspace. |
 | `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
 | `1.1.2` | Moved zod to peerDependencies (`^4.4.0`), plus dependency updates. |
 | `1.1.1` | Bumped upstream runtime dependencies and aligned zod to 4.5.4 across packages. |

@@ -71,3 +71,4 @@ The default filter responds to direct conversations and to channel messages that
 - [Slack messaging](/channels/slack/messaging) — send, threads, attachments, edits, and reactions.
 - [Receive Slack events](/channels/slack/receiving) — Socket Mode input and normalization.
 - [Custom Slack transport](/channels/slack/transport) — own the transport and shut down cleanly.
+- [Releases](/channels/slack/releases) — current version and package history.

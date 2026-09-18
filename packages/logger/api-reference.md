@@ -5,11 +5,13 @@ All public symbols are exported from `@anvia/logger`.
 ## Logger factories
 
 ```ts
-function createConsoleLogger(options?: ConsoleLoggerOptions): Logger
-function createPinoLogger(options?: PinoLoggerOptions): Logger
+function createConsoleLogger(options?: ConsoleLoggerOptions): FlushableLogger
+function createPinoLogger(options?: PinoLoggerOptions): FlushableLogger
 ```
 
-`createConsoleLogger` emits structured lines through its configurable writer. `createPinoLogger` wraps Pino and accepts Pino options or a destination stream.
+`createConsoleLogger` emits structured lines through its configurable writer. `createPinoLogger`
+wraps Pino and accepts one output target: Pino transport configuration, an injected destination, or
+a file path.
 
 ```ts
 type ConsoleLoggerOptions = LoggerOptions & {
@@ -20,8 +22,16 @@ type ConsoleLoggerOptions = LoggerOptions & {
 type PinoLoggerOptions = LoggerOptions & {
   pinoOptions?: import('pino').LoggerOptions
   destination?: import('pino').DestinationStream
+  filePath?: string
+  sync?: boolean
+  mkdir?: boolean
+  append?: boolean
 }
 ```
+
+`sync`, `mkdir`, and `append` apply only with `filePath`; each defaults to `true`. Combining
+`filePath`, `destination`, and `pinoOptions.transport` throws instead of silently dropping an output
+target.
 
 ## Agent observer
 
@@ -62,6 +72,12 @@ interface Logger {
   error(message: string, context?: LogContext): void
   fatal(message: string, context?: LogContext): void
   child(bindings: LogContext): Logger
+  flush?(): Promise<void>
+}
+
+interface FlushableLogger extends Logger {
+  child(bindings: LogContext): FlushableLogger
+  flush(): Promise<void>
 }
 
 type LoggerOptions = {
@@ -76,4 +92,4 @@ type LoggerOptions = {
 | Kind | Public exports |
 | --- | --- |
 | Functions | `createConsoleLogger`, `createLoggerObserver`, `createPinoLogger` |
-| Types | `ConsoleLoggerOptions`, `LogContext`, `Logger`, `LoggerObserverOptions`, `LoggerOptions`, `LogLevel`, `PinoLoggerOptions` |
+| Types | `ConsoleLoggerOptions`, `FlushableLogger`, `LogContext`, `Logger`, `LoggerObserverOptions`, `LoggerOptions`, `LogLevel`, `PinoLoggerOptions` |

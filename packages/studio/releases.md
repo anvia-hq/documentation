@@ -1,10 +1,13 @@
 # Releases
 
-The current stable release is `@anvia/studio` **1.2.1**. The entries below summarize recent v1
+The current stable release is `@anvia/studio` **1.2.4**. The entries below summarize recent v1
 changes and preserve notable v0 Studio milestones.
 
 | Version | Summary |
 | --- | --- |
+| `1.2.4` | Kept playground selectors compact, limited response actions and metrics to final assistant responses, improved fallback metric alignment, and preserved a high-contrast logo tile in dark mode. Updated React UI, Client, Graph, and React dependencies. |
+| `1.2.3` | Updated upstream runtime and schema dependencies and aligned Graph, React UI, Client, and React versions. |
+| `1.2.2` | Stopped persisting stack traces in trace errors; stored and returned trace failures now contain only the error name and message. |
 | `1.2.1` | Dependency-only release following Core, Client, Server, and graph package updates. |
 | `1.2.0` | Added a team playground with live instance trees, coordinator follow-ups, member conversations and tool activity, inter-agent messages, and attributed approval and question controls. Registered AgentTeam targets with attributed JSONL team runs, coordinator steering, cancellation, and application-only interaction responses, emitting `agent_queued` events before instances acquire a concurrency slot. |
 | `1.1.1` | Bumped upstream runtime dependencies, aligned zod to 4.5.4 across workspaces, and updated to Core, Graph, React, React UI, Client, and Server 1.1.1. |

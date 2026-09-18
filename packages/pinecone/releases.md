@@ -1,9 +1,10 @@
 # Releases
 
-Current stable release: `1.1.3`. The entries below preserve notable v0 history.
+Current stable release: `1.2.0`. The entries below preserve notable v0 history.
 
 Notable releases include:
 
+- `1.2.0` upgraded to Pinecone SDK 9, requiring Node.js 22 and targeting Pinecone API 2026-07. Index creation supports serverless and BYOC specifications; legacy pod creation, metadata-indexing schemas, and source collection/backup creation options are no longer available.
 - `1.1.3` declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents.
 - `1.1.2` refreshed runtime dependencies alongside the Core 1.1.2 update.
 - `1.1.1` refreshed runtime dependencies alongside the Core 1.1.1 update.

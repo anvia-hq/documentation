@@ -1,5 +1,7 @@
 # Get started
 
+Use Node.js 22 or later. `@anvia/pinecone` uses Pinecone SDK 9 and targets Pinecone API `2026-07`.
+
 Provision a Pinecone index with the embedding model's dimension before connecting.
 
 ```sh

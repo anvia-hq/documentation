@@ -2,6 +2,9 @@
 
 `@anvia/pinecone` stores Anvia embedded documents in Pinecone and presents a provider-neutral vector-search interface to agents and retrieval code.
 
+The current package uses Pinecone SDK 9, requires Node.js 22 or later, and targets Pinecone API
+`2026-07`. Existing vector upsert, query, and delete operations remain supported.
+
 ## Install
 
 ```sh
@@ -60,6 +63,10 @@ Without an injected client, the adapter creates the standard Pinecone client, wh
 ## Index and namespace ownership
 
 Use a pre-provisioned Pinecone index in production. Set its dimension to the embedding model's output size and use the same metric configured for retrieval. `ensure()` creates a missing index only when `vectorStore({ spec, dimensions, ... })` supplies explicit provisioning data; provider region, capacity, and lifecycle still belong in infrastructure configuration.
+
+SDK 9 index creation supports serverless and BYOC specifications. It no longer supports creating
+legacy pod indexes, metadata-indexing schemas, or indexes from `sourceCollection` or
+`sourceBackupId`; existing pod indexes remain manageable.
 
 The default namespace is the empty string. Use stable namespaces to isolate corpora when that matches the application's data model. Namespace or metadata filtering is not a replacement for authorization.
 
