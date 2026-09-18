@@ -93,6 +93,10 @@ make this work, and do not register the same observer providers globally.
 Every value the application cannot invent is read and validated in one place, so a misconfigured
 deploy fails at startup with one message instead of inside a provider call.
 
+The snippets below are excerpts of the runnable files in
+[`examples/golden-path`](https://github.com/anvia-hq/documentation/tree/main/examples/golden-path);
+that project is the copy to build on.
+
 ::: code-group
 
 ```dotenv [.env.example]
