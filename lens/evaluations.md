@@ -61,6 +61,7 @@ Do not begin by collecting every available score. A small suite with an understa
 | Goal | Page |
 | --- | --- |
 | Turn risks into cases and metrics | [What to evaluate](/lens/evaluations/what-to-evaluate) |
+| Choose a built-in SDK metric | [Metric reference](/lens/evaluations/metrics) |
 | Connect `runEvalSuite()` to Lens | [Run evaluations](/lens/evaluations/run-evaluations) |
 | Monitor and inspect suite executions | [Evaluation runs](/lens/evaluations/runs) |
 | Search metric outcomes across runs | [Results](/lens/evaluations/results) |

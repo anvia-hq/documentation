@@ -63,6 +63,8 @@ Start with deterministic checks. Add `semanticSimilarity`, `llmJudge`, `llmScore
 conversation metrics only when they measure a defined product requirement. Judge metrics make model
 calls and introduce cost and variance.
 
+See the [built-in metric reference](/lens/evaluations/metrics) for what each metric checks and when to use it.
+
 ## Expected behavior and failure scenarios
 
 Each case contains metric outcomes of pass, fail, or invalid, and the suite aggregates totals. Invalid

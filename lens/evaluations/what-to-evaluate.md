@@ -74,6 +74,8 @@ const policyFact = contains({
 
 `exactMatch`, `contains`, and structured-data checks are good fits for identifiers, policy facts, status values, and schema conformance. Avoid forcing a long natural-language response into an exact string comparison when several answers could be correct.
 
+For every built-in metric, including when and why to use it, see the [metric reference](/lens/evaluations/metrics).
+
 ### Model-graded checks
 
 Use a model-graded evaluator when correctness depends on meaning or a rubric. Give the judge one narrow responsibility and require an explanation that reviewers can inspect.

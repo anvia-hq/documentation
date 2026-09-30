@@ -690,6 +690,60 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/lens/evaluations' },
             { text: 'What to evaluate', link: '/lens/evaluations/what-to-evaluate' },
+            {
+              text: 'Metrics',
+              collapsed: true,
+              items: [
+                { text: 'Choose a metric', link: '/lens/evaluations/metrics' },
+                { text: 'Tips', link: '/lens/evaluations/metrics/tips' },
+                {
+                  text: 'Text and structure',
+                  collapsed: true,
+                  items: [
+                    { text: 'Exact match', link: '/lens/evaluations/metrics/exact-match' },
+                    { text: 'Contains', link: '/lens/evaluations/metrics/contains' },
+                    { text: 'Not contains', link: '/lens/evaluations/metrics/not-contains' },
+                    { text: 'Contains all', link: '/lens/evaluations/metrics/contains-all' },
+                    { text: 'Contains any', link: '/lens/evaluations/metrics/contains-any' },
+                    { text: 'Matches', link: '/lens/evaluations/metrics/matches' },
+                    { text: 'Does not match', link: '/lens/evaluations/metrics/does-not-match' },
+                    { text: 'Max length', link: '/lens/evaluations/metrics/max-length' },
+                    { text: 'Required fields', link: '/lens/evaluations/metrics/required-fields' },
+                    { text: 'JSON correctness', link: '/lens/evaluations/metrics/json-correctness' }
+                  ]
+                },
+                {
+                  text: 'Custom judgments',
+                  collapsed: true,
+                  items: [
+                    { text: 'Semantic similarity', link: '/lens/evaluations/metrics/semantic-similarity' },
+                    { text: 'LLM judge', link: '/lens/evaluations/metrics/llm-judge' },
+                    { text: 'LLM score', link: '/lens/evaluations/metrics/llm-score' },
+                    { text: 'G-Eval', link: '/lens/evaluations/metrics/g-eval' }
+                  ]
+                },
+                {
+                  text: 'Answer quality',
+                  collapsed: true,
+                  items: [
+                    { text: 'Answer relevancy', link: '/lens/evaluations/metrics/answer-relevancy' },
+                    { text: 'Prompt alignment', link: '/lens/evaluations/metrics/prompt-alignment' },
+                    { text: 'Hallucination', link: '/lens/evaluations/metrics/hallucination' },
+                    { text: 'Faithfulness', link: '/lens/evaluations/metrics/faithfulness' },
+                    { text: 'Abstention', link: '/lens/evaluations/metrics/abstention' },
+                    { text: 'Summarization', link: '/lens/evaluations/metrics/summarization' }
+                  ]
+                },
+                {
+                  text: 'Conversations',
+                  collapsed: true,
+                  items: [
+                    { text: 'Turn relevancy', link: '/lens/evaluations/metrics/turn-relevancy' },
+                    { text: 'Knowledge retention', link: '/lens/evaluations/metrics/knowledge-retention' }
+                  ]
+                },
+              ]
+            },
             { text: 'Run evaluations', link: '/lens/evaluations/run-evaluations' },
             { text: 'Evaluation runs', link: '/lens/evaluations/runs' },
             { text: 'Results', link: '/lens/evaluations/results' },
