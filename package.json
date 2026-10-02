@@ -9,7 +9,11 @@
     "docs:preview": "vitepress preview",
     "docs:deploy": "pnpm docs:build && wrangler deploy",
     "docs:deploy:dry-run": "pnpm docs:build && wrangler deploy --dry-run",
-    "example:golden-path:check": "pnpm --filter anvia-golden-path typecheck && pnpm --filter anvia-golden-path test"
+    "example:golden-path:check": "pnpm --filter anvia-golden-path typecheck && pnpm --filter anvia-golden-path test",
+    "sdk:check:exports": "node scripts/audit-rc-api.mjs --sdk --source",
+    "sdk:check:types": "node scripts/typecheck-rc-snippets.mjs --sdk --source",
+    "sdk:check:runtime": "node scripts/check-sdk-runtime.mjs",
+    "sdk:check": "pnpm sdk:check:exports && pnpm sdk:check:types && pnpm sdk:check:runtime"
   },
   "devDependencies": {
     "lucide-static": "^1.31.0",

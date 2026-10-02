@@ -81,3 +81,42 @@ jobs:
 
       - name: Validate the example
         run: pnpm example:golden-path:check
+
+  validate-sdk:
+    name: Validate SDK documentation against source
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ANVIA_REPO: ${{ github.workspace }}/anvia-source
+
+    steps:
+      - name: Check out documentation
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Check out the reviewed SDK revision
+        uses: actions/checkout@v6
+        with:
+          repository: anvia-hq/anvia
+          ref: 7cbbe395d881f68133a5644c357e9f1ce2c23f3f
+          path: anvia-source
+          persist-credentials: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.0.4
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Install SDK validation dependencies
+        working-directory: anvia-source
+        run: pnpm install --frozen-lockfile
+
+      - name: Check SDK exports, snippets, and offline runtime examples
+        run: pnpm sdk:check

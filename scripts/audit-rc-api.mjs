@@ -4,6 +4,8 @@ import { basename, dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const sdkOnly = process.argv.includes('--sdk')
+const useSource = process.argv.includes('--source')
 const anviaRoot = resolve(process.env.ANVIA_REPO ?? join(docsRoot, '..', 'anvia'))
 const typescriptCandidates = [
   join(anviaRoot, 'node_modules', 'typescript', 'lib', 'typescript.js'),
@@ -66,8 +68,11 @@ function resolvePackageEntry(moduleName, packages) {
 
   if (!typesPath) return { error: `${moduleName} is not a public package export` }
 
-  const entryPath = resolve(packageInfo.directory, typesPath)
-  if (!existsSync(entryPath)) return { error: `${moduleName} types are not built at ${entryPath}` }
+  const targetPath = useSource
+    ? typesPath.replace(/^\.\/dist\//, './src/').replace(/\.d\.ts$/, '.ts')
+    : typesPath
+  const entryPath = resolve(packageInfo.directory, targetPath)
+  if (!existsSync(entryPath)) return { error: `${moduleName} entry is missing at ${entryPath}` }
 
   return { entryPath }
 }
@@ -90,7 +95,7 @@ function lineAt(source, offset) {
 
 const packages = await loadPackages()
 const documentationFiles = await collectFiles(
-  docsRoot,
+  sdkOnly ? join(docsRoot, 'sdk') : docsRoot,
   (path) =>
     path.endsWith('.md') ||
     (dirname(path) === join(docsRoot, 'public') &&

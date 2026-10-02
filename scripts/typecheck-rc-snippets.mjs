@@ -4,6 +4,8 @@ import { basename, dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const sdkOnly = process.argv.includes('--sdk')
+const useSource = process.argv.includes('--source')
 const anviaRoot = resolve(process.env.ANVIA_REPO ?? join(docsRoot, '..', 'anvia'))
 const typescriptCandidates = [
   join(anviaRoot, 'node_modules', 'typescript', 'lib', 'typescript.js'),
@@ -55,16 +57,23 @@ function resolvePackageEntry(moduleName, packages) {
   const exported = packageInfo.manifest.exports?.[exportKey]
   const typesPath = typeof exported === 'string' ? exported : exported?.types
   if (!typesPath) return undefined
-  const entryPath = resolve(packageInfo.directory, typesPath)
+  const targetPath = useSource
+    ? typesPath.replace(/^\.\/dist\//, './src/').replace(/\.d\.ts$/, '.ts')
+    : typesPath
+  const entryPath = resolve(packageInfo.directory, targetPath)
   return existsSync(entryPath) ? entryPath : undefined
 }
 
 function codeBlocks(markdown) {
   const blocks = []
-  const pattern = /^```(?:ts|typescript|tsx|js|javascript)[^\n]*\n([\s\S]*?)^```\s*$/gm
+  const pattern = /^```(?:ts|typescript|tsx|js|javascript)([^\n]*)\n([\s\S]*?)^```\s*$/gm
   let match
   while ((match = pattern.exec(markdown))) {
-    blocks.push({ code: match[1], offset: match.index + match[0].indexOf(match[1]) })
+    blocks.push({
+      code: match[2],
+      strict: /\banvia-check\b/.test(match[1]),
+      offset: match.index + match[0].indexOf(match[2]),
+    })
   }
   return blocks
 }
@@ -75,7 +84,7 @@ function lineAt(source, offset) {
 
 const packages = await loadPackages()
 const documentationFiles = await collectFiles(
-  docsRoot,
+  sdkOnly ? join(docsRoot, 'sdk') : docsRoot,
   (path) =>
     path.endsWith('.md') ||
     (dirname(path) === join(docsRoot, 'public') &&
@@ -88,7 +97,7 @@ const sourceMetadata = new Map()
 for (const markdownPath of documentationFiles) {
   const markdown = await readFile(markdownPath, 'utf8')
   for (const [blockIndex, block] of codeBlocks(markdown).entries()) {
-    if (!block.code.includes('@anvia/')) continue
+    if (!block.strict && !block.code.includes('@anvia/')) continue
     const virtualPath = join(
       docsRoot,
       '.snippet-types',
@@ -97,6 +106,7 @@ for (const markdownPath of documentationFiles) {
     virtualSources.set(virtualPath, block.code)
     sourceMetadata.set(virtualPath, {
       markdownPath,
+      strict: block.strict,
       markdownLine: lineAt(markdown, block.offset),
     })
   }
@@ -108,7 +118,13 @@ const compilerOptions = {
   module: ts.ModuleKind.ESNext,
   moduleResolution: ts.ModuleResolutionKind.Bundler,
   noEmit: true,
-  noImplicitAny: false,
+  noImplicitAny: true,
+  types: ['node'],
+  typeRoots: [
+    join(docsRoot, 'node_modules', '@types'),
+    join(anviaRoot, 'node_modules', '@types'),
+    join(anviaRoot, 'packages', 'core', 'node_modules', '@types'),
+  ],
   skipLibCheck: true,
   strict: true,
   target: ts.ScriptTarget.ES2022,
@@ -131,7 +147,7 @@ host.resolveModuleNames = (moduleNames, containingFile) =>
     if (moduleName.startsWith('@anvia/')) {
       const resolvedFileName = resolvePackageEntry(moduleName, packages)
       if (resolvedFileName !== undefined) {
-        return { resolvedFileName, extension: ts.Extension.Dts, isExternalLibraryImport: true }
+        return { resolvedFileName, extension: useSource ? ts.Extension.Ts : ts.Extension.Dts, isExternalLibraryImport: true }
       }
     }
     return (
@@ -161,15 +177,15 @@ const relevantCodes = new Set([
 const failures = []
 
 for (const diagnostic of ts.getPreEmitDiagnostics(program)) {
-  if (!relevantCodes.has(diagnostic.code) || diagnostic.file === undefined) continue
+  if (diagnostic.file === undefined) continue
   const metadata = sourceMetadata.get(diagnostic.file.fileName)
-  if (metadata === undefined) continue
+  if (metadata === undefined || (!metadata.strict && !relevantCodes.has(diagnostic.code))) continue
   const position = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start ?? 0)
   const location = `${relative(docsRoot, metadata.markdownPath)}:${metadata.markdownLine + position.line}`
   const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, ' ')
   // Code-group files are checked as independent fences. Imports from their sibling
   // virtual files resolve to `unknown`, which is not evidence of an Anvia API mismatch.
-  if (diagnostic.code === 2339 && message.endsWith("on type 'unknown'.")) continue
+  if (!metadata.strict && diagnostic.code === 2339 && message.endsWith("on type 'unknown'.")) continue
   failures.push(`${location}: TS${diagnostic.code} ${message}`)
 }
 
@@ -178,5 +194,6 @@ if (failures.length > 0) {
   console.error(`\n${failures.length} API-shape diagnostics across ${virtualSources.size} Anvia snippets.`)
   process.exitCode = 1
 } else {
-  console.log(`Type-checked ${virtualSources.size} Anvia snippets with no API-shape diagnostics.`)
+  const strictCount = [...sourceMetadata.values()].filter((item) => item.strict).length
+  console.log(`Type-checked ${virtualSources.size} Anvia snippets, including ${strictCount} complete examples with all diagnostics enabled.`)
 }

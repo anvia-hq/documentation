@@ -69,6 +69,20 @@ Avoid unsupported claims about performance, maturity, popularity, security, or f
 
 State what Anvia provides and what remains application-owned. Authentication, authorization, tenant isolation, secrets, hosting, durable jobs, database operations, and incident response do not appear automatically by installing a package.
 
+## SDK validation
+
+Keep an Anvia source checkout beside this repository, or set `ANVIA_REPO` to its absolute path. Install that checkout's dependencies, then run:
+
+```sh
+pnpm sdk:check
+# For a checkout in another location:
+ANVIA_REPO=/path/to/anvia pnpm sdk:check
+```
+
+This checks SDK imports and snippet API shapes against public source entrypoints and runs offline contract tests. Complete examples marked with `ts anvia-check` are checked with all TypeScript diagnostics enabled, including missing variables and implicit `any`. Ordinary fragments retain the narrower API check; it is not proof that they are standalone programs. The runtime tests extract selected Markdown examples and provide application fixtures, so changing those examples changes the tested behavior.
+
+Add complete examples and runtime scenarios when documenting a new contract. Keep tests free of provider credentials and live calls. The `validate-sdk` CI job pins the reviewed Anvia commit; update that pin and rerun the checks when aligning documentation with another SDK revision.
+
 ## Links and navigation
 
 - Use root-relative links for pages in this site, such as `/sdk/tools/security`.
