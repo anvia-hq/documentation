@@ -80,7 +80,7 @@ const controller = new AbortController()
 const response = await fetch('/api/chat', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ messages }),
+  body: JSON.stringify({ type: 'messages', messages }),
   signal: controller.signal,
 })
 

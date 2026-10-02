@@ -6,7 +6,7 @@ Choose the narrowest lifecycle event that contains the operational information y
 
 `onStart` runs once after the run ID and history are prepared. It receives the input message, history, and maximum turns.
 
-`onFinish` runs once for a completed or guardrail-blocked run. Both forms include text, cumulative usage, and messages. Narrow `event.status`: the completed form has `output`, while the blocked form has `stage`.
+`onFinish` runs once for a completed, guardrail-blocked, or suspended run phase. All three forms include text, cumulative usage, and messages. Narrow `event.status`: `completed` has `output`, `blocked` has `stage`, and `suspended` has `interaction`. An approval or answer request suspends the phase; resuming starts another phase with its own finish event.
 
 `onError` runs when the run fails or is cancelled. It receives the error, cumulative usage, and messages available at failure time.
 

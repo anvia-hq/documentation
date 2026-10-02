@@ -1,67 +1,70 @@
 # Failures and results
 
-Choose whether one failed input should reject the batch or become an explicit item result.
+`runBatch()` returns a settled result for each input. Ordinary item failures do not stop scheduling later inputs or reject the batch promise.
 
-## 1. Use default fail-fast scheduling
+## 1. Inspect per-item status
 
-```ts
-try {
-    const results = await enrichmentPipeline.runBatch({
-        inputs: inputs,
-        concurrency: 3
-    });
-    await publish(results);
-}
-catch (error) {
-    await batchRuns.markFailed(batchId, toPublicError(error));
-}
+```ts anvia-check
+import { Pipeline } from '@anvia/core/pipeline'
+import { z } from 'zod'
 
-```
-
-After the first failure, workers stop starting new items. Items already in flight finish, and the batch then rejects with the first error.
-
-Rejection is not rollback. Completed items and external side effects remain completed, and the batch does not return their successful values.
-
-## 2. Return explicit per-item outcomes
-
-When every input needs a status, convert the failure inside the pipeline:
-
-```ts
-const safeEnrichment = new Pipeline({
-    id: 'safe-ticket-enrichment',
-    inputSchema: ticketSchema,
+const normalizeTicket = new Pipeline({
+  id: 'normalize-ticket',
+  inputSchema: z.string(),
 }).step({
-    id: "step-1",
-    run: async ({ input: ticket }) => {
-        try {
-            return {
-                ok: true as const,
-                id: ticket.id,
-                value: await enrichTicket(ticket),
-            };
-        }
-        catch (error) {
-            return {
-                ok: false as const,
-                id: ticket.id,
-                error: toPublicError(error),
-            };
-        }
-    }
-});
-const outcomes = await safeEnrichment.runBatch({
-    inputs: tickets,
-    concurrency: 3
-});
-const failed = outcomes.filter((outcome) => !outcome.ok);
+  id: 'normalize',
+  run: ({ input }) => {
+    const normalized = input.trim()
+    if (!normalized) throw new Error('Ticket text is required.')
+    return normalized
+  },
+})
 
+const results = await normalizeTicket.runBatch({
+  inputs: [' checkout failed ', '', ' password reset issue '],
+  concurrency: 1,
+})
+
+for (const item of results) {
+  if (item.status === 'completed') {
+    console.log(item.runId, item.output)
+  } else {
+    // Map item.error before showing it to a user or storing it in public logs.
+    console.log(item.runId, 'Ticket normalization failed.')
+  }
+}
+
+const failed = results.filter((item) => item.status === 'failed')
+console.log('Failed items:', failed.length)
 ```
 
-This prevents expected item failures from rejecting the outer batch. Do not catch process-level cancellation or errors that should stop the worker.
+The statuses are `completed`, `failed`, and `completed`, in input order. The third input runs even though the second fails. A completed item includes `output`; a failed item includes `error`.
+
+If the pipeline itself returns a custom `{ ok, value }` outcome, that object is nested under a completed item's `output`. First narrow `item.status`, then inspect `item.output.ok`.
+
+## 2. Require every result at the application boundary
+
+When downstream work requires all items to succeed, check the results before publishing:
+
+```ts
+const failures = results.filter((item) => item.status === 'failed')
+if (failures.length > 0) {
+  throw new AggregateError(
+    failures.map((item) => item.error),
+    'Some batch items failed.',
+  )
+}
+
+await publish(results)
+```
+
+This is an application decision after the batch settles. It does not undo completed work. Preserve successful results and stable input IDs so only failed items need to be retried.
+
+An aborted batch can reject instead of returning a complete result array. Pass `abortSignal` to `runBatch()` when the caller must be able to cancel it; ordinary item failures do not abort that signal.
 
 ## 3. Handle parallel branch failure
 
-A parallel stage rejects when any branch rejects. Other branch operations were already started and are not cancelled automatically.
+A parallel stage signals cancellation to sibling branches when one branch rejects, waits for all branches to settle, then rejects with the first branch failure. Pass each branch's `abortSignal` to external work. Cancellation is cooperative and does not roll back completed side effects.
 
 Gather evidence in parallel, then write in a controlled sequential stage. When parallel writes are unavoidable, use idempotency keys and model partial completion explicitly.
 
@@ -70,19 +73,13 @@ Gather evidence in parallel, then write in a controlled sequential stage. When p
 Provider and service errors may include request data, paths, or credentials. Convert them before persistence or display:
 
 ```ts
-type PublicJobError = {
+interface PublicJobError {
   code: string
   message: string
   retryable: boolean
 }
 ```
 
-Send raw failures only to restricted observability when policy allows.
-
-## 5. Choose the product behavior
-
-Let the batch reject when downstream work requires every result. Return item outcomes when operators need success and failure counts. Persist stable IDs and enqueue only failed items for later retry.
-
-If writes must be atomic across every input, use a product transaction or redesign the boundary. Pipeline parallelism does not provide distributed transactions.
+Send raw failures only to restricted observability when policy allows. If writes must be atomic across every input, use a product transaction or redesign the boundary. Pipeline parallelism does not provide distributed transactions.
 
 Next, move restart-sensitive work into [long-running jobs](/sdk/advanced/parallel-and-batch/jobs).

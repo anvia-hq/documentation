@@ -54,6 +54,8 @@ The SDK is organized around explicit dependencies:
 - [Models](/sdk/models) connect provider packages to the provider-neutral runtime.
 - [Completions](/sdk/completions) perform direct model calls.
 - [Agents](/sdk/agents) coordinate reusable behavior and model/tool turns.
+- [Guardrails](/sdk/guardrails) enforce or observe input and output policies.
+- [Evaluations](/sdk/evaluations) check behavior against versioned cases and metrics.
 - [Tools](/sdk/tools) expose typed application-owned actions.
 - [Memory](/sdk/memory) loads and appends durable session messages.
 - [Knowledges](/sdk/knowledges) attach documents and retrieval indexes.
@@ -61,7 +63,7 @@ The SDK is organized around explicit dependencies:
 - [Pipelines](/sdk/pipelines) compose repeatable sequential and parallel workflows.
 - [Streaming](/sdk/streaming) exposes normalized runtime events.
 - [Server](/packages/server) and [React](/packages/react) connect the runtime to product interfaces.
-- [Observability](/use-cases/observe-systems) records runs, generations, tools, usage, and traces.
+- [Observability](/sdk/observability) records runs, generations, tools, usage, and traces.
 
 These capabilities extend the same runtime objects. Adding memory to an agent or observability to a pipeline does not require moving the feature into a different framework.
 

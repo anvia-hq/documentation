@@ -1,6 +1,6 @@
 # Audio generation
 
-`generateSpeech()` turns text into audio bytes through an `SpeechGenerationModel`.
+`generateSpeech()` turns text into audio bytes through a `SpeechGenerationModel`.
 
 ## 1. Generate speech
 
@@ -23,7 +23,7 @@ const speech = await generateSpeech({
 
 `voice` is required. `speed` defaults to 1 and must be a positive finite number. Provider voice names, formats, and speed ranges may be narrower than the core contract.
 
-The response contains `audio` as a `Uint8Array`, optional `mediaType`, and `rawResponse`.
+The response contains `audio: { data: Uint8Array, mediaType?: string }` and `rawResponse`. Read the bytes from `speech.audio.data` and the optional media type from `speech.audio.mediaType`.
 
 ## 2. Validate the final script
 

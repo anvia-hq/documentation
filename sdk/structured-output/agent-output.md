@@ -56,10 +56,11 @@ Before rejecting the run, the runtime tries to repair invalid structured output.
 
 With no `retries` configured, the first invalid output rejects the run immediately. When the budget is exhausted, the run rejects with `AgentStructuredOutputError`; `attempt` is the failed attempt and `maxAttempts` is the configured budget.
 
-## 4. Validate streamed output at the end
+## 4. Consume validated streamed output
 
-Text deltas are incomplete JSON and must not be parsed as they arrive. Accumulate UI text if
-needed, then use the validated `output` on the terminal `response` event:
+An agent with `outputSchema` buffers response events until the response has passed validation. Provider JSON fragments are not exposed live; text arrives after validation, which increases the delay before visible output. Use the typed `output` on the terminal `response` event instead of parsing text deltas:
+
+Direct [completion streams](/sdk/structured-output/parsed-completion) can expose provisional JSON deltas before validation; that behavior differs from an agent with `outputSchema`.
 
 ```ts
 for await (const event of agent.stream({

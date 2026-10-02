@@ -24,7 +24,7 @@ const transcript = await transcribe({
 console.log(transcript.text)
 ```
 
-The first argument accepts `Uint8Array` or `ArrayBuffer`. Anvia copies the supplied bytes before the provider call and rejects empty audio or an empty filename.
+The options object's `audio.data` accepts `Uint8Array` or `ArrayBuffer`. Anvia copies the supplied bytes before the provider call and rejects empty audio or an empty filename.
 
 Use a meaningful filename with an extension because the provider may use it to infer the format. Language, prompt, temperature, and `providerOptions` pass through to the configured model adapter.
 

@@ -38,7 +38,6 @@ export default defineConfig({
     theme: landingCodeTheme
   },
   themeConfig: {
-    logo: '/logo.svg',
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Anvia SDK', link: '/sdk/' },
@@ -181,6 +180,9 @@ export default defineConfig({
                 { text: 'Production workers', link: '/sdk/pipelines/production-workers' }
               ]
             },
+            { text: 'Guardrails', link: '/sdk/guardrails' },
+            { text: 'Evaluations', link: '/sdk/evaluations' },
+            { text: 'Observability', link: '/sdk/observability' },
             {
               text: 'Streaming',
               collapsed: true,

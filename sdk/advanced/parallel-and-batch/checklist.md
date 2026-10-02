@@ -9,7 +9,7 @@ Review correctness, operational pressure, and restart behavior before increasing
 - Prefer parallel reads and analysis over simultaneous product writes.
 - Avoid shared mutable state between branches and batch items.
 - Carry stable product IDs through every output.
-- Remember that branch failures do not cancel already-started work.
+- Pass branch abort signals to external work; branch failure signals cancellation to siblings without rolling back side effects.
 
 ## Capacity
 
@@ -22,8 +22,8 @@ Review correctness, operational pressure, and restart behavior before increasing
 
 ## Failures and retries
 
-- Decide between outer rejection and explicit per-item outcomes.
-- Expect in-flight items to finish after the first batch failure.
+- Inspect each batch item's `completed` or `failed` status; ordinary item failures do not reject the outer batch.
+- Expect later batch items to run after an item failure; use an abort signal to cancel the batch deliberately.
 - Retry failed items instead of rerunning a partial batch blindly.
 - Add stable idempotency keys before retrying writes.
 - Treat validation and authorization failures as terminal.

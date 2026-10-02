@@ -20,7 +20,7 @@ const result = await supportAgent.generate({
 })
 ```
 
-`maxTurns` must be a nonnegative safe integer. When the model keeps requesting tools beyond the allowed loop, the run rejects with `MaxTurnsError`.
+`maxTurns` must be a nonnegative safe integer. It allows the initial model request plus up to `maxTurns` subsequent model turns: `0` permits one request and `1` permits two. A turn can request several tools; it is not a per-tool limit. Retries within a model invocation use a separate attempt budget. When the model keeps requesting tools beyond the allowed loop, the run rejects with `MaxTurnsError`.
 
 If runs frequently reach the limit, inspect instructions, tool descriptions, invalid tool inputs, and tool outputs before increasing it. More turns increase latency and cost and can hide a model-tool loop.
 
@@ -112,17 +112,17 @@ Do not retry authentication, permission, invalid-request, schema, or determinist
 
 ## 5. Handle stream errors
 
-An agent stream emits an `error` event with accumulated usage and then rejects the iterator with the same run failure:
+An agent stream emits an `error` event with accumulated usage and ends the iterator normally. Its `.result` promise rejects with the run failure. Await that promise inside the same error boundary:
 
 ```ts
 try {
-  for await (const event of supportAgent.stream({
-      prompt: input.message
-  })) {
+  const stream = supportAgent.stream({ prompt: input.message })
+  for await (const event of stream) {
     if (event.type === 'error') {
       recordRunFailure(event.error, event.usage)
     }
   }
+  await stream.result
 } catch (error) {
   return mapSupportError(error)
 }

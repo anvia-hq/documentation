@@ -92,7 +92,7 @@ Keep true data dependencies in sequence. False parallelism causes duplicate read
 
 ## 4. Treat failures as partial execution
 
-The branch implementations start together with `Promise.all()`. If one rejects, the parallel stage rejects, but already-started branches are not cancelled or rolled back.
+Branches start concurrently. If one rejects, the runtime aborts the shared branch signal, waits for all branches to settle, then rejects with the first branch failure. Cancellation is cooperative: pass the branch's `abortSignal` to external work and honor it in handlers. Completed side effects are not rolled back, and work that ignores the signal can continue until it settles.
 
 Prefer parallel reads, classification, and independent analysis. Place controlled writes in a later linear step, or make every branch write idempotent and concurrency-safe.
 

@@ -39,14 +39,14 @@ The runtime validates the model-supplied input, calls `execute`, validates the r
 
 ## Control tool choice
 
-Automatic selection is appropriate for ordinary agents. Require a tool only when every valid run must call one:
+Use automatic selection when the agent must look up information and then produce a final answer:
 
 ```ts
 const agent = new Agent({
   id: 'order-status',
   model,
   instructions: 'Look up the order before answering.',
-  toolChoice: 'required',
+  toolChoice: 'auto',
   maxTurns: 3,
   tools: [getOrder],
 })
@@ -60,7 +60,7 @@ if (result.type === 'response') {
 }
 ```
 
-Test required tool choice and streamed tool arguments with the exact Mistral model selected for production.
+Agent-level `toolChoice: 'required'` applies to every model turn, including turns after a tool result. A model honoring it keeps calling tools until the turn budget is exhausted; it does not mean "require a tool only on the first turn." If the lookup is mandatory, perform it in application code before starting the answering agent, or scope required choice to a direct completion whose tool call the application handles. Test tool selection and streamed tool arguments with the exact Mistral model used.
 
 ## Parse a structured result
 
@@ -100,7 +100,7 @@ const result = await triageAgent.generate({
 })
 
 if (result.type === 'response') {
-  const incident = incidentSchema.parse(JSON.parse(result.output))
+  const incident = result.output
   console.log(incident.severity)
 }
 ```

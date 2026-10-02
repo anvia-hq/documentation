@@ -29,7 +29,7 @@ async execute({ orderId }) {
 }
 ```
 
-Throw for dependency failures, invalid service state, or rejected policy checks. During an agent run, Anvia normally converts the failure into safe model-visible tool output so the agent can respond or recover. Use lifecycle callbacks for observation; enforce a hard policy before or inside the handler.
+Throw for dependency failures, invalid service state, or rejected policy checks. During an agent run, Anvia normally converts the failure into model-visible tool output so the agent can respond or recover. Error messages are not redacted automatically: map private service details to a safe message before throwing. A handler error does not itself terminate the agent loop. Use lifecycle callbacks for observation; enforce a hard policy before or inside the handler.
 
 ## Receive a call context
 
@@ -54,7 +54,7 @@ The agent registry resolves the tools passed to `Agent`. `agent.getTool(name)` r
 const result = await agent.callTool('get_invoice', JSON.stringify({ invoiceId: 'inv_123' }))
 ```
 
-This path skips run-level hooks, approval, and middleware, so reserve it for trusted application code.
+This path skips the run lifecycle, approval, and middleware, so reserve it for trusted application code.
 
 ## Test the handler first
 

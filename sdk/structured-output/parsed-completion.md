@@ -80,6 +80,6 @@ for await (const event of streamCompletion({
 }
 ```
 
-`event.result.output` is parsed and validated against the schema before the `final` event. Invalid output raises `CompletionStructuredOutputError` with the same `phase` union as `generateCompletion()`: when no deltas have been delivered yet and retries are configured, the request is retried transparently; otherwise the error arrives as the terminal `error` event. The model must support both streaming and output schemas.
+`event.result.output` is parsed and validated against the schema before the `final` event. Invalid output raises `CompletionStructuredOutputError` with the same `phase` union as `generateCompletion()` and arrives as a terminal `error` event. The default completion retry policy does not retry structured-output validation failures. A custom `retries.shouldRetry` can opt in, but a stream can retry only before provider progress has been exposed. Direct completion retries do not add an agent-style correction prompt. The model must support both streaming and output schemas.
 
 Use [agent output](/sdk/structured-output/agent-output) when the run needs tools, memory, retrieval, approvals, or several turns. Use an [extractor](/sdk/structured-output/extractors) when fields already exist in document-like text.

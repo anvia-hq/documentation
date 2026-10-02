@@ -48,7 +48,7 @@ const analyzeTicket = new Pipeline({
 
 Branches run concurrently with the same input. Their keys become the keys of the output object. Keep dependent work linear, and avoid parallel writes unless they are idempotent and conflict-safe.
 
-If any branch rejects, the parallel stage rejects. Other already-started branches may still be running, so failure does not roll back their side effects.
+If any branch rejects, the runtime signals cancellation to sibling branches and waits for all branches to settle before rejecting. Pass the branch's `abortSignal` to external work: cancellation is cooperative and does not roll back completed side effects.
 
 ## 2. Process a batch
 

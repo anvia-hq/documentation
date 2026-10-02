@@ -15,10 +15,19 @@ Reuse the same scope values for every operation that should address the same sto
 ## 2. Continue the conversation
 
 ```ts
-const first = await supportAgent.generate({
+let first = await supportAgent.generate({
     prompt: 'Summarize my latest invoice.',
     session,
 });
+while (first.type === 'interaction' && first.interaction.type === 'tool-approval') {
+    // Obtain the decision from the authenticated approver before resuming.
+    const decision = await requestApproval(first.interaction)
+    first = await supportAgent.resume(first.continuation, {
+        type: 'tool-approval',
+        approved: decision.approved,
+        reason: decision.reason,
+    })
+}
 if (first.type !== 'response') {
     throw new Error(`Unexpected agent outcome: ${first.type}`);
 }
@@ -33,22 +42,7 @@ if (followUp.type === 'response') {
 
 Before each run, Anvia loads the stored messages and uses them as history. New runtime messages are appended according to the configured [save policy](/sdk/memory/save-policies).
 
-If a tool requires approval, resume the interaction through the same parent agent:
-
-```ts
-if (first.type === 'interaction' && first.interaction.type === 'tool-approval') {
-  const resumed = await supportAgent.resume(
-    first.continuation,
-    {
-      type: 'tool-approval',
-      approved: true,
-      reason: 'Approved by the account owner.',
-    },
-  )
-}
-```
-
-The interaction continuation retains its memory context.
+The example handles tool approval before requiring a completed response or starting the follow-up. `requestApproval` is application code that waits for an authorized decision. Resume through the same parent agent; the continuation retains its memory context. Handle other [interaction types](/sdk/agents/interactions) according to the product flow.
 
 ## 3. Stream a session run
 

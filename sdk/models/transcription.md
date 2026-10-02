@@ -27,11 +27,11 @@ const audioPath = 'support-call.wav'
 const audio = await readFile(audioPath)
 ```
 
-`transcribe()` accepts a `Uint8Array` or `ArrayBuffer`. Empty audio is rejected before the provider is called.
+`transcribe()` accepts audio bytes as `audio.data`, a `Uint8Array` or `ArrayBuffer` in its options object. Empty audio is rejected before the provider is called.
 
 ## 3. Transcribe the audio
 
-Pass the bytes first and the model plus filename in the options object.
+Pass one options object containing `audio: { data, filename, mediaType? }` and `model`.
 
 ```ts
 import { transcribe } from '@anvia/core/transcription'

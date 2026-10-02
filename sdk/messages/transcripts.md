@@ -4,7 +4,7 @@ A transcript is a non-empty ordered sequence of system, user, assistant, and too
 
 ## 1. Continue a direct completion
 
-Append the next user message, pass the full array as the first argument, then store the normalized assistant response:
+Append the next user message, pass the full array as `messages` in the options object, then store the normalized assistant response:
 
 ```ts
 import { generateCompletion, type Message } from '@anvia/core'

@@ -76,7 +76,7 @@ Omitting `reasoningEffort` leaves the Agent default, or the provider default whe
 
 ## Supported contract features
 
-The default Responses adapter declares streaming, tools, tool choice, image input, file-document input, output schemas, reasoning content, and provider-executed tools. Chat declares streaming, tools, tool choice, image input, output schemas, and reasoning, but not file documents or provider-executed tools.
+The Responses adapter (`api: 'responses'`) declares streaming, tools, tool choice, image input, file-document input, output schemas, reasoning content, and provider-executed tools. Chat is the default when `api` is omitted and declares streaming, tools, tool choice, image input, output schemas, and reasoning, but not file documents or provider-executed tools.
 
 Support at the adapter level does not guarantee that every OpenAI model ID accepts every feature. Test the exact model and request shape used by the application, especially required tool calls, structured output, documents, and streamed tool arguments.
 

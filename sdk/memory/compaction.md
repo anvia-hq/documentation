@@ -129,7 +129,8 @@ if (result.type === 'compacted') {
 ```
 
 Manual compaction requires configured memory and a store with compaction support. It ignores the
-automatic trigger but still preserves the configured recent-token tail. Pass `abortSignal` in the
+automatic trigger but still preserves recent history according to the configured retention policy
+(`recentTurns` or `recentTokens`; the default is one recent turn). Pass `abortSignal` in the
 options object when the maintenance operation should be cancellable.
 
 ## 6. Observe compaction

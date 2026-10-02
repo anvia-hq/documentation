@@ -46,7 +46,7 @@ Lifecycle callbacks receive snapshots and return no control action. If a lifecyc
 
 ## 2. Apply run control deliberately
 
-Use guardrails to block or rewrite model-facing input and output; see [Stable behavior](/sdk/agents/stable-behavior). Use tool `requiresApproval` for human or policy approval before a side effect. Use an authenticated tool handler as the final authorization boundary.
+Use guardrails to block or rewrite model-facing input and output; see [Guardrails](/sdk/guardrails). Use tool `requiresApproval` for human or policy approval before a side effect. Use an authenticated tool handler as the final authorization boundary.
 
 Use client abort and iterator closure to stop a normal stream. Cancellation cannot undo a tool call or write that already completed.
 

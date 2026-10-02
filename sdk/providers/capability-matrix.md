@@ -4,9 +4,9 @@ This page describes the contracts declared by the current Anvia adapters. A decl
 
 ## 1. OpenAI
 
-The default Responses adapter declares streaming, tools, tool choice, image input, file-document input, output schemas, reasoning content, and provider-executed tools.
+The Responses adapter (`api: 'responses'`) declares streaming, tools, tool choice, image input, file-document input, output schemas, reasoning content, and provider-executed tools.
 
-The Chat Completions adapter declares streaming, tools, tool choice, image input, output schemas, and reasoning. It does not declare file-document input or provider-executed tools.
+The default Chat Completions adapter declares streaming, tools, tool choice, image input, output schemas, and reasoning. It does not declare file-document input or provider-executed tools.
 
 The package also exposes embeddings, image generation, audio generation, transcription, and model listing.
 

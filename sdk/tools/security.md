@@ -43,7 +43,7 @@ never use approval as the only permission or policy check.
 
 ## Layer the enforcement points
 
-`requiresApproval` on a tool declares when that tool must pause for approval. A run's `hooks.onToolCall` hook is a wider gate: it sees every tool call before a handler executes and can skip the call, terminate the run, or force an approval request. Middleware transforms input and output data but is not a policy gate, so keep authorization in the handler and use each layer for what it is for. See [middleware](/sdk/tools/middleware) and the [hooks overview](/sdk/advanced/hooks).
+`requiresApproval` on a tool declares when that tool must pause for approval. Enforce user and tenant permissions inside the handler before reading data or performing a side effect. The public v1 API has no `hooks.onToolCall` gate; lifecycle callbacks observe execution and return no control action. [Guardrails](/sdk/guardrails) can block or rewrite model input and output, while [middleware](/sdk/tools/middleware) transforms completion and tool data. Neither replaces handler authorization. See [lifecycle and run control](/sdk/advanced/hooks).
 
 ## Before shipping
 
