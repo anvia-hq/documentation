@@ -468,3 +468,28 @@ test('maxTurns permits the initial request plus the subsequent turn budget', asy
     assert.equal(requests, maxTurns + 1)
   }
 })
+
+test('eval expectations accept a negative control and reject unexpected invalids', async () => {
+  const example = (await blocks('sdk/evaluations.md')).find(block => block.flags.includes('expectations-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    assert.equal(evalExitCode(result), 1)
+    assert.equal(evalExitCode(result, expectations), 0)
+    const invalid = await runEvalCli({ ...suite, target: async () => { throw new Error('offline') }, format: 'quiet' })
+    assert.equal(evalExitCode(invalid, expectations), 2)
+    assert.throws(() => assertEvalOutcomes(invalid, expectations.outcomes))
+  `)
+})
+
+test('eval responder handles approvals and questions, and enforces its limit', async () => {
+  const example = (await blocks('sdk/evaluations.md')).find(block => block.flags.includes('responder-example'))
+  assert.ok(example)
+  await runExample(example.code, '', "assert.equal(output, 'done')")
+  const limited = example.code.replace('maxResponses: 2', 'maxResponses: 1')
+    .replace("const output = await target('Run the test', { id: 'interactions', input: 'Run the test' })", `
+      const { AgentEvalSuspensionError } = await import(${JSON.stringify(await sourceEntry('@anvia/core/evals'))})
+      await assert.rejects(target('Run the test', { id: 'interactions', input: 'Run the test' }), AgentEvalSuspensionError)
+      const output = 'limit checked'
+    `)
+  await runExample(limited)
+})

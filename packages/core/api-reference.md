@@ -566,3 +566,23 @@ const result = await agent.generate({
 `@anvia/core/evals` exports `defineEvalSuite`, `defineMetric`, `runEvalSuite`, built-in metrics, judge helpers, reporters, result formatters, and evaluation case/run types.
 
 Use the [production evaluations guide](/examples/production/evaluations) for suite construction and reporter lifecycle. Use the package source for an exhaustive symbol list tied to the installed version.
+
+### Evaluation assertions and interaction targets
+
+Import these APIs from `@anvia/core/evals`:
+
+| API | Contract |
+| --- | --- |
+| `defineEvalCases(cases)` | Preserve literal case IDs and input/expected types. |
+| `defineEvalExpectations(suite, expectations)` | Type-check case and metric names. |
+| `assertEvalTotals(result, expected)` | Check specified metric/case counts. |
+| `assertEvalOutcomes(result, expected)` | Check per-case metrics; unspecified required metrics default to pass. |
+| `EvalAssertionError` | Assertion failure with `mismatches: string[]`. |
+| `evalExitCode(result, expectations?)` | Compute `0`, `1`, or `2` without changing process state. |
+| `runEvalCli(options)` | Run, print, and optionally raise the process exit code. |
+| `formatEvalResult(result, options?)` / `printEvalResult(result, options?)` | Format or write pretty/JSON/quiet output with optional truncation and redaction. |
+| `agentEvalTarget({ agent, request, interactions?, output? })` | Map inputs, resume with a bounded responder, select completed output. |
+| `AgentEvalSuspensionError` | Missing responder or exhausted response limit; inspect `result`. |
+
+See [expectations](/sdk/evaluations#assert-intentional-negative-cases) and the
+[offline interaction example](/sdk/evaluations#respond-to-agent-interactions-in-evaluations).

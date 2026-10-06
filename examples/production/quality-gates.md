@@ -87,3 +87,8 @@ verify they fail before trusting the gate.
 - Start with [`08_evals/01-basic-metrics.ts`](https://github.com/anvia-hq/anvia/blob/main/cookbook/08_evals/01-basic-metrics.ts).
 - Use [Lens quality gates](/lens/evaluations/quality-gates) when Lens manages the reporting workflow.
 - Extend with baseline comparison, confidence intervals, cost ceilings, and manual override audit logs.
+
+For regression tests with deliberate negative controls, use the SDK's
+[expectation-aware assertions and exit codes](/sdk/evaluations#assert-intentional-negative-cases).
+Keep that test contract separate from the deployment gate: an expected failure proves the test is
+working, not that a candidate is suitable for production.
