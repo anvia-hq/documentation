@@ -637,3 +637,12 @@ Paths above mean `@anvia/core` and `@anvia/core/{completion,agent,pipeline,evals
 outputs, and causes need application redaction. See [provider kinds and retry policy](/sdk/structured-output/validation-errors#_4-handle-invalid-provider-output),
 [adapter behavior](/sdk/agents/errors-and-limits#_6-distinguish-outcomes-from-adapter-errors),
 and [tool normalization](/sdk/tools/validation-and-execution#public-tool-errors).
+
+### Memory scope keys
+
+`createMemoryScopeKey({ scope, includeUserId?, metadataKeys? }): string` is exported from
+`@anvia/core` and `@anvia/core/memory`. `CreateMemoryScopeKeyOptions`, `MemoryScopeKeyOptions`, and
+`MemoryScopeKeyResolver` are exported from the memory subpath. The helper derives an ordered JSON
+key; it does not authorize a scope or enforce required tenant metadata. See the
+[complete custom-store factory](/sdk/memory/custom-stores#_6-reuse-the-official-scope-key-helper)
+for applying the same policy to canonical data, errors, inspection, and compaction.

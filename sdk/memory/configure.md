@@ -80,3 +80,8 @@ Official adapters validate message shapes and record failed-run diagnostics by d
 Failed-run records are not loaded as conversation history. They may still contain sensitive prompts and tool data, so apply a separate retention policy.
 
 Continue with [Sessions](/sdk/memory/sessions).
+
+Official stores use the exported [scope-key helper](/sdk/memory/custom-stores#_6-reuse-the-official-scope-key-helper)
+when no custom resolver is supplied. Custom stores can reuse `createMemoryScopeKey` with the same
+user/metadata policy. Adding a tenant key does not require that field; validate required tenancy in
+the application before passing a session to the runtime.

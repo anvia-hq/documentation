@@ -676,3 +676,38 @@ test('adapter and tool errors match their documented boundaries', async () => {
   await stream.result
   assert.throws(() => stream.steer('late'), AgentStreamClosedError)
 })
+
+
+test('memory key example separates user/tenant scopes and applies one key to all operations', async () => {
+  const example = (await blocks('sdk/memory/custom-stores.md')).find(block => block.flags.includes('memory-key-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    const scope = { sessionId: 's', userId: 'u', metadata: { tenantId: 't' } }
+    assert.notEqual(keyFor(scope), keyFor({ ...scope, userId: 'other' }))
+    assert.notEqual(keyFor(scope), keyFor({ ...scope, metadata: { tenantId: 'other' } }))
+    assert.equal(keyFor({ sessionId: 's' }), '["s",null,null]')
+    assert.equal(createMemoryScopeKey({ scope: { sessionId: 's', metadata: { organization: { id: 'org' } } }, metadataKeys: ['organization.id'] }), '["s",null,"org"]')
+    assert.equal(createMemoryScopeKey({ scope, includeUserId: false }), '["s"]')
+    assert.notEqual(createMemoryScopeKey({ scope, metadataKeys: ['tenantId', 'missing'] }), createMemoryScopeKey({ scope, metadataKeys: ['missing', 'tenantId'] }))
+    const keys = []
+    const backend = {
+      load: async key => { keys.push(key); return [] },
+      append: async input => { keys.push(input.key) },
+      clear: async key => { keys.push(key) },
+      recordError: async input => { keys.push(input.key) },
+      snapshot: async key => { keys.push(key); return { revision: 'r1', messages: [] } },
+      replacePrefix: async input => { keys.push(input.key); return { status: 'committed' } },
+      listConversations: async () => [],
+      getConversation: async ({ ref }) => { keys.push(ref); return undefined },
+    }
+    const store = createProductMemoryStore(backend)
+    await store.load({ scope })
+    await store.append({ scope, messages: [], runId: 'r', turn: 1 })
+    await store.clear({ scope })
+    await store.recordError({ scope, messages: [], runId: 'r', error: new Error('synthetic') })
+    await store.compaction.snapshot({ scope })
+    await store.compaction.replacePrefix({ scope, revision: 'r1', messageCount: 1, runId: 'r', replacement: { role: 'system', content: 'summary', metadata: { anvia: { memoryCompaction: { version: 1, compactedMessageCount: 1 } } } } })
+    await store.inspector.getConversation({ ref: keyFor(scope) })
+    assert.deepEqual(keys, Array(7).fill(keyFor(scope)))
+  `)
+})

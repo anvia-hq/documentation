@@ -5,17 +5,19 @@ Implement `MemoryStore` when the official adapters do not fit the application's 
 ## 1. Implement the required methods
 
 ```ts
-import type { Message } from '@anvia/core'
+import { createMemoryScopeKey, type Message } from '@anvia/core'
 import type {
   MemoryAppendOptions,
   MemoryScope,
   MemoryStore,
 } from '@anvia/core/memory'
 
+const scopeKey = (scope: MemoryScope) => createMemoryScopeKey({ scope, metadataKeys: ['tenantId'] })
+
 export class ProductMemoryStore implements MemoryStore {
   async load({ scope }: { scope: MemoryScope }): Promise<Message[]> {
     const rows = await db.memoryMessages.findMany({
-      where: scopeWhere(scope),
+      where: { scopeKey: scopeKey(scope) },
       orderBy: { position: 'asc' },
     })
 
@@ -26,7 +28,7 @@ export class ProductMemoryStore implements MemoryStore {
     if (input.messages.length === 0) return
 
     await appendOrderedMessagesAtomically({
-      scope: input.scope,
+      scopeKey: scopeKey(input.scope),
       runId: input.runId,
       turn: input.turn,
       messages: input.messages,
@@ -34,7 +36,7 @@ export class ProductMemoryStore implements MemoryStore {
   }
 
   async clear({ scope }: { scope: MemoryScope }): Promise<void> {
-    await deleteConversation(scopeWhere(scope))
+    await deleteConversation({ scopeKey: scopeKey(scope) })
   }
 }
 ```
@@ -101,12 +103,12 @@ import type { MemoryCompactionCapability } from '@anvia/core/memory'
 
 const compaction: MemoryCompactionCapability = {
   async snapshot({ scope }) {
-    return loadRevisionAndModelProjection(scope)
+    return loadRevisionAndModelProjection({ scopeKey: scopeKey(scope) })
   },
 
   async replacePrefix(input) {
     return advanceCompactionCheckpointIfRevisionMatches({
-      scope: input.scope,
+      scopeKey: scopeKey(input.scope),
       expectedRevision: input.revision,
       messageCount: input.messageCount,
       replacement: input.replacement,
@@ -136,3 +138,69 @@ Test empty histories, repeated compactions, append-after-compaction, clear-after
 concurrent writers, failed transactions, full-scope deletion, error isolation, malformed checkpoint
 state, compaction conflicts, canonical replay, model projection, and message-order preservation
 before using a custom store in production.
+
+## 6. Reuse the official scope-key helper
+
+`createMemoryScopeKey({ scope, includeUserId?, metadataKeys? })` is exported from `@anvia/core`
+and `@anvia/core/memory`. It JSON-encodes an ordered array containing `sessionId`, `userId` by
+default (null when absent), and each selected metadata value. Unselected metadata is ignored.
+Dotted paths such as `organization.id` traverse plain objects; missing values become null.
+
+The following complete adapter factory demonstrates one policy at every storage boundary. The
+backend is application-owned: it must implement atomic ordered/idempotent appends, protected error
+storage, canonical-history preservation, and revision-checked compaction as described above.
+
+```ts anvia-check memory-key-example
+import { createMemoryScopeKey, type Message } from '@anvia/core'
+import type {
+  MemoryAppendOptions, MemoryErrorOptions, MemoryScope, MemoryStore,
+  MemoryInspector, MemoryCompactionReplacePrefixOptions,
+  MemoryCompactionReplacePrefixResult, MemoryCompactionSnapshot,
+} from '@anvia/core/memory'
+
+type Keyed<T> = Omit<T, 'scope'> & { key: string }
+type Backend = {
+  load(key: string): Promise<Message[]>
+  append(input: Keyed<MemoryAppendOptions>): Promise<void>
+  clear(key: string): Promise<void> // clear canonical rows AND the compaction checkpoint
+  recordError(input: Keyed<MemoryErrorOptions>): Promise<void>
+  snapshot(key: string): Promise<MemoryCompactionSnapshot>
+  replacePrefix(input: Keyed<MemoryCompactionReplacePrefixOptions>): Promise<MemoryCompactionReplacePrefixResult>
+  // Return summaries with ref equal to the same stored key; filter in authorized tooling.
+  listConversations: MemoryInspector['listConversations']
+  getConversation: MemoryInspector['getConversation']
+}
+export const keyFor = (scope: MemoryScope) => createMemoryScopeKey({ scope, metadataKeys: ['tenantId'] })
+export function createProductMemoryStore(backend: Backend): MemoryStore {
+  return {
+    load: ({ scope }) => backend.load(keyFor(scope)),
+    append: ({ scope, ...input }) => backend.append({ ...input, key: keyFor(scope) }),
+    clear: ({ scope }) => backend.clear(keyFor(scope)),
+    recordError: ({ scope, ...input }) => backend.recordError({ ...input, key: keyFor(scope) }),
+    inspector: {
+      listConversations: (options) => backend.listConversations(options),
+      getConversation: ({ ref }) => backend.getConversation({ ref }),
+    },
+    compaction: {
+      snapshot: ({ scope }) => backend.snapshot(keyFor(scope)),
+      replacePrefix: ({ scope, ...input }) => backend.replacePrefix({ ...input, key: keyFor(scope) }),
+    },
+  }
+}
+const demoKey = keyFor({ sessionId: 'session-1', userId: 'user-1', metadata: { tenantId: 'tenant-1' } })
+console.log(demoKey) // ["session-1","user-1","tenant-1"]
+```
+
+The inspector's `ref` addresses the already stored key; it is not a user-supplied scope or proof of
+access. For a backend with separate opaque references, map them to the stored key server-side.
+
+`includeUserId: false` removes the user element and deliberately shares a session across users
+with otherwise equal selected values. `metadataKeys` order matters, including nested JSON value
+serialization order. Keep selected values stable scalars when possible. Changing the key policy
+(including order or user inclusion) addresses different storage; plan migration of history,
+checkpoints, errors, and references before changing it for existing conversations.
+
+Key derivation does not validate that tenant metadata exists or authorize any caller. If tenancy
+is required, reject a missing/blank tenant before constructing the scope. Missing and explicit null
+metadata values map to the same null key element by design. Retain a custom `MemoryScopeKeyResolver`
+for an application-specific policy, and apply it consistently at all boundaries.
