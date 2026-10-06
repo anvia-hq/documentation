@@ -121,3 +121,69 @@ Core validates continuation integrity against the current Agent and tool catalog
 For browser applications, Client Protocol v3 represents responses as `type: 'interaction_response'`. `useChat()` exposes pending interactions and sends matching responses, while the server remains responsible for mapping the interaction ID to its protected continuation.
 
 Continue with [Tool approval](/sdk/advanced/hooks/tool-control), [Server transport](/sdk/streaming/server-transport), or [Studio approvals and questions](/studio/playground/approvals-and-questions).
+
+## Validate stored continuations and incoming responses
+
+Import the public boundary APIs from `@anvia/core/agent/interactions`:
+
+| API | Validates |
+| --- | --- |
+| `parseAgentContinuation(value)` | Continuation envelope, interaction shape, and strict-JSON state. |
+| `parseAgentInteractionRequest(value)` | Approval/question request shape, IDs, and question definitions. |
+| `parseAgentInteractionResponse(value)` | Response shape, including nonblank question answers. |
+| `assertAgentInteractionResponse(request, response)` | Matching interaction type and exact question coverage; allowed choices when custom answers are disabled. |
+
+The corresponding `agentContinuationSchema`, `agentInteractionRequestSchema`, and
+`agentInteractionResponseSchema` expose `.parse()` and `.safeParse()`. Parsers return deeply frozen
+values. Parsing a response alone does not match it to a pending request: the assertion rejects
+missing, duplicate, unknown-question, and disallowed-choice answers. For free-text questions,
+`allowCustom: false` is invalid; choice questions permit custom answers unless explicitly disabled.
+
+This complete server handler declares its application dependencies. Implement `load`, `authorize`,
+and `claim` in your protected storage layer; `resume` must call the originating Agent:
+
+```ts anvia-check continuation-example
+import {
+  assertAgentInteractionResponse, parseAgentContinuation, parseAgentInteractionResponse,
+  type AgentContinuation, type AgentInteractionResponse,
+} from '@anvia/core/agent/interactions'
+
+type PendingRecord = {
+  continuation: unknown
+  ownerId: string
+  tenantId: string
+  expiresAt: number
+  revision: string
+}
+type Dependencies = {
+  load(id: string): Promise<PendingRecord>
+  authorize(actorId: string, pending: PendingRecord): Promise<void>
+  // Compare revision and pending status atomically; exactly one claimant succeeds.
+  claim(id: string, revision: string): Promise<boolean>
+  resume(continuation: AgentContinuation, response: AgentInteractionResponse): Promise<unknown>
+}
+export async function continueInteraction(
+  authenticatedActorId: string, interactionId: string, body: unknown, deps: Dependencies,
+) {
+  const pending = await deps.load(interactionId)
+  await deps.authorize(authenticatedActorId, pending)
+  if (pending.expiresAt <= Date.now()) throw new Error('Interaction expired')
+  const continuation = parseAgentContinuation(pending.continuation)
+  if (continuation.interaction.id !== interactionId) throw new Error('Interaction ID mismatch')
+  const response = parseAgentInteractionResponse(body)
+  assertAgentInteractionResponse(continuation.interaction, response)
+  if (!await deps.claim(interactionId, pending.revision)) throw new Error('Interaction already claimed')
+  return deps.resume(continuation, response)
+}
+```
+
+Authenticate before calling the handler. `authorize` must check the current actor's access to the
+stored owner/tenant and operation; never take those fields from the response body. Claiming must
+also enforce current pending/expiry state in the same atomic operation, using `revision` to reject
+stale records. Resume failures need an application recovery policy and audit state; blindly
+releasing a claim may repeat a tool side effect.
+
+A structurally valid continuation is not necessarily resumable: the originating Agent validates
+its opaque state against its identity and current tool catalog. Preserve that state unchanged and
+keep it server-side. Neither the schemas nor the matching assertion supply authorization,
+durable locking, expiry enforcement, or an exactly-once execution guarantee.

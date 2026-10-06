@@ -100,3 +100,35 @@ Metadata must be a strict JSON value: strings, finite numbers, booleans, null, a
 Metadata is retained by message, memory, UI, and observability flows, but provider adapters do not treat it as prompt content. Do not put facts there when the model must read them.
 
 Continue with [Content types](/sdk/messages/content).
+
+## Validate application metadata
+
+Use `createMessageSchema({ metadataSchema })` from `@anvia/core` or
+`@anvia/core/completion` when your storage boundary needs a specific metadata shape:
+
+```ts anvia-check metadata-example
+import { createMessageSchema, isMessage, parseMessage, parseMessages } from '@anvia/core'
+import { z } from 'zod'
+
+const ticketMessageSchema = createMessageSchema({
+  metadataSchema: z.object({ tenantId: z.string().min(1), ticketId: z.string().min(1) }).strict(),
+})
+const stored: unknown = {
+  role: 'user', content: 'Check this ticket.',
+  metadata: { tenantId: 'demo', ticketId: 'T-1' },
+}
+const message = ticketMessageSchema.parse(stored)
+console.log(message.metadata?.ticketId)
+const valid = isMessage(stored) // boolean type guard for the standard message contract
+const standard = parseMessage(stored) // throws for an invalid standard message
+const history = parseMessages([stored]) // validates an array of standard messages
+console.log(valid, standard.role, history.length)
+```
+
+Metadata is optional even with a custom schema; require its presence separately if your application
+needs it. `isMessage` checks standard strict-JSON message structure, not your tenant/ticket schema.
+Use `ticketMessageSchema.safeParse(value)` to branch without throwing under the custom contract.
+
+The factory checks strict JSON before metadata parsing and again afterward. A transform that
+produces a Date, undefined value, or other non-JSON data is rejected too. This validates structure;
+it does not verify tenant ownership, message sequencing, or a caller's access to a transcript.

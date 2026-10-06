@@ -493,3 +493,47 @@ test('eval responder handles approvals and questions, and enforces its limit', a
     `)
   await runExample(limited)
 })
+
+
+test('custom message metadata rejects invalid fields and non-JSON transforms', async () => {
+  const example = (await blocks('sdk/messages/roles.md')).find(block => block.flags.includes('metadata-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    assert.equal(message.metadata.ticketId, 'T-1')
+    assert.equal(ticketMessageSchema.safeParse({ ...stored, metadata: { tenantId: 1 } }).success, false)
+    assert.equal(isMessage({ ...stored, metadata: { date: new Date() } }), false)
+    assert.equal(ticketMessageSchema.safeParse({ role: 'user', content: 'ok' }).success, true)
+    const transforming = createMessageSchema({ metadataSchema: z.object({ value: z.string().transform(() => new Date()) }) })
+    assert.equal(transforming.safeParse({ role: 'user', content: 'ok', metadata: { value: 'today' } }).success, false)
+  `)
+})
+
+test('continuation handler validates answers before claiming and resuming', async () => {
+  const example = (await blocks('sdk/agents/interactions.md')).find(block => block.flags.includes('continuation-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    const interaction = { type: 'tool-question', id: 'i1', toolName: 'ask', toolCallId: 'c1', internalCallId: 'c1',
+      questions: [{ id: 'route', text: 'Queue?', choices: [{ label: 'Support', value: 'support' }], allowCustom: false }] }
+    const continuation = { version: 1, agentId: 'agent', sourceRunId: 'run', interaction, state: {} }
+    let claims = 0, resumes = 0
+    const deps = {
+      load: async () => ({ continuation, ownerId: 'operator', tenantId: 'demo', expiresAt: Date.now() + 10000, revision: 'r1' }),
+      authorize: async actor => { if (actor !== 'operator') throw new Error('Forbidden') },
+      claim: async () => { claims++; return claims === 1 },
+      resume: async () => { resumes++; return 'resumed' },
+    }
+    for (const body of [
+      { type: 'tool-approval', approved: true },
+      { type: 'tool-question', answers: [] },
+      { type: 'tool-question', answers: [{ questionId: 'route', value: 'support' }, { questionId: 'route', value: 'support' }] },
+      { type: 'tool-question', answers: [{ questionId: 'route', value: 'other' }] },
+      { type: 'tool-question', answers: [{ questionId: 'unknown', value: 'support' }] },
+    ]) await assert.rejects(continueInteraction('operator', 'i1', body, deps))
+    const body = { type: 'tool-question', answers: [{ questionId: 'route', value: 'support' }] }
+    await assert.rejects(continueInteraction('outsider', 'i1', body, deps), /Forbidden/)
+    assert.equal(claims, 0)
+    assert.equal(await continueInteraction('operator', 'i1', body, deps), 'resumed')
+    await assert.rejects(continueInteraction('operator', 'i1', body, deps), /already claimed/)
+    assert.equal(resumes, 1)
+  `)
+})

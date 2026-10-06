@@ -586,3 +586,17 @@ Import these APIs from `@anvia/core/evals`:
 
 See [expectations](/sdk/evaluations#assert-intentional-negative-cases) and the
 [offline interaction example](/sdk/evaluations#respond-to-agent-interactions-in-evaluations).
+
+## Message and interaction boundary validation
+
+`@anvia/core` and `@anvia/core/completion` export `createMessageSchema({ metadataSchema })`,
+`isMessage(value)`, `parseMessage(value)`, `parseMessages(value)`, `messageSchema`, and
+`messagesSchema`. A custom metadata schema still permits absent metadata; `isMessage` checks the
+standard contract only. See [metadata validation](/sdk/messages/roles#validate-application-metadata).
+
+`@anvia/core/agent/interactions` exports `agentContinuationSchema`,
+`agentInteractionRequestSchema`, `agentInteractionResponseSchema`, `parseAgentContinuation`,
+`parseAgentInteractionRequest`, `parseAgentInteractionResponse`, and
+`assertAgentInteractionResponse(request, response)`, plus the continuation/request/response and
+question types. Parsing checks shape; the assertion matches answers to the request. See the
+[server boundary example](/sdk/agents/interactions#validate-stored-continuations-and-incoming-responses).
