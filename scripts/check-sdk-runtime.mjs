@@ -537,3 +537,54 @@ test('continuation handler validates answers before claiming and resuming', asyn
     assert.equal(resumes, 1)
   `)
 })
+
+
+test('generic stream example validates SSE and handles JSONL, HTTP and parsing failures', async () => {
+  const example = (await blocks('sdk/streaming/server-transport.md')).find(block => block.flags.includes('generic-transport-example'))
+  assert.ok(example)
+  await runExample(example.code, '', String.raw`
+    assert.deepEqual(received, [{ type: 'progress', completed: 1 }])
+    async function collect(body, status = 200) {
+      const client = createFetchEventTransport({ endpoint: 'https://example.invalid',
+        fetch: async () => new Response(body, { status }), mapEvent: event => eventSchema.parse(event) })
+      const values = []
+      for await (const value of client.send({ request: {} })) values.push(value)
+      return values
+    }
+    assert.deepEqual(await collect('{"type":"progress","completed":2}\n'), [{ type: 'progress', completed: 2 }])
+    await assert.rejects(collect('not-json'), SyntaxError)
+    await assert.rejects(collect('{"type":"progress","completed":"bad"}'))
+    await assert.rejects(collect('private error', 503), error => error instanceof EventStreamHttpError && error.body === 'private error')
+    const { readJsonlStream, createDirectEventTransport } = await import(${JSON.stringify(await sourceEntry('@anvia/client/transport'))})
+    let cancelled = false
+    const body = new ReadableStream({ start(c) { c.enqueue(new TextEncoder().encode('1\n2\n')) }, cancel() { cancelled = true } })
+    for await (const value of readJsonlStream(body)) { assert.equal(value, 1); break }
+    assert.equal(cancelled, true)
+    const abort = new AbortController()
+    let closed = false
+    const direct = createDirectEventTransport({ handler: async function* () { try { yield 1; yield 2 } finally { closed = true } } })
+    const values = []
+    for await (const value of direct.send({ request: {}, abortSignal: abort.signal })) { values.push(value); abort.abort() }
+    assert.deepEqual(values, [1])
+    assert.equal(closed, true)
+    let forwarded = false
+    const aborting = createFetchEventTransport({ endpoint: 'https://example.invalid', fetch: async (_input, init) => {
+      forwarded = init.signal === abort.signal
+      init.signal.throwIfAborted()
+      return new Response('')
+    } })
+    await assert.rejects(async () => { for await (const event of aborting.send({ request: {}, abortSignal: abort.signal })) void event })
+    assert.equal(forwarded, true)
+  `)
+})
+
+test('client error helpers distinguish masking from normalization', async () => {
+  const example = (await blocks('packages/client/protocol-and-state.md')).find(block => block.flags.includes('client-errors-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    assert.deepEqual(publicError, { message: 'An unexpected error occurred.' })
+    assert.equal(localError.name, 'ApplicationError')
+    const original = new Error('private details')
+    assert.equal(normalizeClientError(original), original)
+  `)
+})
