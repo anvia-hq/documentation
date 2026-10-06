@@ -20,7 +20,13 @@ tutorial. The `features` entries tie selected APIs to complete examples and name
 
 ## Run the checks
 
-Keep an installed Anvia checkout beside the docs, or set `ANVIA_REPO` to its absolute path:
+Keep an installed Anvia checkout beside the docs, or set `ANVIA_REPO` to its absolute path.
+
+In that SDK checkout, run `pnpm --filter @anvia/core build` before the runtime checks. Provider
+source imports Core through workspace exports that resolve to `dist/`; a clean checkout has no
+generated Core files until this build runs. Both CI validation jobs perform this prerequisite.
+
+Run the following commands from the documentation repository:
 
 ```sh
 node scripts/check-sdk-coverage.mjs

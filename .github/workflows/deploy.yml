@@ -118,5 +118,9 @@ jobs:
         working-directory: anvia-source
         run: pnpm install --frozen-lockfile
 
+      - name: Build Core for SDK workspace imports
+        working-directory: anvia-source
+        run: pnpm --filter @anvia/core build
+
       - name: Check SDK exports, snippets, and offline runtime examples
         run: pnpm sdk:check
