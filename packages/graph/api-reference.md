@@ -76,3 +76,31 @@ prepared records and returns `GraphWriteResult` change counts.
 The package also exports schema, fact, document, chunk, entity, relationship, mention, property,
 preparation, exploration, and write-policy types. Use the published declarations as the exact field
 reference.
+
+## Schema adapter helpers
+
+The root `@anvia/graph` also exports `validateGraphSchemaOptions(options)`,
+`freezeGraphSchema(options, kind)`, `assertGraphName(value, label)`,
+`assertGraphPropertyName(value)`, `parseGraphProperties(value, label)`,
+`parseGraphPropertyValue(value, label)`, and `graphReservedPropertyPrefix` (`__anvia_`).
+
+`defineGraphSchema` validates options before freezing the schema. `freezeGraphSchema` alone is a
+snapshot helper, not validation. Names must be nonempty; property names cannot use the reserved
+prefix. Property values allow strings, booleans, finite numbers (integer values must be safe), and
+homogeneous primitive arrays, including empty arrays. Null, nested objects, and mixed arrays are
+rejected. This graph property contract is narrower than general strict JSON.
+
+```ts anvia-check graph-schema-example
+import { defineGraphSchema, parseGraphProperties } from '@anvia/graph'
+import { z } from 'zod'
+
+const schema = defineGraphSchema({
+  nodes: { Person: { description: 'A person', properties: z.object({ id: z.string() }).strict(), identity: ['id'] } },
+  relationships: {},
+})
+const properties = parseGraphProperties({ id: 'synthetic-person', labels: ['demo'] }, 'Person')
+console.log(schema.kind, properties.id)
+```
+
+These helpers support custom adapters. Application ingestion should still use a declared schema
+and authorized store operations.

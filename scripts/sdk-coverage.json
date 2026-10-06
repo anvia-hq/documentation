@@ -1,0 +1,758 @@
+{
+  "reviewedSdkRevision": "d54b24996a4d6816219618fc703975e38993df75",
+  "entries": [
+    {
+      "module": "@anvia/cli",
+      "guide": "packages/cli/get-started.md",
+      "reference": "packages/cli/api-reference.md",
+      "exportCount": 30,
+      "exportNamesHash": "892ddf47fb197641a46cf1ee309ee13c75d200514badabc572b068278ebef33d"
+    },
+    {
+      "module": "@anvia/client",
+      "guide": "packages/client/get-started.md",
+      "reference": "packages/client/api-reference.md",
+      "exportCount": 53,
+      "exportNamesHash": "45f16677ad194110dd55be942b6ef74d3056c1fb5c9808155fe662f1b3d28114"
+    },
+    {
+      "module": "@anvia/client/transport",
+      "guide": "sdk/streaming/server-transport.md",
+      "reference": "packages/client/api-reference.md",
+      "exportCount": 11,
+      "exportNamesHash": "c6b4eab29c177543042f7d58688e740fa50f949e235ab46f0ce14b48efe23fdb"
+    },
+    {
+      "module": "@anvia/core",
+      "guide": "sdk/index.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 245,
+      "exportNamesHash": "7d48200ba35dc6dc83c9d1ab9f90ec9d13c6a99f8decae14a463219cd477f455"
+    },
+    {
+      "module": "@anvia/core/agent",
+      "guide": "sdk/agents.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 65,
+      "exportNamesHash": "7c093eea0db146c3a1e9e82e42446563d3d5642fdaa79c8df5702beacf31399a"
+    },
+    {
+      "module": "@anvia/core/agent/interactions",
+      "guide": "sdk/agents/interactions.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 15,
+      "exportNamesHash": "494333389be6bcba8ee1974cc020ffb30dd7d48934bb078db7f46b4b0c0f8fef"
+    },
+    {
+      "module": "@anvia/core/speech-generation",
+      "guide": "sdk/models/speech-generation.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 9,
+      "exportNamesHash": "a01c4076a39fcf7856c8dfab456fe803c85f54fc282cab7df3a63a6b8904d0fa"
+    },
+    {
+      "module": "@anvia/core/completion",
+      "guide": "sdk/completions.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 98,
+      "exportNamesHash": "0833a20e310be72fc84c9d8a56ff22cbd14ebe658b6be1ba0e0522231cea65d3"
+    },
+    {
+      "module": "@anvia/core/embeddings",
+      "guide": "sdk/models/embeddings.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 36,
+      "exportNamesHash": "681b48ecfd695f72f9a419f355d651db3962a52920137f37684623e378de90ed"
+    },
+    {
+      "module": "@anvia/core/evals",
+      "guide": "sdk/evaluations.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 134,
+      "exportNamesHash": "fc3724473ec44fe5e1d25fba85025f41d294c1c5c9e3d7ddb57f7c1b3ca3fa32"
+    },
+    {
+      "module": "@anvia/core/documents",
+      "guide": "sdk/knowledges/load-documents.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 9,
+      "exportNamesHash": "35822af9fa856518bfb6433ab9fce91156af41391c37bf667bc0f529299708f6"
+    },
+    {
+      "module": "@anvia/core/extractor",
+      "guide": "sdk/structured-output/extractors.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 4,
+      "exportNamesHash": "c63f925eaa53a55c10e473952c3b89daf01201882c322fd06356d2fedb20368e"
+    },
+    {
+      "module": "@anvia/core/guardrails",
+      "guide": "sdk/guardrails.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 35,
+      "exportNamesHash": "73de8ee87b9dd9dfd7a6e666fda16c3e052cdf86d2421186f2df8c8a7a9c9644"
+    },
+    {
+      "module": "@anvia/core/mcp",
+      "guide": "sdk/advanced/mcp.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 4,
+      "exportNamesHash": "f2303b4d574329bad5a41f938aa67cf9fca79927246eca57b6f931bd1e680c40"
+    },
+    {
+      "module": "@anvia/core/memory",
+      "guide": "sdk/memory.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 40,
+      "exportNamesHash": "87e1b3c525ee1feea2ac150596ae04f0a6b7f8f1472d6e37573159626f7d8ccb"
+    },
+    {
+      "module": "@anvia/core/model-listing",
+      "guide": "sdk/providers/openai/model-listing.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 5,
+      "exportNamesHash": "0f6546d28ad159b122e61521b901246965fee1fd6506972b0162578d42e60281"
+    },
+    {
+      "module": "@anvia/core/observability",
+      "guide": "sdk/observability.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 26,
+      "exportNamesHash": "af6451e4ea218e2476c5fef28613e8623174060dc6721c682b8ec2edcb43d4f5"
+    },
+    {
+      "module": "@anvia/core/pipeline",
+      "guide": "sdk/pipelines.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 40,
+      "exportNamesHash": "f514ea4505f55575ff0971c3fc1eff2bf6e034e5507a96513f0e14e229554b4d"
+    },
+    {
+      "module": "@anvia/core/redaction",
+      "guide": "packages/core/api-reference.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 6,
+      "exportNamesHash": "8dfe128a2db7e9ff8151b900b78824301a0be2bab15535842a88dc8a0b89b344"
+    },
+    {
+      "module": "@anvia/core/skills",
+      "guide": "sdk/advanced/skills.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 7,
+      "exportNamesHash": "a506a774d1967838ca90c06d128163d8936a9c58cd20a86e93b2552090eae9dd"
+    },
+    {
+      "module": "@anvia/core/streaming",
+      "guide": "sdk/streaming.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 2,
+      "exportNamesHash": "650d3ee4b9e69248597d086961519e63da6800b716020043de74c90561c8cf2c"
+    },
+    {
+      "module": "@anvia/core/image-generation",
+      "guide": "sdk/models/image-generation.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 10,
+      "exportNamesHash": "4e2a33be0f6eb5f3b6a512ee6e3beff1d40a100cce997769c99c19c9b9544654"
+    },
+    {
+      "module": "@anvia/core/tool",
+      "guide": "sdk/tools.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 45,
+      "exportNamesHash": "2155abeeb09b62ab7018df6e2d45a12757e234a7dc891ff2548c9fb89674a4cd"
+    },
+    {
+      "module": "@anvia/core/transcription",
+      "guide": "sdk/models/transcription.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 10,
+      "exportNamesHash": "c7db66423f6783b30d0bf38ce54ba26292c7e3f9526b83f87b3bed38237dc92b"
+    },
+    {
+      "module": "@anvia/core/vector-store",
+      "guide": "sdk/index.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 33,
+      "exportNamesHash": "460763d5e5166bfa32947e9b55a994440a7218145facd464f5616c3d2417186a"
+    },
+    {
+      "module": "@anvia/transformers",
+      "guide": "packages/transformers/get-started.md",
+      "reference": "packages/transformers/api-reference.md",
+      "exportCount": 10,
+      "exportNamesHash": "9bcc54a41a43ffe1932ca2567823964fa1a1df93b5026952efbcb08bd89dbc72"
+    },
+    {
+      "module": "@anvia/graph",
+      "guide": "packages/graph/get-started.md",
+      "reference": "packages/graph/api-reference.md",
+      "exportCount": 87,
+      "exportNamesHash": "5e81c241ab21d5f618d211e598c6fb5571d7a4f1f3428e7f6e84ed8e8d645a21"
+    },
+    {
+      "module": "@anvia/graph/explore",
+      "guide": "packages/graph/get-started.md",
+      "reference": "packages/graph/api-reference.md",
+      "exportCount": 4,
+      "exportNamesHash": "b76bf1ccd22a03ad62f182e72d6ed9c7b18edce6b96fdaa5d194588f8b449422"
+    },
+    {
+      "module": "@anvia/memgraph",
+      "guide": "packages/memgraph/get-started.md",
+      "reference": "packages/memgraph/api-reference.md",
+      "exportCount": 45,
+      "exportNamesHash": "0af57dfa62a000021006f80989cc50529ee0d92e18ff49c8b6eed64918586671"
+    },
+    {
+      "module": "@anvia/neo4j",
+      "guide": "packages/neo4j/get-started.md",
+      "reference": "packages/neo4j/api-reference.md",
+      "exportCount": 51,
+      "exportNamesHash": "1d5c14a9f78c072c3e5eec581b6f4b4d5a729ba6d0bdac4712f35d1d7842da3a"
+    },
+    {
+      "module": "@anvia/logger",
+      "guide": "packages/logger/get-started.md",
+      "reference": "packages/logger/api-reference.md",
+      "exportCount": 11,
+      "exportNamesHash": "2d5c1d5411da05cfe5ba3572af439bac2ef3c42bc999d5548e8505d0903e9742"
+    },
+    {
+      "module": "@anvia/mcp",
+      "guide": "packages/mcp/get-started.md",
+      "reference": "packages/mcp/api-reference.md",
+      "exportCount": 14,
+      "exportNamesHash": "722cb29ff5dc8263d53f609e667b3ee565033d2ab13c4941f06b88b9d3c87b2a"
+    },
+    {
+      "module": "@anvia/memory-drizzle",
+      "guide": "packages/memory-drizzle/get-started.md",
+      "reference": "packages/memory-drizzle/api-reference.md",
+      "exportCount": 10,
+      "exportNamesHash": "5cd2286e9d8a1f54d50469d08a8bf066384f5f064f7ab4fd0d661395b4b2317f"
+    },
+    {
+      "module": "@anvia/memory-postgres",
+      "guide": "packages/memory-postgres/get-started.md",
+      "reference": "packages/memory-postgres/api-reference.md",
+      "exportCount": 13,
+      "exportNamesHash": "0da76242e7483135ea6554e7572bb625d28820a5b77d18fce50b5b0f7518585b"
+    },
+    {
+      "module": "@anvia/memory-prisma",
+      "guide": "packages/memory-prisma/get-started.md",
+      "reference": "packages/memory-prisma/api-reference.md",
+      "exportCount": 13,
+      "exportNamesHash": "9da739b8cdff61046409284176633f9c73eda1d1b5ec71310a617dabeb9e71f1"
+    },
+    {
+      "module": "@anvia/memory-prisma/v8",
+      "guide": "packages/memory-prisma/get-started.md",
+      "reference": "packages/memory-prisma/api-reference.md",
+      "exportCount": 3,
+      "exportNamesHash": "2df5c3f6c8f3b97c7213a4d2b75bcb8a9e8cf09922db9d53369791262e6f48d2"
+    },
+    {
+      "module": "@anvia/memory-sqlite",
+      "guide": "packages/memory-sqlite/get-started.md",
+      "reference": "packages/memory-sqlite/api-reference.md",
+      "exportCount": 9,
+      "exportNamesHash": "63ec44f89f5886ada08b9c3f75e0ace2b58bbb9014255974fc582779ade9fc67"
+    },
+    {
+      "module": "@anvia/langfuse",
+      "guide": "packages/langfuse/get-started.md",
+      "reference": "packages/langfuse/api-reference.md",
+      "exportCount": 29,
+      "exportNamesHash": "a41942589589a2c7f5f2b64841ce51087fab47541fbca9e2c82b2acaf7791fd0"
+    },
+    {
+      "module": "@anvia/lens",
+      "guide": "packages/lens/get-started.md",
+      "reference": "packages/lens/api-reference.md",
+      "exportCount": 32,
+      "exportNamesHash": "1b1bf6f31e5cbd1f8af05d7234cb9cd37e45b2691b84a86111c0a4f960f89fd8"
+    },
+    {
+      "module": "@anvia/otel",
+      "guide": "packages/otel/get-started.md",
+      "reference": "packages/otel/api-reference.md",
+      "exportCount": 13,
+      "exportNamesHash": "a4ba519cc288137087c671254e1b80b9c96d1e87a751df510e2193dc9cb529ad"
+    },
+    {
+      "module": "@anvia/anthropic",
+      "guide": "packages/anthropic/get-started.md",
+      "reference": "packages/anthropic/api-reference.md",
+      "exportCount": 15,
+      "exportNamesHash": "8be38dd651c3e29bbeceefae17e2a7f8798ab10b9d62682cdad652bfff8ead25"
+    },
+    {
+      "module": "@anvia/gemini",
+      "guide": "packages/gemini/get-started.md",
+      "reference": "packages/gemini/api-reference.md",
+      "exportCount": 31,
+      "exportNamesHash": "dbbaebc417f051ee304e5f4a2ea4d93f4b3f2a648601cd43a87eb8900c5fdba4"
+    },
+    {
+      "module": "@anvia/grok",
+      "guide": "packages/grok/get-started.md",
+      "reference": "packages/grok/api-reference.md",
+      "exportCount": 39,
+      "exportNamesHash": "2e0c0c4ea3ce53309d552ac3d50d88a62e850fc0b635c48217996f3f9a18a892"
+    },
+    {
+      "module": "@anvia/mistral",
+      "guide": "packages/mistral/get-started.md",
+      "reference": "packages/mistral/api-reference.md",
+      "exportCount": 25,
+      "exportNamesHash": "e91d6e4a2dea95b5932b7434773a2cee8cc32ff3a1844e74e7b5abefd729f7cc"
+    },
+    {
+      "module": "@anvia/openai",
+      "guide": "packages/openai/get-started.md",
+      "reference": "packages/openai/api-reference.md",
+      "exportCount": 39,
+      "exportNamesHash": "b1cddc00fe3d9db267d8386c84b3ccdd5905960ebabb2b6d096bc5fe7e7183a2"
+    },
+    {
+      "module": "@anvia/react",
+      "guide": "packages/react/get-started.md",
+      "reference": "packages/react/api-reference.md",
+      "exportCount": 27,
+      "exportNamesHash": "9cc51458599a24a59dd994545ed098f4c3c1e1ee4efd5c4034faea4043140757"
+    },
+    {
+      "module": "@anvia/react/graph-explorer",
+      "guide": "packages/react/get-started.md",
+      "reference": "packages/react/api-reference.md",
+      "exportCount": 7,
+      "exportNamesHash": "bb39454a40b625e5fcb3834a56b95e06d5c39dd89a04fb4516dcce3b0608696b"
+    },
+    {
+      "module": "@anvia/react-ui",
+      "guide": "packages/react-ui/get-started.md",
+      "reference": "packages/react-ui/api-reference.md",
+      "exportCount": 76,
+      "exportNamesHash": "3777a575d59495fe95f5ae5a5282d3630aaec686e06d2e880b2e0247e86f6e93"
+    },
+    {
+      "module": "@anvia/react-ui/attachment",
+      "guide": "packages/react-ui/get-started.md",
+      "reference": "packages/react-ui/api-reference.md",
+      "exportCount": 3,
+      "exportNamesHash": "9b4b8a24438f3043286491a039acff4be79ff4beddd34c007ce212a3eac5a973"
+    },
+    {
+      "module": "@anvia/react-ui/chat",
+      "guide": "packages/react-ui/get-started.md",
+      "reference": "packages/react-ui/api-reference.md",
+      "exportCount": 25,
+      "exportNamesHash": "ed747a165d03ce294337e4b27a32707a3a5dd88b8c4eef390fd5ea67e11e8ef6"
+    },
+    {
+      "module": "@anvia/react-ui/completion",
+      "guide": "packages/react-ui/get-started.md",
+      "reference": "packages/react-ui/api-reference.md",
+      "exportCount": 7,
+      "exportNamesHash": "fbae959d594c9d939ef4186054451d0db6381a834f353c201b27ee8837d94bf3"
+    },
+    {
+      "module": "@anvia/react-ui/graph-explorer",
+      "guide": "packages/react-ui/get-started.md",
+      "reference": "packages/react-ui/api-reference.md",
+      "exportCount": 12,
+      "exportNamesHash": "27d0f6ee8aab335ca4fc4861a3c3f06c3c823d24bfdec45144506c81ea3a9a8f"
+    },
+    {
+      "module": "@anvia/react-ui/human-input",
+      "guide": "packages/react-ui/get-started.md",
+      "reference": "packages/react-ui/api-reference.md",
+      "exportCount": 9,
+      "exportNamesHash": "a78e04118b98a7766e3d7322f815c0f9f8ce20a6b187c6ddbe7cf80231b30a05"
+    },
+    {
+      "module": "@anvia/react-ui/image",
+      "guide": "packages/react-ui/get-started.md",
+      "reference": "packages/react-ui/api-reference.md",
+      "exportCount": 3,
+      "exportNamesHash": "3510427879de37033602c6dc2b2aa7ec59aa07fe6e35112d64b459103c2cd350"
+    },
+    {
+      "module": "@anvia/react-ui/message",
+      "guide": "packages/react-ui/get-started.md",
+      "reference": "packages/react-ui/api-reference.md",
+      "exportCount": 12,
+      "exportNamesHash": "a5bc8e9335dd27c9a17420599828076e99e280440ca8447e3795e8c2c5e4443e"
+    },
+    {
+      "module": "@anvia/react-ui/selection-toolbar",
+      "guide": "packages/react-ui/get-started.md",
+      "reference": "packages/react-ui/api-reference.md",
+      "exportCount": 4,
+      "exportNamesHash": "4255514eac218a4f20e28862c660a54840538a6f4633a9274436301e662e43dc"
+    },
+    {
+      "module": "@anvia/react-ui/stream",
+      "guide": "packages/react-ui/get-started.md",
+      "reference": "packages/react-ui/api-reference.md",
+      "exportCount": 2,
+      "exportNamesHash": "d7f928000b423f0b95564c3a4f83d42f31092c161b4123b2ece14b1feddc382c"
+    },
+    {
+      "module": "@anvia/react-ui/shared",
+      "guide": "packages/react-ui/get-started.md",
+      "reference": "packages/react-ui/api-reference.md",
+      "exportCount": 54,
+      "exportNamesHash": "f19274deed26b6d4ad9fa35a3e8d0ce860b7fd9489b1fd5089c1ca94520cf938"
+    },
+    {
+      "module": "@anvia/react-ui/thread-list",
+      "guide": "packages/react-ui/get-started.md",
+      "reference": "packages/react-ui/api-reference.md",
+      "exportCount": 9,
+      "exportNamesHash": "37a117f2d2c913165ec678c568253c0df9633352fc700f880982042daa9232e6"
+    },
+    {
+      "module": "@anvia/server",
+      "guide": "packages/server/get-started.md",
+      "reference": "packages/server/api-reference.md",
+      "exportCount": 32,
+      "exportNamesHash": "f9ad440e5ad77baf237c0d55dfc39aa3a79ff897bcb4342f935052d567754e99"
+    },
+    {
+      "module": "@anvia/browser",
+      "guide": "packages/browser/get-started.md",
+      "reference": "packages/browser/api-reference.md",
+      "exportCount": 35,
+      "exportNamesHash": "82db5c5c892c70852a7e5c7b2dc42cc751bac72e17f2f6351829ec88aeb5cc3b"
+    },
+    {
+      "module": "@anvia/sandbox",
+      "guide": "packages/sandbox/get-started.md",
+      "reference": "packages/sandbox/api-reference.md",
+      "exportCount": 46,
+      "exportNamesHash": "8b71600ad6c1fcd2885f09355bdb1004bf0ea75ef4d320a3c9e8c90685615825"
+    },
+    {
+      "module": "@anvia/studio",
+      "guide": "packages/studio/get-started.md",
+      "reference": "packages/studio/api-reference.md",
+      "exportCount": 175,
+      "exportNamesHash": "c05800bf21379cce51c0a846653dbed10e79c47c8c8809f2c121009171bab2c3"
+    },
+    {
+      "module": "@anvia/chroma",
+      "guide": "packages/chroma/get-started.md",
+      "reference": "packages/chroma/api-reference.md",
+      "exportCount": 7,
+      "exportNamesHash": "fdfc41bc110ec610246e3240336ea9ab12b2923b32dce8fc2afa60473d2ee72b"
+    },
+    {
+      "module": "@anvia/lancedb",
+      "guide": "packages/lancedb/get-started.md",
+      "reference": "packages/lancedb/api-reference.md",
+      "exportCount": 6,
+      "exportNamesHash": "27abeb768ac1aaa0c299dd649bce45a0d0d37898e17e4e72472a2013c81ab8f1"
+    },
+    {
+      "module": "@anvia/milvus",
+      "guide": "packages/milvus/get-started.md",
+      "reference": "packages/milvus/api-reference.md",
+      "exportCount": 7,
+      "exportNamesHash": "4d1fc491dedc982f07092793eb7e9d320ada06eff2161c4e1e68ed9882f37fde"
+    },
+    {
+      "module": "@anvia/pgvector",
+      "guide": "packages/pgvector/get-started.md",
+      "reference": "packages/pgvector/api-reference.md",
+      "exportCount": 8,
+      "exportNamesHash": "0b22e5b9a65e8d5e2582bc3096962be2392187edaa0ec7693698be0055b66551"
+    },
+    {
+      "module": "@anvia/pinecone",
+      "guide": "packages/pinecone/get-started.md",
+      "reference": "packages/pinecone/api-reference.md",
+      "exportCount": 9,
+      "exportNamesHash": "90ced0550fe39df84a6d75405dd5994ba19d7d534d7394f508727466c3b90ac4"
+    },
+    {
+      "module": "@anvia/qdrant",
+      "guide": "packages/qdrant/get-started.md",
+      "reference": "packages/qdrant/api-reference.md",
+      "exportCount": 14,
+      "exportNamesHash": "021c9adb85b3498625784e16201ee934dd7d8e8dec1797a0ba3ddb37f78178a9"
+    },
+    {
+      "module": "@anvia/redis",
+      "guide": "packages/redis/get-started.md",
+      "reference": "packages/redis/api-reference.md",
+      "exportCount": 9,
+      "exportNamesHash": "1bab772710919651ff86441e2d814578b44c5d56b7592c4e30666c4099bbc161"
+    },
+    {
+      "module": "@anvia/weaviate",
+      "guide": "packages/weaviate/get-started.md",
+      "reference": "packages/weaviate/api-reference.md",
+      "exportCount": 9,
+      "exportNamesHash": "4a096f6eb1bb571a50bce95db1869177a753732fc26d6e12699e835b94349a26"
+    }
+  ],
+  "features": [
+    {
+      "title": "Eval expectations",
+      "module": "@anvia/core/evals",
+      "symbols": [
+        "defineEvalCases",
+        "defineEvalExpectations",
+        "assertEvalTotals",
+        "assertEvalOutcomes",
+        "evalExitCode"
+      ],
+      "page": "sdk/evaluations.md",
+      "marker": "expectations-example",
+      "runtimeTest": "eval expectations accept a negative control and reject unexpected invalids"
+    },
+    {
+      "title": "Eval responders",
+      "module": "@anvia/core/evals",
+      "symbols": [
+        "agentEvalTarget",
+        "AgentEvalSuspensionError"
+      ],
+      "page": "sdk/evaluations.md",
+      "marker": "responder-example",
+      "runtimeTest": "eval responder handles approvals and questions, and enforces its limit"
+    },
+    {
+      "title": "Message metadata",
+      "module": "@anvia/core",
+      "symbols": [
+        "createMessageSchema",
+        "isMessage",
+        "parseMessages"
+      ],
+      "page": "sdk/messages/roles.md",
+      "marker": "metadata-example",
+      "runtimeTest": "custom message metadata rejects invalid fields and non-JSON transforms"
+    },
+    {
+      "title": "Continuation validation",
+      "module": "@anvia/core/agent/interactions",
+      "symbols": [
+        "parseAgentContinuation",
+        "parseAgentInteractionResponse",
+        "assertAgentInteractionResponse"
+      ],
+      "page": "sdk/agents/interactions.md",
+      "marker": "continuation-example",
+      "runtimeTest": "continuation handler validates answers before claiming and resuming"
+    },
+    {
+      "title": "Generic transports",
+      "module": "@anvia/client/transport",
+      "symbols": [
+        "createFetchEventTransport",
+        "EventStreamHttpError"
+      ],
+      "page": "sdk/streaming/server-transport.md",
+      "marker": "generic-transport-example",
+      "runtimeTest": "generic stream example validates SSE and handles JSONL, HTTP and parsing failures"
+    },
+    {
+      "title": "Client errors",
+      "module": "@anvia/client",
+      "symbols": [
+        "ClientProtocolError",
+        "maskedClientError",
+        "normalizeClientError"
+      ],
+      "page": "packages/client/protocol-and-state.md",
+      "marker": "client-errors-example",
+      "runtimeTest": "client error helpers distinguish masking from normalization"
+    },
+    {
+      "title": "Custom models",
+      "module": "@anvia/core/completion",
+      "symbols": [
+        "defineCompletionModelControls",
+        "mergeCompletionControlValues",
+        "assertCompletionRequestSupported",
+        "withContextUsage"
+      ],
+      "page": "sdk/providers/model-boundary.md",
+      "marker": "custom-model-example",
+      "runtimeTest": "custom model maps controls, applies defaults, and reports input context usage"
+    },
+    {
+      "title": "Provider errors",
+      "module": "@anvia/core",
+      "symbols": [
+        "CompletionProviderOutputError"
+      ],
+      "page": "sdk/structured-output/validation-errors.md",
+      "marker": "provider-error-example",
+      "runtimeTest": "provider error example respects retry kinds and stops after streaming progress"
+    },
+    {
+      "title": "Memory keys",
+      "module": "@anvia/core/memory",
+      "symbols": [
+        "createMemoryScopeKey"
+      ],
+      "page": "sdk/memory/custom-stores.md",
+      "marker": "memory-key-example",
+      "runtimeTest": "memory key example separates user/tenant scopes and applies one key to all operations"
+    },
+    {
+      "title": "Embedding utility reference",
+      "module": "@anvia/core/embeddings",
+      "symbols": [
+        "cosineSimilarity",
+        "euclideanDistance"
+      ],
+      "page": "packages/core/api-reference.md",
+      "marker": "embedding-utilities-example",
+      "runtimeTest": "Core reference distance example verifies zero vectors and dimensional boundaries"
+    },
+    {
+      "title": "Graph schema reference",
+      "module": "@anvia/graph",
+      "symbols": [
+        "defineGraphSchema",
+        "parseGraphProperties"
+      ],
+      "page": "packages/graph/api-reference.md",
+      "marker": "graph-schema-example",
+      "runtimeTest": "Graph reference schema example rejects unsafe graph property values"
+    }
+  ],
+  "utilities": [
+    {
+      "module": "@anvia/core/embeddings",
+      "symbols": [
+        "dotProduct",
+        "cosineSimilarity",
+        "angularDistance",
+        "euclideanDistance",
+        "manhattanDistance",
+        "chebyshevDistance"
+      ],
+      "coverage": "reference",
+      "page": "packages/core/api-reference.md",
+      "reason": "Small numerical helpers belong in a compact reference and checked example, not individual tutorials."
+    },
+    {
+      "module": "@anvia/core/completion",
+      "symbols": [
+        "normalizeDocuments",
+        "formatDocument",
+        "reasoningDisplayText",
+        "textFromAssistantContent",
+        "isStreamingCompletionModel",
+        "isProviderTool"
+      ],
+      "coverage": "reference",
+      "page": "packages/core/api-reference.md",
+      "reason": "Adapter and presentation helpers are listed with their boundaries."
+    },
+    {
+      "module": "@anvia/core/tool",
+      "symbols": [
+        "isQuestionTool",
+        "normalizeToolResultOutput",
+        "toolResultContentToText",
+        "parseToolArgs"
+      ],
+      "coverage": "reference",
+      "page": "packages/core/api-reference.md",
+      "reason": "Local runtime integration helpers are listed; direct application tool execution is already covered."
+    },
+    {
+      "module": "@anvia/core/agent",
+      "symbols": [
+        "isVectorContext"
+      ],
+      "coverage": "reference",
+      "page": "packages/core/api-reference.md",
+      "reason": "Context discriminator belongs beside the adapter helper reference."
+    },
+    {
+      "module": "@anvia/core/evals",
+      "symbols": [
+        "selectPromptOutput",
+        "defaultEvalTraceSelector",
+        "projectEvalOutcome",
+        "resolveEvalTraceRef",
+        "EvalAbortError",
+        "EvalTimeoutError",
+        "EvalReporterDispatchError",
+        "EvalFailFastError"
+      ],
+      "coverage": "reference",
+      "page": "packages/core/api-reference.md",
+      "reason": "Reporter/selector contracts and execution errors need discoverable references."
+    },
+    {
+      "module": "@anvia/core/guardrails",
+      "symbols": [
+        "runInputGuardrails",
+        "runOutputGuardrails",
+        "normalizeGuardrailPolicies",
+        "appendGuardrailPolicies",
+        "hasEnforcedOutputGuardrails"
+      ],
+      "coverage": "integration-only",
+      "page": "sdk/guardrails.md",
+      "reason": "Low-level runtime composition is for integrators; the application guide uses policies and Agent boundaries. No separate tutorial is required."
+    },
+    {
+      "module": "@anvia/core/redaction",
+      "symbols": [
+        "passesLuhn"
+      ],
+      "coverage": "integration-only",
+      "page": "packages/core/api-reference.md",
+      "reason": "Checksum primitive supports pattern validation; it is not a payment-card or identity validation product."
+    },
+    {
+      "module": "@anvia/graph",
+      "symbols": [
+        "validateGraphSchemaOptions",
+        "freezeGraphSchema",
+        "assertGraphName",
+        "assertGraphPropertyName",
+        "parseGraphProperties",
+        "parseGraphPropertyValue",
+        "graphReservedPropertyPrefix"
+      ],
+      "coverage": "reference",
+      "page": "packages/graph/api-reference.md",
+      "reason": "Schema adapter validation helpers belong in the Graph reference."
+    },
+    {
+      "module": "@anvia/grok",
+      "symbols": [
+        "GROK_4_3",
+        "GROK_4_5",
+        "GROK_4_6",
+        "GROK_4_20",
+        "GROK_4_20_NON_REASONING",
+        "GROK_BUILD_0_1",
+        "GROK_IMAGINE_IMAGE",
+        "GROK_IMAGINE_IMAGE_QUALITY"
+      ],
+      "coverage": "reference",
+      "page": "packages/grok/api-reference.md",
+      "reason": "Constants identify model strings; availability is not established by a constant. No individual model tutorial is required."
+    }
+  ],
+  "externalPackages": [
+    "@anvia/channel",
+    "@anvia/channel-agent",
+    "@anvia/discord",
+    "@anvia/slack",
+    "@anvia/telegram"
+  ]
+}

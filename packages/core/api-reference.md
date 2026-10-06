@@ -638,7 +638,7 @@ outputs, and causes need application redaction. See [provider kinds and retry po
 [adapter behavior](/sdk/agents/errors-and-limits#_6-distinguish-outcomes-from-adapter-errors),
 and [tool normalization](/sdk/tools/validation-and-execution#public-tool-errors).
 
-### Memory scope keys
+## Memory scope keys
 
 `createMemoryScopeKey({ scope, includeUserId?, metadataKeys? }): string` is exported from
 `@anvia/core` and `@anvia/core/memory`. `CreateMemoryScopeKeyOptions`, `MemoryScopeKeyOptions`, and
@@ -646,3 +646,55 @@ and [tool normalization](/sdk/tools/validation-and-execution#public-tool-errors)
 key; it does not authorize a scope or enforce required tenant metadata. See the
 [complete custom-store factory](/sdk/memory/custom-stores#_6-reuse-the-official-scope-key-helper)
 for applying the same policy to canonical data, errors, inspection, and compaction.
+
+## Integration utility reference
+
+These exported utilities support adapter, reporter, and presentation code. Import them from the
+specified public subpath; a discriminator or formatter is not a complete validation boundary.
+
+| Subpath after `@anvia/core/` | Utilities and behavior |
+| --- | --- |
+| `completion` | `normalizeDocuments(documents)` returns a user message or undefined for an empty list; `formatDocument(document)` renders text with file/metadata markers, not an escaped security envelope. |
+| `completion` | `reasoningDisplayText(reasoningOrDetails)` joins visible text/summary details; `textFromAssistantContent(parts)` joins text parts. Neither decrypts reasoning or redacts content. |
+| `completion` | `isStreamingCompletionModel(model)` checks for a streaming method; `isProviderTool(value)` checks the provider-tool shape and JSON-safe configuration. |
+| `agent` | `isVectorContext(value)` checks the context marker, store search method, and model presence; it does not probe the store or model. |
+| `tool` | `isQuestionTool(tool)` checks the question-tool marker; `parseToolArgs(rawJson)` parses strict JSON but does not apply a tool's input schema. |
+| `tool` | `normalizeToolResultOutput(value)` returns normalized text/JSON/content or throws `ToolResultSerializationError`; `toolResultContentToText(parts)` renders text and file media-type placeholders. |
+| `evals` | `selectPromptOutput(args)` requires an output object with a string `output` field. |
+| `evals` | `resolveEvalTraceRef({ output?, input?, metadata? })` selects a trace from output, input, then metadata; `defaultEvalTraceSelector(args)` applies that order to a case. |
+| `evals` | `projectEvalOutcome(outcome, dataType, projectScore?)` maps outcomes/scores into reporter projections, with optional numeric/categorical fields and explanation. |
+| `evals` | `EvalTimeoutError.timeoutMs` identifies case timeout; suite cancellation rejects with its abort reason (`EvalAbortError` when no reason is available). `EvalFailFastError` has `caseId`/`outcome`; `EvalReporterDispatchError` has `phase`/aggregate `errors`. |
+| `redaction` | `passesLuhn(digits)` checks a digit-string checksum only; it does not establish a valid card, issuer, ownership, or permission. |
+
+Low-level `runInputGuardrails`, `runOutputGuardrails`, `normalizeGuardrailPolicies`,
+`appendGuardrailPolicies`, and `hasEnforcedOutputGuardrails` are exported from
+`@anvia/core/guardrails` for runtime integrators. Ordinary applications use
+[policies attached to Agents](/sdk/guardrails); separate tutorials for these runtime helpers are
+intentionally excluded from the coverage inventory.
+
+### Embedding distances
+
+Import these numerical functions from `@anvia/core/embeddings`:
+
+| Function | Result |
+| --- | --- |
+| `dotProduct(left, right)` | Sum of pairwise products. |
+| `cosineSimilarity(left, right)` | Normalized dot product; returns zero if either magnitude is zero. |
+| `angularDistance(left, right)` | `acos(clampedCosine) / PI`. |
+| `euclideanDistance(left, right)` | Square root of summed squared differences. |
+| `manhattanDistance(left, right)` | Sum of absolute differences. |
+| `chebyshevDistance(left, right)` | Maximum absolute difference; zero for empty vectors. |
+
+Dimensions must match. These functions do not validate finite elements or normalize a store's
+score semantics; use vectors from a compatible embedding model.
+
+```ts anvia-check embedding-utilities-example
+import { cosineSimilarity, euclideanDistance } from '@anvia/core/embeddings'
+
+const similarity = cosineSimilarity([1, 0], [1, 0])
+const distance = euclideanDistance([0, 0], [3, 4])
+console.log(similarity, distance) // 1, 5
+```
+
+See the contributor [SDK coverage review](/sdk-coverage) for the entrypoint map, tested feature
+inventory, explicit exclusions, and validation scope.

@@ -89,3 +89,17 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. Keep docu
 ## License
 
 This repository is available under the [MIT License](https://github.com/anvia-hq/documentation/blob/main/LICENSE).
+
+## SDK coverage review
+
+Read [SDK coverage review](sdk-coverage.md) for the public entrypoint inventory, explicit integration
+utility decisions, and checked examples. In addition to the focused SDK checks, run:
+
+```sh
+node scripts/check-sdk-coverage.mjs
+node scripts/typecheck-rc-snippets.mjs --source
+node scripts/check-sdk-runtime.mjs
+```
+
+Coverage review detects new or changed export names; import and snippet checks validate the
+examples already written. Neither alone proves complete behavioral documentation.

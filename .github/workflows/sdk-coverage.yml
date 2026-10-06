@@ -1,0 +1,54 @@
+name: Verify SDK documentation coverage
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ANVIA_REPO: ${{ github.workspace }}/anvia-source
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Read the inventory's reviewed SDK revision
+        id: sdk
+        run: |
+          node --input-type=module <<'JS'
+          import { readFileSync, appendFileSync } from 'node:fs'
+          const { reviewedSdkRevision } = JSON.parse(readFileSync('scripts/sdk-coverage.json', 'utf8'))
+          if (!/^[a-f0-9]{40}$/.test(reviewedSdkRevision)) throw new Error('Expected a full reviewed SDK commit')
+          appendFileSync(process.env.GITHUB_OUTPUT, `revision=${reviewedSdkRevision}\n`)
+          JS
+      - uses: actions/checkout@v6
+        with:
+          repository: anvia-hq/anvia
+          ref: ${{ steps.sdk.outputs.revision }}
+          path: anvia-source
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.0.4
+          run_install: false
+      - name: Install SDK dependencies
+        working-directory: anvia-source
+        run: pnpm install --frozen-lockfile
+      - name: Verify export coverage and imports
+        run: node scripts/check-sdk-coverage.mjs
+      - name: Test coverage failure detection
+        run: node --test scripts/test-sdk-coverage.mjs
+      - name: Typecheck SDK and package-reference examples
+        run: node scripts/typecheck-rc-snippets.mjs --source
+      - name: Run offline documentation contracts
+        run: node scripts/check-sdk-runtime.mjs

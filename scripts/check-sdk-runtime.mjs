@@ -65,6 +65,7 @@ async function sourceEntry(specifier) {
     '@anvia/core': 'core',
     '@anvia/openai': 'provider-openai',
     '@anvia/client': 'client',
+    '@anvia/graph': 'graph',
   }
   const directory = directories[packageName]
   assert.ok(directory, `Add a source resolver for ${packageName}`)
@@ -709,5 +710,29 @@ test('memory key example separates user/tenant scopes and applies one key to all
     await store.compaction.replacePrefix({ scope, revision: 'r1', messageCount: 1, runId: 'r', replacement: { role: 'system', content: 'summary', metadata: { anvia: { memoryCompaction: { version: 1, compactedMessageCount: 1 } } } } })
     await store.inspector.getConversation({ ref: keyFor(scope) })
     assert.deepEqual(keys, Array(7).fill(keyFor(scope)))
+  `)
+})
+
+
+test('Core reference distance example verifies zero vectors and dimensional boundaries', async () => {
+  const example = (await blocks('packages/core/api-reference.md')).find(block => block.flags.includes('embedding-utilities-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    assert.equal(similarity, 1)
+    assert.equal(distance, 5)
+    assert.equal(cosineSimilarity([0, 0], [1, 0]), 0)
+    assert.throws(() => euclideanDistance([1], [1, 2]), /dimension mismatch/)
+  `)
+})
+
+test('Graph reference schema example rejects unsafe graph property values', async () => {
+  const example = (await blocks('packages/graph/api-reference.md')).find(block => block.flags.includes('graph-schema-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    assert.equal(properties.id, 'synthetic-person')
+    for (const value of [null, { nested: true }, [1, 'mixed'], Infinity, Number.MAX_SAFE_INTEGER + 1]) {
+      assert.throws(() => parseGraphProperties({ value }, 'Person'))
+    }
+    assert.throws(() => parseGraphProperties({ __anvia_internal: 'private' }, 'Person'))
   `)
 })

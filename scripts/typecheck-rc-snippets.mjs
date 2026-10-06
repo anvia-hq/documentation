@@ -27,6 +27,7 @@ async function collectFiles(directory, predicate) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     if (entry.name === '.git' || entry.name === 'node_modules' || entry.name === '.vitepress') continue
     const path = join(directory, entry.name)
+    if (resolve(path) === anviaRoot) continue
     if (entry.isDirectory()) files.push(...(await collectFiles(path, predicate)))
     else if (predicate(path)) files.push(path)
   }
