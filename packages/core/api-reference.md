@@ -600,3 +600,21 @@ standard contract only. See [metadata validation](/sdk/messages/roles#validate-a
 `assertAgentInteractionResponse(request, response)`, plus the continuation/request/response and
 question types. Parsing checks shape; the assertion matches answers to the request. See the
 [server boundary example](/sdk/agents/interactions#validate-stored-continuations-and-incoming-responses).
+
+## Custom completion controls and context accounting
+
+| API | Public import path | Contract |
+| --- | --- | --- |
+| `defineCompletionModelControls(controls)` | root or completion | Validate/freeze typed select controls. |
+| `REASONING_EFFORT_CONTROL_ID` | root or completion | Standard control ID `reasoningEffort`. |
+| `mergeCompletionControlValues(defaults, overrides)` | completion | Merge string values; overrides win, no option validation. |
+| `assertCompletionControlsSupported(model, values)` | completion | Reject unknown IDs/unsupported options. |
+| `assertCompletionRequestSupported(model, request, options?)` | completion | Check request controls and capabilities, including optional streaming. |
+| `resolveModelContextLimits(modelId, catalog, override?)` | root or completion | Override, exact catalog entry, or undefined. |
+| `calculateContextUsage(usage, modelInfo)` | root or completion | Input-token context-window snapshot, or undefined. |
+| `withContextUsage(response, modelInfo)` | root or completion | Attach usable context accounting to a response. |
+
+Here root means `@anvia/core`; completion means `@anvia/core/completion`. Types include
+`CompletionModelControls`, `CompletionModelSelectControl`, `CompletionControlValues`,
+`CompletionModelControlsOf`, `ModelContextLimits`, `CompletionModelInfo`, and `ContextUsage`.
+See the [complete custom model](/sdk/providers/model-boundary#_7-declare-controls-in-a-custom-model).

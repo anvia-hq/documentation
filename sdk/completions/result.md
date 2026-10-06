@@ -134,3 +134,7 @@ for await (const event of streamCompletion({
 Parsing or validation failures produce a `CompletionStructuredOutputError` with a `phase` of `'truncated'`, `'content-filter'`, `'parse'`, or `'schema'`. In a stream the error arrives as the `error` event; `generateCompletion()` rejects with the same error. See [Structured output](/sdk/structured-output) for schema design and failure handling.
 
 Continue with [When to use completions](/sdk/completions/when-to-use).
+
+For custom model authors, the [model boundary guide](/sdk/providers/model-boundary#_8-attach-context-usage-explicitly)
+shows `calculateContextUsage`, `withContextUsage`, and explicit context-limit resolution. Missing
+usage or limits leaves accounting unknown; these helpers do not enforce request token budgets.

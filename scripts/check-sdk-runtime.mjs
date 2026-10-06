@@ -588,3 +588,26 @@ test('client error helpers distinguish masking from normalization', async () => 
     assert.equal(normalizeClientError(original), original)
   `)
 })
+
+
+test('custom model maps controls, applies defaults, and reports input context usage', async () => {
+  const example = (await blocks('sdk/providers/model-boundary.md')).find(block => block.flags.includes('custom-model-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    assert.equal(result.output, 'long')
+    assert.equal(result.contextUsage.usedPercent, 2)
+    assert.equal((await generateCompletion({ model, prompt: 'Explain' })).output, 'short')
+    await assert.rejects(generateCompletion({ model, prompt: 'Explain', controls: { responseStyle: 'invalid' } }))
+    assert.throws(() => defineCompletionModelControls({ style: { type: 'select', label: 'Style', options: ['x', 'x'] } }))
+    assert.throws(() => defineCompletionModelControls({ style: { type: 'select', label: 'Style', options: ['x'], defaultValue: 'y' } }))
+    const { calculateContextUsage } = await import(${JSON.stringify(await sourceEntry('@anvia/core/completion'))})
+    assert.equal(resolveModelContextLimits('missing', {}), undefined)
+    assert.equal(calculateContextUsage(result.usage, undefined), undefined)
+    assert.equal(calculateContextUsage(Usage.empty(), { modelId: 'offline', context: limits }), undefined)
+    const over = calculateContextUsage({ ...Usage.empty(), inputTokens: 2000 }, { modelId: 'offline', context: limits })
+    assert.equal(over.usedTokens, 2000)
+    assert.equal(over.usedPercent, 100)
+    assert.equal(over.remainingTokens, 0)
+    assert.equal(withContextUsage({ choice: [], usage: Usage.empty(), rawResponse: null }, undefined).contextUsage, undefined)
+  `)
+})
