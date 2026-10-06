@@ -618,3 +618,22 @@ Here root means `@anvia/core`; completion means `@anvia/core/completion`. Types 
 `CompletionModelControls`, `CompletionModelSelectControl`, `CompletionControlValues`,
 `CompletionModelControlsOf`, `ModelContextLimits`, `CompletionModelInfo`, and `ContextUsage`.
 See the [complete custom model](/sdk/providers/model-boundary#_7-declare-controls-in-a-custom-model).
+
+## Provider and adapter error reference
+
+| Public class | Import path | Trigger and diagnostic fields |
+| --- | --- | --- |
+| `CompletionProviderOutputError` | root or completion | Invalid/incomplete provider contract; `code`, `kind`, optional `toolCallId`, `finishReason`, `usage`; no raw arguments. |
+| `AgentRunBlockedError` | root or agent | Completed-output adapter received blocked outcome; `result`. |
+| `AgentToolSuspensionError` | root or agent | Agent-as-tool received an interaction; `result`. |
+| `AgentStreamClosedError` | root or agent | Steering after input closed. |
+| `PipelineAgentSuspensionError` | pipeline | Agent stage received an interaction; `result`. |
+| `AgentEvalSuspensionError` | evals | Missing/exhausted eval responder; `result`. |
+| `ToolNotFoundError`, `ToolJsonError`, `ToolCallError` | tool | Registry/JSON/execution failure; `toolName` or `cause`. |
+| `ToolResultSerializationError` | tool | Unsupported normalized result; raw `output`. |
+
+Paths above mean `@anvia/core` and `@anvia/core/{completion,agent,pipeline,evals,tool}` respectively.
+`COMPLETION_PROVIDER_OUTPUT_ERROR_CODE` is exported with the provider error. Full outcomes, raw
+outputs, and causes need application redaction. See [provider kinds and retry policy](/sdk/structured-output/validation-errors#_4-handle-invalid-provider-output),
+[adapter behavior](/sdk/agents/errors-and-limits#_6-distinguish-outcomes-from-adapter-errors),
+and [tool normalization](/sdk/tools/validation-and-execution#public-tool-errors).

@@ -129,3 +129,32 @@ try {
 ```
 
 Centralize error mapping in the server or worker that owns the run. Return stable, product-safe messages to users and keep diagnostic details in protected logs, traces, or event records.
+
+## 6. Distinguish outcomes from adapter errors
+
+Direct `generate()` returns `blocked` and `interaction` outcomes. An adapter that promises completed
+output converts those outcomes into errors:
+
+| Boundary | Blocked outcome | Interaction outcome |
+| --- | --- | --- |
+| Direct Agent generate/stream result | `type: 'blocked'` | `type: 'interaction'` with continuation |
+| `agent.asTool({ name, suspension: 'reject' }).call(...)` | `AgentRunBlockedError` | `AgentToolSuspensionError` |
+| Pipeline `.agent({ ..., suspension: 'reject' })` | `AgentRunBlockedError` | `PipelineAgentSuspensionError` |
+| `agentEvalTarget` | `AgentRunBlockedError` | Responder continues it, or `AgentEvalSuspensionError` |
+
+Import the Agent errors from `@anvia/core` or `@anvia/core/agent`, Pipeline errors from
+`@anvia/core/pipeline`, and eval errors from `@anvia/core/evals`. Each error in the table retains the
+outcome in `result`; it can include messages, tool inputs, and a trusted continuation. Log a small
+approved summary rather than serializing the entire error.
+
+Calling an agent-tool through `parent.callTool(...)` adds the local `ToolCallError` wrapper; its
+`cause` retains the adapter error. During an ordinary parent agent run, local tool failures are
+normally converted to model-visible tool error output. In eval suites, target failures become
+invalid judgments. Inspect the boundary you actually invoke before choosing a catch policy.
+
+`AgentStreamClosedError` means `stream.steer(...)` was called after the stream stopped accepting
+input. It has no transcript fields. Steering cannot reopen a finished run; create another run or
+resume a stored interaction through the originating Agent. Continue to await `stream.result` inside
+your error boundary, because a normal end of iteration does not establish a successful result.
+
+For provider contract failures, see [provider output errors](/sdk/structured-output/validation-errors#_4-handle-invalid-provider-output).

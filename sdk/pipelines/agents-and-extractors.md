@@ -29,7 +29,7 @@ const supportSummary = new Pipeline({
 
 `.agent()` requires an explicit `request` mapper and returns the completed agent output. The stage requires `suspension: 'reject'` and rejects `blocked` or `interaction` child outcomes.
 
-Pipeline agent stages cannot cross an interaction boundary. If the agent returns `type: 'interaction'` or `type: 'blocked'`, the pipeline cancels that child phase and rejects. Run interaction-capable agents outside the pipeline when a person or policy engine must continue them.
+Pipeline agent stages cannot cross an interaction boundary. If the agent returns `type: 'interaction'` or `type: 'blocked'`, the child phase has ended and the pipeline rejects. Run interaction-capable agents outside the pipeline when a person or policy engine must continue them.
 
 ## 2. Add an extractor stage
 
@@ -77,3 +77,8 @@ After `.extract()`, the next stage receives the schema's output type. The stage 
 The agent owns model reasoning. The extractor owns conversion from text into validated fields. Deterministic steps own authorization, product state, side effects, and final response mapping.
 
 Next, learn how to [compose reusable pipelines](/sdk/pipelines/composition).
+
+A blocked stage throws `AgentRunBlockedError` from `@anvia/core/agent`; an interaction throws
+`PipelineAgentSuspensionError` from `@anvia/core/pipeline`. Both retain the child outcome in
+`result`. See the [boundary comparison](/sdk/agents/errors-and-limits#_6-distinguish-outcomes-from-adapter-errors)
+and [evaluation responders](/sdk/evaluations#respond-to-agent-interactions-in-evaluations).

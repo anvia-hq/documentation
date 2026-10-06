@@ -68,3 +68,23 @@ expect(result.status).toBe('paid')
 ```
 
 Add agent-level tests separately for tool selection, argument quality, and failure recovery.
+
+## Public tool errors
+
+Import from `@anvia/core/tool`:
+
+| Error | Trigger boundary | Diagnostic fields |
+| --- | --- | --- |
+| `ToolNotFoundError` | `agent.callTool` cannot find a registered name. | `toolName` |
+| `ToolJsonError` | `agent.callTool` cannot parse raw JSON arguments as strict JSON. | `cause` (may contain input details) |
+| `ToolCallError` | Argument schema, handler, output schema, or result normalization failed through the agent tool-call path. | `cause`, original error message |
+| `ToolResultSerializationError` | `normalizeToolResultOutput` receives a non-string/non-JSON/non-rich-content value. | `output` (raw, potentially private) |
+
+`tool.call(input)` validates schemas and returns the handler's typed value; it does not add the
+agent's JSON-argument or `ToolCallError` wrapper. `agent.callTool(name, rawJson)` returns normalized
+output; normalization errors become `ToolCallError` with `ToolResultSerializationError` as cause.
+Returning a Date, undefined, a function, cyclic data, or invalid rich content cannot be normalized.
+Use `ToolOutput.content(...)` for supported text/file parts.
+
+Treat `cause`, `output`, and messages as protected diagnostics. No class automatically redacts them.
+An agent used as a tool also has [adapter-specific suspension/blocking errors](/sdk/agents/errors-and-limits#_6-distinguish-outcomes-from-adapter-errors).

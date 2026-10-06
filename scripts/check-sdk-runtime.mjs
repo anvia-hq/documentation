@@ -611,3 +611,68 @@ test('custom model maps controls, applies defaults, and reports input context us
     assert.equal(withContextUsage({ choice: [], usage: Usage.empty(), rawResponse: null }, undefined).contextUsage, undefined)
   `)
 })
+
+
+test('provider error example respects retry kinds and stops after streaming progress', async () => {
+  const example = (await blocks('sdk/structured-output/validation-errors.md')).find(block => block.flags.includes('provider-error-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    assert.equal(attempts, 2)
+    assert.equal(diagnostic.code, 'ANVIA_COMPLETION_PROVIDER_OUTPUT')
+    for (const kind of ['invalid-response', 'filtered-tool-call']) {
+      let calls = 0
+      const failure = kind === 'filtered-tool-call' ? { kind, finishReason: 'content-filter' } : { kind }
+      const failing = { ...model, completion: async () => { calls++; throw new CompletionProviderOutputError(failure) } }
+      await assert.rejects(generateCompletion({ model: failing, prompt: 'test', retries: { maxAttempts: 2, initialDelayMs: 0, maxDelayMs: 0 } }), CompletionProviderOutputError)
+      assert.equal(calls, 1)
+    }
+    const { streamCompletion } = await import(${JSON.stringify(await sourceEntry('@anvia/core/completion'))})
+    let calls = 0
+    const streaming = { ...model, capabilities: { ...model.capabilities, streaming: true }, streamCompletion: async function* () {
+      calls++
+      yield { type: 'text_delta', delta: 'partial' }
+      throw new CompletionProviderOutputError({ kind: 'incomplete-stream' })
+    } }
+    const events = []
+    for await (const event of streamCompletion({ model: streaming, prompt: 'test', retries: { maxAttempts: 2, initialDelayMs: 0, maxDelayMs: 0 } })) events.push(event)
+    assert.equal(calls, 1)
+    assert.equal(events.at(-1).type, 'error')
+  `)
+})
+
+test('adapter and tool errors match their documented boundaries', async () => {
+  const { AgentToolSuspensionError, AgentRunBlockedError, AgentStreamClosedError } = await import(coreURL)
+  const { ToolCallError, ToolJsonError, ToolNotFoundError, ToolResultSerializationError, normalizeToolResultOutput } = await import(await sourceEntry('@anvia/core/tool'))
+  const { PipelineAgentSuspensionError } = await import(await sourceEntry('@anvia/core/pipeline'))
+  const { agentEvalTarget, AgentEvalSuspensionError } = await import(await sourceEntry('@anvia/core/evals'))
+  const guarded = createTool({ name: 'guarded', description: 'Synthetic approval', inputSchema: z.object({}), requiresApproval: true, execute: () => 'done' })
+  const agent = new Agent({ id: 'adapter-errors', model: fakeModel({ completion: async () => completion([
+    { type: 'tool-call', toolCallId: 'c1', toolName: 'guarded', input: {} },
+  ]) }), tools: [guarded] })
+  const request = { prompt: 'test' }
+  assert.equal((await agent.generate(request)).type, 'interaction')
+  await assert.rejects(agent.asTool({ name: 'child', suspension: 'reject' }).call(request), AgentToolSuspensionError)
+  const pipeline = new Pipeline({ id: 'adapter-errors', inputSchema: z.string() }).agent({ id: 'agent', agent, suspension: 'reject', request: ({ input }) => ({ prompt: input }) })
+  await assert.rejects(pipeline.run({ input: 'test' }), PipelineAgentSuspensionError)
+  const target = agentEvalTarget({ agent, request: ({ input }) => ({ prompt: input }) })
+  await assert.rejects(target('test', { id: 'case', input: 'test' }), AgentEvalSuspensionError)
+  await assert.rejects(agent.callTool('missing', '{}'), ToolNotFoundError)
+  await assert.rejects(agent.callTool('guarded', '{'), ToolJsonError)
+  const broken = createTool({ name: 'broken', description: 'Invalid output', inputSchema: z.object({}), execute: () => new Date() })
+  const registry = new Agent({ id: 'registry', model: agent.model, tools: [broken] })
+  assert.throws(() => normalizeToolResultOutput(new Date()), ToolResultSerializationError)
+  await assert.rejects(registry.callTool('broken', '{}'), error => error instanceof ToolCallError && error.cause instanceof ToolResultSerializationError)
+  const { defineGuardrailPolicy, guardrails } = await import(await sourceEntry('@anvia/core/guardrails'))
+  const blocked = new Agent({ id: 'blocked-adapter', model: agent.model, guardrails: defineGuardrailPolicy({ input: [guardrails.blockText({ id: 'block-test', boundary: 'input', patterns: ['BLOCK'], reason: 'test' })] }) })
+  assert.equal((await blocked.generate({ prompt: 'BLOCK' })).type, 'blocked')
+  await assert.rejects(blocked.asTool({ name: 'blocked', suspension: 'reject' }).call({ prompt: 'BLOCK' }), AgentRunBlockedError)
+  const blockedPipeline = new Pipeline({ id: 'blocked-pipeline', inputSchema: z.string() }).agent({ id: 'agent', agent: blocked, suspension: 'reject', request: ({ input }) => ({ prompt: input }) })
+  await assert.rejects(blockedPipeline.run({ input: 'BLOCK' }), AgentRunBlockedError)
+  const blockedTarget = agentEvalTarget({ agent: blocked, request: ({ input }) => ({ prompt: input }) })
+  await assert.rejects(blockedTarget('BLOCK', { id: 'blocked', input: 'BLOCK' }), AgentRunBlockedError)
+  const streamingAgent = new Agent({ id: 'closed-stream', model: fakeModel({ completion: async () => textResponse('done'), streamCompletion: async function* () { yield { type: 'final', response: textResponse('done') } } }) })
+  const stream = streamingAgent.stream({ prompt: 'test' })
+  for await (const event of stream) void event
+  await stream.result
+  assert.throws(() => stream.steer('late'), AgentStreamClosedError)
+})
