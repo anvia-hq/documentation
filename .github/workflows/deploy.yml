@@ -99,7 +99,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: anvia-hq/anvia
-          ref: 7cbbe395d881f68133a5644c357e9f1ce2c23f3f
+          ref: e196d84347a66bf5107d060268a3fee876720550
           path: anvia-source
           persist-credentials: false
 
