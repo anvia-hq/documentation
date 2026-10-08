@@ -1,6 +1,7 @@
-# Releases
+# CLI releases
 
-The current stable release is `@anvia/cli` **1.5.0**.
+The CLI package versions independently from React UI and the runtime SDK. The current stable
+release is `@anvia/cli` **1.5.0**.
 
 | Version | Summary |
 | --- | --- |
@@ -13,8 +14,25 @@ The current stable release is `@anvia/cli` **1.5.0**.
 | `1.0.1` | Maintenance release; the changelog records no package-specific changes. |
 | `1.0.0` | Added shadcn-backed `init` and `add` commands for editable app-owned chat components built on `@anvia/react-ui` primitives. |
 
-The first release contains registry items for a complete chat plus independent thread, message,
-composer, attachment, Markdown, and fallback-tool components.
+## Upgrading from CLI 1.3.0 or earlier
 
-Review the [`@anvia/cli` package source](https://github.com/anvia-hq/anvia/tree/main/packages/cli)
-and [changelog](https://github.com/anvia-hq/anvia/blob/main/packages/cli/CHANGELOG.md).
+Releases before `1.4.0` use root commands only:
+
+```sh
+pnpm dlx @anvia/cli@1.3.0 init vite
+pnpm dlx @anvia/cli@1.3.0 add chat
+pnpm dlx @anvia/cli@1.3.0 update composer --overwrite
+pnpm dlx @anvia/cli@1.3.0 skills update --force
+```
+
+These commands still work in `1.5.0` as aliases. Two behaviors changed in `1.4.0`:
+
+- Earlier releases requested the React UI version equal to the CLI's own version, which may not
+  exist. `1.4.0` and later use the React UI version recorded with the bundled registry. If you
+  must stay on an older CLI, use the
+  [explicit-version registry workaround](/packages/cli/components#install-the-registry-with-an-explicit-react-ui-version).
+- In `1.3.0`, `skills update --agents` or `--codex` could write `AGENTS.md` without `--force`.
+  `1.4.0` and later preview every selected target and write only with `--apply`.
+
+See the [CLI changelog](https://github.com/anvia-hq/anvia/blob/main/packages/cli/CHANGELOG.md)
+for full release entries.

@@ -64,6 +64,7 @@ The SDK is organized around explicit dependencies:
 - [Pipelines](/sdk/pipelines) compose repeatable sequential and parallel workflows.
 - [Streaming](/sdk/streaming) exposes normalized runtime events.
 - [Server](/packages/server) and [React](/packages/react) connect the runtime to product interfaces.
+- [CLI](/packages/cli) installs coding-agent skills and editable React components.
 - [Observability](/sdk/observability) records runs, generations, tools, usage, and traces.
 
 These capabilities extend the same runtime objects. Adding memory to an agent or observability to a pipeline does not require moving the feature into a different framework.

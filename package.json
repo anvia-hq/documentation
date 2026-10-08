@@ -13,7 +13,10 @@
     "sdk:check:exports": "node scripts/audit-rc-api.mjs --sdk --source",
     "sdk:check:types": "node scripts/typecheck-rc-snippets.mjs --sdk --source",
     "sdk:check:runtime": "node scripts/check-sdk-runtime.mjs",
-    "sdk:check": "pnpm sdk:check:exports && pnpm sdk:check:types && pnpm sdk:check:runtime"
+    "sdk:check": "pnpm sdk:check:exports && pnpm sdk:check:types && pnpm sdk:check:runtime",
+    "cli:check:exports": "node scripts/audit-rc-api.mjs --cli --source",
+    "cli:check:types": "node scripts/typecheck-rc-snippets.mjs --cli --source",
+    "cli:check": "pnpm cli:check:exports && pnpm cli:check:types"
   },
   "devDependencies": {
     "lucide-static": "^1.31.0",

@@ -1,63 +1,92 @@
 # Get started
 
-Run the CLI from the root of an existing React application.
+Use Node.js **20.18.1 or newer** and run commands against the intended project directory.
 
-For Vite:
+## Run the CLI
 
-```sh
-pnpm dlx @anvia/cli ui init vite
-pnpm dlx @anvia/cli ui add chat
-```
-
-For Next.js:
+Run the published CLI without installing it, or add it to the project as a development dependency:
 
 ```sh
-pnpm dlx @anvia/cli ui init next
-pnpm dlx @anvia/cli ui add chat
+pnpm dlx @anvia/cli --help
+pnpm add -D @anvia/cli
 ```
 
-Use `--cwd <path>` when the application is not the current directory. The root-level `init`, `add`, and `update` commands still work as aliases for their `ui` equivalents. `ui init --force` allows shadcn
-to replace existing configuration; `ui add --overwrite` allows it to replace existing generated
-components. Review those changes before using either flag.
-
-Add a narrower item when the application already owns the rest of the interface:
+The guides use `anvia` as shorthand for either form. For example:
 
 ```sh
-pnpm dlx @anvia/cli ui add message
-pnpm dlx @anvia/cli ui add composer
+pnpm dlx @anvia/cli skills init --cwd /path/to/my-project --codex
 ```
 
-The `chat`, `thread`, `message`, and `markdown` items also install the reduced-motion-aware stream
-reveal CSS. All generated styling remains application-owned.
+These guides describe CLI `1.5.0`. If `ui` or `--apply` is unknown, you are running a release older
+than `1.4.0`; see [Troubleshooting](/packages/cli/troubleshooting#grouped-commands-or-apply-are-unknown).
 
-## Update installed components
-
-`ui update` compares installed Anvia components against the bundled registry. It previews by default and writes nothing until you pass `--apply`:
+## Install knowledge for your coding agent
 
 ```sh
-pnpm dlx @anvia/cli ui update                # check every item (preview only)
-pnpm dlx @anvia/cli ui update composer       # check a single item
-pnpm dlx @anvia/cli ui update composer --apply
+anvia skills list
+anvia skills init --codex
 ```
 
-The preview reports each file as `up-to-date`, `modified` (the installed copy differs from the registry), or `missing`, then tells you to re-run with `--apply`. With `--apply` it writes registry content over out-of-date and missing files, but only for already-installed components; it never installs new items (use `ui add`). Locally edited copies are overwritten, so commit or stash changes first. You can name several items. Unknown item names get did-you-mean suggestions. Updates do not run shadcn, upgrade dependencies, refresh CSS, or delete obsolete files. The legacy `update --overwrite` still works as an alias for `--apply`.
-
-## Install Agent Skills
-
-Install the bundled Anvia knowledge for a coding agent, inspect the available skills, and update
-them when the CLI changes:
+This creates `skills/<name>/` and an Anvia section in `AGENTS.md`. For Claude Code or Cursor:
 
 ```sh
-pnpm dlx @anvia/cli skills list
-pnpm dlx @anvia/cli skills init
-pnpm dlx @anvia/cli skills update            # preview only
-pnpm dlx @anvia/cli skills update --apply
+anvia skills init --claude
+anvia skills init --cursor
 ```
 
-The canonical files live under `skills/<name>/`. Add `--claude`, `--cursor`, or `--agents` to
-generate the corresponding integration; `--codex` aliases `--agents`. Use `--dir <path>` to choose
-a different canonical directory and `--cwd <path>` to target another project.
+Target flags can be combined. They add integrations alongside the canonical `skills/` copy.
+Use `--cwd <path>` for another project and `--dir <path>` for another canonical directory:
 
-The bundled set covers agents, chat, RAG, MCP, pipelines, Studio, evaluations, channels, and the experimental `anvia-durable` skill. `anvia-durable` guides durable main agents, owned subagents, replay-safe tool and effect execution, approvals, persisted waits, task graphs, remote controls, and operations, and includes a local no-network restart smoke check. `skills list` shows every bundled name, and `skills init` installs them all.
+```sh
+anvia skills init --codex --cursor --dir agent-skills --cwd ./my-project
+```
 
-`skills update` previews without writing any file, including `AGENTS.md`, and lists the paths that would change for every selected target. Repeat the same target flags and `--dir` when you update, then add `--apply` to write. `--apply` replaces differing files and restores missing files inside installed skill trees, so review the preview first. The legacy `skills update --force` still works as an alias for `--apply`. A skill you removed entirely is not reinstalled by an update; run `skills init` to restore it.
+Skills installation needs no React application, shadcn configuration, or provider API key.
+Read [Agent Skills](/packages/cli/agent-skills) for the catalog and output paths. Repeat target
+flags and directory options during later updates.
+
+## Prepare an existing React application
+
+UI installation requires an existing Next.js or Vite application with Tailwind styling and
+resolvable component aliases. Initialize shadcn from the application's root:
+
+::: code-group
+
+```sh [Vite]
+anvia ui init vite
+```
+
+```sh [Next.js]
+anvia ui init next
+```
+
+:::
+
+`ui init` prepares shadcn and `components.json`. Use `--cwd <path>` for another directory.
+`ui init --force` lets shadcn replace existing configuration. Install a complete chat composition:
+
+```sh
+anvia ui add chat
+```
+
+Follow the [component guide](/packages/cli/components) to connect `Chat` to a controller and server.
+
+## Preview and apply updates
+
+Both update commands write nothing by default, including selected agent integrations:
+
+```sh
+anvia ui update composer
+anvia skills update --codex --cursor
+```
+
+Review the listed paths, then repeat the command with `--apply`:
+
+```sh
+anvia ui update composer --apply
+anvia skills update --codex --cursor --apply
+```
+
+Applying changes replaces differing files without merging local edits. Read the
+[skill update rules](/packages/cli/agent-skills#update-skills-and-integrations) and
+[component update rules](/packages/cli/components#update-generated-components) before applying.

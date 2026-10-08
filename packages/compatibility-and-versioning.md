@@ -49,7 +49,10 @@ Some adapters require a specific Node.js version, browser runtime, native depend
 - `@anvia/neo4j` requires Neo4j 2026.01 or newer and matching vector dimensions;
 - `@anvia/memgraph` requires Memgraph 3.6 or newer and matching vector dimensions;
 - `@anvia/mcp` requires Node.js 20 or newer and pins MCP protocol `2026-07-28` by default;
-- `@anvia/cli` requires Node.js 20.18.1 or newer and an existing Next.js or Vite application;
+- `@anvia/cli` requires Node.js 20.18.1 or newer; its UI setup targets existing Next.js or Vite
+  applications, while skills installation works in any project. CLI `1.3.0` and earlier have a
+  [React UI version-selection limitation](/packages/cli/troubleshooting#react-ui-version-cannot-be-found)
+  fixed in `1.4.0`;
 - Core document helpers operate on application-normalized text and do not require a file-parser peer;
 - applications must use Zod 4: `@anvia/core` depends on `zod ^4.5.4`, and schema conversion uses Zod-4-only APIs such as `z.toJSONSchema`;
 - observability adapters require credentials and network access to their backend.

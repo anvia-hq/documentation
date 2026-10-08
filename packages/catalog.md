@@ -13,7 +13,7 @@ All packages below are maintained in the Anvia monorepo. “First-party” descr
 | `@anvia/server` | Server-side event stream and UI transport helpers | [Open](/packages/server) |
 | `@anvia/react` | React state hooks over `@anvia/client` transports | [Open](/packages/react) |
 | `@anvia/react-ui` | Strictly headless React chat and completion primitives | [Open](/packages/react-ui) |
-| `@anvia/cli` | Editable shadcn/Tailwind application components built on React UI primitives | [Open](/packages/cli) |
+| `@anvia/cli` | Agent Skills for coding agents and editable shadcn/Tailwind application components | [Open](/packages/cli) |
 
 ## Model providers
 

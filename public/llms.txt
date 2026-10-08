@@ -18,7 +18,8 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - Construct agents, pipelines, and extractors directly; builder-era APIs are migration context only.
 - Use `@anvia/mcp` for MCP SDK v2 clients and transports. Core retains lightweight registration contracts.
 - Use Client Protocol v3 across `@anvia/client`, `@anvia/server`, and `@anvia/react`.
-- Treat `@anvia/react-ui` as strictly headless. Use `@anvia/cli` to copy editable application-owned UI.
+- Treat `@anvia/react-ui` as strictly headless. Use the CLI component guide (`anvia ui add chat`) for editable
+  application-owned UI. The CLI also installs coding-agent skills.
 - Parse files or run OCR in application code, then pass normalized text to Core document helpers.
   Provider adapters may separately support PDF attachments for model input.
 - Treat Anvia package versions independently and verify declared dependency ranges instead of
@@ -90,7 +91,10 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [`@anvia/react`](https://docs.anvia.dev/packages/react/): React state and hooks for Anvia streams.
 - [`@anvia/mcp`](https://docs.anvia.dev/packages/mcp/): MCP SDK v2 clients, transports, discovery, and lifecycle ownership.
 - [`@anvia/react-ui`](https://docs.anvia.dev/packages/react-ui/): Strictly headless React interface primitives.
-- [`@anvia/cli`](https://docs.anvia.dev/packages/cli/): Editable shadcn/Tailwind application components built on React UI.
+- [`@anvia/cli`](https://docs.anvia.dev/packages/cli/): Coding-agent skills and editable shadcn/Tailwind application components.
+- [CLI Agent Skills](https://docs.anvia.dev/packages/cli/agent-skills): Ten bundled skills (including experimental anvia-durable), Claude Code, Cursor, AGENTS.md/Codex, custom directories, and target-specific updates.
+- [CLI editable components](https://docs.anvia.dev/packages/cli/components): Registry items, optional explicit React UI version pinning, controller wiring, and shared-file updates.
+- [CLI troubleshooting](https://docs.anvia.dev/packages/cli/troubleshooting): Pre-1.4.0 CLI limitations, aliases, and configuration.
 - [Model providers](https://docs.anvia.dev/sdk/providers): OpenAI, Anthropic, Gemini, Mistral, Grok, and compatible provider APIs.
 - [Memory adapters](https://docs.anvia.dev/sdk/memory/store-adapters): SQLite, PostgreSQL, Drizzle, and Prisma-backed memory.
 - [Vector stores](https://docs.anvia.dev/sdk/knowledges/vector-stores): Qdrant, Pinecone, pgvector, Redis, Chroma, LanceDB, Milvus, and Weaviate.
@@ -114,3 +118,5 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Comparisons](https://docs.anvia.dev/faqs/comparisons/): Anvia compared with adjacent SDKs and direct provider APIs.
 - [API references](https://docs.anvia.dev/references/): Reference entry points for public APIs.
 - [GitHub repository](https://github.com/anvia-hq/anvia): Anvia source code; exported package surfaces are authoritative when documentation and implementation differ.
+
+CLI guides document CLI 1.5.0: the ui/skills command groups and read-only update previews with --apply (introduced in 1.4.0). Root init/add/update remain aliases.

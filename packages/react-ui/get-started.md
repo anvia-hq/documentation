@@ -6,12 +6,8 @@ Install React UI with its controller package and React peers.
 pnpm add @anvia/react-ui @anvia/react @anvia/client react react-dom
 ```
 
-Choose one of two styling paths:
-
-```sh
-# Install editable application components
-pnpm dlx @anvia/cli ui add chat
-```
+Choose one of two styling paths. For editable application components, follow the
+[CLI component guide](/packages/cli/components), which installs them with `anvia ui add chat`.
 
 Or compose the headless primitives directly and pass your own `className` values:
 

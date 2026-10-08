@@ -15,6 +15,9 @@ Use this matrix to find the package family that owns a capability. A check means
 | `@anvia/react-ui` | — | Client | — | Headless primitives |
 | `@anvia/cli` | — | — | — | Editable components |
 
+The CLI also installs [Agent Skills](/packages/cli/agent-skills) for coding agents, with Claude
+Code, Cursor, and AGENTS.md integrations. Skills installation works independently of the React UI.
+
 ## Model integrations
 
 | Package | Hosted completion models | Embeddings | Local execution |

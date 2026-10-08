@@ -83,7 +83,7 @@ jobs:
         run: pnpm example:golden-path:check
 
   validate-sdk:
-    name: Validate SDK documentation against source
+    name: Validate SDK and CLI documentation against source
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -95,7 +95,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Check out the reviewed SDK revision
+      - name: Check out the reviewed Anvia revision
         uses: actions/checkout@v6
         with:
           repository: anvia-hq/anvia
@@ -124,3 +124,6 @@ jobs:
 
       - name: Check SDK exports, snippets, and offline runtime examples
         run: pnpm sdk:check
+
+      - name: Check CLI exports and snippet API shapes
+        run: pnpm cli:check

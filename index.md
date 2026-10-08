@@ -2,6 +2,15 @@
 
 Anvia is a TypeScript runtime for adding AI agents to an application without handing over the rest of its architecture. You create the provider model and define the agent's behavior; Anvia runs the model and tool loop.
 
+## Anvia CLI
+
+Use the CLI to install Anvia knowledge for your coding agent or editable React chat components
+for your application.
+
+- [Get started](/packages/cli/get-started): Set up the CLI and choose skills or component installation.
+- [Agent Skills](/packages/cli/agent-skills): Install skills for Claude Code, Cursor, or AGENTS.md/Codex.
+- [Editable components](/packages/cli/components): Install Tailwind chat components and connect them to your application.
+
 The tutorial below builds a small support agent with the stable v1 API. Add each snippet to the same TypeScript file in order.
 
 ## 1. Install the runtime and a provider
