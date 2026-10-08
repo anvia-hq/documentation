@@ -24,6 +24,8 @@ Available provider guides cover:
 - [Gemini](/sdk/providers/gemini) through `@anvia/gemini`
 - [Mistral](/sdk/providers/mistral) through `@anvia/mistral`
 - [Grok](/packages/grok) through `@anvia/grok`
+- [Azure OpenAI](/sdk/providers/azure) through `@anvia/azure`, for Azure OpenAI and Foundry deployments
+- [Jev](/sdk/providers/jev) through `@anvia/jev`, for [typed decisions](/sdk/decisions) rather than completions
 - [Compatible APIs](/sdk/providers/compatible) through an OpenAI- or Anthropic-shaped adapter
 
 ## 2. Create models at a server boundary

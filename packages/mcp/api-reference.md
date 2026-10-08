@@ -53,7 +53,8 @@ safe to call during application shutdown.
 
 - `stdio`: `command`, optional `args`, `cwd`, `env`, `stderr`, and buffer limits;
 - `streamableHttp`: `url`, optional exact-endpoint `headers`, `authProvider`, session/reconnection
-  settings, and `ssrfProtection`; or
+  settings, `ssrfProtection`, and `maxBufferSize` (per-message response bound in bytes, default
+  10 MiB, applied to each JSON body or SSE event); or
 - `custom`: an application-owned factory returning an MCP SDK v2 `Transport`.
 
 Return to the [`@anvia/mcp` overview](/packages/mcp).

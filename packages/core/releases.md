@@ -5,6 +5,10 @@ entries below summarize recent v1 changes and preserve notable v0 compatibility 
 
 | Version | Summary |
 | --- | --- |
+| `1.7.1` | Retained empty or encrypted Responses reasoning that arrives only in the final streamed response (including Azure Responses) and let final encrypted details enrich matching streamed reasoning for replay on later turns. |
+| `1.6.1` | Refreshed package READMEs with concise overviews and links to detailed guides. |
+| `1.6.0` | Added opt-in `errorSerialization: 'anvia'` for `toReadableStream`, which writes a minimized terminal error envelope. Forwarded evaluation case cancellation through agent targets, approvals, embeddings, and judge retries. Cancelled built-in skill scripts with their tool invocation. Validated embedding counts for every provider batch, preserved terminal stream metadata for empty terminal choices, and copied Standard Schema converter data before strict-object refinement. |
+| `1.5.1` | Bounded tool results in memory-compaction prompts: tool output is truncated to 2,000 characters with a `[truncated N chars]` marker, like inline file text. |
 | `1.5.0` | Added deterministic `recentTurns` memory-compaction retention. Omitted retention now keeps one complete user-led turn instead of 25% of `afterTokens`; deprecated `recentTokens` remains available as an explicit migration path. |
 | `1.4.0` | Centralized PII redaction in `@anvia/core/redaction` for Lens and Langfuse, with safer card and phone matching, bounded traversal, circular-reference handling, bearer-token detection, and broader key-prefix defaults. |
 | `1.3.2` | Clarified the default think-tool description to encourage step-by-step planning and reassessment. |

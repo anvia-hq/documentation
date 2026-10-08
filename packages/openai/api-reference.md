@@ -96,6 +96,10 @@ import {
 } from '@anvia/openai'
 ```
 
-`openai` contains the same client, types, and constants as the root entry point. The package has no public subpath exports.
+`openai` contains the same client, types, and constants as the root entry point. The package has one public subpath, `@anvia/openai/adapters`, described below.
 
 `OPENAI_REASONING_EFFORTS` enumerates every accepted reasoning effort (`none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`). `OpenAIControlsFor`, `OpenAIReasoningControls`, and `OpenAIReasoningEffort` type the per-model controls surface; `OpenAICompletionModelOptions` mirrors the `completionModel()` options.
+
+## Adapters subpath
+
+`@anvia/openai/adapters` (added in `1.2.0`) exports `OpenAIResponsesCompletionModel`, the reusable Responses completion model. Provider packages such as [`@anvia/azure`](/packages/azure) extend it and override its protected hooks: `normalizeStream(stream)` adapts endpoint-specific stream events before they are mapped, and `requestParams(request)` adapts the outgoing request. Subclasses can also override `provider` and `traceRequest()`. OpenAI's own parser keeps native event handling, including unnamed argument events, and validates tool-call names on completed calls. Application code should use `OpenAIClient` from the root entry point.

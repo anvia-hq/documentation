@@ -60,6 +60,7 @@ The SDK is organized around explicit dependencies:
 - [Memory](/sdk/memory) loads and appends durable session messages.
 - [Knowledges](/sdk/knowledges) attach documents and retrieval indexes.
 - [Structured output](/sdk/structured-output) turns model responses into validated data.
+- [Typed decisions](/sdk/decisions) return validated labels, scores, and probabilities for routing and classification.
 - [Pipelines](/sdk/pipelines) compose repeatable sequential and parallel workflows.
 - [Streaming](/sdk/streaming) exposes normalized runtime events.
 - [Server](/packages/server) and [React](/packages/react) connect the runtime to product interfaces.

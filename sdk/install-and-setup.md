@@ -27,6 +27,8 @@ pnpm add @anvia/anthropic
 pnpm add @anvia/gemini
 pnpm add @anvia/mistral
 pnpm add @anvia/grok
+pnpm add @anvia/azure # Azure OpenAI and Foundry
+pnpm add @anvia/jev # typed decisions
 ```
 
 Add packages such as `@anvia/server`, `@anvia/react`, memory adapters, or observability integrations only when the application needs those capabilities.

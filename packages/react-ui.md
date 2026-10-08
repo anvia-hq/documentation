@@ -15,7 +15,7 @@ pnpm add @anvia/react-ui @anvia/react @anvia/client react react-dom
 For editable Tailwind and shadcn-based application components, install the complete chat registry:
 
 ```sh
-pnpm dlx @anvia/cli add chat
+pnpm dlx @anvia/cli ui add chat
 ```
 
 The primitive package has no stylesheet. Style ordinary `className` props or compose design-system

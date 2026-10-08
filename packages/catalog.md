@@ -8,6 +8,7 @@ All packages below are maintained in the Anvia monorepo. “First-party” descr
 | --- | --- | --- |
 | `@anvia/core` | Agent, model, tool, memory, pipeline, evaluation, and streaming primitives | [Open](/packages/core) |
 | `@anvia/client` | Framework-neutral protocol v3, transports, UI messages, interactions, and stream state | [Open](/packages/client) |
+| `@anvia/durable` | Experimental SQLite-backed durable agent execution: checkpoints, restart recovery, approvals, task graphs, and owned subagents | [Open](/packages/durable) |
 | `@anvia/mcp` | MCP SDK v2 clients, transports, discovery, result mapping, and connection ownership | [Open](/packages/mcp) |
 | `@anvia/server` | Server-side event stream and UI transport helpers | [Open](/packages/server) |
 | `@anvia/react` | React state hooks over `@anvia/client` transports | [Open](/packages/react) |
@@ -23,6 +24,7 @@ All packages below are maintained in the Anvia monorepo. “First-party” descr
 | `@anvia/gemini` | Google Gemini | [Open](/packages/gemini) |
 | `@anvia/mistral` | Mistral AI | [Open](/packages/mistral) |
 | `@anvia/grok` | xAI Grok | [Open](/packages/grok) |
+| `@anvia/jev` | Jev typed-decision adapter on TypeSafe's SDK: choice, multi-label, score, and boolean-probability decisions | [Open](/packages/jev) |
 
 ## Embeddings
 

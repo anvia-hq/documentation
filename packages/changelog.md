@@ -7,6 +7,7 @@ changelogs for exact fixes, additions, breaking changes, and migration notes.
 
 - [`@anvia/core`](https://github.com/anvia-hq/anvia/blob/main/packages/core/CHANGELOG.md)
 - [`@anvia/client`](https://github.com/anvia-hq/anvia/blob/main/packages/client/CHANGELOG.md)
+- [`@anvia/durable`](/packages/durable/releases)
 - [`@anvia/mcp`](/packages/mcp/releases)
 - [`@anvia/server`](https://github.com/anvia-hq/anvia/blob/main/packages/server/CHANGELOG.md)
 - [`@anvia/react`](https://github.com/anvia-hq/anvia/blob/main/packages/react/CHANGELOG.md)
@@ -20,6 +21,7 @@ changelogs for exact fixes, additions, breaking changes, and migration notes.
 - [`@anvia/gemini`](https://github.com/anvia-hq/anvia/blob/main/packages/provider-gemini/CHANGELOG.md)
 - [`@anvia/mistral`](https://github.com/anvia-hq/anvia/blob/main/packages/provider-mistral/CHANGELOG.md)
 - [`@anvia/grok`](https://github.com/anvia-hq/anvia/blob/main/packages/provider-grok/CHANGELOG.md)
+- [`@anvia/jev`](/packages/jev/releases)
 - [`@anvia/transformers`](https://github.com/anvia-hq/anvia/blob/main/packages/embedding-transformers/CHANGELOG.md)
 
 ## Memory, vector stores, and knowledge graphs

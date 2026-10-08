@@ -12,6 +12,7 @@ Use advanced capabilities when an agent needs runtime control, specialized coord
 | [Agent teams](/sdk/advanced/multi-agent/agent-teams) | Dynamic team membership, messaging, and hierarchy. |
 | [MCP](/sdk/advanced/mcp) | Remote tool servers, transports, and trust. |
 | [Skills](/sdk/advanced/skills) | Reusable instructions, references, and tools. |
+| [Durable execution](/sdk/advanced/durable-execution) | Restart-safe agent runs, tasks, and graphs. |
 | [Dynamic tools](/sdk/advanced/dynamic-tools) | Runtime tool retrieval through searchable indexes. |
 | [Think tool](/sdk/advanced/think-tool) | Deliberate intermediate reasoning. |
 | [Parallel and batch](/sdk/advanced/parallel-and-batch) | Concurrent branches, batches, and workers. |

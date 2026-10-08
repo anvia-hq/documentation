@@ -53,6 +53,6 @@ In allow mode, shell interpreters (`sh`, `bash`, `zsh`, and similar) are blocked
 
 ## Treat all sandbox data as exposed
 
-Commands can inspect workspace files and process environment. Do not seed credentials, unrestricted customer data, hidden prompts, or infrastructure configuration unless the task explicitly requires them. Avoid logging command input, output, or file contents by default.
+Commands can inspect workspace files and process environment. Sandbox `env` values are passed to Docker as `--env KEY=VALUE` arguments; if a Docker command fails, the resulting `DockerSandboxError` message shows the variable name but replaces the value with `<redacted>` (for example `--env OPENAI_API_KEY=<redacted>`), so those messages are safer to log. That covers error text only, and does not make environment values safe to expose to the commands themselves. Do not seed credentials, unrestricted customer data, hidden prompts, or infrastructure configuration unless the task explicitly requires them. Avoid logging command input, output, or file contents by default.
 
 For public arbitrary-code execution or strong multi-tenant isolation, add infrastructure controls such as dedicated workers, rootless containers, restrictive seccomp/AppArmor profiles, microVMs, egress policy, image scanning, and host patching.

@@ -49,7 +49,7 @@ Choose a metric for a defined product requirement. Pin dataset, prompt, model, a
 
 `targetConcurrency` and `metricConcurrency` bound those phases separately; `concurrency` is a shorthand for both. Targets receive an optional third argument with a case `signal`, and metrics receive `signal` in their context. Pass it to external calls.
 
-`caseTimeoutMs` covers the target and its metrics. A suite-level `signal` stops scheduling and rejects on abort. `failFast: true` rejects with `EvalFailFastError` after the first completed required failure or invalid case; it is distinct from pipeline batch behavior.
+`caseTimeoutMs` covers the target and its metrics. A suite-level `signal` stops scheduling and rejects on abort with the original abort reason, including an explicit `null`. `failFast: true` rejects with `EvalFailFastError` after the first completed required failure or invalid case; it is distinct from pipeline batch behavior.
 
 Select cases with `caseIds`, `caseFilter`, or `shard: { index, count }`. `selectEvalCaseIds(previousResult)` selects failed and invalid cases for a rerun. `onProgress` receives case, target, metric, and completion events.
 
@@ -169,6 +169,14 @@ whose `result` contains the pending outcome. A blocked agent throws `AgentRunBlo
 When called inside `runEvalSuite`, target errors are recorded as failed target execution and invalid
 judgments rather than ordinary completed outputs. Without `output`, the adapter returns the full
 `AgentResponse`; an output selector maps only a completed response.
+
+### Cancellation
+
+`agentEvalTarget` forwards the case `signal` to the initial generation and to approval resumes. If the request also supplies its own `abortSignal`, either signal cancels that target invocation; the first observed abort reason is preserved, including an explicit `null`. Cancellation rejects pending request, interaction responder, and output callbacks without starting later phases. Those callbacks keep their signatures, and application-owned work inside them cannot be forcibly stopped.
+
+Built-in embedding and judge metrics forward the case signal to provider work and retry delays. Providers must cooperate with cancellation, so a settled suite does not by itself prove that a noncooperative operation has stopped.
+
+`gEval` shares one preparation request among concurrent cases of the same metric instance. Cancelling one waiter does not cancel the others; when the last waiter leaves, the pending preparation is cancelled. Setup usage is attached once, to the first case that completes scoring with a valid outcome. Supplying `evaluationSteps` avoids the preparation request. Aggregate evaluation usage is not a complete provider billing ledger.
 
 Keep responders specific to synthetic cases. Automatically approving arbitrary tools in an eval
 can execute real side effects; approval never replaces authorization in the handler.

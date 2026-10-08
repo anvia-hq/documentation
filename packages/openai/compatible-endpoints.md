@@ -23,6 +23,10 @@ const responsesModel = provider.completionModel({
 })
 ```
 
+## Azure OpenAI and Foundry
+
+Use [`AzureOpenAIClient` from `@anvia/azure`](/packages/azure) for Azure OpenAI and Azure AI Foundry endpoints. A custom `baseUrl` on `OpenAIClient` remains supported, but Azure Responses stream normalization (restoring a function name that Azure omits from the terminal tool-argument event) and Azure provider identities belong to `AzureOpenAIClient`. See [Migrate from `@anvia/openai`](/packages/azure/migration).
+
 ## Compatibility is capability-specific
 
 An endpoint that supports Chat Completions may not implement:

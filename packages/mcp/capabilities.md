@@ -9,6 +9,7 @@
 | Registration | Immutable `McpServer` snapshots for `Agent.mcpServers` |
 | Results | Text maps to text, image to a file content part, embedded resources to serialized text; `audio` and `resource_link` content are rejected. `structuredContent` is a fallback serialized as text only when `content` is empty |
 | URL safety | Strict public-network validation by default for Streamable HTTP |
+| Response bounds | Streamable HTTP caps each JSON-RPC response message with `maxBufferSize` (default 10 MiB) |
 | Credentials | Exact-endpoint string headers or an MCP OAuth provider |
 | Lifecycle | Lazy construction with explicit `connect()` and `close()` |
 

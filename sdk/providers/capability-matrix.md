@@ -10,6 +10,8 @@ The default Chat Completions adapter declares streaming, tools, tool choice, ima
 
 The package also exposes embeddings, image generation, audio generation, transcription, and model listing.
 
+`@anvia/azure` wraps these same adapters for Azure OpenAI and Foundry deployments. Its completion handles declare the same capabilities as the matching OpenAI Responses or Chat adapter, and its embedding, image-generation, speech-generation, transcription, and model-listing factories mirror OpenAI's. Support for each depends on the Azure endpoint and deployment. See [Azure OpenAI](/sdk/providers/azure).
+
 ## 2. Anthropic
 
 The completion adapter declares streaming, tools, tool choice, image input, file-document input, and reasoning. It does not declare Core output schemas or provider-executed tools.
@@ -34,7 +36,11 @@ The Responses adapter mirrors the OpenAI Responses surface and enables xAI provi
 
 The package also exposes image generation, audio generation, transcription, and model listing. It has no embedding or OCR model factory.
 
-## 6. Read the declaration in code
+## 6. Jev
+
+The Jev adapter is a decision provider. It exposes a `DecisionModel` for [typed decisions](/sdk/decisions) with native choice, score, and boolean-probability questions and multi-label questions composed per label. It has no completion, embedding, OCR, image-generation, speech-generation, or transcription model factory.
+
+## 7. Read the declaration in code
 
 ```ts
 const model = client.completionModel({
@@ -69,13 +75,13 @@ if (
 }
 ```
 
-## 7. Treat compatible endpoints separately
+## 8. Treat compatible endpoints separately
 
 [Compatible APIs](/sdk/providers/compatible) reuse an OpenAI or Anthropic HTTP shape. Streaming chunks, tool arguments, schemas, reasoning fields, and media commonly differ.
 
 For a custom `baseUrl`, select `api: 'chat'` or `api: 'responses'` explicitly according to the endpoint surface.
 
-## 8. Run minimum live verification
+## 9. Run minimum live verification
 
 Test one direct completion, one complete stream, the tool-choice modes you use, parsed output when required, every representative media or embedding path, and one error case for retry behavior.
 

@@ -102,3 +102,32 @@ stream.cancel('The caller no longer needs this run.')
 Cancellation does not undo completed tool calls, writes, or external side effects. Long-running application work needs its own cancellation and cleanup design.
 
 A [resumable stream](/sdk/streaming/resumable-streams) intentionally keeps draining and storing the original run after the response reader disconnects.
+
+## 5. Serialize terminal errors safely as JSONL
+
+`toReadableStream()` from `@anvia/core/streaming` converts an async iterable into a JSONL `ReadableStream<Uint8Array>` for a custom HTTP route. By default, yielded values use ordinary `JSON.stringify`, so a yielded `Error` becomes `{}`, and a thrown error is written as one `{ type: 'error', error }` line with its name, message, and well-known `code` and `details` fields.
+
+Pass `errorSerialization: 'anvia'` to opt in to a minimized terminal envelope:
+
+```ts
+import { toReadableStream } from '@anvia/core/streaming'
+
+const body = toReadableStream(agent.stream({ prompt: message }), {
+  errorSerialization: 'anvia',
+})
+
+return new Response(body, {
+  headers: { 'Content-Type': 'application/x-ndjson' },
+})
+```
+
+With this policy, a top-level `type: 'error'` event or an iterator failure becomes a fresh line containing only `type`, `error`, and optional `usage`, and the stream then closes:
+
+- `error` keeps string `name` and `message` values and finite scalar `code` values, including data properties inherited from an error prototype. Recognized completion provider-output errors also keep `kind`, `toolCallId`, and a normalized `finishReason`.
+- Stack traces, `cause`, arbitrary `details`, raw provider payloads, and extra envelope fields are omitted. Getters, `toJSON`, and coercion methods are never called.
+- Strings, finite numbers, booleans, and `null` stay primitive error values. A BigInt becomes `{ message: '42' }`, and any value without supported diagnostics becomes `{ message: 'Unknown error' }`.
+- `usage` is kept only when all five token counters and any numeric `details` are finite and non-negative; otherwise it is omitted without changing the error.
+
+The terminal line is written once and the source iterator is finished once. Cancelling the response body suppresses pending iterator results and requests cleanup once. A noncooperative iterator can still hold its own pending work or delay cleanup. Successful events and nested data keep ordinary JSON serialization.
+
+This policy limits which fields are exposed; it does not redact secrets inside the allowed `message` or other diagnostics. Keep sanitizing errors at your boundary, for example with `mapError` in `createClientStreamResponse()`.

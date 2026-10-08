@@ -72,13 +72,19 @@ for await (const event of events) {
 
 If the provider output is truncated, filtered, unparseable, or fails schema validation, the stream yields an `error` event carrying a `CompletionStructuredOutputError` with a `phase` of `truncated`, `content-filter`, `parse`, or `schema`. See [Structured output](/sdk/structured-output).
 
-## 4. Check capabilities before transport
+## 4. Rely on terminal metadata and reasoning
+
+The terminal provider response owns completion metadata: `contextUsage`, finish reason, and `rawResponse`. When the terminal choice is empty, Anvia uses the content accumulated from the stream without replacing that metadata. A nonempty terminal choice must agree with the streamed content. Sources merge by URL and text offsets, and provider-tool calls merge by ID, so terminal duplicates replace streamed entries instead of repeating them. When retries occurred, usage includes failed attempts, but context usage and the raw response come from the successful terminal response.
+
+Reasoning that a provider supplies only in the final response is retained, including empty or encrypted reasoning from OpenAI Responses and Azure Responses streams. Final encrypted details can enrich matching streamed reasoning so it can be replayed on later turns. Conflicting text, reasoning, or tool calls still fail provider output validation.
+
+## 5. Check capabilities before transport
 
 The model must implement streaming and report `capabilities.streaming: true`. It must also support every optional request feature, such as tools, images, documents, reasoning, or an output schema.
 
 Anvia checks capabilities before starting the provider request and throws `CompletionCapabilityError` for an incompatible request.
 
-## 5. Retry only before progress is exposed
+## 6. Retry only before progress is exposed
 
 ```ts
 const events = streamCompletion({
