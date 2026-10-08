@@ -45,6 +45,16 @@ new Studio([supportAgent, triagePipeline], {
 
 The adapter creates the parent directory when necessary and initializes its schema lazily on first access. If you omit `path`, `createSqliteSessionStore()` uses SQLite's `:memory:` database and does not persist across process restarts.
 
+The store is application-owned, and `Studio.close()` does not close it. `createSqliteSessionStore()` returns a `SqliteSessionStoreHandle` with a synchronous `close()` method that releases the SQLite handle while the database file would otherwise stay locked, which on Windows can make removing its directory fail with `EPERM`. Call it during graceful shutdown, after Studio stops using the store:
+
+```ts
+process.on('SIGTERM', () => {
+  store.close()
+})
+```
+
+Calling `close()` more than once is harmless, and the store reopens lazily if it is used again. If schema setup fails after the database opens, for example when the legacy `messages_json` guard rejects an old database, the handle is closed before the error is thrown so the documented recovery of deleting or recreating the database works.
+
 The SQLite adapter implements every Studio store interface. Setting only `stores.sessions` to this adapter also lets Studio reuse it for traces, pipeline logs, and pipeline runs. Listing all four assignments makes that ownership explicit and keeps future store changes easy to review.
 
 ## Data written by the SQLite adapter

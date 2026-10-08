@@ -1,10 +1,14 @@
 # Releases
 
-The current stable release is `@anvia/studio` **1.2.4**. The entries below summarize recent v1
+The current stable release is `@anvia/studio` **1.3.5**. The entries below summarize recent v1
 changes and preserve notable v0 Studio milestones.
 
 | Version | Summary |
 | --- | --- |
+| `1.3.5` | Dependency-only release updating Client, Server, React, and React UI. |
+| `1.3.4` | Dependency-only release updating Client, Server, Graph, React, and React UI. |
+| `1.3.3` | Dependency-only release updating Client, Server, Graph, React, and React UI. |
+| `1.3.0` | Added `close()` to the SQLite session store (`SqliteSessionStoreHandle`), which releases the SQLite handle and reopens lazily; schema setup that fails after the database opens now closes the handle before rethrowing. |
 | `1.2.4` | Kept playground selectors compact, limited response actions and metrics to final assistant responses, improved fallback metric alignment, and preserved a high-contrast logo tile in dark mode. Updated React UI, Client, Graph, and React dependencies. |
 | `1.2.3` | Updated upstream runtime and schema dependencies and aligned Graph, React UI, Client, and React versions. |
 | `1.2.2` | Stopped persisting stack traces in trace errors; stored and returned trace failures now contain only the error name and message. |

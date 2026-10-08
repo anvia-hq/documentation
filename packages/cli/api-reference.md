@@ -1,19 +1,12 @@
 # `@anvia/cli` API reference
 
-::: info Upcoming CLI release
-The `ui` command group and update `--apply` flag describe the reviewed development CLI and are
-pending publication. Published CLI `1.3.0` uses the [legacy commands](/packages/cli/releases#published-cli-1-3-0).
-To try these examples now, use the [development build](/packages/cli/get-started#try-the-development-build).
-:::
-
-
 Use the root `@anvia/cli` export for programmatic integration. Functions are synchronous.
 File APIs inspect or modify local files; `initializeProject()` and `addRegistryItem()` also invoke
 the bundled shadcn CLI. Exceptions propagate to programmatic callers.
 
 ## Commands
 
-Use `anvia` as shorthand for the [development build](/packages/cli/get-started#try-the-development-build).
+Use `anvia` as shorthand for `pnpm dlx @anvia/cli` or an installed `@anvia/cli` binary. This reference describes CLI `1.5.0`.
 
 ```text
 anvia ui init [next|vite] [--cwd <path>] [--force]

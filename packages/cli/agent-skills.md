@@ -1,23 +1,17 @@
 # Agent Skills
 
-::: info Upcoming CLI release
-The `ui` command group and update `--apply` flag describe the reviewed development CLI and are
-pending publication. Published CLI `1.3.0` uses the [legacy commands](/packages/cli/releases#published-cli-1-3-0).
-To try these examples now, use the [development build](/packages/cli/get-started#try-the-development-build).
-:::
-
-
 The CLI bundles Anvia knowledge for a developer's coding agent. Each skill has a `SKILL.md`
 entrypoint, supporting `references/`, and verification or example `scripts/`. Installing a skill
 copies these files; it does not execute the scripts or start an Anvia agent.
 
 ## Bundled skills
 
-The reviewed CLI includes these nine skills:
+CLI `1.5.0` includes these ten skills:
 
 | Skill | Use it for |
 | --- | --- |
 | `anvia-agent` | Agents, tools, approvals, memory, streaming, teams, and providers |
+| `anvia-durable` | Experimental: durable main agents, owned subagents, replay-safe effects, approvals, persisted waits, task graphs, and remote controls; includes a local no-network restart smoke check |
 | `anvia-chat` | Server routes, transports, React hooks, and chat UI primitives |
 | `anvia-channels` | Discord, Slack, Telegram, sessions, and proactive delivery |
 | `anvia-evals` | Deterministic metrics, model judges, RAG checks, and CI evaluation |

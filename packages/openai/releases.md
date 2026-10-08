@@ -1,11 +1,15 @@
 # Releases
 
-Current stable release: `1.1.5`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Current stable release: `1.2.0`. The entries below summarize the 1.0 line and preserve notable v0 history.
 
 ## Recent changes
 
 | Version | Type | Summary |
 | --- | --- | --- |
+| `1.2.0` | Minor | Added the `@anvia/openai/adapters` export with the reusable Responses model, request-mapping and stream-normalization extension points, for the new `@anvia/azure` package. Moved Azure Responses function-name recovery out of the OpenAI parser into `@anvia/azure`; OpenAI's parser keeps native events, including unnamed argument events without synthesizing a name, and completed tool calls stay validated. Existing `OpenAIClient` custom endpoints remain supported. |
+| `1.1.8` | Patch | Refreshed package README and usage guides. |
+| `1.1.7` | Patch | Updated the OpenAI SDK to `^7.23.0`. |
+| `1.1.6` | Patch | Updated upstream runtime dependencies, including the OpenAI SDK `7.18.0`. |
 | `1.1.5` | Patch | Supported Azure AI Foundry Responses streams that omit the function name from the terminal tool-argument event. |
 | `1.1.4` | Patch | Updated upstream runtime and schema dependencies across the workspace. |
 | `1.1.3` | Patch | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
@@ -46,3 +50,4 @@ These summaries are selective. Review the complete source history before upgradi
 - [Full `@anvia/openai` changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-openai/CHANGELOG.md)
 - [Compatibility and versioning](/packages/compatibility-and-versioning)
 - [API reference](/packages/openai/api-reference)
+- [`@anvia/azure`](/packages/azure) for Azure OpenAI and Foundry

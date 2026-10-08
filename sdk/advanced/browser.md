@@ -37,6 +37,8 @@ Operational failures reject with a structured `BrowserError` carrying `code`, `r
 
 Use `{ mode: 'origins', origins }` for a known application or documentation set. Use `allow-all-http` only when infrastructure networking already provides the required isolation and the product accepts open web navigation.
 
+Private and reserved IP literals (loopback, link-local, RFC 1918, and the other IANA special-purpose ranges) are blocked under every policy, including `origins` policies that list them, and again on each redirect. The check is on the literal host, so a public domain that resolves to a private address is not blocked; keep network egress controls in place.
+
 Navigation policy is not content trust. Web pages can contain prompt injection, misleading controls, private data, and destructive actions. Keep consequential product operations behind application tools with authorization and, when appropriate, an Agent interaction.
 
 ## Human takeover

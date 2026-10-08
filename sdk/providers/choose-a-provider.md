@@ -6,15 +6,16 @@ Choose from the workflow's actual requirements, not a general model ranking. The
 
 Current Anvia adapters provide these shortlists:
 
-- Text completion, streaming, and tools: OpenAI, Anthropic, Gemini, Mistral, and Grok.
-- Core output schemas: OpenAI, Gemini, Mistral, and Grok.
-- Image input: OpenAI, Anthropic, Gemini, and Grok.
-- File-document input: OpenAI Responses, Anthropic, Gemini, and Grok Responses.
-- Embeddings: OpenAI, Gemini, and Mistral.
-- Image generation: OpenAI, Gemini, and Grok.
-- Audio generation: OpenAI and Grok.
-- Transcription: OpenAI, Gemini, and Grok.
+- Text completion, streaming, and tools: OpenAI, Azure OpenAI, Anthropic, Gemini, Mistral, and Grok.
+- Core output schemas: OpenAI, Azure OpenAI, Gemini, Mistral, and Grok.
+- Image input: OpenAI, Azure OpenAI, Anthropic, Gemini, and Grok.
+- File-document input: OpenAI Responses, Azure OpenAI Responses, Anthropic, Gemini, and Grok Responses.
+- Embeddings: OpenAI, Azure OpenAI, Gemini, and Mistral.
+- Image generation: OpenAI, Azure OpenAI, Gemini, and Grok.
+- Audio generation: OpenAI, Azure OpenAI, and Grok.
+- Transcription: OpenAI, Azure OpenAI, Gemini, and Grok.
 - OCR: Mistral.
+- Typed decisions (choice, labels, scores, probabilities): Jev.
 
 These are adapter contracts. Verify the exact model ID with the [capability guide](/sdk/providers/capability-matrix) and a live request.
 
@@ -29,7 +30,7 @@ Remove candidates that cannot meet non-negotiable requirements:
 - input types, context size, and output limits
 - budget and cost attribution
 
-For example, the Anthropic package supports direct API and Vertex AI clients. Gemini also supports API-key and Vertex configurations. Select that deployment in trusted server configuration, not an agent prompt.
+For example, the Anthropic package supports direct API and Vertex AI clients. Gemini also supports API-key and Vertex configurations. The Azure OpenAI package supports API-key and Microsoft Entra authentication against Azure OpenAI and Foundry endpoints. Select that deployment in trusted server configuration, not an agent prompt.
 
 ## 3. Evaluate the real workflow
 

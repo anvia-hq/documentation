@@ -1,12 +1,5 @@
 # Editable components
 
-::: info Upcoming CLI release
-The `ui` command group and update `--apply` flag describe the reviewed development CLI and are
-pending publication. Published CLI `1.3.0` uses the [legacy commands](/packages/cli/releases#published-cli-1-3-0).
-To try these examples now, use the [development build](/packages/cli/get-started#try-the-development-build).
-:::
-
-
 The CLI registry copies styled React source into your application. Behavior and accessibility
 come from the headless `@anvia/react-ui` primitives; Tailwind classes and composition belong to
 the generated files.
@@ -118,17 +111,18 @@ separately when changing the CLI version. Continue with [Troubleshooting](/packa
 
 ## Install the registry with an explicit React UI version
 
-::: warning CLI 1.3.0 version selection
-Published CLI `1.3.0` uses `anvia add chat`, which requests `@anvia/react-ui@1.3.0`. That version is unpublished
-in the release baseline checked on October 4, 2026. The following workaround uses the public
-registry API to select published React UI `1.1.6` explicitly while keeping CLI `1.3.0` components.
+::: tip Only needed for older CLI releases or explicit pinning
+CLI `1.4.0` and later install the React UI version recorded with the bundled registry, so `ui add`
+works without this workaround. CLI `1.3.0` and earlier requested a React UI version equal to the
+CLI's own version, which may not be published (for example, `@anvia/react-ui@1.3.0`). Use the public
+registry API below to select a published React UI version, such as `1.1.6`, explicitly.
 :::
 
 Install the CLI for the local registry-generation script, and install the controller and peers
 used by the application:
 
 ```sh
-pnpm add -D @anvia/cli@1.3.0
+pnpm add -D @anvia/cli
 pnpm add @anvia/react-ui@1.1.6 @anvia/react @anvia/client react react-dom
 ```
 
@@ -153,6 +147,6 @@ Add shadcn's `--overwrite` flag only when you intend to replace existing applica
 The registry JSON and generation script can be deleted after installation. To install a narrower
 item, change `'chat'` in the script to one of the registry names above.
 
-The published `1.3.0` CLI interface is `anvia add <item> [--cwd <path>] [--overwrite]`. CLI `1.3.0`
+CLI `1.3.0` and earlier use the root `anvia add <item> [--cwd <path>] [--overwrite]` command. The CLI
 has no command-line flag for overriding the React UI version; the override is available through
 `createRegistryItem()`.

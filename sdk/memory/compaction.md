@@ -107,7 +107,7 @@ message and no synthetic summaries.
 
 ## 4. Know what the summarizer receives
 
-The built-in compactor serializes transcript roles, visible text, tool calls, textual tool results, image descriptors, and bounded inline document text. It omits reasoning blocks and raw base64 image or document bytes.
+The built-in compactor serializes transcript roles, visible text, tool calls, textual tool results, image descriptors, and bounded inline document text. Inline file text and tool results are each truncated to 2,000 characters, with a `[truncated N chars]` marker, so a single large tool output cannot overflow the compaction model's context or inflate its cost. It omits reasoning blocks and raw base64 image or document bytes.
 
 Compaction still processes user and tool data. Apply the same access, redaction, provider, and retention policy used for the main agent request.
 

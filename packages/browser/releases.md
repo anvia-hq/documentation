@@ -1,9 +1,14 @@
 # Releases
 
-The current stable release is `@anvia/browser` **1.1.4**.
+The current stable release is `@anvia/browser` **1.1.9**.
 
 | Version | Summary |
 | --- | --- |
+| `1.1.9` | Refreshed the package README and updated to Sandbox `1.1.8`. |
+| `1.1.8` | Updated to the Sandbox `1.1.7` contract. |
+| `1.1.7` | Updated to the Sandbox `1.1.6` contract. |
+| `1.1.6` | Updated to the Sandbox `1.1.5` contract. |
+| `1.1.5` | Blocked private and reserved IP literals in `browser_navigate` under every navigation policy, including `origins` policies that list them, and on each redirect the automation worker follows. |
 | `1.1.4` | Updated upstream runtime dependencies, aligned the browser image and Playwright host pins, and updated to Sandbox `1.1.4`. |
 | `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents, and updated to the Sandbox `1.1.3` contract. |
 | `1.1.2` | Updated to the Core `1.1.2` and Sandbox `1.1.2` contracts. |

@@ -1,24 +1,19 @@
 # Troubleshooting
 
-::: info Upcoming CLI release
-The `ui` command group and update `--apply` flag describe the reviewed development CLI and are
-pending publication. Published CLI `1.3.0` uses the [legacy commands](/packages/cli/releases#published-cli-1-3-0).
-To try these examples now, use the [development build](/packages/cli/get-started#try-the-development-build).
-:::
-
 ## Grouped commands or `--apply` are unknown
 
-You are likely running published CLI `1.3.0`. The grouped UI commands and `--apply` flag belong
-to the upcoming release. Use the [development build](/packages/cli/get-started#try-the-development-build)
-for this guide, or use the [published legacy commands](/packages/cli/releases#published-cli-1-3-0).
+You are running a CLI release older than `1.4.0`, which introduced the grouped UI commands and
+`--apply`. Run the latest release with `pnpm dlx @anvia/cli@latest`, or upgrade a pinned
+development dependency. On an older release, use the
+[root commands](/packages/cli/releases#upgrading-from-cli-1-3-0-or-earlier).
 
 ## React UI version cannot be found
 
-Published CLI `1.3.0` requests `@anvia/react-ui@1.3.0` because it uses its own package version.
-The reviewed development build records the React UI version with the registry instead. Anvia
-packages release independently.
+CLI `1.3.0` and earlier request the React UI version equal to the CLI's own version, for example
+`@anvia/react-ui@1.3.0`. CLI `1.4.0` and later record the React UI version with the registry
+instead. Anvia packages release independently.
 
-If you are using `1.3.0`, follow the
+Upgrade the CLI, or, if you must stay on an older release, follow the
 [explicit-version workaround](/packages/cli/components#install-the-registry-with-an-explicit-react-ui-version).
 Check the versions of the packages you intend to install:
 
@@ -65,9 +60,9 @@ explain this behavior and what the updater does not change.
 
 ## A skills preview changed `AGENTS.md`
 
-This is a known limitation of published CLI `1.3.0`: `skills update --agents` and `--codex` can
-write immediately without `--force`. The reviewed development build previews every selected
-target without writing. Use that build, or omit AGENTS.md target flags when comparing with `1.3.0`.
+This is a known limitation of CLI `1.3.0` and earlier: `skills update --agents` and `--codex` can
+write immediately without `--force`. CLI `1.4.0` and later preview every selected target without
+writing. Upgrade the CLI, or omit AGENTS.md target flags when comparing with an older release.
 Keep your own instructions outside the Anvia markers.
 
 ## Skills or integrations remain outdated

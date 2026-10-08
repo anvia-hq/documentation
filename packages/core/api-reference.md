@@ -523,6 +523,14 @@ See [MCP transport configuration](/sdk/advanced/mcp/transports#streamable-http) 
 
 `@anvia/core/skills` exports `skill.local(...)`, `loadSkills(...)`, `SkillSet`, and validation types.
 
+## Streaming helpers
+
+`@anvia/core/streaming` exports `toReadableStream(events, options?)`, which converts an async iterable into JSONL bytes. `options.errorSerialization: 'anvia'` opts in to a safe terminal error envelope (`type`, `error`, optional `usage`); the default keeps generic `JSON.stringify` behavior. See [errors and cancellation](/sdk/streaming/errors-and-cancellation#_5-serialize-terminal-errors-safely-as-jsonl).
+
+## Typed decisions
+
+`@anvia/core/decision` (also exported from the Core root) provides provider-neutral typed decisions. Build a question with `choice`, `multiLabel`, `score`, or `check`, run it with `decide(model, question, options?)`, or run many with `decideBatch(model, questions, options?)`, which returns results in input order with per-item retries and cancellation. A model that cannot answer a question kind throws `DecisionCapabilityError`; malformed provider answers throw `DecisionProviderOutputError`. See [Typed decisions](/sdk/decisions) for questions, answers, execution, batches, custom decision models, and errors, and [`@anvia/jev`](/packages/jev) for a provider adapter.
+
 ## Redaction
 
 `@anvia/core/redaction` exports the shared PII-redaction implementation used by the Lens and

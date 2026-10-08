@@ -1,10 +1,17 @@
 # Releases
 
-The current stable release is `@anvia/core` **1.5.0**. The source changelog is authoritative; the
+The current stable release is `@anvia/core` **1.9.0**. The source changelog is authoritative; the
 entries below summarize recent v1 changes and preserve notable v0 compatibility milestones.
 
 | Version | Summary |
 | --- | --- |
+| `1.9.0` | Added provider-neutral typed decisions through `@anvia/core/decision` (also exported from the Core root): choice, multi-label, rubric score, and boolean-probability questions, validated execution, and ordered batches with retries and cancellation. See [Typed decisions](/sdk/decisions). |
+| `1.8.0` | Added opt-in durable agent streaming with persisted generation deltas, unique model-attempt identities, and validated streamed response checkpoints; durable execution protocol moved to version 2. See [`@anvia/durable`](/packages/durable). |
+| `1.7.0` | Added the execution boundaries and stable tool operation IDs that back experimental durable agent execution, preserving direct agent behavior. |
+| `1.7.1` | Retained empty or encrypted Responses reasoning that arrives only in the final streamed response (including Azure Responses) and let final encrypted details enrich matching streamed reasoning for replay on later turns. |
+| `1.6.1` | Refreshed package READMEs with concise overviews and links to detailed guides. |
+| `1.6.0` | Added opt-in `errorSerialization: 'anvia'` for `toReadableStream`, which writes a minimized terminal error envelope. Forwarded evaluation case cancellation through agent targets, approvals, embeddings, and judge retries. Cancelled built-in skill scripts with their tool invocation. Validated embedding counts for every provider batch, preserved terminal stream metadata for empty terminal choices, and copied Standard Schema converter data before strict-object refinement. |
+| `1.5.1` | Bounded tool results in memory-compaction prompts: tool output is truncated to 2,000 characters with a `[truncated N chars]` marker, like inline file text. |
 | `1.5.0` | Added deterministic `recentTurns` memory-compaction retention. Omitted retention now keeps one complete user-led turn instead of 25% of `afterTokens`; deprecated `recentTokens` remains available as an explicit migration path. |
 | `1.4.0` | Centralized PII redaction in `@anvia/core/redaction` for Lens and Langfuse, with safer card and phone matching, bounded traversal, circular-reference handling, bearer-token detection, and broader key-prefix defaults. |
 | `1.3.2` | Clarified the default think-tool description to encourage step-by-step planning and reassessment. |

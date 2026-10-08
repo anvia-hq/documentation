@@ -1,11 +1,15 @@
 # Releases
 
-Current stable release: `1.1.5`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Current stable release: `1.1.9`. The entries below summarize the 1.0 line and preserve notable v0 history.
 
 ## Recent changes
 
 | Version | Type | Summary |
 | --- | --- | --- |
+| `1.1.9` | Patch | Updated to OpenAI adapter `1.2.0`, which adds the `@anvia/openai/adapters` export. |
+| `1.1.8` | Patch | Refreshed package README and usage guides. |
+| `1.1.7` | Patch | Updated the OpenAI SDK to `^7.23.0`. |
+| `1.1.6` | Patch | Updated upstream runtime dependencies, including the OpenAI SDK `7.18.0`. |
 | `1.1.5` | Patch | Updated to OpenAI adapter `1.1.5`, including the Azure AI Foundry terminal tool-argument stream fix. |
 | `1.1.4` | Patch | Updated upstream runtime and schema dependencies and aligned the OpenAI adapter dependency. |
 | `1.1.3` | Patch | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |

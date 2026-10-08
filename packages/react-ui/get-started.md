@@ -7,8 +7,7 @@ pnpm add @anvia/react-ui @anvia/react @anvia/client react react-dom
 ```
 
 Choose one of two styling paths. For editable application components, follow the
-[CLI component guide](/packages/cli/components), including setup and the CLI `1.3.0`
-dependency-version workaround.
+[CLI component guide](/packages/cli/components), which installs them with `anvia ui add chat`.
 
 Or compose the headless primitives directly and pass your own `className` values:
 

@@ -3,11 +3,8 @@
 `@anvia/cli` installs Anvia knowledge for your coding agent and editable React components for
 your application. It runs on Node.js **20.18.1 or newer**.
 
-::: info Upcoming CLI release
-The `ui` command group and update `--apply` flag describe the reviewed development CLI and are
-pending publication. Published CLI `1.3.0` uses the [legacy commands](/packages/cli/releases#published-cli-1-3-0).
-To try these examples now, use the [development build](/packages/cli/get-started#try-the-development-build).
-:::
+Examples use `anvia` as shorthand for the published CLI. Run it with `pnpm dlx @anvia/cli` or
+install `@anvia/cli` as a development dependency. The current release is `1.5.0`.
 
 | Group | What it manages | Start here |
 | --- | --- | --- |
@@ -37,7 +34,7 @@ Legacy root `init`, `add`, and `update` commands remain aliases for the UI comma
 anvia skills init --codex
 ```
 
-This copies all nine bundled skills into `skills/` and adds an Anvia section to `AGENTS.md`.
+This copies all ten bundled skills, including the experimental `anvia-durable` skill, into `skills/` and adds an Anvia section to `AGENTS.md`.
 Choose `--claude`, `--cursor`, or `--agents` for another integration, or omit target flags to
 install only the canonical files. Skills installation works in any project directory.
 

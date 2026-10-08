@@ -51,7 +51,7 @@ const compatibleModel = compatible.completionModel({
 })
 ```
 
-Use the dedicated [Compatible APIs guide](/sdk/providers/compatible) and smoke test every required workflow. The current documented `@anvia/openai` public surface does not provide a dedicated Azure OpenAI client, so this guide does not prescribe unverified Azure configuration.
+Use the dedicated [Compatible APIs guide](/sdk/providers/compatible) and smoke test every required workflow. For Azure OpenAI and Azure AI Foundry, use the dedicated [`AzureOpenAIClient` from `@anvia/azure`](/sdk/providers/azure) instead of a custom `baseUrl`; it handles Azure endpoints, API-key or Microsoft Entra authentication, and Azure Responses stream differences.
 
 ## Export models, not credentials
 

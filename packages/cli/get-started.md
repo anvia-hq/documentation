@@ -2,32 +2,23 @@
 
 Use Node.js **20.18.1 or newer** and run commands against the intended project directory.
 
-::: info Upcoming CLI release
-The `ui` command group and update `--apply` flag describe the reviewed development CLI and are
-pending publication. Published CLI `1.3.0` uses the [legacy commands](/packages/cli/releases#published-cli-1-3-0).
-To try these examples now, use the [development build](/packages/cli/get-started#try-the-development-build).
-:::
+## Run the CLI
 
-## Try the development build
-
-Check out the CLI PR branch in the [Anvia repository](https://github.com/anvia-hq/anvia/tree/codex/cli-command-groups),
-then run from that repository's root:
+Run the published CLI without installing it, or add it to the project as a development dependency:
 
 ```sh
-pnpm install --frozen-lockfile
-pnpm --filter @anvia/cli... build
-node packages/cli/dist/cli.js --help
+pnpm dlx @anvia/cli --help
+pnpm add -D @anvia/cli
 ```
 
-The guides use `anvia` as shorthand for this built entrypoint. For example:
+The guides use `anvia` as shorthand for either form. For example:
 
 ```sh
-node packages/cli/dist/cli.js skills init --cwd /path/to/my-project --codex
+pnpm dlx @anvia/cli skills init --cwd /path/to/my-project --codex
 ```
 
-After the new CLI release is published, the same commands will be available through its installed
-`anvia` binary. The package version is assigned by the release process; these guides do not assume
-an unpublished version number.
+These guides describe CLI `1.5.0`. If `ui` or `--apply` is unknown, you are running a release older
+than `1.4.0`; see [Troubleshooting](/packages/cli/troubleshooting#grouped-commands-or-apply-are-unknown).
 
 ## Install knowledge for your coding agent
 

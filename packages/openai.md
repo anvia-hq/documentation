@@ -5,7 +5,7 @@ OpenAI’s provider adapter covers the broadest set of Anvia model contracts: co
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.1.1` |
+| Version | `1.2.0` |
 | Runtime | ESM, server-side JavaScript |
 | Peer | Matching `@anvia/core` stable release |
 
@@ -89,11 +89,13 @@ const embeddings = openai.embeddingModel({
 const images = openai.imageGenerationModel({ modelId: 'gpt-image-2' })
 ```
 
+For Azure OpenAI and Azure AI Foundry, use [`@anvia/azure`](/packages/azure), which builds on this adapter.
+
 Create the provider client once at the server boundary. Keep credentials there, inject the returned model contracts, and keep fallback policy and tenant routing in application code.
 
 ## Compatibility
 
-`@anvia/openai` is an ESM package and uses the official `openai` SDK. It accepts a preconfigured SDK client for custom transports. Media and embedding methods require endpoints that implement the corresponding OpenAI APIs; an OpenAI-compatible chat endpoint does not imply support for those other capabilities.
+`@anvia/openai` is an ESM package and uses the official `openai` SDK. It accepts a preconfigured SDK client for custom transports. Provider packages can reuse the Responses model through the `@anvia/openai/adapters` subpath. Media and embedding methods require endpoints that implement the corresponding OpenAI APIs; an OpenAI-compatible chat endpoint does not imply support for those other capabilities.
 
 ## Continue
 

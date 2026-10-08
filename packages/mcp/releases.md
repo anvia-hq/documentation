@@ -1,9 +1,13 @@
 # Releases
 
-The current stable release is `@anvia/mcp` **1.1.3**.
+The current stable release is `@anvia/mcp` **1.2.3**.
 
 | Version | Summary |
 | --- | --- |
+| `1.2.3` | Refreshed the package README. |
+| `1.2.2` | Updated `@modelcontextprotocol/client` to `^2.1.0` and `undici` to `^8.11.2`. |
+| `1.2.1` | Updated `undici` to `^8.11.0`. |
+| `1.2.0` | Bounded Streamable HTTP responses per JSON-RPC message with the new `transport.maxBufferSize` option (default 10 MiB, applied to a regular response body and to each SSE event, in both SSRF modes; `custom` transports stay caller-owned). |
 | `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
 | `1.1.2` | Updated the Core dependency to `1.1.2`. |
 | `1.1.1` | Bumped upstream runtime dependencies and aligned zod to 4.5.4 across packages. |
