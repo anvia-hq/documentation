@@ -17,6 +17,7 @@ changelogs for exact fixes, additions, breaking changes, and migration notes.
 ## Providers and embeddings
 
 - [`@anvia/openai`](https://github.com/anvia-hq/anvia/blob/main/packages/provider-openai/CHANGELOG.md)
+- [`@anvia/azure`](/packages/azure/releases)
 - [`@anvia/anthropic`](https://github.com/anvia-hq/anvia/blob/main/packages/provider-anthropic/CHANGELOG.md)
 - [`@anvia/gemini`](https://github.com/anvia-hq/anvia/blob/main/packages/provider-gemini/CHANGELOG.md)
 - [`@anvia/mistral`](https://github.com/anvia-hq/anvia/blob/main/packages/provider-mistral/CHANGELOG.md)

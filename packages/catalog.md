@@ -20,6 +20,7 @@ All packages below are maintained in the Anvia monorepo. “First-party” descr
 | Package | Integration | Reference |
 | --- | --- | --- |
 | `@anvia/openai` | OpenAI and compatible APIs | [Open](/packages/openai) |
+| `@anvia/azure` | Azure OpenAI and Azure AI Foundry with API-key or Microsoft Entra auth and Azure Responses stream normalization | [Open](/packages/azure) |
 | `@anvia/anthropic` | Anthropic Claude | [Open](/packages/anthropic) |
 | `@anvia/gemini` | Google Gemini | [Open](/packages/gemini) |
 | `@anvia/mistral` | Mistral AI | [Open](/packages/mistral) |

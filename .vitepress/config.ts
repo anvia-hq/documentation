@@ -454,6 +454,16 @@ export default defineConfig({
               ]
             },
             {
+              text: 'Azure OpenAI',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/sdk/providers/azure' },
+                { text: 'Setup', link: '/sdk/providers/azure/setup' },
+                { text: 'Deployment models', link: '/sdk/providers/azure/models' },
+                { text: 'Production', link: '/sdk/providers/azure/production' }
+              ]
+            },
+            {
               text: 'Compatible APIs',
               collapsed: true,
               items: [
@@ -983,6 +993,19 @@ export default defineConfig({
                 { text: 'Models and media', link: '/packages/openai/models-and-media' },
                 { text: 'API', link: '/packages/openai/api-reference' },
                 { text: 'Releases', link: '/packages/openai/releases' }
+              ]
+            },
+            {
+              text: '@anvia/azure',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/azure' },
+                { text: 'Get started', link: '/packages/azure/get-started' },
+                { text: 'Capabilities', link: '/packages/azure/capabilities' },
+                { text: 'Configuration', link: '/packages/azure/configuration' },
+                { text: 'Migrate from OpenAI', link: '/packages/azure/migration' },
+                { text: 'API', link: '/packages/azure/api-reference' },
+                { text: 'Releases', link: '/packages/azure/releases' }
               ]
             },
             {

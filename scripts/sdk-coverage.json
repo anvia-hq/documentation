@@ -1,5 +1,5 @@
 {
-  "reviewedSdkRevision": "d54b24996a4d6816219618fc703975e38993df75",
+  "reviewedSdkRevision": "e196d84347a66bf5107d060268a3fee876720550",
   "entries": [
     {
       "module": "@anvia/cli",
@@ -26,8 +26,8 @@
       "module": "@anvia/core",
       "guide": "sdk/index.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 245,
-      "exportNamesHash": "7d48200ba35dc6dc83c9d1ab9f90ec9d13c6a99f8decae14a463219cd477f455"
+      "exportCount": 277,
+      "exportNamesHash": "f4b7d4c63488f7555b7fdd9706fb43399a427c44dde867fe56d591369443b3bd"
     },
     {
       "module": "@anvia/core/agent",
@@ -497,6 +497,76 @@
       "reference": "packages/weaviate/api-reference.md",
       "exportCount": 9,
       "exportNamesHash": "4a096f6eb1bb571a50bce95db1869177a753732fc26d6e12699e835b94349a26"
+    },
+    {
+      "module": "@anvia/azure",
+      "guide": "sdk/providers/azure/setup.md",
+      "reference": "packages/azure/api-reference.md",
+      "exportCount": 12,
+      "exportNamesHash": "b1d846fa490d32750aafe9ddf9036de9952824491ec4ea2a6ab77dec06475135"
+    },
+    {
+      "module": "@anvia/client/durable",
+      "guide": "packages/durable/http.md",
+      "reference": "packages/durable/api-reference.md",
+      "exportCount": 4,
+      "exportNamesHash": "c90ea2e87c351a9b04a77c584c379e524650e10674afef436351ee306b27dca2"
+    },
+    {
+      "module": "@anvia/core/decision",
+      "guide": "sdk/decisions.md",
+      "reference": "packages/core/api-reference.md",
+      "exportCount": 39,
+      "exportNamesHash": "5222ac167ab55e23da24df2581c9f57fca6b2fc9de766d2f73e0a51b3452fcb2"
+    },
+    {
+      "module": "@anvia/durable",
+      "guide": "sdk/advanced/durable-execution.md",
+      "reference": "packages/durable/api-reference.md",
+      "exportCount": 53,
+      "exportNamesHash": "a54e62f574e066da7b4317e3923e79496eb69a2418cab000f4a99c84cc8098fa"
+    },
+    {
+      "module": "@anvia/durable/maintenance",
+      "guide": "packages/durable/operations.md",
+      "reference": "packages/durable/api-reference.md",
+      "exportCount": 3,
+      "exportNamesHash": "5fc42a2bdea771627c5f9ce5c6f72d2a518b765e20c1f636607aae99c9c8b94e"
+    },
+    {
+      "module": "@anvia/durable/protocol",
+      "guide": "packages/durable/capabilities.md",
+      "reference": "packages/durable/api-reference.md",
+      "exportCount": 42,
+      "exportNamesHash": "7099dc9c30441faa840bf6afdc1c34ea0406438cd9560003f0eb7bd2011ef9f3"
+    },
+    {
+      "module": "@anvia/durable/sqlite",
+      "guide": "packages/durable/configuration.md",
+      "reference": "packages/durable/api-reference.md",
+      "exportCount": 1,
+      "exportNamesHash": "3b5a690b1b765f8bbc84464baf54c1f0e8852361268c97024bc3e82f310fbe0f"
+    },
+    {
+      "module": "@anvia/jev",
+      "guide": "sdk/providers/jev/setup.md",
+      "reference": "packages/jev/api-reference.md",
+      "exportCount": 8,
+      "exportNamesHash": "435629b154c9bcb4dffe50ecf5f1b8e00a575f6a2cc20a6d89989358309e477f"
+    },
+    {
+      "module": "@anvia/openai/adapters",
+      "guide": "packages/azure/capabilities.md",
+      "reference": "packages/openai/api-reference.md",
+      "exportCount": 1,
+      "exportNamesHash": "87eecc8e3fc1d60b938269ae24f5665ad0c24fe0a0c4d1077e8766a767ce8f75"
+    },
+    {
+      "module": "@anvia/server/durable",
+      "guide": "packages/durable/http.md",
+      "reference": "packages/durable/api-reference.md",
+      "exportCount": 4,
+      "exportNamesHash": "c94c93480fa448a9a9f17fdf263a53f017cd9148104607e1161fbce45f3ad509"
     }
   ],
   "features": [

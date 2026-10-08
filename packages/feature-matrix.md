@@ -20,6 +20,7 @@ Use this matrix to find the package family that owns a capability. A check means
 | Package | Hosted completion models | Embeddings | Local execution |
 | --- | :---: | :---: | :---: |
 | `@anvia/openai` | ✓ | ✓ | — |
+| `@anvia/azure` | ✓ | — | — |
 | `@anvia/anthropic` | ✓ | — | — |
 | `@anvia/gemini` | ✓ | ✓ | — |
 | `@anvia/mistral` | ✓ | ✓ | — |
