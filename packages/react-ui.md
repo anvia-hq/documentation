@@ -12,11 +12,9 @@ Use the root package for a convenient combined API or import a component family 
 pnpm add @anvia/react-ui @anvia/react @anvia/client react react-dom
 ```
 
-For editable Tailwind and shadcn-based application components, install the complete chat registry:
-
-```sh
-pnpm dlx @anvia/cli add chat
-```
+For editable Tailwind and shadcn-based application components, follow the
+[CLI component guide](/packages/cli/components). It covers shadcn setup, the CLI `1.3.0`
+dependency-version workaround, and mounting the generated chat with a controller.
 
 The primitive package has no stylesheet. Style ordinary `className` props or compose design-system
 elements with `asChild`. Its small DOM contract is limited to ARIA attributes, `data-state`, and

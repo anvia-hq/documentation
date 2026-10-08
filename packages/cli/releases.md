@@ -1,17 +1,41 @@
-# Releases
+# CLI releases
 
-The current stable release is `@anvia/cli` **1.3.0**.
+The CLI package versions independently from React UI and the runtime SDK.
 
-| Version | Summary |
-| --- | --- |
-| `1.3.0` | Added `anvia skills init`, `skills update`, and `skills list` for installing verified Anvia Agent Skills into an application's `skills/` directory. Target flags support Claude Code, Cursor, and AGENTS.md/Codex integration. |
-| `1.2.0` | Added `anvia update`: previews installed components as up-to-date, modified, or missing against the registry, and rewrites out-of-date files with `--overwrite` (never installs new items). Includes programmatic `inspectInstalledItems` / `updateInstalledItems` exports with did-you-mean suggestions. |
-| `1.0.2` | Maintenance release; the changelog records no package-specific changes. |
-| `1.0.1` | Maintenance release; the changelog records no package-specific changes. |
-| `1.0.0` | Added shadcn-backed `init` and `add` commands for editable app-owned chat components built on `@anvia/react-ui` primitives. |
+## Upcoming release
 
-The first release contains registry items for a complete chat plus independent thread, message,
-composer, attachment, Markdown, and fallback-tool components.
+The reviewed development changes add:
 
-Review the [`@anvia/cli` package source](https://github.com/anvia-hq/anvia/tree/main/packages/cli)
-and [changelog](https://github.com/anvia-hq/anvia/blob/main/packages/cli/CHANGELOG.md).
+- A `ui` group: `anvia ui init`, `anvia ui add`, and `anvia ui update`.
+- Read-only previews for both update commands, including all selected skill integrations.
+- A shared `--apply` flag and programmatic `apply: true` option for writing updates.
+- Grouped help and errors for unknown commands or options.
+- React UI dependency selection from the version recorded with the bundled registry.
+
+Root UI commands remain compatibility aliases. `ui update --overwrite` and
+`skills update --force` remain aliases for `--apply`. Installation flags retain their behavior.
+The package version will be assigned during release; these changes are not in published `1.3.0`.
+
+## Published CLI 1.3.0
+
+The published package uses this command structure:
+
+```sh
+pnpm dlx @anvia/cli@1.3.0 init vite
+pnpm dlx @anvia/cli@1.3.0 add chat
+pnpm dlx @anvia/cli@1.3.0 update composer
+pnpm dlx @anvia/cli@1.3.0 update composer --overwrite
+pnpm dlx @anvia/cli@1.3.0 skills list
+pnpm dlx @anvia/cli@1.3.0 skills init --codex
+pnpm dlx @anvia/cli@1.3.0 skills update
+pnpm dlx @anvia/cli@1.3.0 skills update --force
+```
+
+`add` requests the CLI's own version of React UI, so use the
+[explicit-version registry workaround](/packages/cli/components#install-the-registry-with-an-explicit-react-ui-version)
+with React UI `1.1.6`. Skill updates with `--agents` or `--codex` may write AGENTS.md without force;
+omit those flags for a read-only comparison with this release.
+
+`1.3.0` introduced the coding-agent integrations and bundled skills. `1.2.0` added component
+inspection and updates; `1.1.1` preceded it. See the
+[CLI changelog](https://github.com/anvia-hq/anvia/blob/main/packages/cli/CHANGELOG.md) for release entries.

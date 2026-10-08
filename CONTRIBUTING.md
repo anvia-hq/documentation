@@ -83,6 +83,16 @@ This checks SDK imports and snippet API shapes against public source entrypoints
 
 Add complete examples and runtime scenarios when documenting a new contract. Keep tests free of provider credentials and live calls. The `validate-sdk` CI job pins the reviewed Anvia commit; update that pin and rerun the checks when aligning documentation with another SDK revision.
 
+For changes to `packages/cli.md` or `packages/cli/`, also run:
+
+```sh
+pnpm cli:check
+```
+
+This checks the CLI guide imports and snippet API shapes against the same Anvia checkout.
+Examples that import generated application files also need verification with those files present;
+the snippet checker does not create an application or install a shadcn registry.
+
 ## Links and navigation
 
 - Use root-relative links for pages in this site, such as `/sdk/tools/security`.

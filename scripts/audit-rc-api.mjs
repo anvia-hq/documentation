@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const sdkOnly = process.argv.includes('--sdk')
+const cliOnly = process.argv.includes('--cli')
 const useSource = process.argv.includes('--source')
 const anviaRoot = resolve(process.env.ANVIA_REPO ?? join(docsRoot, '..', 'anvia'))
 const typescriptCandidates = [
@@ -95,13 +96,14 @@ function lineAt(source, offset) {
 
 const packages = await loadPackages()
 const documentationFiles = await collectFiles(
-  sdkOnly ? join(docsRoot, 'sdk') : docsRoot,
+  sdkOnly ? join(docsRoot, 'sdk') : cliOnly ? join(docsRoot, 'packages', 'cli') : docsRoot,
   (path) =>
     path.endsWith('.md') ||
     (dirname(path) === join(docsRoot, 'public') &&
       basename(path).startsWith('llms') &&
       path.endsWith('.txt')),
 )
+if (cliOnly) documentationFiles.push(join(docsRoot, 'packages', 'cli.md'))
 const imports = []
 const entryPaths = new Set()
 const failures = []

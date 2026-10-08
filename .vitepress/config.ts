@@ -897,7 +897,10 @@ export default defineConfig({
               items: [
                 { text: 'Overview', link: '/packages/cli' },
                 { text: 'Get started', link: '/packages/cli/get-started' },
+                { text: 'Agent Skills', link: '/packages/cli/agent-skills' },
+                { text: 'Editable components', link: '/packages/cli/components' },
                 { text: 'API', link: '/packages/cli/api-reference' },
+                { text: 'Troubleshooting', link: '/packages/cli/troubleshooting' },
                 { text: 'Releases', link: '/packages/cli/releases' }
               ]
             }

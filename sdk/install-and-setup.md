@@ -31,6 +31,10 @@ pnpm add @anvia/grok
 
 Add packages such as `@anvia/server`, `@anvia/react`, memory adapters, or observability integrations only when the application needs those capabilities.
 
+To give your coding agent Anvia knowledge, install the [CLI Agent Skills](/packages/cli/agent-skills).
+For editable React chat components, follow the [CLI component guide](/packages/cli/components),
+including its explicit-version installation for CLI `1.3.0`.
+
 ## 2. Configure the credential
 
 Keep provider credentials in the server environment and out of browser code, committed files, and client-visible errors.
