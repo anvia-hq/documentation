@@ -23,7 +23,7 @@ await fileLogger.flush()
 ```
 
 `sync` and parent-directory creation default to `true`; files are appended by default. Set
-`sync: false` for higher throughput and call `flush()` during graceful shutdown.
+`sync: false` for higher throughput and call `flush()` during graceful shutdown. If an asynchronous (`sync: false`) file destination fails to open, the failed destination is retired so Pino does not throw while the process shuts down, and the original open error is retained for later `flush()` calls, including those on child loggers.
 
 ## Operational checklist
 

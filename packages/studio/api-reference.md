@@ -101,12 +101,17 @@ function createInMemoryStudioStore():
 
 type SqliteSessionStoreOptions = { path?: string }
 
-function createSqliteSessionStore(options?: SqliteSessionStoreOptions):
+type SqliteSessionStoreHandle =
   & StudioSessionStore
   & StudioTraceStore
   & StudioPipelineLogStore
   & StudioPipelineRunStore
+  & { close(): void }
+
+function createSqliteSessionStore(options?: SqliteSessionStoreOptions): SqliteSessionStoreHandle
 ```
+
+`close()` releases the underlying SQLite handle. It is synchronous, safe to call more than once, and the store reopens lazily on its next operation. If schema setup fails after the database was opened (for example the legacy `messages_json` guard), the handle is closed before the error is rethrown.
 
 Store contracts are intentionally public so applications can provide another backend:
 

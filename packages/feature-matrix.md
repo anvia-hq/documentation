@@ -8,6 +8,7 @@ Use this matrix to find the package family that owns a capability. A check means
 | --- | :---: | :---: | :---: | :---: |
 | `@anvia/core` | ✓ | — | — | — |
 | `@anvia/client` | — | Protocol/client | — | — |
+| `@anvia/durable` | Restart-safe agent runs (experimental) | Persisted progress events | — | — |
 | `@anvia/mcp` | Agent tools | Client transports (stdio, Streamable HTTP, custom) | — | — |
 | `@anvia/server` | — | ✓ | — | — |
 | `@anvia/react` | — | Client | ✓ | — |
@@ -19,11 +20,14 @@ Use this matrix to find the package family that owns a capability. A check means
 | Package | Hosted completion models | Embeddings | Local execution |
 | --- | :---: | :---: | :---: |
 | `@anvia/openai` | ✓ | ✓ | — |
+| `@anvia/azure` | ✓ | — | — |
 | `@anvia/anthropic` | ✓ | — | — |
 | `@anvia/gemini` | ✓ | ✓ | — |
 | `@anvia/mistral` | ✓ | ✓ | — |
 | `@anvia/grok` | ✓ | — | — |
 | `@anvia/transformers` | — | ✓ | ✓ |
+
+`@anvia/jev` is a typed-decision adapter for `@anvia/core/decision`, not a completion or embedding provider, so it is not listed above.
 
 Provider-specific support for images, audio, transcription, OCR, tools, reasoning, and structured output varies by adapter and model. Check the provider page before selecting a model.
 

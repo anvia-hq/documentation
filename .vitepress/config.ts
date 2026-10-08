@@ -167,6 +167,20 @@ export default defineConfig({
               ]
             },
             {
+              text: 'Typed decisions',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/sdk/decisions' },
+                { text: 'Questions', link: '/sdk/decisions/questions' },
+                { text: 'Answers and results', link: '/sdk/decisions/answers' },
+                { text: 'Execution', link: '/sdk/decisions/execution' },
+                { text: 'Batches', link: '/sdk/decisions/batches' },
+                { text: 'Custom decision models', link: '/sdk/decisions/custom-models' },
+                { text: 'Errors and validation', link: '/sdk/decisions/errors' },
+                { text: 'Production checklist', link: '/sdk/decisions/production' }
+              ]
+            },
+            {
               text: 'Pipelines',
               collapsed: true,
               items: [
@@ -262,6 +276,19 @@ export default defineConfig({
                 { text: 'Local tools', link: '/sdk/advanced/mcp/local-tools' },
                 { text: 'Observability', link: '/sdk/advanced/mcp/observability' },
                 { text: 'MCP checklist', link: '/sdk/advanced/mcp/checklist' }
+              ]
+            },
+            {
+              text: 'Durable execution',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/sdk/advanced/durable-execution' },
+                { text: 'Runs and queues', link: '/sdk/advanced/durable-execution/runs' },
+                { text: 'Progress and streaming', link: '/sdk/advanced/durable-execution/streaming' },
+                { text: 'Tools and recovery', link: '/sdk/advanced/durable-execution/recovery' },
+                { text: 'Tasks and subagents', link: '/sdk/advanced/durable-execution/tasks' },
+                { text: 'Task graphs', link: '/sdk/advanced/durable-execution/graphs' },
+                { text: 'Production', link: '/sdk/advanced/durable-execution/production' }
               ]
             },
             {
@@ -387,6 +414,17 @@ export default defineConfig({
               ]
             },
             {
+              text: 'Jev',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/sdk/providers/jev' },
+                { text: 'Setup', link: '/sdk/providers/jev/setup' },
+                { text: 'Decisions', link: '/sdk/providers/jev/decisions' },
+                { text: 'Model listing', link: '/sdk/providers/jev/model-listing' },
+                { text: 'Production', link: '/sdk/providers/jev/production' }
+              ]
+            },
+            {
               text: 'Gemini',
               collapsed: true,
               items: [
@@ -413,6 +451,16 @@ export default defineConfig({
                 { text: 'OCR', link: '/sdk/providers/mistral/ocr' },
                 { text: 'Model listing', link: '/sdk/providers/mistral/model-listing' },
                 { text: 'Production', link: '/sdk/providers/mistral/production' }
+              ]
+            },
+            {
+              text: 'Azure OpenAI',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/sdk/providers/azure' },
+                { text: 'Setup', link: '/sdk/providers/azure/setup' },
+                { text: 'Deployment models', link: '/sdk/providers/azure/models' },
+                { text: 'Production', link: '/sdk/providers/azure/production' }
               ]
             },
             {
@@ -854,6 +902,33 @@ export default defineConfig({
               ]
             },
             {
+              text: '@anvia/durable',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/durable' },
+                { text: 'Get started', link: '/packages/durable/get-started' },
+                { text: 'Capabilities', link: '/packages/durable/capabilities' },
+                { text: 'Configuration', link: '/packages/durable/configuration' },
+                { text: 'Tasks and graphs', link: '/packages/durable/tasks-and-graphs' },
+                { text: 'HTTP server and client', link: '/packages/durable/http' },
+                { text: 'Operations', link: '/packages/durable/operations' },
+                { text: 'API', link: '/packages/durable/api-reference' },
+                { text: 'Releases', link: '/packages/durable/releases' }
+              ]
+            },
+            {
+              text: '@anvia/jev',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/jev' },
+                { text: 'Get started', link: '/packages/jev/get-started' },
+                { text: 'Capabilities', link: '/packages/jev/capabilities' },
+                { text: 'Configuration', link: '/packages/jev/configuration' },
+                { text: 'API', link: '/packages/jev/api-reference' },
+                { text: 'Releases', link: '/packages/jev/releases' }
+              ]
+            },
+            {
               text: '@anvia/server',
               collapsed: true,
               items: [
@@ -918,6 +993,19 @@ export default defineConfig({
                 { text: 'Models and media', link: '/packages/openai/models-and-media' },
                 { text: 'API', link: '/packages/openai/api-reference' },
                 { text: 'Releases', link: '/packages/openai/releases' }
+              ]
+            },
+            {
+              text: '@anvia/azure',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/azure' },
+                { text: 'Get started', link: '/packages/azure/get-started' },
+                { text: 'Capabilities', link: '/packages/azure/capabilities' },
+                { text: 'Configuration', link: '/packages/azure/configuration' },
+                { text: 'Migrate from OpenAI', link: '/packages/azure/migration' },
+                { text: 'API', link: '/packages/azure/api-reference' },
+                { text: 'Releases', link: '/packages/azure/releases' }
               ]
             },
             {

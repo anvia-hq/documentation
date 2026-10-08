@@ -90,7 +90,9 @@ Anvia v1 currently includes these media and data adapters:
 - OpenAI: completions, embeddings, image generation, speech, and transcription.
 - Gemini: completions, embeddings, image generation, and transcription.
 - Grok: completions, image generation, speech, and transcription.
+- Azure OpenAI: completions, embeddings, image generation, speech, and transcription from Azure deployments.
 - Mistral: completions, embeddings, and OCR.
+- Jev: typed decision models for [`decide()`](/sdk/decisions), not completions.
 - `@anvia/transformers`: local embeddings with Transformers.js models.
 
 Use the [provider capability matrix](/sdk/providers/capability-matrix) to narrow the options, then verify the exact workflow before production.

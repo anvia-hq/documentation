@@ -41,9 +41,24 @@ const client = new McpClient({
 const server = await client.connect()
 ```
 
-The HTTP transport also accepts an MCP SDK `authProvider`, `reconnectionOptions`, and `sessionId`. The transport union contains only `stdio`, `streamableHttp`, and `custom` variants.
+The HTTP transport also accepts an MCP SDK `authProvider`, `reconnectionOptions`, `sessionId`, and `maxBufferSize`. The transport union contains only `stdio`, `streamableHttp`, and `custom` variants.
 
 Protocol version is configured on `McpClient` through `versionNegotiation`, not on the transport. The default pins `2026-07-28` without fallback. Use `mode: "auto"` or `mode: "legacy"` on the client when a 2025-era server needs it.
+
+### Bound response size
+
+`maxBufferSize` caps each JSON-RPC response message from a Streamable HTTP server so an untrusted server cannot stream unbounded data into your process. It must be a positive safe integer of bytes and defaults to 10 MiB, matching the stdio default. For a regular JSON response, the cap applies to the whole body (an oversized `Content-Length` is rejected before reading). For an SSE (`text/event-stream`) response, it applies to each event, so long-lived streams made of many small messages keep flowing. An oversized message fails with `MCP response exceeded maxBufferSize (<n> bytes per message)`. The bound applies in both `ssrfProtection` modes; `custom` transports remain caller-owned.
+
+```ts
+const client = new McpClient({
+  name: 'reports',
+  transport: {
+    type: 'streamableHttp',
+    url: 'https://mcp.example.com/api',
+    maxBufferSize: 2 * 1024 * 1024,
+  },
+})
+```
 
 ### Configure static endpoint headers
 

@@ -1,9 +1,11 @@
 # Releases
 
-Current stable release: `1.1.3`. The entries below preserve notable v0 history.
+Current stable release: `1.1.5`. The entries below preserve notable v0 history.
 
 The available changelog records:
 
+- `1.1.5` refreshed the package README.
+- `1.1.4` rejected reserved `__anvia_`-prefixed metadata keys during document upsert, validating metadata before the existing document is deleted.
 - `1.1.3` declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents.
 - `1.1.2` refreshed runtime dependencies alongside the Core 1.1.2 update.
 - `1.1.1` refreshed runtime dependencies alongside the Core 1.1.1 update.

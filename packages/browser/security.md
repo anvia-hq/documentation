@@ -14,6 +14,8 @@ The browser image runs Chromium as a non-root user with Chromium's process sandb
 
 The navigation policy checks direct navigation, links, forms, redirects, and popups across the connection. It does not block third-party subresources loaded by an allowed page.
 
+Independent of the policy mode, `browser_navigate` rejects private and reserved IP literals (loopback, link-local, RFC 1918, and the other IANA special-purpose ranges) on the initial URL and on every redirect the automation worker follows. This applies even to `origins` entries that list such an address; globally reachable addresses are unaffected. The guard matches the literal host only, so a public domain name that resolves to a private address is not covered. Keep infrastructure egress policy in place.
+
 ## Protect the desktop
 
 The VNC password must be exactly eight printable ASCII characters. The package publishes noVNC only on a host-loopback port and does not publish raw VNC. Do not place the password in URLs, image metadata, logs, or browser-visible configuration.

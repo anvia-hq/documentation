@@ -1,9 +1,13 @@
 # Releases
 
-The current stable release is `@anvia/sandbox` **1.1.4**. The entries below preserve notable v0 history.
+The current stable release is `@anvia/sandbox` **1.1.8**. The entries below preserve notable v0 history.
 
 | Version | Summary |
 | --- | --- |
+| `1.1.8` | Refreshed the package README. |
+| `1.1.7` | Redacted sandbox `env` values (`--env KEY=<redacted>`) in Docker command error messages. |
+| `1.1.6` | Accepted natural shell command lines in `exec_command` (run as `sh -c`, rejected under block-mode policies), supported file listing in Alpine and other BusyBox images, and avoided false file-boundary errors from macOS temporary path aliases. |
+| `1.1.5` | Fixed the package-manager-symlinked CLI entry point and accepted workspace-absolute paths inside the sandbox workdir in tool calls. |
 | `1.1.4` | Updated upstream runtime and schema dependencies and aligned the browser image and Playwright host pins. |
 | `1.1.3` | Block shell interpreters by default in allow-mode command policies, plus the peer-range fix. |
 | `1.1.2` | Added containerRuntime option to DockerSandboxClient.createSandbox() for running sandboxes on gVisor (e.g. runsc); creation fails with runtime_not_found unless registered. |

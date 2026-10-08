@@ -25,6 +25,6 @@ Use the [provider capability matrix](/sdk/providers/capability-matrix) to shortl
 
 Core workflows can depend on provider-neutral interfaces, so switching is usually localized to model construction. Provider-specific options, response details, and capability differences still need review.
 
-Start with [Choose a provider](/sdk/providers/choose-a-provider). Package setup is available for [OpenAI](/packages/openai), [Anthropic](/packages/anthropic), [Gemini](/packages/gemini), [Mistral](/packages/mistral), and [Grok](/packages/grok).
+Start with [Choose a provider](/sdk/providers/choose-a-provider). Package setup is available for [OpenAI](/packages/openai), [Anthropic](/packages/anthropic), [Gemini](/packages/gemini), [Mistral](/packages/mistral), [Grok](/packages/grok), and [Azure OpenAI](/packages/azure). [Jev](/packages/jev) provides typed decision models.
 
 Keep provider credentials on the server and treat model capability declarations as configuration checks, not live network probes.

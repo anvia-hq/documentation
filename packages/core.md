@@ -68,6 +68,7 @@ The model, credentials, business data, permissions, storage, and deployment rema
 | Documents | `@anvia/core/documents` | Shared text-document records and deterministic single/batch text chunking |
 | Memory | `@anvia/core/memory` | Conversation persistence and compaction contracts |
 | Retrieval | `@anvia/core/embeddings`, `@anvia/core/vector-store` | Raw-text ingestion, embedding documents, and searching vector indexes |
+| Decisions | `@anvia/core/decision` | Typed choice, multi-label, score, and boolean-probability decisions with validation, retries, cancellation, and ordered batches |
 | Pipelines | `@anvia/core/pipeline` | Typed multi-stage workflows, batches, graphs, run events, and named run/stage observability |
 | Media | `@anvia/core/image-generation`, `@anvia/core/speech-generation`, `@anvia/core/transcription` | Provider-neutral media requests |
 | Runtime control | `@anvia/core/agent`, `@anvia/core/guardrails` | Lifecycle observation, resumable interactions, and enforced input/output policy |

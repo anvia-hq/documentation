@@ -56,7 +56,9 @@ for (const embedding of embeddings) {
 }
 ```
 
-Anvia throws when a provider returns a different number of vectors than requested, preventing silent input/result misalignment.
+Anvia validates every provider batch: each batch must return exactly one embedding per requested text. A short or long batch is rejected before results are flattened or grouped, even when the totals would otherwise match, and malformed successful responses are not retried. The same rule applies to `embedSparseTexts()` and `embedDocuments()`, which prevents silent input/result misalignment.
+
+If a call is cancelled after a provider batch completes, cancellation takes precedence over vector-shape errors, which take precedence over batch-count errors. Each concurrency pool waits for its already-started batches to settle before rejecting. A hybrid `embedDocuments()` call rejects when either its dense or sparse channel rejects, but the other channel may still have provider calls running; neither sibling cancellation nor global settlement is guaranteed.
 
 ## 4. Prepare application documents
 

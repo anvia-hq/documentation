@@ -13,7 +13,7 @@ const fileTools = createDockerSandboxTools({
 })
 ```
 
-Paths are workspace-relative. `read_file` returns one bounded page of UTF-8 text; binary artifacts should use trusted runtime methods.
+Paths are workspace-relative (for example `notes/result.txt`). Agent tool calls also accept an absolute path inside the sandbox workdir (for example `/workspace/notes/result.txt` with the default workdir); paths outside the workdir are rejected. Command `cwd` values follow the same rule. `read_file` returns one bounded page of UTF-8 text; binary artifacts should use trusted runtime methods.
 
 ## Use runtime methods from trusted code
 
