@@ -55,9 +55,9 @@ agent.completed
 pipeline.run_completed
 ```
 
-The exact stage prefix follows the node kind, including `pipeline`, `parallel`, `branch`, `agent`, and `extractor`. Failed stages use `.failed`, and the run ends with `pipeline.run_failed`.
+The exact stage prefix follows the node kind, including `pipeline`, `parallel`, `route`, `branch`, `agent`, `extractor`, and `decision`. Failed stages use `.failed`, and the run ends with `pipeline.run_failed`.
 
-Each log includes a timestamp, level, category, event name, message, run ID, sequence number, and compact metadata. Stage logs include the node ID, kind, label, duration when available, and identifiers such as agent ID, nested pipeline ID, or branch key.
+Each log includes a timestamp, level, category, event name, message, run ID, sequence number, and compact metadata. Stage logs include the node ID, kind, label, duration when available, and identifiers such as agent ID, nested pipeline ID, branch key, or `branchOf`. Decision stages, route stages, and route branches use the `decision` category; parallel stages and their branches use `parallel`.
 
 Pipeline logs intentionally do not copy the raw input or output. The request log records details such as input byte length and metadata keys; the completion log records duration and output byte length. A failed log can contain a serialized error, so error messages should still avoid secrets.
 

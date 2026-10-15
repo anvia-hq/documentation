@@ -405,7 +405,15 @@ const pipeline = new Pipeline({
   })
 ```
 
-`Pipeline` is immutable; each composition method returns a new typed pipeline. Public composition methods are `step`, `compose`, `parallel`, `agent`, and `extract`; `compose({ id, pipeline })` nests another pipeline as a single stage.
+`Pipeline` is immutable; each composition method returns a new typed pipeline. Public composition methods are `step`, `compose`, `parallel`, `route`, `agent`, `extract`, and `decide`; `compose({ id, pipeline })` nests another pipeline as a single stage.
+
+`decide({ id, model, state, questions, retries?, providerOptions? })` returns the typed
+`DecisionResult`. `route({ id, model, question, state, branches, retries?, providerOptions? })`
+asks one `choice` question and runs only the branch keyed by the selected option; branches must
+match the options exactly. Its output is `RouteOutput<Branches>`: `{ branch, answer, usage?, output }`,
+discriminated by `branch`. Route branch graph nodes carry `branchOf: 'route'`, parallel branch
+nodes carry `branchOf: 'parallel'`, and route edges are labelled with the option key. See
+[Decisions and routing](/sdk/pipelines/decisions-and-routing).
 
 ```ts
 const result = await pipeline.run({
@@ -436,7 +444,8 @@ The `observer` passed to `run()` is the separate `PipelineRunObserver` stage-eve
 The subpath exports graph and stage metadata plus `PipelineObserver`, `PipelineRunObservation`,
 `PipelineStageObservation`, their lifecycle argument types, `PipelineObservabilityOptions`,
 `PipelineTraceOptions`, `PipelineTraceInfo`, `PipelineRunObserver`, run-event types, batch options,
-and `PipelineObserverDispatchError`.
+`PipelineDecideOptions`, `PipelineRouteOptions`, `PipelineRouteBranches`, `RouteOutput`, and
+`PipelineObserverDispatchError`.
 
 ## Media
 

@@ -46,7 +46,7 @@ const analyzeTicket = new Pipeline({
 
 ```
 
-Branches run concurrently with the same input. Their keys become the keys of the output object. Keep dependent work linear, and avoid parallel writes unless they are idempotent and conflict-safe.
+Branches run concurrently with the same input. Their keys become the keys of the output object. Keep dependent work linear, and avoid parallel writes unless they are idempotent and conflict-safe. To run only one of several branches per input, use [`.route()`](/sdk/pipelines/decisions-and-routing) instead.
 
 If any branch rejects, the runtime signals cancellation to sibling branches and waits for all branches to settle before rejecting. Pass the branch's `abortSignal` to external work: cancellation is cooperative and does not roll back completed side effects.
 

@@ -1,5 +1,5 @@
 {
-  "reviewedSdkRevision": "6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679",
+  "reviewedSdkRevision": "6346c81e38123be68a9cf5383afdd3139e385b90",
   "entries": [
     {
       "module": "@anvia/cli",
@@ -124,8 +124,8 @@
       "module": "@anvia/core/pipeline",
       "guide": "sdk/pipelines.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 40,
-      "exportNamesHash": "f514ea4505f55575ff0971c3fc1eff2bf6e034e5507a96513f0e14e229554b4d"
+      "exportCount": 44,
+      "exportNamesHash": "7257c56d2fdbde42a7a90f49c20927f8ad217f1a6cb03de5c7b0b8e902ff788f"
     },
     {
       "module": "@anvia/core/redaction",
@@ -707,6 +707,17 @@
       "page": "packages/openai/decisions.md",
       "marker": "openai-decision-example",
       "runtimeTest": "OpenAI decision example preserves confidence and maps refusals to application questions"
+    },
+    {
+      "title": "Pipeline decision routing",
+      "module": "@anvia/core/pipeline",
+      "symbols": [
+        "Pipeline",
+        "RouteOutput"
+      ],
+      "page": "sdk/pipelines/decisions-and-routing.md",
+      "marker": "pipeline-route-example",
+      "runtimeTest": "Pipeline route example runs only the chosen branch and keeps the decision"
     },
     {
       "title": "Durable goals",

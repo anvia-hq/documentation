@@ -10,7 +10,7 @@ record fields         topics: multiLabel         call model              topics.
                       refund: check              retry / cancel          refund.probability
 ```
 
-Decisions live in `@anvia/core/decision` and are also exported from the root `@anvia/core`. They do not require an agent: an application calls `decide()` directly, and the same call works inside a pipeline step, an agent hook, a tool, or an eval metric.
+Decisions live in `@anvia/core/decision` and are also exported from the root `@anvia/core`. They do not require an agent: an application calls `decide()` directly, and the same call works inside an agent hook, a tool, or an eval metric. Pipelines provide [`.decide()` and `.route()` stages](/sdk/pipelines/decisions-and-routing) for decisions inside a workflow.
 
 ## 1. Install a decision provider
 
@@ -77,6 +77,6 @@ A decision model performs one provider call. `decide()` wraps it with the applic
 | A label, score, or probability from a fixed set of possibilities | Typed decisions |
 | Free-form fields extracted from text under a schema | [Structured output](/sdk/structured-output) |
 | A multi-step, tool-using loop | [Agents](/sdk/agents) |
-| Fixed multi-stage workflow around decisions | [Pipelines](/sdk/pipelines) |
+| Fixed multi-stage workflow around decisions | [Pipeline decision and route stages](/sdk/pipelines/decisions-and-routing) |
 
 Decisions answer closed questions. Probabilities and confidence are provider-reported estimates; Anvia does not calibrate them.

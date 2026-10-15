@@ -21,12 +21,14 @@ A graph can contain these node kinds:
 | `step` | A synchronous or asynchronous TypeScript transform. |
 | `pipeline` | A composed pipeline operation. |
 | `parallel` | The parent stage that starts named branches together. |
-| `branch` | One named operation inside a parallel stage. |
+| `route` | The parent stage that asks a typed `choice` decision and runs one named branch. |
+| `branch` | One named operation inside a parallel or route stage. |
 | `agent` | A prompt sent through an Anvia agent. |
 | `extractor` | Model output parsed into a schema-defined value. |
+| `decision` | Typed decision questions answered by a decision model. |
 | `output` | The final value returned by the workflow. |
 
-Edges show execution order. Parallel branch edges can also carry labels, and branch nodes expose their branch key.
+Edges show execution order. Edges from a route to its branches carry the option key as a label. Branch nodes expose their branch key and `branchOf`, which is `parallel` or `route`. During a run, only the selected route branch starts. See [Decisions and routing](/sdk/pipelines/decisions-and-routing).
 
 The graph is generated from the current in-process pipeline definition. Restart Studio after changing the pipeline so the browser loads the new structure.
 
@@ -58,7 +60,7 @@ Select a node in Studio and open **Metadata**. The inspector can show:
 - custom metadata added by the pipeline builder;
 - an agent ID for an agent stage;
 - a nested pipeline ID for a composed pipeline;
-- a branch key for a parallel branch;
+- a branch key for a parallel or route branch;
 - the active run status when that stage has started, completed, or failed.
 
 The summary above the selected node reports total nodes and edges, agent and extractor counts, and whether the graph contains a parallel stage. The node total includes the synthetic input and output nodes; the pipeline's stage count does not.

@@ -74,4 +74,4 @@ Keep provider options beside model construction rather than scattering them thro
 
 ## 4. Where to call it
 
-`decide()` is an ordinary async function. Call it from a route handler, queue worker, `Pipeline.step()`, agent hook, tool handler, or a custom eval metric. Next, run many inputs with [Batches](/sdk/decisions/batches).
+`decide()` is an ordinary async function. Call it from a route handler, queue worker, agent hook, tool handler, or a custom eval metric. Inside a pipeline, use the [`.decide()` and `.route()` stages](/sdk/pipelines/decisions-and-routing); they accept the same `retries` and `providerOptions`. Next, run many inputs with [Batches](/sdk/decisions/batches).

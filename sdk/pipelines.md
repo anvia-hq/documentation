@@ -46,6 +46,8 @@ Use `.step()` for normalization, authorization, database access, service calls, 
 
 Use `.agent()` only where model reasoning adds value. Use `.extract()` when existing text must become [schema-validated data](/sdk/structured-output/extractors).
 
+Use `.decide()` when a stage needs a typed label, score, or probability, and `.route()` when a [typed decision](/sdk/decisions) selects which of several known branches runs.
+
 Keep deterministic product decisions in TypeScript rather than prompt instructions.
 
 ## 3. Continue through the section
@@ -53,6 +55,7 @@ Keep deterministic product decisions in TypeScript rather than prompt instructio
 - [Validate typed input](/sdk/pipelines/typed-input)
 - [Add deterministic steps](/sdk/pipelines/steps)
 - [Use agents and extractors](/sdk/pipelines/agents-and-extractors)
+- [Decide and route with typed decisions](/sdk/pipelines/decisions-and-routing)
 - [Compose reusable operations](/sdk/pipelines/composition)
 - [Run parallel branches and batches](/sdk/pipelines/parallel-and-batch)
 - [Observe runs and handle errors](/sdk/pipelines/runs-and-errors)
