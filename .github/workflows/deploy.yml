@@ -95,11 +95,21 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Read the reviewed SDK revision
+        id: sdk
+        run: |
+          node --input-type=module <<'JS'
+          import { readFileSync, appendFileSync } from 'node:fs'
+          const { reviewedSdkRevision } = JSON.parse(readFileSync('scripts/sdk-coverage.json', 'utf8'))
+          if (!/^[a-f0-9]{40}$/.test(reviewedSdkRevision)) throw new Error('Expected a full reviewed SDK commit')
+          appendFileSync(process.env.GITHUB_OUTPUT, `revision=${reviewedSdkRevision}\n`)
+          JS
+
       - name: Check out the reviewed Anvia revision
         uses: actions/checkout@v6
         with:
           repository: anvia-hq/anvia
-          ref: e196d84347a66bf5107d060268a3fee876720550
+          ref: ${{ steps.sdk.outputs.revision }}
           path: anvia-source
           persist-credentials: false
 

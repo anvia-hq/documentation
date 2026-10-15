@@ -247,3 +247,11 @@ current schemas. Restore compatible code and call `retry()` for an already block
 also be submitted by name with `runtime.submitRegisteredTask()`, the same boundary the HTTP handler uses.
 
 See [HTTP server and client](/packages/durable/http) for remote controls.
+
+## Continue a sibling conversation
+
+`ctx.spawnAgent(key, { agentId, prompt, maxModelTurns?, continueFrom? })` can cap the child's total
+model calls, including its initial response. `continueFrom` selects a finished agent sibling by its
+stable child key, preserving its conversation, including partial turn-exhausted work. It cannot
+reference another parent's child. `ctx.agentRun(childId)` reads a direct owned agent's persisted
+record. Use [goals](/packages/durable/goals) for the built-in verified session controller.

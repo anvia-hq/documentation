@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | `store` | required | A `DurableStore`, normally `new SqliteDurableStore(path)`. |
 | `agents` | `[]` | `DurableAgentRegistration[]` for agent runs, graphs, and owned agents. |
-| `tasks` | `[]` | Tasks created with `defineTask()`. Fixed at open. |
+| `tasks` | `[]` | Tasks created with `defineTask()` or `defineGoal()`. Fixed at open. |
 | `maxConcurrentRuns` | `4` | Simultaneous agent executions across sessions (integer, 1 to 1000). |
 | `maxConcurrentTasks` | `4` | Simultaneous custom-task phases, independent of agent runs (1 to 1000). |
 | `limits` | see below | Admission, payload, and operation limits. |
@@ -34,7 +34,8 @@ agents: [
 | `version` | Required nonblank string. Bump it when code, model, tools, schemas, or instructions change incompatibly. |
 | `stream` | Execute with `agent.stream()` and persist generation deltas. Needs a streaming-capable model. |
 | `toolRecovery` | Map of tool name to `'safe'`, `'idempotent'`, or `'manual'`. Unlisted tools are `manual`. Every named tool must exist on the agent. |
-| `modelRetry` | Opt-in persisted retry for model errors. |
+| `modelRetry` | Opt-in persisted retry for model and compactor errors. |
+| `compaction` | Optional trigger, retention, compactor, and token counter; see [Compaction](/packages/durable/compaction). |
 
 Registration is validated eagerly: duplicate IDs, unsupported agent options, unknown recovery tools, invalid
 policies, and non-streaming models with `stream: true` throw at `open()` or `registerAgents()`.
@@ -132,3 +133,10 @@ limits: {
 ```
 
 All four are positive integers with the defaults shown. See [Operations](/packages/durable/operations#admission-and-payload-limits).
+
+## Goals, steering, and tracing
+
+Register [goal definitions](/packages/durable/goals) in `tasks`; an optional per-submission agent
+binding is captured before execution. Use [steering](/packages/durable/steering) for new user input
+within a run, and goal signals for changes between sessions. Submission `trace` options group
+observer traces without changing execution ownership; see [Tracing](/packages/durable/tracing).

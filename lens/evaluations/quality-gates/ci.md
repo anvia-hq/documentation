@@ -92,3 +92,11 @@ The endpoint uses HTTP Basic authentication with the project public key as usern
 
 Each public check also records project-key usage and can drive a failed-quality-gate alert. See [Quality gates](/lens/evaluations/quality-gates) for verdict semantics.
 
+## Evidence policies in CI
+
+The endpoint evaluates the saved per-rule `evidence` settings using the same evaluator as Compare.
+The response includes them under `gate.rules` and `rules[].rule`. Missing valid cases or exceeded
+invalid/unknown budgets produces `insufficient_data`, even if the displayed pass rate is high.
+Accept only `verdict: "pass"`; HTTP 200 means evaluation succeeded, not that approval was granted.
+Existing rules without evidence retain legacy behavior until explicitly upgraded. See
+[Require valid evidence](/lens/evaluations/quality-gates/configure#require-valid-evidence-per-metric).

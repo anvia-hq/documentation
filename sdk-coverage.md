@@ -6,7 +6,7 @@ only validate APIs present in examples; they cannot reveal an exported API that 
 ## Source and inventory
 
 `scripts/sdk-coverage.json` records 81 public entrypoints across 38 public SDK packages at reviewed
-source revision `e196d84347a66bf5107d060268a3fee876720550`. Each entry links its owning guide and
+source revision `6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679`. Each entry links its owning guide and
 reference, with an export-name count and SHA-256 snapshot. The checker resolves TypeScript exports
 from source, including re-exports and types; private packages and `@anvia/core/internal/*` are
 excluded. A new/removed entrypoint or changed exported name set requires editorial review.
@@ -51,9 +51,7 @@ validates shell commands, dynamic imports, provider availability, or deployment 
 
 Runtime checks execute selected actual Markdown examples with fake providers and synthetic data.
 They verify deterministic contracts, not production services. The coverage CI workflow checks out
-the full reviewed SDK revision from the inventory and runs these gates. The existing deployment
-workflow retains its own SDK pin and focused checks; align pins when updating that workflow rather
-than assuming they are synchronized automatically.
+the full reviewed SDK revision from the inventory and runs these gates. The deployment workflow reads the same inventory revision for its focused checks.
 
 ## Review a changed SDK surface
 
@@ -75,6 +73,10 @@ than assuming they are synchronized automatically.
 
 | Contract | Complete example | Offline checks |
 | --- | --- | --- |
+| OpenAI decisions | [Provider example](/packages/openai/decisions) | Provider confidence, encoded state, disabled SDK retries, and refusal identity. |
+| Durable goals | [Goal runtime](/packages/durable/goals) | Verified completion and reuse after database reopen. |
+| Durable steering | [Queued input](/packages/durable/steering) | Deduplicated receipts, conflicting input, and committed application events. |
+| Durable compaction | [Registration factory](/packages/durable/compaction) | Canonical history, summary checkpoint, and omitted summary temperature. |
 | Eval expectations | [Negative controls](/sdk/evaluations#assert-intentional-negative-cases) | Expected failures and unexpected invalid judgments. |
 | Eval responders | [Approval/question target](/sdk/evaluations#respond-to-agent-interactions-in-evaluations) | Continuation responses and exhausted response limits. |
 | Message metadata | [Custom message schema](/sdk/messages/roles#validate-application-metadata) | Invalid fields and non-JSON transforms. |

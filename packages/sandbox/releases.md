@@ -1,6 +1,12 @@
 # Releases
 
-The current stable release is `@anvia/sandbox` **1.1.8**. The entries below preserve notable v0 history.
+The reviewed source release is `@anvia/sandbox` **1.2.0**. The entries below preserve notable v0 history.
+
+## Changes through 1.2.0
+
+Reviewed `1.1.8` → `1.2.0` against SDK source on 2026-10-15. Natural commands in `exec_command` and `start_process` now prefer `/bin/bash -c`, falling back to `sh -c` only if Bash is unavailable. Allow policies check the selected executable; explicit argv and low-level APIs keep their behavior. See [Commands](/sdk/advanced/sandbox/commands#natural-command-lines).
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/tool-sandbox/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

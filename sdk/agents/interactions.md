@@ -187,3 +187,18 @@ A structurally valid continuation is not necessarily resumable: the originating 
 its opaque state against its identity and current tool catalog. Preserve that state unchanged and
 keep it server-side. Neither the schemas nor the matching assertion supply authorization,
 durable locking, expiry enforcement, or an exactly-once execution guarantee.
+
+## Question tool defaults and input limits
+
+`createQuestionTool()` defaults to `ask_user` with built-in instructions for necessary clarification.
+Override `name` or `description` independently. `DEFAULT_QUESTION_TOOL_NAME` and
+`DEFAULT_QUESTION_TOOL_DESCRIPTION` are exported from `@anvia/core` and `@anvia/core/tool`.
+Defaults apply only when options are omitted; explicitly supplied strings are preserved, so supply
+nonblank overrides.
+
+New calls accept 1–4 questions with unique, nonblank IDs and nonblank text. Optional choices require
+2–4 entries with nonblank labels and unique nonblank values; input strings are trimmed. Set
+`allowCustom: true` for answers outside the choices, or omit choices for free text. A free-text
+question cannot set `allowCustom: false`. Stored interactions and continuations keep their existing
+parsing rules. Calling the tool directly does not display a UI; the application renders the question
+and resumes with one valid answer per requested ID.

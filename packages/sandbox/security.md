@@ -52,3 +52,11 @@ Sandbox file APIs normalize relative workspace paths and reject traversal outsid
 Avoid placing provider keys, cloud credentials, production datasets, or host identity tokens in sandbox files or environment variables. Port publication requires bridge networking and binds host ports to loopback. Authenticate and authorize any proxy that makes a preview externally reachable.
 
 See the SDK [sandbox security guide](/sdk/advanced/sandbox/security) for application-level controls.
+
+## Shell selection
+
+Natural command lines in `exec_command` and `start_process` prefer `/bin/bash -c`, falling back to
+`sh -c` only when Bash is unavailable. Allow-mode policies must permit the selected executable and
+set `allowShellInterpreters: true`; allowing only `sh` is insufficient on Bash-equipped images.
+Block-mode policies reject natural command lines. Use explicit `{ command, args }` for exact argv
+execution. See [Commands](/sdk/advanced/sandbox/commands#natural-command-lines).

@@ -83,7 +83,7 @@ await restoreSqlite('./backup-2026-10-06.sqlite', './restored.sqlite')
 ```
 
 Both functions return a `DurableBackupInfo` of `{ createdAt, schemaVersion }` and are offline maintenance
-operations that accept schema 3 or 4 databases. `backupSqlite` acquires the database's exclusive ownership,
+operations that accept schema 3 through 9 databases. `backupSqlite` acquires the database's exclusive ownership,
 uses SQLite's backup API (including committed WAL state), integrity-checks the copy, seals it with metadata,
 and publishes a new file with mode 0600. Existing destination files, symlinks, and SQLite sidecars are
 rejected and nothing is replaced. A sealed archive cannot be opened as a runtime. `restoreSqlite` validates
@@ -105,11 +105,32 @@ isolated environment with side effects disabled, and measure recovery point and 
 4. Restart one owner, inspect readiness and blocked work, call `resume()`, then admit a small workload.
 5. Expand only after fault recovery, restoration, and sustained-load checks meet your targets.
 
-Opening a database upgrades schemas 1 to 3 to schema 4 on ownership acquisition, retaining existing runs,
-graphs, and tasks. The maintenance helpers cover schemas 3 and 4 only, so take an infrastructure-level
-offline snapshot before upgrading an older schema. Older engines reject schema 4, and there is no automatic
+Opening a database upgrades schemas 1–8 to schema 9 on ownership acquisition, retaining existing runs,
+graphs, and tasks. The maintenance helpers accept schemas 3–9; backup acquisition upgrades its source
+before producing a schema-9 archive. Keep an infrastructure-level offline copy before an upgrade when
+rollback to an older engine is required. Older engines reject schema 9, and there is no automatic
 downgrade; roll back by restoring the prior backup to a new file and auditing post-backup external effects.
 
 Tests cover injected journal failures, process kills at real model and tool boundaries, bounded task load,
 cancellation, remote authorization, and backup and restore. They do not replace a disk-full or read-only
 drill, a long soak on your filesystem, or an operational recovery exercise.
+
+## Bounded inspection and shared histories
+
+For frequent polling, use `await run.status()` or `runtime.status(runId)`: these read a bounded
+`DurableRunSummary` without decoding transcripts. `runtime.run(runId)` reads the record without
+operations. `run.snapshot({ operations: false })` still decodes the record and outcome but skips
+operation payloads. Task snapshots omit operations by default; request `{ operations: true }`
+when inspecting effects.
+
+Since 0.7, SQLite snapshots expose compact operation envelopes. Model operations with
+`historyEncoding: 'linked-v1'` store an opaque `{ head, length }` at `input.request.chatHistory`;
+context operations also use linked histories. Use `runtime.operationRequest(runId, operation.key)`
+to reconstruct a model's full `CompletionRequest`, including pre-compaction requests. Do not treat
+stored history references as message arrays. Backups include the shared log; there is no automatic
+pruning or vacuum.
+
+Custom stores must implement bounded `DurableTransaction.getRunSummary(id)` reads, return expanded
+histories from `getOperation()`, and preserve stored envelopes in `operations()`. Upgrade Core and
+Durable together for execution protocol 4. New runs capture steering and live-compaction support;
+legacy runs preserve their original replay boundaries. Test recovery on a database copy before rollout.

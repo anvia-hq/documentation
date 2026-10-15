@@ -62,3 +62,12 @@ observers that belong to the same backend.
 Both adapters use a supplied `tracer` or the active global tracer provider. The package does not
 initialize exporters or own provider lifecycle. Configure and start the application's OpenTelemetry
 SDK before invoking observed Agents or Pipelines.
+
+## Durable runs and conversation grouping
+
+Durable executions share one trace per run across retries and recovery; committed replayed steps
+do not add duplicate spans or observer usage. Set submission `trace.sessionId` to group turns,
+goal rounds, and subagents under one application chat without merging execution histories.
+`LensClient` installs the needed ID generator automatically. An application-owned OpenTelemetry
+provider must use `createAnviaIdGenerator()` to keep parentless durable attempts in the supplied
+trace. See [Durable tracing](/packages/durable/tracing) for setup and HTTP context ownership.

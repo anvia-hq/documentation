@@ -16,6 +16,8 @@ Use `completionModel()` for agents, direct completions, tools, and structured ou
 
 Use `embeddingModel()` for retrieval and semantic search.
 
+Use `decisionModel()` for [typed decisions](/packages/openai/decisions), including classification, scoring, and probability checks.
+
 Use `imageGenerationModel()`, `speechGenerationModel()`, and `transcriptionModel()` for their separate [media contracts](/sdk/providers/openai/media).
 
 Use `listModels()` for administrative [model inventory](/sdk/providers/openai/model-listing).

@@ -1,6 +1,12 @@
 # Releases
 
-The current stable release is `@anvia/graph` **1.1.4**.
+The reviewed source release is `@anvia/graph` **1.1.5**.
+
+## Changes through 1.1.5
+
+Reviewed `1.1.4` → `1.1.5` against SDK source on 2026-10-15. Refreshed package READMEs with current overviews, quickstarts, and links to the detailed guides. Review the source changelog for any dependency changes included in your upgrade.
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/graph/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

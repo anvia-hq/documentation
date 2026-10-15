@@ -529,7 +529,7 @@ See [MCP transport configuration](/sdk/advanced/mcp/transports#streamable-http) 
 
 ## Typed decisions
 
-`@anvia/core/decision` (also exported from the Core root) provides provider-neutral typed decisions. Build a question with `choice`, `multiLabel`, `score`, or `check`, run it with `decide(model, question, options?)`, or run many with `decideBatch(model, questions, options?)`, which returns results in input order with per-item retries and cancellation. A model that cannot answer a question kind throws `DecisionCapabilityError`; malformed provider answers throw `DecisionProviderOutputError`. See [Typed decisions](/sdk/decisions) for questions, answers, execution, batches, custom decision models, and errors, and [`@anvia/jev`](/packages/jev) for a provider adapter.
+`@anvia/core/decision` (also exported from the Core root) provides provider-neutral typed decisions. Build a question with `choice`, `multiLabel`, `score`, or `check`, run it with `decide({ model, state, questions })`, or run many with `decideBatch({ model, inputs, concurrency })`, which returns results in input order with per-item retries and cancellation. A model that cannot answer a question kind throws `DecisionCapabilityError`; malformed provider answers throw `DecisionProviderOutputError`, and provider refusals throw `DecisionRefusalError` with application question names and the raw response. See [Typed decisions](/sdk/decisions) for questions, answers, execution, batches, custom decision models, and errors, and [`@anvia/jev`](/packages/jev) or [OpenAI decisions](/packages/openai/decisions) for provider adapters.
 
 ## Redaction
 
@@ -706,3 +706,18 @@ console.log(similarity, distance) // 1, 5
 
 See the contributor [SDK coverage review](/sdk-coverage) for the entrypoint map, tested feature
 inventory, explicit exclusions, and validation scope.
+
+## Observer failure reporting and question defaults
+
+`AgentObservabilityOptions.onObserverError?: AgentObserverErrorHandler` receives
+`AgentObserverFailureReport` (`phase`, `observer`, original `error`) for swallowed observer failures.
+The default reports to `console.error`; use a no-op to silence it. Handler promises are not awaited,
+and handler errors cannot fail the run. These types are exported from `@anvia/core/observability`.
+See [Observability](/sdk/observability#route-observer-failures).
+
+`createQuestionTool()` accepts omitted options and defaults to `ask_user` with built-in model
+instructions. `DEFAULT_QUESTION_TOOL_NAME` and `DEFAULT_QUESTION_TOOL_DESCRIPTION` are exported
+from the root and `@anvia/core/tool`. New calls require 1–4 questions, unique nonblank IDs, and
+nonblank text. Choices, when supplied, require 2–4 entries with unique nonblank values and nonblank
+labels. Input strings are trimmed. Free-text questions cannot set `allowCustom: false`. Existing
+stored interactions retain their previous parsing rules. See [Interactions](/sdk/agents/interactions).

@@ -30,10 +30,12 @@ class OpenAIClient {
     const Controls extends CompletionModelControls = OpenAIControlsFor<ModelId>,
   >(options: {
     modelId: ModelId
-    api: 'responses' | 'chat'
+    api?: 'responses' | 'chat'
     contextLimits?: ModelContextLimits
     controls?: Controls
   }): OpenAICompletionModel<Controls>
+
+  decisionModel(options: OpenAIDecisionModelOptions): OpenAIDecisionModelHandle
 
   embeddingModel(options: {
     modelId: OpenAIEmbeddingModelId
@@ -58,7 +60,7 @@ class OpenAIClient {
 }
 ```
 
-All constructors and factories require one options object. `completionModel()` requires an explicit API; `baseUrl` does not select it. Omitting `controls` applies per-model reasoning defaults derived from the model ID (`OpenAIControlsFor`). The two client forms are mutually exclusive: either provide managed connection options or inject an initialized OpenAI SDK client.
+All constructors and factories require one options object. `completionModel()` defaults to `api: 'chat'`; `baseUrl` does not select it. Omitting `controls` applies per-model reasoning defaults derived from the model ID (`OpenAIControlsFor`). The two client forms are mutually exclusive: either provide managed connection options or inject an initialized OpenAI SDK client.
 
 ## Model IDs and handles
 
@@ -87,6 +89,7 @@ import {
   GPT_4O_TRANSCRIBE_DIARIZE,
   GPT_IMAGE_1,
   GPT_IMAGE_2,
+  GPT_6_LUNA,
   GPT_TRANSCRIBE,
   OPENAI_REASONING_EFFORTS,
   TTS_1,
@@ -103,3 +106,11 @@ import {
 ## Adapters subpath
 
 `@anvia/openai/adapters` (added in `1.2.0`) exports `OpenAIResponsesCompletionModel`, the reusable Responses completion model. Provider packages such as [`@anvia/azure`](/packages/azure) extend it and override its protected hooks: `normalizeStream(stream)` adapts endpoint-specific stream events before they are mapped, and `requestParams(request)` adapts the outgoing request. Subclasses can also override `provider` and `traceRequest()`. OpenAI's own parser keeps native event handling, including unnamed argument events, and validates tool-call names on completed calls. Application code should use `OpenAIClient` from the root entry point.
+
+## Decision models
+
+`OpenAIDecisionModelOptions` is `{ modelId: OpenAIDecisionModelId }`, and
+`OpenAIDecisionModelHandle` is `DecisionModel<unknown>`. `KnownOpenAIDecisionModelId` is the type of
+`GPT_6_LUNA`; `OpenAIDecisionModelId` also admits extensible string IDs. These types are exported
+from the root and `openai` namespace. Use the public client factory rather than internal model classes.
+See [OpenAI decisions](/packages/openai/decisions) for mappings, limits, and refusal handling.

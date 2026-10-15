@@ -1,7 +1,13 @@
 # Releases
 
-The current release is `@anvia/durable` **0.3.0**. The package is experimental and its database records may
+The reviewed source release is `@anvia/durable` **0.12.0**. The package is experimental and its database records may
 change between releases.
+
+## Changes through 0.12.0
+
+Reviewed `0.3.0` → `0.12.0` against SDK source on 2026-10-15. Added registration compaction (0.4), verified multi-session goals (0.5), per-submission goal agents (0.6), shared histories and bounded inspection (0.7), queued steering and SQLite schema 9 (0.8), goal controls (0.9), continuing rounds (0.10), stable run traces (0.11), and application-selected observability sessions (0.12). See [Goals](/packages/durable/goals), [Compaction](/packages/durable/compaction), [Steering](/packages/durable/steering), [Tracing](/packages/durable/tracing), and [Operations](/packages/durable/operations). Upgrade Core and Durable together for execution protocol 4; snapshots can contain linked history references, and database downgrades are unsupported.
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/durable/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
@@ -13,12 +19,14 @@ change between releases.
 ## Related package releases
 
 - `@anvia/core` 1.7.0 added the agent execution boundaries and stable tool operation IDs used by durable
-  execution, and 1.8.0 added persisted streaming support and execution protocol version 2. Direct agent
+  execution. The current runtime requires execution protocol 4 (introduced in Core 1.13);
+  use mutually compatible current Core and Durable releases. Direct agent
   execution behavior is unchanged.
 - `@anvia/server` 1.2.0 and `@anvia/client` 1.3.0 added the opt-in `./durable` subpaths (run, graph, and
   custom-task routes and methods, with owned-agent authorization mapped to the parent task session and root
   task identity in task event envelopes). Server 1.2.1 and client 1.3.1 added the 0.2 peer range, and server
-  1.2.2 and client 1.3.2 added 0.3, all through an optional `@anvia/durable` peer.
+  1.2.2 and client 1.3.2 added 0.3, all through an optional `@anvia/durable` peer. The reviewed Server 1.3.4 and Client 1.4.4
+  ranges extend through Durable 0.12; use these for the full steering and tracing contracts.
 - `@anvia/cli` 1.5.0 bundles the `anvia-durable` skill (see [CLI](/packages/cli)).
 
 Read the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/durable/CHANGELOG.md).

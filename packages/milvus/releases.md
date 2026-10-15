@@ -1,6 +1,6 @@
 # Releases
 
-Current stable release: `1.1.3`. The entries below preserve notable v0 history.
+Reviewed source release: `1.1.5`. The entries below preserve notable v0 history.
 
 Notable releases include:
 
@@ -17,3 +17,9 @@ Notable releases include:
 - `0.3.0` introduced the Milvus adapter with filter translation, multi-embedding support, and `asTool()`.
 
 See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-milvus/CHANGELOG.md).
+
+## Changes through 1.1.5
+
+Reviewed `1.1.3` → `1.1.5` against SDK source on 2026-10-15. Refreshed package guidance and updated the Milvus client dependency. Check the source changelog alongside server compatibility.
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/vector-milvus/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.

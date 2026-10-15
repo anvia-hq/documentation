@@ -76,3 +76,26 @@ On shutdown, abort and await active runs before closing tracing clients. Otherwi
 Observer payloads can contain prompts, history, completion requests, reasoning, tool arguments, results, and raw errors. Select safe fields or apply `@anvia/core/redaction` before sending them to an external backend. Error conversion and output guardrails do not automatically redact telemetry.
 
 Use [Lens](/lens/connect/anvia), [Langfuse](/packages/langfuse), or [OpenTelemetry](/packages/otel) for persistent traces. Evaluation reporters are a separate surface; see [evaluations](/sdk/evaluations) for metric outcomes and target/evaluator usage.
+
+## Route observer failures
+
+`errorPolicy: 'ignore'` keeps observer failures from failing the agent, but no longer discards them
+silently: by default each swallowed failure writes one line to `console.error`. Set `onObserverError`
+to route reports into your logger, or a no-op to suppress them deliberately:
+
+```ts anvia-check observer-error-example
+import type { AgentObservabilityOptions, AgentObserverFailureReport } from '@anvia/core/observability'
+
+export function observedFailures(report: (failure: AgentObserverFailureReport) => void) {
+  return {
+    observers: {},
+    errorPolicy: 'ignore',
+    onObserverError: report,
+  } satisfies AgentObservabilityOptions
+}
+```
+
+A report contains `phase`, observer name in `observer`, and the original `error`. Startup and terminal
+failures are reported when the active policy swallows them. `AgentObserverErrorHandler` can return a
+promise, but it is not awaited; synchronous throws and promise rejections from the handler are swallowed.
+A failing diagnostic sink cannot fail the run. Pipeline observer dispatch is unchanged.

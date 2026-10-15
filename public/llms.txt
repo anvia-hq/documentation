@@ -120,3 +120,12 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [GitHub repository](https://github.com/anvia-hq/anvia): Anvia source code; exported package surfaces are authoritative when documentation and implementation differ.
 
 CLI guides document CLI 1.5.0: the ui/skills command groups and read-only update previews with --apply (introduced in 1.4.0). Root init/add/update remain aliases.
+
+## Updated runtime contracts
+
+- [Durable goals](https://docs.anvia.dev/packages/durable/goals): Verified objectives across bounded sessions, continuing rounds, budgets, and pause/edit/message signals.
+- [Durable compaction](https://docs.anvia.dev/packages/durable/compaction): Registration-level summaries and recoverable active-loop projections without deleting canonical history.
+- [Durable steering](https://docs.anvia.dev/packages/durable/steering): Persisted user input and deduplicated receipts at safe execution boundaries.
+- [Durable tracing](https://docs.anvia.dev/packages/durable/tracing): Stable run traces, application chat grouping, and OpenTelemetry ID-generator setup.
+- [OpenAI decisions](https://docs.anvia.dev/packages/openai/decisions): Choice, score, check, multi-label mappings, request limits, and typed refusals.
+- [Lens evidence policies](https://docs.anvia.dev/lens/evaluations/quality-gates/configure#require-valid-evidence-per-metric): Per-metric valid-case minimums and invalid/unknown budgets.

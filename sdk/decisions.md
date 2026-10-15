@@ -14,7 +14,7 @@ Decisions live in `@anvia/core/decision` and are also exported from the root `@a
 
 ## 1. Install a decision provider
 
-Core defines the contract; a provider package supplies a decision model. [`@anvia/jev`](/sdk/providers/jev) is the first adapter.
+Core defines the contract; a provider package supplies a decision model. [`@anvia/jev`](/sdk/providers/jev) and [`@anvia/openai`](/packages/openai/decisions) provide adapters. The example below uses Jev; the OpenAI guide shows `OpenAIClient.decisionModel()` and its limits.
 
 ```sh
 pnpm add @anvia/core @anvia/jev

@@ -1,5 +1,5 @@
 {
-  "reviewedSdkRevision": "e196d84347a66bf5107d060268a3fee876720550",
+  "reviewedSdkRevision": "6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679",
   "entries": [
     {
       "module": "@anvia/cli",
@@ -26,8 +26,8 @@
       "module": "@anvia/core",
       "guide": "sdk/index.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 277,
-      "exportNamesHash": "f4b7d4c63488f7555b7fdd9706fb43399a427c44dde867fe56d591369443b3bd"
+      "exportCount": 280,
+      "exportNamesHash": "d6c1864ea2b789107d4199346c66581af1d4329b65aa536596380bfc31844fe3"
     },
     {
       "module": "@anvia/core/agent",
@@ -117,8 +117,8 @@
       "module": "@anvia/core/observability",
       "guide": "sdk/observability.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 26,
-      "exportNamesHash": "af6451e4ea218e2476c5fef28613e8623174060dc6721c682b8ec2edcb43d4f5"
+      "exportCount": 28,
+      "exportNamesHash": "d24a27fdb625583a791db93e44ce0047f06fa6ce37f3c65956d6ecc7b0d731a0"
     },
     {
       "module": "@anvia/core/pipeline",
@@ -159,8 +159,8 @@
       "module": "@anvia/core/tool",
       "guide": "sdk/tools.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 45,
-      "exportNamesHash": "2155abeeb09b62ab7018df6e2d45a12757e234a7dc891ff2548c9fb89674a4cd"
+      "exportCount": 47,
+      "exportNamesHash": "87310f0973660d36f9a1f6f212a041e5ce3e959cff80eca5af8b0fed5dbaaadd"
     },
     {
       "module": "@anvia/core/transcription",
@@ -278,8 +278,8 @@
       "module": "@anvia/otel",
       "guide": "packages/otel/get-started.md",
       "reference": "packages/otel/api-reference.md",
-      "exportCount": 13,
-      "exportNamesHash": "a4ba519cc288137087c671254e1b80b9c96d1e87a751df510e2193dc9cb529ad"
+      "exportCount": 15,
+      "exportNamesHash": "ab53592ad05370d7617a17316b789fe51663b6ebd95552b3ea08eb698bdcb040"
     },
     {
       "module": "@anvia/anthropic",
@@ -313,8 +313,8 @@
       "module": "@anvia/openai",
       "guide": "packages/openai/get-started.md",
       "reference": "packages/openai/api-reference.md",
-      "exportCount": 39,
-      "exportNamesHash": "b1cddc00fe3d9db267d8386c84b3ccdd5905960ebabb2b6d096bc5fe7e7183a2"
+      "exportCount": 44,
+      "exportNamesHash": "0253a9e1c1d880b646ddbe9cf8fdaf6c4bbefb9c4f55f5d5948d5a0fb1f84fb3"
     },
     {
       "module": "@anvia/react",
@@ -516,15 +516,15 @@
       "module": "@anvia/core/decision",
       "guide": "sdk/decisions.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 39,
-      "exportNamesHash": "5222ac167ab55e23da24df2581c9f57fca6b2fc9de766d2f73e0a51b3452fcb2"
+      "exportCount": 40,
+      "exportNamesHash": "114541b6b8c4a4f62440514cbe7a0d9703294a2d9c090665375d236bb7b0fd9b"
     },
     {
       "module": "@anvia/durable",
       "guide": "sdk/advanced/durable-execution.md",
       "reference": "packages/durable/api-reference.md",
-      "exportCount": 53,
-      "exportNamesHash": "a54e62f574e066da7b4317e3923e79496eb69a2418cab000f4a99c84cc8098fa"
+      "exportCount": 82,
+      "exportNamesHash": "abd39b6f8f52e0e4c268a6ec89bb0bf3dd4074425f0aaf3f5dc48358f09d81fc"
     },
     {
       "module": "@anvia/durable/maintenance",
@@ -537,8 +537,8 @@
       "module": "@anvia/durable/protocol",
       "guide": "packages/durable/capabilities.md",
       "reference": "packages/durable/api-reference.md",
-      "exportCount": 42,
-      "exportNamesHash": "7099dc9c30441faa840bf6afdc1c34ea0406438cd9560003f0eb7bd2011ef9f3"
+      "exportCount": 47,
+      "exportNamesHash": "3c48c82554c418f0cc3f965e4675e0e2fd1e5f5cc8320a2a49ecc5af8255c969"
     },
     {
       "module": "@anvia/durable/sqlite",
@@ -696,6 +696,48 @@
       "page": "packages/graph/api-reference.md",
       "marker": "graph-schema-example",
       "runtimeTest": "Graph reference schema example rejects unsafe graph property values"
+    },
+    {
+      "title": "OpenAI decisions",
+      "module": "@anvia/openai",
+      "symbols": [
+        "OpenAIClient",
+        "GPT_6_LUNA"
+      ],
+      "page": "packages/openai/decisions.md",
+      "marker": "openai-decision-example",
+      "runtimeTest": "OpenAI decision example preserves confidence and maps refusals to application questions"
+    },
+    {
+      "title": "Durable goals",
+      "module": "@anvia/durable",
+      "symbols": [
+        "defineGoal",
+        "DurableRuntime"
+      ],
+      "page": "packages/durable/goals.md",
+      "marker": "durable-goal-example",
+      "runtimeTest": "durable goal example verifies completion and preserves it across reopen"
+    },
+    {
+      "title": "Durable steering",
+      "module": "@anvia/durable",
+      "symbols": [
+        "DurableRun"
+      ],
+      "page": "packages/durable/steering.md",
+      "marker": "durable-steering-example",
+      "runtimeTest": "durable steering example deduplicates receipts and applies queued input"
+    },
+    {
+      "title": "Durable compaction",
+      "module": "@anvia/durable",
+      "symbols": [
+        "DurableCompactionOptions"
+      ],
+      "page": "packages/durable/compaction.md",
+      "marker": "durable-compaction-example",
+      "runtimeTest": "durable compaction example preserves canonical history and omits summary temperature"
     }
   ],
   "utilities": [

@@ -41,3 +41,12 @@ Use an OpenTelemetry Node SDK, a platform integration, or another runtime-specif
 - [Runtime scoring](/packages/otel/runtime-scoring)
 - [Data and privacy](/packages/otel/data-and-privacy)
 - [Lifecycle](/packages/otel/lifecycle)
+
+## Durable runs and conversation grouping
+
+Durable executions share one trace per run across retries and recovery; committed replayed steps
+do not add duplicate spans or observer usage. Set submission `trace.sessionId` to group turns,
+goal rounds, and subagents under one application chat without merging execution histories.
+`LensClient` installs the needed ID generator automatically. An application-owned OpenTelemetry
+provider must use `createAnviaIdGenerator()` to keep parentless durable attempts in the supplied
+trace. See [Durable tracing](/packages/durable/tracing) for setup and HTTP context ownership.

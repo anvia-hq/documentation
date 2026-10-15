@@ -26,6 +26,8 @@ const compactMemory = createSummaryMemoryCompactor({
 
 The built-in compactor makes one direct completion. Its defaults are 1,024 output tokens, temperature `0`, and instructions designed to treat transcript content as untrusted data.
 
+Use `temperature: null` to omit temperature for summary models that reject the parameter. Omitted or
+`undefined` temperature retains the default of zero; main-agent sampling does not change it.
 Choose the summary model deliberately for quality, cost, residency, and sensitive-data handling.
 
 ## 2. Configure automatic compaction
@@ -39,7 +41,7 @@ const supportAgent = new Agent({
     savePolicy: 'turn',
     compaction: {
       trigger: { afterTokens: 32_000 },
-      retention: { recentTurns: 2 },
+      retention: { recentTurns: 2, recentToolTurns: 1 },
       conflictRetries: { maxAttempts: 2 },
       compactor: compactMemory,
     },
@@ -104,6 +106,20 @@ Long conversations can compact more than once. A later compaction summarizes a p
 projection, which may include the previous summary, and advances the same checkpoint. The model sees
 only the newest summary plus the remaining tail; canonical history still contains every original
 message and no synthetic summaries.
+
+### Active tool loops and approval continuations
+
+Compaction also runs before model calls inside an active tool loop, including after newly approved
+tools finish. `retention.recentToolTurns` is a nonnegative integer, defaulting to one; zero allows
+summarizing the latest completed tool round. Parallel tool calls stay together with all their results,
+and the active user request remains verbatim. This model-facing projection does not rewrite canonical
+history. Retained rounds, a large user prompt, or a large summary can still exceed the model window;
+the threshold is not an automatic recovery mechanism for arbitrary context-limit errors.
+
+Both normal and streaming runs include committed summary usage and report compaction progress.
+Between-run `recentTurns` and active-loop `recentToolTurns` control different boundaries. For durable
+runs, configure [registration compaction](/packages/durable/compaction), which atomically checkpoints
+projections, usage, and events for recovery.
 
 ## 4. Know what the summarizer receives
 

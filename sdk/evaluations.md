@@ -122,7 +122,8 @@ const replies: CompletionResponse[] = [
     usage: Usage.empty(), rawResponse: null },
   { choice: [{ type: 'tool-call', toolCallId: 'ask', toolName: 'ask', input: {
     questions: [{ id: 'route', text: 'Which queue?',
-      choices: [{ label: 'Support', value: 'support' }], allowCustom: false }],
+      choices: [{ label: 'Support', value: 'support' },
+        { label: 'Billing', value: 'billing' }], allowCustom: false }],
   } }], usage: Usage.empty(), rawResponse: null },
   { choice: [{ type: 'text', text: 'done' }], usage: Usage.empty(), rawResponse: null },
 ]

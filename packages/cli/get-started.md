@@ -17,7 +17,7 @@ The guides use `anvia` as shorthand for either form. For example:
 pnpm dlx @anvia/cli skills init --cwd /path/to/my-project --codex
 ```
 
-These guides describe CLI `1.5.0`. If `ui` or `--apply` is unknown, you are running a release older
+These guides describe CLI `1.5.1`. If `ui` or `--apply` is unknown, you are running a release older
 than `1.4.0`; see [Troubleshooting](/packages/cli/troubleshooting#grouped-commands-or-apply-are-unknown).
 
 ## Install knowledge for your coding agent

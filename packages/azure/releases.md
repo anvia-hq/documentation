@@ -1,6 +1,12 @@
 # Releases
 
-Current stable release: `0.1.0`. `@anvia/azure` is a new package, so its release history starts here.
+Reviewed source release: `0.1.1`. `@anvia/azure` is a new package, so its release history starts here.
+
+## Changes through 0.1.1
+
+Reviewed `0.1.0` → `0.1.1` against SDK source on 2026-10-15. Aligned the OpenAI dependency with the Decisions-capable release. Azure continues to expose its documented Responses completion adapter; this dependency update does not add an Azure decision factory.
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/provider-azure/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 
