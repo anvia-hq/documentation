@@ -4,7 +4,7 @@
 your application. It runs on Node.js **20.18.1 or newer**.
 
 Examples use `anvia` as shorthand for the published CLI. Run it with `pnpm dlx @anvia/cli` or
-install `@anvia/cli` as a development dependency. The current release is `1.5.0`.
+install `@anvia/cli` as a development dependency. The reviewed source release is `1.5.1`.
 
 | Group | What it manages | Start here |
 | --- | --- | --- |

@@ -98,3 +98,11 @@ provider tools, and dynamic tool indexes.
 The [`@anvia/durable` package guide](/packages/durable) lists every entry point, and the
 [API reference](/packages/durable/api-reference) lists signatures. Coding agents can load the bundled
 `anvia-durable` skill with `pnpm dlx @anvia/cli skills init` (see [CLI](/packages/cli)).
+
+## Goals and live controls
+
+Use [durable goals](/packages/durable/goals) when work needs multiple bounded sessions and an
+application assessor verifies completion. Goals support fresh or continuing conversations, budgets,
+and persisted pause/edit/message controls. Configure [registration compaction](/packages/durable/compaction)
+for long conversations, [steer runs](/packages/durable/steering) at safe boundaries, and
+[group traces](/packages/durable/tracing) under the application's chat session.

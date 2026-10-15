@@ -1,10 +1,11 @@
 # Capabilities
 
-`@anvia/openai` implements six Anvia model and provider capabilities.
+`@anvia/openai` implements seven Anvia model and provider capabilities.
 
 | Capability | Implementation | Notes |
 | --- | --- | --- |
 | Completion | Responses and Chat Completions adapters | Both stream and support tools; `api` selects one and defaults to `'chat'`. |
+| Decisions | `decisionModel({ modelId })` | Native choice, score, and check; composed independent multi-label predicates. |
 | Embeddings | `OpenAIEmbeddingModel` | Batches inputs and restores provider results to input order. |
 | Images | `imageGenerationModel({ modelId })` | Requires base64 image output; URL-only responses are rejected. |
 | Speech | `OpenAISpeechGenerationModel` | Returns bytes and a media type inferred from response format. |
@@ -43,3 +44,9 @@ Changing `dimensions` changes the stored vector shape. Rebuild an existing vecto
 ## Failure behavior
 
 Provider SDK errors propagate. Adapter validation also rejects malformed embedding indices, missing image data, and transcription responses without text. `listModels()` wraps listing failures in `ModelListingError` and preserves the provider and status code when available.
+
+## Decision boundaries
+
+The Decisions adapter supports mixed questions, up to 200 provider questions after multi-label
+expansion, 2–255 choice options, and at most 10 rubric levels. Refused questions fail the whole
+decision with `DecisionRefusalError`. See [OpenAI decisions](/packages/openai/decisions).

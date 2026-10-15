@@ -21,3 +21,11 @@ It still records operational fields such as usage, model identity, timing, tool 
 - Review error serialization: `name`, `message`, `stack`, and `cause` are logged for `Error` instances.
 
 The four capture flags are coarse switches, not a redaction engine. If selected fields need transformation, wrap the `Logger` contract or sanitize data before the agent run.
+
+## Error stacks
+
+Logger observers omit serialized `Error.stack` by default, including nested `Error.cause` stacks,
+to avoid exposing host paths. Set `createLoggerObserver({ logger, includeErrorStack: true })` only
+when the logging policy permits debugging stacks. Provider-output errors retain their dedicated
+safe handling. Core's default redaction patterns also cover Google API keys, GitHub tokens, AWS
+access-key IDs, and Slack tokens; pattern redaction does not replace application capture controls.

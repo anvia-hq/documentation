@@ -45,6 +45,7 @@ type LoggerObserverOptions = {
   includeRequest?: boolean
   includeResponse?: boolean
   includeToolResult?: boolean
+  includeErrorStack?: boolean
 }
 ```
 

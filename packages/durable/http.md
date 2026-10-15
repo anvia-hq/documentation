@@ -27,7 +27,7 @@ const handleRequest = createDurableHandler({
 
 `authorize` is required for every operation, including reads and event subscriptions. It receives a
 `DurableAuthorization` resource with `action` (`list`, `submit`, `inspect`, `events`, `respond`,
-`resolve-tool`, `retry`, `cancel`, `signal`, or `resolve-effect`), the owning `sessionId`, and where
+`steer`, `resolve-tool`, `retry`, `cancel`, `signal`, or `resolve-effect`), the owning `sessionId`, and where
 applicable `runId`, `agentId`, `graphId`, `taskId`, `rootTaskId`, and `taskName`. Existing-run authorization
 uses the session stored in the database, never a client-supplied one. Owned agent runs map to their parent
 task's session. Graph children authorize against the graph's owning session, and graph-wide operations
@@ -42,6 +42,7 @@ lifecycle. SSE authorization is checked at connection time (task tree events rea
 | GET | `/runs?sessionId=...` | Summaries; optional `agentId`, `status`, `after`, `limit`. |
 | GET | `/runs/:id` | Atomic snapshot. |
 | GET | `/runs/:id/events?after=...` | SSE events; `Last-Event-ID` is the fallback cursor. |
+| POST | `/runs/:id/steer` | `{ input: { prompt } }` or `{ input: { messages }, requestId? }`; persisted receipt (202). |
 | POST | `/runs/:id/respond` | `{ interactionId, response }` (204). |
 | POST | `/runs/:id/resolve-tool` | `{ operationId, output }` (204). |
 | POST | `/runs/:id/retry` | Explicit retry (204). |
@@ -103,7 +104,7 @@ for await (const event of client.stream(accepted.run.id, { after: snapshot.curso
 
 | Area | Methods |
 | --- | --- |
-| Runs | `submit`, `snapshot`, `listRuns`, `stream`, `respond`, `resolveTool`, `retry`, `cancel` |
+| Runs | `submit`, `snapshot`, `listRuns`, `stream`, `steer`, `respond`, `resolveTool`, `retry`, `cancel` |
 | Graphs | `submitGraph`, `graphSnapshot`, `listGraphs`, `streamGraph`, `cancelGraph` |
 | Tasks | `submitTask`, `taskSnapshot`, `taskGraph`, `listTasks`, `streamTask`, `signalTask`, `resolveEffect`, `retryTask`, `cancelTask` |
 
@@ -112,3 +113,21 @@ incoming snapshots and events, rejects wrong-run, wrong-root, and out-of-order e
 `DurableHttpError` with the HTTP status on a failed response. It never retries mutations automatically. On a
 connection failure, reconnect from a fresh snapshot or from the last event cursor your application applied.
 Durable progress events are not the token-delta chat protocol used by the standard client transport.
+
+## Steering, goals, and trace context
+
+`client.steer(runId, { prompt: 'Focus on recovery' }, { requestId: 'correction-123' })` queues
+persisted user input. The route body is `{ input, requestId? }`; a request ID can accompany either
+input form. Authorization uses action `steer`. A receipt confirms storage; `steering_applied`
+confirms the boundary at which it entered the conversation. See [Steering](/packages/durable/steering).
+
+Goals are registered tasks. Submit their name/version through `/tasks`, with `agentId`, `objective`,
+`acceptanceCriteria`, and `limits` inside `input`. Use task signal routes for pause, edit, message,
+and resume. Authorization includes the effective agent even when supplied by a definition default;
+a binding changed during authorization returns 409. See [Goals](/packages/durable/goals).
+
+`createDurableHandler({ runtime, authorize, trace })` optionally derives observer context through
+`trace(request, resource)` after authorization. Return `DurableTraceOptions` or `undefined`, synchronously
+or asynchronously. HTTP request schemas reject client-supplied `trace`; derive user and tenant identity
+from authenticated state. The callback requires Durable 0.11+, and its `sessionId` override needs 0.12+.
+See [Tracing](/packages/durable/tracing) for grouping and OpenTelemetry provider setup.

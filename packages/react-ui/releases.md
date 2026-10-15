@@ -1,7 +1,13 @@
 # Releases
 
-The current stable release is `@anvia/react-ui` **1.1.5**. It is strictly headless and pairs with
+The reviewed source release is `@anvia/react-ui` **1.1.7**. It is strictly headless and pairs with
 the `@anvia/cli` installer. The entries below preserve notable v0 history.
+
+## Changes through 1.1.7
+
+Reviewed `1.1.5` → `1.1.7` against SDK source on 2026-10-15. Updated the Markdown parser dependency and refreshed package guidance. The package remains headless; application styling and CLI-installed source remain application-owned.
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/react-ui/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

@@ -66,6 +66,7 @@ async function sourceEntry(specifier) {
     '@anvia/openai': 'provider-openai',
     '@anvia/client': 'client',
     '@anvia/graph': 'graph',
+    '@anvia/durable': 'durable',
   }
   const directory = directories[packageName]
   assert.ok(directory, `Add a source resolver for ${packageName}`)
@@ -485,7 +486,8 @@ test('eval expectations accept a negative control and reject unexpected invalids
 test('eval responder handles approvals and questions, and enforces its limit', async () => {
   const example = (await blocks('sdk/evaluations.md')).find(block => block.flags.includes('responder-example'))
   assert.ok(example)
-  await runExample(example.code, '', "assert.equal(output, 'done')")
+  const verified = example.code.replace("console.log('response phase', phase)", 'observedPhases.push(phase)')
+  await runExample(verified, 'const observedPhases = []', "assert.equal(output, 'done'); assert.deepEqual(observedPhases, [1, 2])")
   const limited = example.code.replace('maxResponses: 2', 'maxResponses: 1')
     .replace("const output = await target('Run the test', { id: 'interactions', input: 'Run the test' })", `
       const { AgentEvalSuspensionError } = await import(${JSON.stringify(await sourceEntry('@anvia/core/evals'))})
@@ -734,5 +736,155 @@ test('Graph reference schema example rejects unsafe graph property values', asyn
       assert.throws(() => parseGraphProperties({ value }, 'Person'))
     }
     assert.throws(() => parseGraphProperties({ __anvia_internal: 'private' }, 'Person'))
+  `)
+})
+
+test('OpenAI decision example preserves confidence and maps refusals to application questions', async () => {
+  const example = (await blocks('packages/openai/decisions.md')).find(block => block.flags.includes('openai-decision-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    const { OpenAIClient } = await import(${JSON.stringify(await sourceEntry('@anvia/openai'))})
+    let refused = false
+    const requests = []
+    const client = new OpenAIClient({ client: { decisions: { create: async (request, options) => {
+      requests.push({ request, options })
+      return { model: GPT_6_LUNA,
+        answers: [refused ? { type: 'refusal', name: 'q0' } : {
+          type: 'choice', name: 'q0', choice: 'billing', confidence: 0.7,
+          probabilities: [{ value: 'billing', probability: 0.8 },
+            { value: 'technical', probability: 0.1 }, { value: 'general', probability: 0.1 }],
+        }], usage: { input_tokens: 12, output_tokens: 3, total_tokens: 15,
+          input_tokens_details: { cached_tokens: 0, cache_write_tokens: 0 },
+          output_tokens_details: { reasoning_tokens: 0 } } }
+    } } } })
+    const answer = await routeTicket(client, 'Refund my duplicate payment')
+    assert.equal(answer.choice, 'billing')
+    assert.equal(answer.confidence, 0.7)
+    assert.equal(requests[0].options.maxRetries, 0)
+    assert.deepEqual(JSON.parse(requests[0].request.input), { message: 'Refund my duplicate payment' })
+    refused = true
+    await assert.rejects(routeTicket(client, 'Another request'), error => {
+      assert.equal(error.name, 'DecisionRefusalError')
+      assert.deepEqual(error.questionNames, ['department'])
+      assert.equal(error.rawResponse.answers[0].type, 'refusal')
+      return true
+    })
+  `)
+})
+
+// Durable imports Core's internal registration state through workspace exports. Use the same
+// built Agent instance in these integration fixtures rather than mixing source/dist WeakMaps.
+const durableModelFixture = modelFixture + `
+const { Agent: DurableAgent } = await import(${JSON.stringify(pathToFileURL(join(anviaRoot, 'packages/core/dist/index.js')).href)})
+`
+
+test('durable goal example verifies completion and preserves it across reopen', { timeout: 10000 }, async () => {
+  const example = (await blocks('packages/durable/goals.md')).find(block => block.flags.includes('durable-goal-example'))
+  assert.ok(example)
+  const directory = await mkdtemp(join(tmpdir(), 'anvia-doc-goal-'))
+  try {
+    await runExample(example.code, durableModelFixture, `
+      const builder = new DurableAgent({ id: 'builder', model, maxTurns: 1 })
+      let checks = 0
+      const verify = async (criteria, signal) => {
+        signal.throwIfAborted()
+        assert.deepEqual(criteria, ['Synthetic acceptance check passes'])
+        checks++
+        return { passed: true, blocked: false, artifactHash: 'verified-artifact',
+          summary: 'Acceptance check passed', nextAction: '', evidence: ['synthetic-check:pass'] }
+      }
+      const opened = await openGoalRuntime(builder, ${JSON.stringify(join(directory, 'goals.sqlite'))}, verify)
+      let goalId
+      try {
+        const goal = await opened.runtime.submitGoal(opened.definition, {
+          sessionId: 'docs-goal', requestId: 'request-1', objective: 'Complete synthetic work',
+          acceptanceCriteria: ['Synthetic acceptance check passes'],
+          limits: { maxSessions: 2, maxTotalModelTurns: 3, maxConsecutiveNoProgressSessions: 1 },
+        })
+        goalId = goal.id
+        const result = await goal.result({ abortSignal: AbortSignal.timeout(5000) })
+        assert.equal(result.sessions, 1)
+        assert.equal(result.handoff.status, 'complete')
+        assert.deepEqual(result.handoff.evidence, ['synthetic-check:pass'])
+        assert.equal(checks, 1)
+      } finally { await opened.runtime.close() }
+      const reopened = await openGoalRuntime(builder, ${JSON.stringify(join(directory, 'goals.sqlite'))}, verify)
+      try {
+        const goal = await reopened.runtime.getTask(goalId)
+        assert.equal((await goal.result()).handoff.status, 'complete')
+        assert.equal(checks, 1)
+      } finally { await reopened.runtime.close() }
+    `)
+  } finally {
+    await rm(directory, { recursive: true, force: true })
+  }
+})
+
+test('durable steering example deduplicates receipts and applies queued input', { timeout: 10000 }, async () => {
+  const example = (await blocks('packages/durable/steering.md')).find(block => block.flags.includes('durable-steering-example'))
+  assert.ok(example)
+  await runExample(example.code, durableModelFixture, `
+    const { DurableRuntime, DurableConflictError } = await import(${JSON.stringify(await sourceEntry('@anvia/durable'))})
+    const { SqliteDurableStore } = await import(${JSON.stringify(await sourceEntry('@anvia/durable/sqlite'))})
+    let release, started, calls = 0
+    const pending = new Promise(resolve => { release = resolve })
+    const firstCall = new Promise(resolve => { started = resolve })
+    const agent = new DurableAgent({ id: 'steered', model: { ...model, completion: async () => {
+      calls++
+      if (calls === 1) { started(); await pending }
+      return textResponse('done')
+    } } })
+    const runtime = await DurableRuntime.open({ store: new SqliteDurableStore(':memory:'),
+      agents: [{ agent, version: '1' }] })
+    try {
+      const run = await runtime.submit({ agentId: agent.id, sessionId: 'docs-steer',
+        requestId: 'run-1', prompt: 'Start work' })
+      await firstCall
+      const receipt = await steerRun(run, 'note-1')
+      assert.deepEqual(receipt, { id: 'note-1', status: 'queued' })
+      assert.deepEqual(await steerRun(run, 'note-1'), receipt)
+      await assert.rejects(run.steer({ prompt: 'different' }, { requestId: 'note-1' }),
+        DurableConflictError)
+      release()
+      await run.result({ abortSignal: AbortSignal.timeout(5000) })
+      assert.equal((await run.status()).status, 'completed')
+      assert.equal(calls, 2)
+      const applied = runtime.events(run.id, 0).filter(event => event.type === 'steering_applied')
+      assert.equal(applied.length, 1)
+      assert.equal(applied[0].data.id, 'note-1')
+    } finally { release(); await runtime.close() }
+  `)
+})
+
+test('durable compaction example preserves canonical history and omits summary temperature', { timeout: 10000 }, async () => {
+  const example = (await blocks('packages/durable/compaction.md')).find(block => block.flags.includes('durable-compaction-example'))
+  assert.ok(example)
+  await runExample(example.code, durableModelFixture, `
+    const { DurableRuntime } = await import(${JSON.stringify(await sourceEntry('@anvia/durable'))})
+    const { SqliteDurableStore } = await import(${JSON.stringify(await sourceEntry('@anvia/durable/sqlite'))})
+    const requests = []
+    const agent = new DurableAgent({ id: 'compacted', model: { ...model, completion: async request => {
+      requests.push(request)
+      return textResponse('Preserved synthetic fact')
+    } } })
+    const registration = compactingRegistration(agent)
+    registration.compaction.trigger.afterTokens = 1
+    registration.compaction.retention = { recentTurns: 0, recentToolTurns: 0 }
+    const runtime = await DurableRuntime.open({ store: new SqliteDurableStore(':memory:'), agents: [registration] })
+    try {
+      const first = await runtime.submit({ agentId: agent.id, sessionId: 'docs-compaction',
+        requestId: 'first', prompt: 'Remember the synthetic fact' })
+      await first.result({ abortSignal: AbortSignal.timeout(5000) })
+      const second = await runtime.submit({ agentId: agent.id, sessionId: 'docs-compaction',
+        requestId: 'second', prompt: 'Recall the fact' })
+      await second.result({ abortSignal: AbortSignal.timeout(5000) })
+      const snapshot = await second.snapshot({ operations: false })
+      assert.deepEqual(snapshot.operations, [])
+      assert.ok(snapshot.run.history.some(message => JSON.stringify(message).includes('Remember the synthetic fact')))
+      assert.ok(snapshot.run.contextCheckpoint.compactedMessageCount > 0)
+      assert.equal(requests.length, 3)
+      assert.equal(requests[1].temperature, undefined)
+      assert.ok(runtime.events(second.id, 0).some(event => event.type === 'compaction_completed'))
+    } finally { await runtime.close() }
   `)
 })

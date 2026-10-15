@@ -1,6 +1,6 @@
 # Releases
 
-Current stable release: `1.1.5`. The entries below preserve notable v0 history.
+Reviewed source release: `1.1.5`. The entries below preserve notable v0 history.
 
 The available changelog records:
 

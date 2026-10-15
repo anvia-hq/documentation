@@ -1,6 +1,12 @@
 # Releases
 
-Current stable release: `1.1.9`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Reviewed source release: `1.1.10`. The entries below summarize the 1.0 line and preserve notable v0 history.
+
+## Changes through 1.1.10
+
+Reviewed `1.1.9` → `1.1.10` against SDK source on 2026-10-15. Aligned the OpenAI dependency with its Decisions-capable release. Grok retains its documented completion API; use the OpenAI package for OpenAI Decisions.
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/provider-grok/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 

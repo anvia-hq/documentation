@@ -101,3 +101,11 @@ Keep suite, case, and metric names stable across releases. This makes a result s
 When a rubric changes materially, create a new metric name. Historical results remain valid evidence for the old contract instead of appearing comparable to a different decision rule.
 
 Continue with [Evaluation runs](/lens/evaluations/runs) for execution-level context, or [Compare releases](/lens/evaluations/compare) to measure a candidate against a baseline.
+
+## Evidence for release gates
+
+A high pass rate can coexist with mostly invalid judgments. Configure per-metric
+[valid-evidence requirements](/lens/evaluations/quality-gates/configure#require-valid-evidence-per-metric)
+for sample size and invalid/unknown budgets. The valid-case minimum counts distinct named cases;
+pass/fail rates and invalid/unknown budgets remain judgment-weighted. Score evidence additionally
+requires a finite numeric value.

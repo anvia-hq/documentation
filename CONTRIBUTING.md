@@ -81,7 +81,7 @@ ANVIA_REPO=/path/to/anvia pnpm sdk:check
 
 This checks SDK imports and snippet API shapes against public source entrypoints and runs offline contract tests. Complete examples marked with `ts anvia-check` are checked with all TypeScript diagnostics enabled, including missing variables and implicit `any`. Ordinary fragments retain the narrower API check; it is not proof that they are standalone programs. The runtime tests extract selected Markdown examples and provide application fixtures, so changing those examples changes the tested behavior.
 
-Add complete examples and runtime scenarios when documenting a new contract. Keep tests free of provider credentials and live calls. The `validate-sdk` CI job pins the reviewed Anvia commit; update that pin and rerun the checks when aligning documentation with another SDK revision.
+Add complete examples and runtime scenarios when documenting a new contract. Keep tests free of provider credentials and live calls. Both SDK CI jobs read the reviewed Anvia commit from `scripts/sdk-coverage.json`; review the changed API coverage, refresh that inventory, and rerun the checks when aligning documentation with another SDK revision.
 
 For changes to `packages/cli.md` or `packages/cli/`, also run:
 

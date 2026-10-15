@@ -61,3 +61,9 @@ Provider-specific support for images, audio, transcription, OCR, tools, reasonin
 | `@anvia/studio` | ✓ | ✓ | ✓ | Through sandbox adapters | Viewer | — |
 | `@anvia/sandbox` | — | — | — | ✓ | Infrastructure | Optional |
 | `@anvia/browser` | — | — | — | — | ✓ | Optional profile volume |
+
+## Typed decisions and durable goals
+
+Both `@anvia/jev` and `@anvia/openai` implement `@anvia/core/decision`; see
+[Typed decisions](/sdk/decisions). `@anvia/durable` adds verified multi-session
+[goals](/packages/durable/goals), queued steering, and recoverable compaction alongside agent runs.

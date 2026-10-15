@@ -135,3 +135,12 @@ await strictAgent.generate({
 `observability.errorPolicy: 'throw'` surfaces observer callback failures during the run. It does not prove that the asynchronous OTLP exporter delivered the batch to Lens; use `flush()` for that boundary.
 
 Continue to [Capture and privacy](/lens/connect/anvia/capture-and-privacy) before enabling request or response bodies.
+
+## Durable runs and conversation grouping
+
+Durable executions share one trace per run across retries and recovery; committed replayed steps
+do not add duplicate spans or observer usage. Set submission `trace.sessionId` to group turns,
+goal rounds, and subagents under one application chat without merging execution histories.
+`LensClient` installs the needed ID generator automatically. An application-owned OpenTelemetry
+provider must use `createAnviaIdGenerator()` to keep parentless durable attempts in the supplied
+trace. See [Durable tracing](/packages/durable/tracing) for setup and HTTP context ownership.

@@ -56,3 +56,12 @@ Full capture adds Agent payloads plus Pipeline and stage inputs and outputs. Ena
 privacy review.
 
 Call `lens.flush()` at a short-lived delivery boundary and `lens.close()` during final cleanup.
+
+## Durable runs and conversation grouping
+
+Durable executions share one trace per run across retries and recovery; committed replayed steps
+do not add duplicate spans or observer usage. Set submission `trace.sessionId` to group turns,
+goal rounds, and subagents under one application chat without merging execution histories.
+`LensClient` installs the needed ID generator automatically. An application-owned OpenTelemetry
+provider must use `createAnviaIdGenerator()` to keep parentless durable attempts in the supplied
+trace. See [Durable tracing](/packages/durable/tracing) for setup and HTTP context ownership.

@@ -6,6 +6,7 @@ Failures fall into caller mistakes, unsupported requests, and bad provider outpu
 | --- | --- |
 | `TypeError` or `RangeError` | The request is invalid: non-JSON state, malformed questions, empty names, a threshold outside zero to one, a request over a declared limit, mixed questions on a model that does not support them, or an invalid `concurrency`. |
 | `DecisionCapabilityError` | The model declares a question type `unsupported`. |
+| `DecisionRefusalError` | The provider refused one or more application questions; the whole decision fails without partial answers. |
 | `DecisionProviderOutputError` | The provider answered, but the answer violates the question contract or the usage is invalid. |
 | `AbortError` | The `abortSignal` fired. |
 | Provider error | The provider or network failed. Propagated as thrown, after any retries. |
@@ -45,3 +46,11 @@ The error carries `provider`, `modelId`, the offending `questionName` when known
 ## 4. Provider errors
 
 Everything else is surfaced unchanged, for example an authentication or rate-limit error from the vendor SDK. With [Jev](/sdk/providers/jev/production), an SDK timeout is normalized to an error named `TimeoutError` so the default retry policy treats it as transient.
+
+## Refusals
+
+`DecisionRefusalError` is exported by `@anvia/core/decision` and the Core root. It carries `provider`,
+`modelId`, immutable `questionNames`, and `rawResponse`. A refusal does not change successful answer
+types or return partial results. For OpenAI multi-label questions, refused expanded predicates map
+back to the application question key. Route refusals through an application fallback or review flow;
+keep raw responses within the application's capture policy. See [OpenAI decisions](/packages/openai/decisions#refusals).

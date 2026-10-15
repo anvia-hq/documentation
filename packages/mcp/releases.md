@@ -1,6 +1,12 @@
 # Releases
 
-The current stable release is `@anvia/mcp` **1.2.3**.
+The reviewed source release is `@anvia/mcp` **1.2.4**.
+
+## Changes through 1.2.4
+
+Reviewed `1.2.3` → `1.2.4` against SDK source on 2026-10-15. Added cumulative `tools.discoveryLimits`, cancellation cleanup during protocol negotiation, and opt-in `transport.terminateSessionOnClose` with bounded best-effort session deletion. See [API reference](/packages/mcp/api-reference#discovery-budgets-and-session-cleanup).
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/mcp/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

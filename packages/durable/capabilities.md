@@ -6,7 +6,7 @@ An agent is registered with an explicit version. Submitting a prompt atomically 
 a submission event before any work starts. Session history is captured when the request reaches the head of
 its session queue.
 
-The runtime uses core's model and tool execution boundaries (`@anvia/core` execution protocol version 2).
+The runtime uses core's model and tool execution boundaries (`@anvia/core` execution protocol version 4).
 Before a model request or an approved tool call it commits an operation intent. After the operation returns
 it commits the normalized result and its event together. Tool checkpoint errors propagate out of the agent
 loop; they are never turned into ordinary tool errors for the model to ignore.
@@ -62,8 +62,9 @@ Supported:
 
 Rejected at registration because they need additional persistence boundaries: agent memory, lifecycle
 callbacks, middleware, guardrails, context sources, MCP servers, provider tools, and dynamic tool indexes.
-Durable session history replaces the agent's memory store. Observability callbacks may run again during
-reconstruction and must be safe to repeat; they are not the authoritative journal.
+Durable session history replaces the agent's memory store. New attempts invoke observers, but replayed
+model, tool, and context checkpoints do not emit
+duplicate spans or usage. Observers are not the authoritative journal; see [Tracing](/packages/durable/tracing).
 
 ## Run states
 
@@ -79,17 +80,18 @@ reconstruction and must be safe to repeat; they are not the authoritative journa
   worker leases, and distributed execution are unsupported. `:memory:` is useful in tests but does not
   survive restart.
 - Each session runs one run at a time. Opt-in persisted successors wait in FIFO order; cross-session
-  concurrency is bounded by `maxConcurrentRuns`. Mid-run steering is not supported.
-- Not yet available: Pipeline and team recovery, compaction, Studio integration, Postgres, retention,
+  concurrency is bounded by `maxConcurrentRuns`. [Queued steering](/packages/durable/steering) applies input at safe execution boundaries.
+- Not yet available: Pipeline and team recovery, Studio integration, Postgres, retention,
   general migration tooling, execution deadlines, and distributed workers.
 - The database holds prompts, normalized responses, tool arguments and results, and interaction state. Keep it
   in application-private storage; retention, encryption, authentication, and authorization are yours.
 
 ## Schema versions
 
-SQLite schema version 2 added graphs, version 3 added custom tasks, and version 4 added persisted streaming
-attempts. A newer engine upgrades older schemas when it acquires ownership. Older engines reject a newer
-schema, and downgrading a database is unsupported. See [Operations](/packages/durable/operations).
+The current SQLite schema is **9**. Schemas 1–8 upgrade when the runtime acquires ownership.
+Schema 5 added conversation compaction, 6 active-loop compaction, 7 goal session exhaustion,
+8 shared message histories, and 9 steering checkpoints. Older engines reject newer schemas;
+downgrading a database is unsupported. Upgrade Core and Durable together for execution protocol 4. See [Operations](/packages/durable/operations).
 
 ## Custom stores
 
@@ -98,3 +100,10 @@ ownership, atomic writes, detached read values, validation, ordered event cursor
 and history semantics. Since 0.1.1 stores also implement `pendingCounts()` and `operationCount()` inside
 transactions and `metrics()` outside them, and all store failures are fatal. Transaction callbacks must not
 perform external work, return promises, or retain their transaction handle.
+
+## Goals, compaction, and steering
+
+[Goals](/packages/durable/goals) add verified continuation across bounded agent sessions.
+[Compaction](/packages/durable/compaction) is configured on registrations and preserves canonical
+history. [Steering](/packages/durable/steering) persists new user input for the next safe boundary;
+approvals and uncertain effects remain explicit decisions. Static graph runs are not compacted.

@@ -109,3 +109,27 @@ Jobs, scripts, tests, and request-scoped connections should close in `finally`. 
 Do not reconnect and list tools for every message unless credentials or remote visibility are intentionally request-scoped.
 
 Next, choose a [stdio, streamable HTTP, or custom transport](/sdk/advanced/mcp/transports).
+
+## Bound discovery and clean up sessions
+
+```ts anvia-check mcp-discovery-example
+import { McpClient } from '@anvia/mcp'
+
+export function boundedMcpClient(url: string) {
+  return new McpClient({
+    name: 'knowledge',
+    transport: {
+      type: 'streamableHttp',
+      url,
+      terminateSessionOnClose: true,
+    },
+    tools: { discoveryLimits: { maxTools: 100, maxBytes: 1_048_576 } },
+  })
+}
+```
+
+Call `connect({ abortSignal })` and close the client during application cleanup. Discovery budgets
+are cumulative over decoded pages and unlimited by default; the first page exceeding either limit
+rejects before further pages are fetched. A new attempt starts a fresh budget. Session termination
+is opt-in, best-effort, and bounded to two seconds; it covers failed initialization and cancellation
+as well as ordinary closure. See [MCP reference](/packages/mcp/api-reference#discovery-budgets-and-session-cleanup).

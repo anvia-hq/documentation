@@ -20,11 +20,13 @@ pnpm add @anvia/durable @anvia/core zod
 
 Add a provider package such as `@anvia/openai` for the model. SQLite storage uses Node's built-in
 `node:sqlite`, so the package requires **Node.js 22.16 or newer**. Use the accompanying `@anvia/core`
-release: the durable package requires core's agent execution protocol version 2 and rejects older core
+release: the durable package requires core's agent execution protocol version 4 and rejects older core
 versions when it is imported. `zod` is a peer dependency.
 
 To expose durable runs over HTTP, add `@anvia/server` (`@anvia/server/durable`) and `@anvia/client`
-(`@anvia/client/durable`). Both declare an optional peer range for `@anvia/durable` 0.1, 0.2, and 0.3.
+(`@anvia/client/durable`). Use mutually compatible releases: the reviewed Client and Server manifests accept Durable through
+0.12. Steering requires Durable 0.8+, HTTP task agent binding requires 0.6+, and tracing requires
+0.11+ (0.12+ for an observability session override).
 
 ## What it provides
 
@@ -47,13 +49,17 @@ submit → queued request + event (atomic) → model/tool checkpoints → outcom
 | Runtime registration | Add agents without a restart; remove idle registrations safely. |
 | Custom tasks | Versioned, schema-validated tasks with checkpoints, owned children, timers, signals, and effects. |
 | Static task graphs | Persisted DAGs of registered-agent tasks with committed dependency outputs. |
+| Goals | Verified objectives across bounded sessions, with continuing rounds and persisted controls. |
+| Steering | Deduplicated user input queued at safe model/tool boundaries. |
+| Compaction | Recoverable model-context summaries between runs and inside tool loops. |
+| Tracing | One trace per durable run across attempts, with application session grouping. |
 | Operations | Fail-closed storage, readiness, metrics, limits, and offline backup and restore. |
 
 ## Entry points
 
 | Import | Purpose |
 | --- | --- |
-| `@anvia/durable` | `DurableRuntime`, `defineTask`, run/task/graph handles, errors, and types. |
+| `@anvia/durable` | `DurableRuntime`, `defineTask`, `defineGoal`, run/task/graph handles, errors, and types. |
 | `@anvia/durable/sqlite` | `SqliteDurableStore`. Kept separate so the root never imports `node:sqlite`. |
 | `@anvia/durable/protocol` | Browser-safe validators and types used by the HTTP client. |
 | `@anvia/durable/maintenance` | Offline `backupSqlite` and `restoreSqlite`. |
@@ -64,6 +70,10 @@ submit → queued request + event (atomic) → model/tool checkpoints → outcom
 - [Capabilities](/packages/durable/capabilities)
 - [Configuration](/packages/durable/configuration)
 - [Tasks and graphs](/packages/durable/tasks-and-graphs)
+- [Goals](/packages/durable/goals)
+- [Compaction](/packages/durable/compaction)
+- [Steering](/packages/durable/steering)
+- [Tracing](/packages/durable/tracing)
 - [HTTP server and client](/packages/durable/http)
 - [Operations](/packages/durable/operations)
 - [API reference](/packages/durable/api-reference)

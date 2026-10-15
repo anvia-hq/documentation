@@ -4,7 +4,8 @@ A quality gate converts a release comparison into a repeatable approval policy. 
 
 Use a gate when “the candidate looks acceptable” needs to become explicit rules such as:
 
-- Evaluate at least 50 cases.
+- Evaluate at least 50 cases and require 50 valid cases for each release metric.
+- Bound invalid and unknown judgment rates per metric.
 - Keep correctness pass rate at or above 95%.
 - Allow no more than a two-percentage-point correctness regression.
 - Keep P95 trace duration within 15% of the baseline.
@@ -29,7 +30,7 @@ The candidate and baseline must be different completed runs with the same suite 
 | --- | --- | --- |
 | `pass` | The minimum case count and every rule passed. | The gate approves this comparison. |
 | `fail` | At least one calculable rule exceeded its limit. | Investigate the failed rules and changed cases. |
-| `insufficient_data` | Lens could not calculate one or more requirements. | Fix the evidence; do not treat it as approval. |
+| `insufficient_data` | A measure cannot be calculated, or a configured evidence minimum/rate budget was not met. | Fix the evidence; do not treat it as approval. |
 
 A failure takes precedence over insufficient data when both occur. Otherwise, any insufficient rule makes the overall verdict `insufficient_data`.
 

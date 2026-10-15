@@ -288,6 +288,10 @@ export default defineConfig({
                 { text: 'Tools and recovery', link: '/sdk/advanced/durable-execution/recovery' },
                 { text: 'Tasks and subagents', link: '/sdk/advanced/durable-execution/tasks' },
                 { text: 'Task graphs', link: '/sdk/advanced/durable-execution/graphs' },
+                { text: 'Goals', link: '/packages/durable/goals' },
+                { text: 'Compaction', link: '/packages/durable/compaction' },
+                { text: 'Steering', link: '/packages/durable/steering' },
+                { text: 'Tracing', link: '/packages/durable/tracing' },
                 { text: 'Production', link: '/sdk/advanced/durable-execution/production' }
               ]
             },
@@ -910,6 +914,10 @@ export default defineConfig({
                 { text: 'Capabilities', link: '/packages/durable/capabilities' },
                 { text: 'Configuration', link: '/packages/durable/configuration' },
                 { text: 'Tasks and graphs', link: '/packages/durable/tasks-and-graphs' },
+                { text: 'Goals', link: '/packages/durable/goals' },
+                { text: 'Compaction', link: '/packages/durable/compaction' },
+                { text: 'Steering', link: '/packages/durable/steering' },
+                { text: 'Tracing', link: '/packages/durable/tracing' },
                 { text: 'HTTP server and client', link: '/packages/durable/http' },
                 { text: 'Operations', link: '/packages/durable/operations' },
                 { text: 'API', link: '/packages/durable/api-reference' },
@@ -994,6 +1002,7 @@ export default defineConfig({
                 { text: 'Configuration', link: '/packages/openai/configuration' },
                 { text: 'Compatible endpoints', link: '/packages/openai/compatible-endpoints' },
                 { text: 'Models and media', link: '/packages/openai/models-and-media' },
+                { text: 'Decisions', link: '/packages/openai/decisions' },
                 { text: 'API', link: '/packages/openai/api-reference' },
                 { text: 'Releases', link: '/packages/openai/releases' }
               ]

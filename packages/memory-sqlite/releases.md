@@ -1,6 +1,6 @@
 # Releases
 
-Current stable release: `1.2.0`. The entries below preserve notable v0 history.
+Reviewed source release: `1.2.1`. The entries below preserve notable v0 history.
 
 Notable package releases include:
 
@@ -14,3 +14,9 @@ Notable package releases include:
 - `0.1.0` introduced the SQLite store.
 
 Dependency and patch details remain authoritative in the [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-sqlite/CHANGELOG.md). Review it together with [Schema and migrations](/packages/memory-sqlite/schema-and-migrations) before upgrading a managed schema.
+
+## Changes through 1.2.1
+
+Reviewed `1.2.0` → `1.2.1` against SDK source on 2026-10-15. Refreshed package READMEs with current overviews, quickstarts, and links to the detailed guides. Review the source changelog for any dependency changes included in your upgrade.
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/memory-sqlite/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.

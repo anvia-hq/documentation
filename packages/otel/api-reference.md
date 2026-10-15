@@ -2,6 +2,8 @@
 
 ```ts
 import {
+  createAnviaIdGenerator,
+  type OtelIdGenerator,
   createOtelEvalReporter,
   createOtelObserver,
   createOtelPipelineObserver,
@@ -96,3 +98,12 @@ const reporter = createOtelEvalReporter({
 ```
 
 Pass the reporter to `runEvalSuite()`. When no logger is supplied it uses the active global OpenTelemetry logging provider.
+
+## Trace ID generator
+
+`createAnviaIdGenerator(base?: OtelIdGenerator): OtelIdGenerator` lets parentless Anvia root spans
+use a supplied trace ID, including durable retries. `OtelIdGenerator` has `generateTraceId(): string`
+and `generateSpanId(): string`. Without a supplied base, ordinary IDs use the package's random
+generator; a supplied base handles ordinary IDs. Configure the result as the tracer provider's
+`idGenerator`. The helper does not register the provider or manage exporters. See
+[Durable tracing](/packages/durable/tracing#opentelemetry-provider-setup).

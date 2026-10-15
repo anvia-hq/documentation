@@ -64,10 +64,11 @@ await backupSqlite('./durable.sqlite', './backup.sqlite')
 await restoreSqlite('./backup.sqlite', './restored.sqlite') // always a new file
 ```
 
-Backup and restore are offline, accept schema 3 or 4, and only write new files. Never run a restored copy next
-to the original, and reconcile external effects that happened after the backup before replaying. SQLite
-upgrades older schemas to 4 on acquisition, older engines reject schema 4, and there is no downgrade: roll
-back from a backup. Drain, back up, test against a restored copy, then restart one owner and admit a small
+Backup and restore are offline and write new destination files. They accept schemas 3–9, but backup
+ownership acquisition upgrades its source before writing a schema-9 archive. Keep an offline copy
+before upgrading if rollback to an older engine is required. Never run a restored copy alongside
+the original, and reconcile post-backup external effects before replaying. SQLite upgrades schemas
+1–8 to 9 on acquisition; older engines reject schema 9, and databases cannot be downgraded. Drain, back up, test against a restored copy, then restart one owner and admit a small
 workload. See [Operations](/packages/durable/operations) for the full procedure.
 
 ## 6. Checklist

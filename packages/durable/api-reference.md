@@ -7,6 +7,8 @@ import {
   DurableTaskGraph,
   DurableTaskHandle,
   defineTask,
+  defineGoal,
+  goalControlSignal,
   DurableConflictError,
   DurableLimitError,
   DurableNotFoundError,
@@ -35,6 +37,13 @@ class DurableRuntime {
   // Agent runs
   submit(input: DurableSubmission, options?: DurableSubmitOptions): Promise<DurableRun>
   getRun(id: string): Promise<DurableRun>
+  status(id: string): DurableRunSummary
+  run(id: string): DurableRunRecord
+  operationRequest(id: string, key: string): CompletionRequest
+  steer(id: string, input: AgentSteerInput, options?: DurableSteerOptions): AgentSteerReceipt
+  submitGoal(definition: DefinedGoal, input: GoalInput & {
+    sessionId: string; requestId: string; trace?: DurableTraceOptions
+  }): Promise<DurableTaskHandle<GoalResult>>
   listRuns(options?: DurableListOptions): Promise<DurableRunPage>
   runScope(runId: string): DurableRunScope
 
@@ -50,7 +59,7 @@ class DurableRuntime {
   // Custom tasks
   submitTask<I, S, R>(
     definition: DefinedTask<I, S, R>,
-    input: { sessionId: string; requestId: string; input: I },
+    input: { sessionId: string; requestId: string; input: I; trace?: DurableTraceOptions },
   ): Promise<DurableTaskHandle<R>>
   submitRegisteredTask(input: {
     name: string
@@ -58,6 +67,7 @@ class DurableRuntime {
     sessionId: string
     requestId: string
     input: JsonValue
+    trace?: DurableTraceOptions
   }): Promise<DurableTaskHandle>
   getTask(id: string): Promise<DurableTaskHandle>
   listTasks(options?: TaskListOptions): Promise<TaskPage>
@@ -98,7 +108,9 @@ type DurableRuntimeOptions = {
 ```ts
 class DurableRun {
   readonly id: string
-  snapshot(): Promise<DurableSnapshot>
+  status(): Promise<DurableRunSummary>
+  snapshot(options?: { operations?: boolean }): Promise<DurableSnapshot>
+  steer(input: AgentSteerInput, options?: DurableSteerOptions): Promise<AgentSteerReceipt>
   stream(options?: { after?: number; abortSignal?: AbortSignal }): AsyncIterable<DurableEvent>
   result(options?: { abortSignal?: AbortSignal }): Promise<AgentOutcome<unknown>>
   respond(interactionId: string, response: AgentInteractionResponse): Promise<void>
@@ -121,6 +133,7 @@ type DurableSubmission = {
   sessionId: string
   requestId: string
   prompt: AgentPrompt // nonblank string or a core user message
+  trace?: DurableTraceOptions
 }
 type DurableSubmitOptions = { enqueue?: boolean }
 
@@ -130,6 +143,7 @@ type DurableAgentRegistration = {
   stream?: boolean
   toolRecovery?: Readonly<Record<string, 'safe' | 'idempotent' | 'manual'>>
   modelRetry?: { maxAttempts: number; initialDelayMs: number; maxDelayMs: number }
+  compaction?: DurableCompactionOptions
 }
 
 type DurableRunStatus =
@@ -150,6 +164,8 @@ type DurableEvent = {
     | 'submitted' | 'status' | 'model_started' | 'model_attempt_started'
     | 'model_delta' | 'model_attempt_failed' | 'model_completed'
     | 'tool_started' | 'tool_completed'
+    | 'compaction_started' | 'compaction_completed'
+    | 'steering_queued' | 'steering_applied'
   data: JsonValue
 }
 
@@ -166,7 +182,7 @@ type DurableRunPage = { runs: DurableRunSummary[]; nextCursor?: number }
 `DurableRunRecord` includes the submission fields plus `id`, `version`, `status`, timestamps, `graphId`,
 `taskId`, `dependencies`, `epoch`, `input`, `modelTurns`, `maxModelTurns`, `usage`, `history`, `outcome`,
 `error`, `blockedOperation`, `modelRetry`, `nextAttemptAt`, `stream`, and `responses`. `DurableOperation`
-has `key`, `kind` (`model`, `tool`, or `effect`), `input`, `status` (`started` or `completed`), `recovery`,
+has `key`, `kind` (`model`, `tool`, `context`, or `effect`), `input`, `status` (`started` or `completed`), `recovery`,
 `result`, `attempts`, and `attemptId`.
 
 ## Graphs
@@ -220,7 +236,8 @@ type TaskContext<I, S> = {
   readonly checkpoint: S
   readonly signal: AbortSignal
   spawn(key: string, task: TaskDefinition<CI, CS, CR>, input: CI): string
-  spawnAgent(key: string, input: { agentId: string; prompt: AgentPrompt }): string
+  spawnAgent(key: string, input: TaskAgentInput): string
+  agentRun(childId: string): DurableRunRecord
   children(): TaskRecord[]
   signalValue(name: string): JsonValue | undefined
   effect<T extends JsonValue>(
@@ -239,7 +256,7 @@ type TaskWait =
 
 class DurableTaskHandle<R = JsonValue> {
   readonly id: string
-  snapshot(): Promise<{ task: TaskRecord; operations: DurableOperation[]; cursor: number }>
+  snapshot(options?: { operations?: boolean }): Promise<{ task: TaskRecord; operations: DurableOperation[]; cursor: number }>
   graph(): Promise<TaskGraphSnapshot>
   stream(options?: { after?: number; abortSignal?: AbortSignal }): AsyncIterable<TaskEvent>
   result(options?: { abortSignal?: AbortSignal }): Promise<R>
@@ -288,3 +305,44 @@ import { DurableClient, DurableHttpError } from '@anvia/client/durable'
 ```
 
 See [HTTP server and client](/packages/durable/http) for options, routes, and methods.
+
+## Goals and continuing agent children
+
+`defineGoal(definition: GoalDefinition): DefinedGoal` creates a registered task controller.
+`GoalDefinition` has `name`, `version`, optional default `agentId`, optional `rounds: 'fresh' | 'continue'`,
+and required `assess(input: GoalAssessment, signal: AbortSignal): Promise<GoalDecision>`.
+See [Goals](/packages/durable/goals) for input, limits, result, assessment, and control contracts.
+
+The root exports `GoalDefinition`, `DefinedGoal`, `GoalAssessment`, `GoalSession`, `GoalInput`,
+`GoalLimits`, `GoalDecision`, `GoalCheckpoint`, `GoalResult`, `GoalPauseReason`, `GoalResume`,
+`GoalControls`, `GoalEdit`, and `GoalMessage`. It also exports `goalDecisionSchema`, `goalEditSchema`,
+`goalMessageSchema`, `goalPauseSchema`, and `goalResumeSchema`.
+`goalControlSignal(task, family)` accepts `pause`, `edit`, or `message` and returns the next unused
+indexed name; delivery still uses `taskHandle.signal()`.
+
+`TaskAgentInput` is `{ agentId, prompt, maxModelTurns?, continueFrom? }`. The optional turn cap
+includes the initial call. `continueFrom` is the key of a finished agent sibling owned by the same
+parent task, including a turn-exhausted sibling. `context.agentRun(childId)` reads only direct owned
+agent children. See [Tasks and graphs](/packages/durable/tasks-and-graphs).
+
+## Compaction, steering, and trace types
+
+`DurableCompactionPolicy` is `{ trigger: { afterTokens }, retention?: { recentTurns?, recentToolTurns? } }`.
+`DurableCompactionOptions` adds required `compactor: MemoryCompactor` and optional
+`tokenCounter: MemoryTokenCounter`. `DurableContextCheckpoint` is `{ summary, compactedMessageCount }`.
+See [Compaction](/packages/durable/compaction) for recovery and usage semantics.
+
+`DurableSteerOptions` is `{ requestId?: string }`. `DurableSteeringEntry` is `{ id, messages }`;
+`DurableSteeringState` contains `pending`, boundary `checkpoints`, and `closed`.
+`AgentSteerInput` and `AgentSteerReceipt` come from `@anvia/core/agent`.
+The browser-safe protocol entrypoint exports `parseDurableSteering`, `parseDurableSteerReceipt`,
+and the durable steering types. See [Steering](/packages/durable/steering).
+
+`DurableTraceOptions` contains optional `sessionId`, `name`, `userId`, `tags`, JSON `metadata`, and
+`version`. The runtime assigns trace IDs and durable metadata. See [Tracing](/packages/durable/tracing).
+
+Records additionally capture `continueFrom`, `compaction`, `contextCheckpoint`, `contextPrepared`,
+`loopCompaction`, `exhaustion`, and `steering` when applicable. SQLite operation envelopes may have
+`historyEncoding: 'linked-v1'`; use `operationRequest()` to expand a model request. Run snapshots
+include operations by default; task snapshots omit them by default. See
+[bounded inspection](/packages/durable/operations#bounded-inspection-and-shared-histories).

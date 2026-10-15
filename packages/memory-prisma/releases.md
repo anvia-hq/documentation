@@ -1,6 +1,6 @@
 # Releases
 
-Current stable release: `1.2.1`. The entries below preserve notable v0 history.
+Reviewed source release: `1.2.2`. The entries below preserve notable v0 history.
 
 Notable package releases include:
 
@@ -17,3 +17,9 @@ Notable package releases include:
 - `0.2.0` introduced the durable Prisma adapter family release.
 
 Release entries are generated through Changesets. Consult the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-prisma/CHANGELOG.md) before migrating schema or changing peer versions.
+
+## Changes through 1.2.2
+
+Reviewed `1.2.1` → `1.2.2` against SDK source on 2026-10-15. Refreshed package READMEs with current overviews, quickstarts, and links to the detailed guides. Review the source changelog for any dependency changes included in your upgrade.
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/memory-prisma/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
