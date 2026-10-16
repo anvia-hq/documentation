@@ -6,7 +6,7 @@ The reviewed source release is `@anvia/client` **1.4.4**.
 
 Reviewed `1.2.0` → `1.4.4` against SDK source on 2026-10-15. Added durable discovery, queues, graphs, custom tasks, and operations support, followed by multimodal prompts and compatibility with compaction and goals. Queued steering is available through `DurableClient.steer()`; subsequent releases accept Durable 0.9–0.12 for goal controls, continuing rounds, and tracing. HTTP submission types exclude server-owned trace context. See [Durable HTTP](/packages/durable/http).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/client/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/client/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

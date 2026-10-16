@@ -1,13 +1,13 @@
 # Releases
 
-The reviewed source release is `@anvia/studio` **1.3.14**. The entries below summarize recent v1
+The reviewed source release is `@anvia/studio` **1.3.16**. The entries below summarize recent v1
 changes and preserve notable v0 Studio milestones.
 
 ## Changes through 1.3.14
 
 Reviewed `1.3.5` → `1.3.14` against SDK source on 2026-10-15. Updated workspace dependencies across the Core, Durable, provider, observability, browser, and sandbox releases. These dependency updates do not introduce a durable goals UI; see [Durable scope](/packages/durable/capabilities).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/tool-studio/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/tool-studio/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

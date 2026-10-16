@@ -1,13 +1,13 @@
 # Releases
 
-The reviewed source release is `@anvia/core` **1.14.1**. The source changelog is authoritative; the
+The reviewed source release is `@anvia/core` **1.15.0**. The source changelog is authoritative; the
 entries below summarize recent v1 changes and preserve notable v0 compatibility milestones.
 
 ## Changes through 1.14.1
 
 Reviewed `1.9.0` → `1.14.1` against SDK source on 2026-10-15. Added OpenAI Decisions and typed refusal errors (1.10), active-loop compaction and broader credential redaction (1.11), summary temperature omission (1.11.1), question-tool defaults and input limits (1.12), durable steering protocol 4 (1.13), observer failure reporting (1.14), and replay-aware durable tracing (1.14.1). See [Decisions](/sdk/decisions), [compaction](/sdk/memory/compaction), and [observability](/sdk/observability).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/core/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/core/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
