@@ -6,7 +6,7 @@ only validate APIs present in examples; they cannot reveal an exported API that 
 ## Source and inventory
 
 `scripts/sdk-coverage.json` records 81 public entrypoints across 38 public SDK packages at reviewed
-source revision `6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679`. Each entry links its owning guide and
+source revision `10977b75a1518a553b7d5deb0193b788258ba093`. Each entry links its owning guide and
 reference, with an export-name count and SHA-256 snapshot. The checker resolves TypeScript exports
 from source, including re-exports and types; private packages and `@anvia/core/internal/*` are
 excluded. A new/removed entrypoint or changed exported name set requires editorial review.
@@ -17,6 +17,11 @@ behavior under the same names. Review those changes against the source, checked 
 runtime tests. Types and aliases can belong to an existing feature/reference without a separate
 tutorial. The `features` entries tie selected APIs to complete examples and named offline tests;
 `utilities` records reference coverage or a reason for excluding a dedicated tutorial.
+
+The 2026-10-16 release-baseline refresh updates source versions and export-name snapshots only.
+Pipeline decision and routing documentation remains tracked in
+[documentation PR #10](https://github.com/anvia-hq/documentation/pull/10); refreshing the snapshot
+does not establish feature coverage for those additions.
 
 ## Run the checks
 

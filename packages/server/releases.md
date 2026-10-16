@@ -6,7 +6,7 @@ The reviewed source release is `@anvia/server` **1.3.4**. The entries below pres
 
 Reviewed `1.1.4` → `1.3.4` against SDK source on 2026-10-15. Added authorized durable run, graph, and task routes and operational controls, then multimodal prompts, goal agent authorization, and `POST /runs/:id/steer`. The handler now derives trace context after authorization through `trace(request, resource)`, including an observability session override with Durable 0.12. See [Durable HTTP](/packages/durable/http).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/server/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/server/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
