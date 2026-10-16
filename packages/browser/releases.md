@@ -1,12 +1,12 @@
 # Releases
 
-The reviewed source release is `@anvia/browser` **1.1.10**.
+The reviewed source release is `@anvia/browser` **1.1.11**.
 
 ## Changes through 1.1.10
 
 Reviewed `1.1.9` → `1.1.10` against SDK source on 2026-10-15. Aligned the sandbox dependency with Bash-aware command selection. See [Sandbox commands](/sdk/advanced/sandbox/commands#natural-command-lines).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/tool-browser/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/tool-browser/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

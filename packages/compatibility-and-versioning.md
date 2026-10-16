@@ -17,20 +17,20 @@ Package pages summarize these boundaries, while the package manifest remains the
 ## Stable versions
 
 Each package publishes stable releases through its own npm `latest` tag. As of the current
-documentation baseline, Core is `1.14.1`, Studio is `1.3.14`, and the graph packages are `1.1.5`;
+documentation baseline, Core is `1.15.0`, Studio is `1.3.16`, and the graph packages are `1.1.5`;
 other packages can have different versions. Check the package's release page or npm metadata rather
 than assuming one repository-wide version.
 
-These are versions in the reviewed SDK source (`6664e5df`, 2026-10-15), not a live npm-tag query.
+These are versions in the reviewed SDK source (`10977b75`, 2026-10-16), not a live npm-tag query.
 Durable is `0.12.0`; Client `1.4.4` and Server `1.3.4` support its current protocol.
 Pin exact versions in production environments when upgrades require deliberate review.
 
 ```json
 {
   "dependencies": {
-    "@anvia/core": "1.14.1",
-    "@anvia/openai": "1.3.0",
-    "@anvia/studio": "1.3.14"
+    "@anvia/core": "1.15.0",
+    "@anvia/openai": "1.3.1",
+    "@anvia/studio": "1.3.16"
   }
 }
 ```

@@ -1,12 +1,12 @@
 # Releases
 
-Reviewed source release: `1.2.0`. The entries below preserve notable v0 history.
+Reviewed source release: `1.2.1`. The entries below preserve notable v0 history.
 
 ## Changes through 1.2.0
 
 Reviewed `1.1.6` → `1.2.0` against SDK source on 2026-10-15. Omitted serialized observer error stacks by default, including nested causes. Added `includeErrorStack` for explicit debugging capture, with expanded Core credential redaction. See [Data and privacy](/packages/logger/data-and-privacy#error-stacks).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/logger/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/logger/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Notable history
 

@@ -1,12 +1,12 @@
 # Releases
 
-Reviewed source release: `1.3.0`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Reviewed source release: `1.3.1`. The entries below summarize the 1.0 line and preserve notable v0 history.
 
 ## Changes through 1.3.0
 
 Reviewed `1.2.0` → `1.3.0` against SDK source on 2026-10-15. Added `OpenAIClient.decisionModel()`, `GPT_6_LUNA`, decision model types, native choice/score/check mappings, composed multi-label checks, and typed refusal handling. Requires OpenAI SDK 7.30.0 or newer. See [OpenAI decisions](/packages/openai/decisions).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/provider-openai/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/provider-openai/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 

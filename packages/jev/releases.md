@@ -1,6 +1,6 @@
 # Releases
 
-Current release: `0.2.0`. This is the first functional release of `@anvia/jev`.
+Reviewed source release: `0.2.0`. This is the first functional release of `@anvia/jev`.
 
 ## Recent changes
 
@@ -10,7 +10,7 @@ Current release: `0.2.0`. This is the first functional release of `@anvia/jev`.
 
 A `0.0.0-bootstrap.0` placeholder was published once to the `bootstrap` tag to establish the package on npm. It contains no adapter and should not be used in applications.
 
-- [Full `@anvia/jev` changelog](https://github.com/anvia-hq/anvia/blob/main/packages/provider-jev/CHANGELOG.md)
+- [Full `@anvia/jev` changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/provider-jev/CHANGELOG.md)
 - [Compatibility and versioning](/packages/compatibility-and-versioning)
 - [API reference](/packages/jev/api-reference)
 - [Typed decisions guide](/sdk/decisions)

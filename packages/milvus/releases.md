@@ -22,4 +22,4 @@ See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/
 
 Reviewed `1.1.3` → `1.1.5` against SDK source on 2026-10-15. Refreshed package guidance and updated the Milvus client dependency. Check the source changelog alongside server compatibility.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/vector-milvus/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/vector-milvus/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.

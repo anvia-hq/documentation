@@ -1,12 +1,12 @@
 # Releases
 
-Reviewed source release: `1.1.7`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Reviewed source release: `1.1.8`. The entries below summarize the 1.0 line and preserve notable v0 history.
 
 ## Changes through 1.1.7
 
 Reviewed `1.1.4` → `1.1.7` against SDK source on 2026-10-15. Refreshed package guidance and updated upstream Anthropic and Vertex SDK dependencies. Review the source changelog for the dependency versions crossed by your upgrade.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/provider-anthropic/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/provider-anthropic/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 

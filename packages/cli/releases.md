@@ -1,13 +1,13 @@
 # CLI releases
 
 The CLI package versions independently from React UI and the runtime SDK. The reviewed source
-release is `@anvia/cli` **1.5.1**.
+release is `@anvia/cli` **1.5.2**.
 
 ## Changes through 1.5.1
 
 Reviewed `1.5.0` → `1.5.1` against SDK source on 2026-10-15. Bundled the durable-goals skill guidance for persisted handoffs, verified completion, budgets, and resumable sessions. UI installation and skills installation remain separate workflows.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/6664e5df6cfa82c9d8898c2ca2cfba59b2ec0679/packages/cli/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/cli/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

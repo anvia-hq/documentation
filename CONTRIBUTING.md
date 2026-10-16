@@ -11,7 +11,9 @@ Thanks for helping make Anvia easier to understand and operate. Contributions ca
 
 ## Set up the site
 
-You need Node.js 22 or newer and pnpm 11 or newer.
+You need Node.js 24 (24.12.0 or newer within the 24.x release line) and pnpm 11 or newer.
+Local development and CI use `.nvmrc`; if you use nvm, run `nvm install` and `nvm use`
+before installing dependencies.
 
 ```sh
 pnpm install

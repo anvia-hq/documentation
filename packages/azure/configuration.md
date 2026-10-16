@@ -14,12 +14,15 @@ Configure `AzureOpenAIClient` once, then create capability-specific model object
 | `fetch` | Custom `fetch` for the managed client. |
 | `client` | Reuses an initialized official OpenAI SDK client. Cannot be combined with any option above. |
 
+Starting in `0.1.3`, `endpoint` and `baseUrl` require `https://` for non-loopback hosts. Plain `http://` is allowed only for loopback development hosts: `localhost`, `127.0.0.1`, or `[::1]`. For example, `endpoint: 'http://127.0.0.1:10000'` and `baseUrl: 'http://[::1]:10000/openai/v1/'` remain valid for local emulators. Remote gateways must use HTTPS.
+
 The constructor validates its input and throws a `TypeError` when:
 
 - both or neither of `endpoint` and `baseUrl` are given;
 - both or neither of `apiKey` and `azureADTokenProvider` are given;
 - `apiKey` is empty, or `azureADTokenProvider` is not a function, or the provider returns an empty token;
 - the URL is not HTTP(S), or contains credentials, a query string, or a fragment;
+- the URL uses plain HTTP with a non-loopback host;
 - `endpoint` has a path (it must be a resource origin; use `baseUrl` for a full API URL);
 - `client` is combined with managed options.
 
