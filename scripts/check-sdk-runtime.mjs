@@ -772,6 +772,50 @@ test('OpenAI decision example preserves confidence and maps refusals to applicat
   `)
 })
 
+test('Pipeline route example runs only the chosen branch and keeps the decision', async () => {
+  const example = (await blocks('sdk/pipelines/decisions-and-routing.md')).find((block) =>
+    block.flags.includes('pipeline-route-example'),
+  )
+  assert.ok(example)
+  await runExample(example.code, '', `
+    const requests = []
+    const model = {
+      provider: 'docs-test',
+      modelId: 'offline',
+      capabilities: {
+        questionSupport: { choice: 'native', 'multi-label': 'native', score: 'native', check: 'native' },
+        mixedQuestions: true,
+      },
+      async decision(request, options) {
+        requests.push({ request, options })
+        const [name] = Object.keys(request.questions)
+        return {
+          answers: { [name]: { type: 'choice', choice: 'technical', confidence: 0.9 } },
+          usage: { ...Usage.empty(), inputTokens: 8, outputTokens: 1, totalTokens: 9 },
+          rawResponse: {},
+        }
+      },
+    }
+    const triage = createTriage(model)
+    const controller = new AbortController()
+    const started = []
+    const { output } = await triage.run({
+      input: { subject: 'App crashes', body: 'The app crashes on login.' },
+      abortSignal: controller.signal,
+      observer: { onEvent(event) { if (event.type === 'stage_started') started.push(event.path.join('/')) } },
+    })
+    assert.equal(output.branch, 'technical')
+    assert.deepEqual(output.output, { queue: 'engineering', subject: 'App crashes' })
+    assert.equal(output.answer.confidence, 0.9)
+    assert.equal(output.usage.totalTokens, 9)
+    assert.deepEqual(started, ['department', 'department/technical', 'department/technical/open-incident'])
+    assert.deepEqual(requests[0].request.state, { subject: 'App crashes', body: 'The app crashes on login.' })
+    assert.equal(requests[0].options.abortSignal, controller.signal)
+    const labels = triage.graph().edges.flatMap((edge) => (edge.label === undefined ? [] : [edge.label]))
+    assert.deepEqual(labels.sort(), ['billing', 'technical'])
+  `)
+})
+
 // Durable imports Core's internal registration state through workspace exports. Use the same
 // built Agent instance in these integration fixtures rather than mixing source/dist WeakMaps.
 const durableModelFixture = modelFixture + `

@@ -188,6 +188,7 @@ export default defineConfig({
                 { text: 'Typed input', link: '/sdk/pipelines/typed-input' },
                 { text: 'Steps', link: '/sdk/pipelines/steps' },
                 { text: 'Agents and extractors', link: '/sdk/pipelines/agents-and-extractors' },
+                { text: 'Decisions and routing', link: '/sdk/pipelines/decisions-and-routing' },
                 { text: 'Composition', link: '/sdk/pipelines/composition' },
                 { text: 'Parallel and batch', link: '/sdk/pipelines/parallel-and-batch' },
                 { text: 'Runs and errors', link: '/sdk/pipelines/runs-and-errors' },

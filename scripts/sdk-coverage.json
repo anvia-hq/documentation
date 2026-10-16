@@ -709,6 +709,17 @@
       "runtimeTest": "OpenAI decision example preserves confidence and maps refusals to application questions"
     },
     {
+      "title": "Pipeline decision routing",
+      "module": "@anvia/core/pipeline",
+      "symbols": [
+        "Pipeline",
+        "RouteOutput"
+      ],
+      "page": "sdk/pipelines/decisions-and-routing.md",
+      "marker": "pipeline-route-example",
+      "runtimeTest": "Pipeline route example runs only the chosen branch and keeps the decision"
+    },
+    {
       "title": "Durable goals",
       "module": "@anvia/durable",
       "symbols": [

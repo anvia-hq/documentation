@@ -49,6 +49,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Knowledge](https://docs.anvia.dev/sdk/knowledges): Document loading, embeddings, vector stores, retrieval, and search tools.
 - [Structured output](https://docs.anvia.dev/sdk/structured-output): Schema-driven completion and agent output.
 - [Pipelines](https://docs.anvia.dev/sdk/pipelines): Typed multi-step workflows, composition, parallelism, and production workers.
+- [Pipeline decisions and routing](https://docs.anvia.dev/sdk/pipelines/decisions-and-routing): Typed decision stages and choice-based routing to one branch pipeline.
 - [Pipeline runs and observability](https://docs.anvia.dev/sdk/pipelines/runs-and-errors): Named run and stage tracing, Agent trace nesting, operational events, and failure policy.
 - [Streaming](https://docs.anvia.dev/sdk/streaming): Completion and agent streams, event types, transports, cancellation, and resumption.
 - [Providers](https://docs.anvia.dev/sdk/providers): Provider adapters, supported capabilities, and provider selection.

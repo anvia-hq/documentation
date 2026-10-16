@@ -76,7 +76,9 @@ After `.extract()`, the next stage receives the schema's output type. The stage 
 
 The agent owns model reasoning. The extractor owns conversion from text into validated fields. Deterministic steps own authorization, product state, side effects, and final response mapping.
 
-Next, learn how to [compose reusable pipelines](/sdk/pipelines/composition).
+When the judgment is a label, score, or probability, or it selects which flow runs next, use a [decision or route stage](/sdk/pipelines/decisions-and-routing) instead of extracting a routing field.
+
+Next, learn how to [decide and route with typed decisions](/sdk/pipelines/decisions-and-routing).
 
 A blocked stage throws `AgentRunBlockedError` from `@anvia/core/agent`; an interaction throws
 `PipelineAgentSuspensionError` from `@anvia/core/pipeline`. Both retain the child outcome in
