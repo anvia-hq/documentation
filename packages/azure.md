@@ -5,7 +5,7 @@ The Azure provider adapter connects Anvia agents to Azure OpenAI and Azure AI Fo
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `0.1.0` |
+| Version | `0.1.3` |
 | Runtime | ESM, server-side JavaScript |
 | Peer | Matching `@anvia/core` stable release |
 | Depends on | `@anvia/openai`, official `openai` SDK |
@@ -43,6 +43,8 @@ if (result.type === 'response') {
 ```
 
 `endpoint` is the resource origin, such as `https://example.openai.azure.com`; the client appends `/openai/v1/`. Use `baseUrl` instead for a full API URL, including a Foundry project endpoint. `modelId` is your Azure deployment name, not necessarily the underlying model name. `api` is optional and defaults to Chat Completions; pass `api: 'responses'` for the Responses API.
+
+Starting in `0.1.3`, both `endpoint` and `baseUrl` require HTTPS for non-loopback hosts. Plain `http://` is allowed only for loopback development hosts (`localhost`, `127.0.0.1`, or `[::1]`); other HTTP URLs throw a `TypeError` during construction. See [Configuration](/packages/azure/configuration#client-options).
 
 ## Capabilities
 
