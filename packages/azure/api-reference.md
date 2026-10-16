@@ -59,7 +59,17 @@ Handles report `provider: 'azure-openai'`. Chat request traces report `azure-ope
 
 ## Errors
 
-Construction throws `TypeError` for invalid endpoint, credential, or option combinations, as listed in [Configuration](/packages/azure/configuration#client-options). Azure Responses streams that cannot resolve or that conflict on a function name reject with a `CompletionProviderOutputError` of kind `invalid-tool-call`.
+Construction throws `TypeError` for invalid endpoint, credential, or option combinations, as listed in [Configuration](/packages/azure/configuration#client-options).
+
+Starting in `0.1.3`, a plain `http://` URL in either `endpoint` or `baseUrl` with a non-loopback host throws during construction, before any request:
+
+```text
+TypeError: AzureOpenAIClient requires HTTPS for non-loopback endpoints; plain HTTP is allowed only for loopback development hosts.
+```
+
+Use `https://` for remote endpoints and gateways. HTTP remains allowed for loopback development hosts (`localhost`, `127.0.0.1`, or `[::1]`).
+
+Azure Responses streams that cannot resolve or that conflict on a function name reject with a `CompletionProviderOutputError` of kind `invalid-tool-call`.
 
 ## Related `@anvia/openai` export
 

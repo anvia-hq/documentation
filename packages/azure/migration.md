@@ -25,6 +25,12 @@ Replace the import, keep your Azure `baseUrl` and `apiKey` (or switch to `endpoi
 
 OpenAI's own parser accepts an unnamed arguments-done event without synthesizing a name and validates the name on the completed function call. Azure's behavior is layered on through `@anvia/openai/adapters`, so request mapping, tool-result serialization, argument validation, and stream completion checks remain shared.
 
+## Upgrade to 0.1.3
+
+If your `endpoint` or `baseUrl` uses `http://` for a remote host, configure HTTPS on that service or gateway and update the URL to `https://` before upgrading. Otherwise, `AzureOpenAIClient` construction throws a `TypeError`; see the [exact error](/packages/azure/api-reference#errors).
+
+Existing HTTPS configurations need no changes. Local emulator URLs using `http://localhost`, `http://127.0.0.1`, or `http://[::1]` (with optional ports) remain allowed.
+
 ## Build a similar provider
 
 Provider packages that implement an OpenAI-shaped Responses endpoint can reuse the protocol adapter:
