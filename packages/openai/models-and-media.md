@@ -86,3 +86,5 @@ const { data } = await openai.listModels()
 ```
 
 Listing reports inventory; it does not classify every returned ID into Anvia capability factories. Maintain application allowlists for enabled models.
+
+Each listed model keeps its provider `reasoning` metadata and any advertised `pricing` metadata. Both come from the provider, so validate the fields you rely on before you use them.
