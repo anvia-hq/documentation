@@ -42,7 +42,7 @@ const remote = grokTools.mcp({
 })
 ```
 
-The URL must be HTTPS. Labels, authorization, header names, and header values must be non-empty. Credentials are sent to xAI so it can call the remote server; Anvia omits sensitive authorization and headers from its request trace summary.
+The URL must be HTTPS and must not point to a private, loopback, link-local, or other reserved host; `mcp()` throws a `TypeError` for those. Labels, authorization, header names, and header values must be non-empty. Credentials are sent to xAI so it can call the remote server; Anvia omits sensitive authorization and headers from its request trace summary.
 
 ## Operational controls
 

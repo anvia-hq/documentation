@@ -45,6 +45,8 @@ Stores may also implement `inspect()`, which pages stored documents with `limit`
 `cursor` and `filter` — useful for debugging and rebuilds. The in-memory store and the Qdrant
 adapter implement it.
 
+The in-memory store accepts only a canonical nonnegative safe integer string as `cursor`. Signs, fractions, exponents, whitespace, and leading zeroes are rejected. Invalid cursors throw a `RangeError` subclass. Check for them with `VectorInspectCursorError.isCursorError(error)`, which is exported from `@anvia/core/vector-store`. Pass each returned `nextCursor` back unchanged.
+
 ## 2. Search the store
 
 ```ts
