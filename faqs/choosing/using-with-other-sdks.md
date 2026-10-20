@@ -9,7 +9,7 @@ Common integration patterns include:
 - Implement a Core model, memory, vector-store, or observer contract around an existing client.
 - Run an Anvia agent as one stage inside an application-owned worker or workflow.
 - Expose Anvia stream events through an existing server framework using [`@anvia/server`](/packages/server).
-- Connect a custom client through the [`EventTransport` contract](/packages/client/api-reference#transports).
+- Connect a custom client through the [`EventTransport` contract](/packages/client/api-reference#generic-event-transport-reference).
 
 Do not hide ownership boundaries merely to make everything look like one SDK. Provider-specific calls should remain visibly provider-specific. Tool wrappers must preserve authentication, authorization, timeouts, idempotency, and error behavior. A second agent runtime may also introduce two event models, two memory systems, or competing retry policies; define which system owns each concern.
 
