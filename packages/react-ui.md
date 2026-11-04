@@ -1,8 +1,9 @@
 # `@anvia/react-ui`
 
 `@anvia/react-ui` is a strictly headless behavior layer for chat, completion, messages,
-attachments, human input, images, thread lists, and streaming Markdown. It connects to controllers
-from `@anvia/react` while leaving all layout and product styling in the application.
+attachments, human input, images, thread lists, streaming Markdown, and optional sandbox viewers. It
+connects to controllers from `@anvia/react` while leaving all layout and product styling in the
+application.
 
 Use the root package for a convenient combined API or import a component family such as `@anvia/react-ui/message` when you want a narrower boundary.
 
@@ -81,8 +82,22 @@ Compound components read their controller and item state from context, so the sa
 | `@anvia/react-ui/thread-list` | `ThreadListPrimitive`, `ThreadListItemPrimitive` | Conversation navigation and management actions |
 | `@anvia/react-ui/selection-toolbar` | `SelectionToolbarPrimitive` | Quote and copy actions for selected text |
 | `@anvia/react-ui/stream` | `StreamMarkdown` | Context-free Markdown rendering for app-owned streamed text |
+| `@anvia/react-ui/sandbox-terminal` | `SandboxTerminal` | xterm.js terminal for a remote sandbox session |
+| `@anvia/react-ui/sandbox-desktop` | `SandboxDesktop` | noVNC desktop viewer with take-over control |
 | `@anvia/react-ui/graph-explorer` | `GraphExplorerPrimitive`, `GraphExplorerNodePrimitive` | Headless graph-explore provider, search, viewport, node list, empty/status parts, refresh, and node expansion |
 | `@anvia/react-ui` | `ContextMeterPrimitive` | Used or remaining model-context display |
+
+## Sandbox viewers
+
+`@anvia/react-ui/sandbox-terminal` draws a remote sandbox session's terminal with xterm.js.
+`@anvia/react-ui/sandbox-desktop` shows its desktop with noVNC and lets a person take control from
+the agent. Both use optional peer dependencies, load their viewer library on demand, and live on
+their own subpaths rather than the root export. The application mints a one-time ticket for each
+connection; the sandbox hub authorizes the session and any read-only grant.
+
+- [Terminal behavior and security](/sdk/advanced/sandbox/terminals)
+- [Desktop behavior and control](/sdk/advanced/sandbox/desktop)
+- [Viewer API reference](/packages/react-ui/api-reference#anvia-react-ui-sandbox-terminal)
 
 ## Common patterns
 
@@ -116,7 +131,8 @@ Markdown output and tool results may contain model-produced content. Treat custo
 | React peer dependency | `>=18` |
 | React DOM peer dependency | `>=18` |
 | `@anvia/react` peer dependency | Matching stable release |
-| Styling | Application-owned; no package CSS exports |
+| Optional viewer peers | `@xterm/xterm`, `@xterm/addon-fit`, and `@novnc/novnc`; required only by their viewer subpaths |
+| Styling | Application-owned; no package CSS exports. Import `@xterm/xterm/css/xterm.css` when using the terminal |
 
 The components target React DOM and use browser behavior for rich composer, selection, image, and attachment interactions. Render browser-dependent interactions on the client when using an SSR framework.
 

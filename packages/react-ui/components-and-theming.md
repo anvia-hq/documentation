@@ -47,6 +47,15 @@ Inspect the rendered attributes for the part being styled. The stable semantic s
 `data-state` and `data-role`; internal structure is not a styling API. Prefer explicit `className`
 values on the exact primitives your application composes.
 
+The sandbox viewers expose connection state on their root:
+
+- `SandboxTerminal` sets `data-state` to the relay state and adds `data-readonly` while the viewer is read-only.
+- `SandboxDesktop` sets `data-state`, adds `data-readonly` whenever this viewer is view-only (the prop, a ticket grant, or not holding control), and sets `data-control` to `you`, `other`, or `none`.
+- The default status lines use `role="status"` with `data-relay-status`; the desktop's default bar uses `data-sandbox-desktop-controls`.
+
+Replace the status or control markup with `renderStatus` and `renderControls` when the application
+needs its own presentation.
+
 To start from editable Tailwind components, follow the
 [CLI component guide](/packages/cli/components) and modify the generated application files directly.
 

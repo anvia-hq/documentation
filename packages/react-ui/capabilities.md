@@ -15,6 +15,8 @@ React UI exposes compound component families backed by context from `@anvia/reac
 | Threads | `ThreadListPrimitive`, `ThreadListItemPrimitive` | App-controlled thread navigation and archive/delete actions |
 | Context usage | `ContextMeterPrimitive` | Used or remaining model-context display |
 | Streamed Markdown | `StreamMarkdown` | Context-free rendering for an app-owned growing string |
+| Sandbox terminal (`@anvia/react-ui/sandbox-terminal`) | `SandboxTerminal` | xterm.js terminal for a remote sandbox session, with connection status, reconnect, and read-only display |
+| Sandbox desktop (`@anvia/react-ui/sandbox-desktop`) | `SandboxDesktop` | noVNC desktop viewer with scaling, quality controls, and agent/viewer control handoff |
 | Graph explorer | `GraphExplorerPrimitive`, `GraphExplorerNodePrimitive` | Provider context, search, node list, status and empty states, refresh, and node expansion over a `useGraphExplorer` controller |
 
 ## Headless behavior
@@ -27,7 +29,7 @@ components installed by `@anvia/cli`.
 
 ## Boundaries
 
-The package does not provide a complete visual theme, application navigation, server persistence, authentication, Markdown link policy, or tool authorization. Thread-list mutations call the controller supplied by the application. Human-input buttons call `useChat().respondToInteraction()` and do not decide whether the current user is allowed to resolve an interaction.
+The package does not provide a complete visual theme, application navigation, server persistence, authentication, Markdown link policy, or tool authorization. Thread-list mutations call the controller supplied by the application. Human-input buttons call `useChat().respondToInteraction()` and do not decide whether the current user is allowed to resolve an interaction. The sandbox viewers render app-authorized relay sessions: the application mints one-time tickets, and the hub's `authorizeTerminal` or `authorizeDesktop` decides the sandbox, session, and any read-only grant. A viewer's `readOnly` prop is not an access-control decision.
 
 The rich composer uses Tiptap and browser DOM behavior. Image zoom, selection tooling, attachments, and rich editing should run on the client in SSR applications.
 
