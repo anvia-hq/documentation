@@ -2,6 +2,8 @@
 
 Reviewed source release: `1.1.6`. The entries below preserve notable v0 history.
 
+Reviewed against SDK source on 2026-11-04. LanceDB continues to apply the Core filter matcher after retrieval; the richer operators need no adapter release because they run in the shared matcher. See [search and filters](/packages/lancedb/search-and-filters).
+
 Notable releases in the source changelog include:
 
 - `1.1.3` declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents.
@@ -20,4 +22,4 @@ See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/
 
 Reviewed `1.1.3` → `1.1.5` against SDK source on 2026-10-15. Refreshed package guidance and updated the LanceDB client dependency. Check the source changelog alongside database and native-runtime compatibility.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/vector-lancedb/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/vector-lancedb/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
