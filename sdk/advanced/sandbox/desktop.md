@@ -2,7 +2,7 @@
 
 A remote sandbox can expose a virtual display that an agent can see and drive and that a person can watch or take over. Chromium is just one program on that desktop; the API is not browser-specific.
 
-Desktops belong to the [remote runtime](/sdk/advanced/sandbox/remote). Create one with `hub.desktop(sandboxId)` from `@anvia/sandbox/remote`; the local `DockerSandboxClient` runtime does not offer one. The daemon starts the display, inputs, and viewing path inside the sandbox, with the daemon user's privileges. Treat the desktop as an interface inside the sandbox, not as an isolation boundary.
+Desktops belong to the [remote runtime](/sdk/advanced/sandbox/remote). Create one with `hub.desktop(sandboxId)` from `@anvia/sandbox/remote`; the local `DockerSandboxClient` runtime does not offer one. The daemon runs the display and its input tools inside the sandbox, with the daemon user's privileges. Treat the desktop as an interface inside the sandbox, not as an isolation boundary.
 
 ## Look at and drive the desktop
 
@@ -24,7 +24,7 @@ await desktop.resize(1920, 1080)
 
 `status()` reports where the desktop is without starting it. `start()` starts it if needed and waits until it is up. `screenshot()`, `act()`, `resize()`, and `openViewer()` start it on demand too, and callers arriving together share one start.
 
-A status object contains `state` (`stopped`, `starting`, `running`, `restarting`, or `failed`), the current `width` and `height`, `maxWidth` and `maxHeight`, the X `display`, the loopback `vncPort`, the number of `restarts`, an optional `message`, and the current `control` holder.
+A status object contains `state` (`stopped`, `starting`, `running`, `restarting`, or `failed`), the current `width` and `height`, `maxWidth` and `maxHeight`, the X `display`, the loopback `vncPort`, the number of `restarts`, an optional `message`, and the current `control` state.
 
 `screenshot()` returns `{ png, width, height, displayWidth, displayHeight }`. `width` and `height` describe the image; `displayWidth` and `displayHeight` describe the display. Pass a `scale` greater than 0 and at most 1 for a smaller image.
 
@@ -208,7 +208,7 @@ The display starts at 1280x800. Larger sizes cost CPU and bandwidth; 1440x900 is
 
 ## View in a browser
 
-The daemon's VNC server listens on `127.0.0.1` with no password, so the only route to it is a [tunnel](/sdk/advanced/sandbox/tunnels). The daemon always allows its VNC port through, even when tunnel ports are restricted. `desktop.openViewer()` starts the desktop and opens that tunnel, returning a byte handle for a VNC viewer. Nothing like websockify runs in the sandbox.
+The daemon's VNC server listens on `127.0.0.1` with no password, so from outside the sandbox the only route to it is a [tunnel](/sdk/advanced/sandbox/tunnels). The daemon always allows its VNC port through, even when tunnel ports are restricted. `desktop.openViewer()` starts the desktop and opens that tunnel, returning a byte handle for a VNC viewer. Nothing like websockify runs in the sandbox.
 
 For a browser, route upgrades to `handleDesktopUpgrade` and authorize them:
 
