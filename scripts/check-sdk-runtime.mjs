@@ -932,3 +932,12 @@ test('durable compaction example preserves canonical history and omits summary t
     } finally { await runtime.close() }
   `)
 })
+
+test('vector filters combine n-ary operators and metric scoring', async () => {
+  const example = (await blocks('sdk/knowledges/metadata-filters.md')).find(block => block.flags.includes('vector-filter-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    assert.deepEqual(results.map(({ id }) => id), ['invoice', 'accounts'])
+    assert.ok(results[0].score >= results[1].score)
+  `)
+})

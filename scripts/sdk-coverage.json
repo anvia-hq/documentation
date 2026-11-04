@@ -749,6 +749,17 @@
       "page": "packages/durable/compaction.md",
       "marker": "durable-compaction-example",
       "runtimeTest": "durable compaction example preserves canonical history and omits summary temperature"
+    },
+    {
+      "title": "Vector filters and metrics",
+      "module": "@anvia/core/vector-store",
+      "symbols": [
+        "InMemoryVectorStore",
+        "vectorFilter"
+      ],
+      "page": "sdk/knowledges/metadata-filters.md",
+      "marker": "vector-filter-example",
+      "runtimeTest": "vector filters combine n-ary operators and metric scoring"
     }
   ],
   "utilities": [

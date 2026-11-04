@@ -76,6 +76,67 @@ The exported types `VectorFilter`, `VectorFilterOperator`, `VectorFilterComparis
 `VectorFilterList` describe these shapes. `matchesVectorFilter(metadata, filter)` evaluates the
 in-memory semantics directly when an application needs to test a stored record.
 
+```ts anvia-check vector-filter-example
+import { InMemoryVectorStore, vectorFilter } from '@anvia/core/vector-store'
+
+const store = InMemoryVectorStore.fromDocuments({
+  metric: 'euclidean',
+  documents: [
+    {
+      id: 'invoice',
+      document: 'Invoice settings',
+      metadata: {
+        tenantId: 'acme',
+        product: 'billing',
+        status: 'active',
+        revision: 4,
+        priority: 3,
+      },
+      embeddings: [{ document: 'Invoice settings', vector: [1, 0] }],
+    },
+    {
+      id: 'accounts',
+      document: 'Account settings',
+      metadata: {
+        tenantId: 'acme',
+        product: 'accounts',
+        status: 'active',
+        revision: 8,
+        priority: 2,
+      },
+      embeddings: [{ document: 'Account settings', vector: [1, 0.2] }],
+    },
+    {
+      id: 'archive',
+      document: 'Archived invoice',
+      metadata: {
+        tenantId: 'acme',
+        product: 'billing',
+        status: 'archived',
+        revision: 9,
+        priority: 1,
+      },
+      embeddings: [{ document: 'Archived invoice', vector: [1, 0.1] }],
+    },
+  ],
+})
+
+const filter = vectorFilter.and(
+  vectorFilter.eq('tenantId', 'acme'),
+  vectorFilter.ne('status', 'archived'),
+  vectorFilter.in('product', ['billing', 'accounts']),
+  vectorFilter.gte('revision', 3),
+  vectorFilter.lte('revision', 8),
+  vectorFilter.or(
+    vectorFilter.eq('priority', 2),
+    vectorFilter.gte('priority', 3),
+  ),
+)
+
+const results = await store.search({ vector: [1, 0], topK: 5, filter })
+console.log(results.map(({ id }) => id))
+```
+
 ## 4. Adapter translation
 
 Chroma, Milvus, PgVector, Pinecone, Qdrant, Redis, and Weaviate translate filters natively. LanceDB
