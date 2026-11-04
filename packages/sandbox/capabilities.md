@@ -1,6 +1,6 @@
 # Capabilities
 
-The package exposes a Docker sandbox client, a runtime contract, an inspection adapter, and policy-constrained agent tools.
+The package exposes Docker sandboxes, a remote runtime, an inspection adapter, policy-constrained agent tools, and a supervised desktop.
 
 | Surface | Capability |
 | --- | --- |
@@ -12,6 +12,12 @@ The package exposes a Docker sandbox client, a runtime contract, an inspection a
 | Ports | Publish declared ports to random loopback host ports and wait for readiness |
 | Inspection | Opt-in, read-only file, port, and process capabilities through `sandbox.inspector(...)` |
 | Agent tools | Explicit command, file, process, port, and readiness tool selection with policy limits |
+| Remote runtime | A hub that accepts daemon connections and exposes a runtime per sandbox, including reconnects and idempotent operations |
+| Terminals | Interactive PTY sessions through the hub, persistent in tmux when the image has it |
+| Tunnels | Byte streams to allowed loopback ports inside the sandbox |
+| Desktop | Virtual display, screenshots, input actions, resizing, a control lock, and a VNC viewer path |
+| Desktop tools | Screenshot, click, mouse, drag, scroll, type, key, cursor, and wait tools with coordinate scaling |
+| Daemon CLI | `anvia-sandbox-daemon` with environment configuration and `--check` / `--require` |
 | Image CLI | Generate and optionally build composed runtime images with `create-image` |
 
 ## Image builder
@@ -24,10 +30,12 @@ pnpm dlx @anvia/sandbox create-image \
   --feature artifacts
 ```
 
-The CLI supports curated runtimes/features plus explicit apt, npm, and uv packages. `--dry-run` prints without writing or building; `--no-build` writes the Docker context only. Generated custom package versions can drift unless pinned.
+The CLI supports curated runtimes and features plus explicit apt, npm, and uv packages. `--dry-run` prints without writing or building; `--no-build` writes the Docker context only. Generated custom package versions can drift unless pinned.
+
+`--feature desktop` adds Node.js and writes an image that installs Xvnc, openbox, xdotool, ImageMagick, xterm, tmux, and the daemon with `node-pty`, then runs it as a non-root `sandbox` user. It cannot be combined with `playwright`. The generated image starts the daemon, so it is for the remote runtime rather than `DockerSandboxClient`.
 
 ## Boundaries
 
-The package does not provide a remote sandbox service, scheduler, artifact registry, secret manager, automatic image pulling, or complete hostile-code guarantee. Docker and host configuration remain part of the isolation boundary.
+The package does not provide a hosted control plane, a token issuer, a scheduler, an artifact registry, a secret manager, automatic image pulling, or a complete hostile-code guarantee. The hub authorizes and routes daemon connections; Docker, the VM, the host, and the daemon user remain part of the isolation boundary. A desktop runs inside the sandbox and is not a separate security boundary.
 
-See [lifecycle](/packages/sandbox/lifecycle), [security](/packages/sandbox/security), and the [API reference](/packages/sandbox/api-reference).
+See [remote sandboxes](/sdk/advanced/sandbox/remote), [desktop](/sdk/advanced/sandbox/desktop), [terminals](/sdk/advanced/sandbox/terminals), [tunnels](/sdk/advanced/sandbox/tunnels), [lifecycle](/packages/sandbox/lifecycle), [security](/packages/sandbox/security), and the [API reference](/packages/sandbox/api-reference).
