@@ -1,6 +1,6 @@
 # Anvia Full-Stack Applications
 
-> Current stable v1 implementation context for server streaming and React chat. Updated 2026-08-23.
+> Current stable v1 implementation context for server streaming and React chat. Updated 2026-11-04.
 
 Keep agents, provider credentials, tools, memory, retrieval, observers, continuations, and access
 control on the server. Send only the reviewed Client Protocol to the browser.
@@ -148,6 +148,18 @@ For resumable streams, use durable shared storage across replicas, authorize bot
 ownership, and apply retention/deletion policy separately to messages, uploads, stream envelopes,
 memory, and telemetry.
 
+When the backend is a `@anvia/durable` endpoint, create one
+`createDurableChatTransport({ client, agentId, sessionId })` per chat session and pass it to
+`useChat`. The adapter submits only the last user message, maps durable journal events to Client
+Protocol frames, routes interactions to the active run, and uses the durable run ID and sequence as
+the resume cursor. `stop()` detaches the subscription; it does not cancel the run. Use
+`transport.controller.cancel()`, `retry()`, or `reattach()` explicitly. A busy session (HTTP 409)
+surfaces as `DurableBusyError` with the active run to reattach to.
+
+Durable payload limits are terminal for admission: a prompt, input, or inherited history over
+`maxPayloadBytes` ends the run as `failed`, returns HTTP 413 through the handler, and is never
+retried with a truncated history. The handler's `maxBodyBytes` is the binding ceiling for uploads.
+
 ## Production checklist
 
 - Validate actual request bytes, message/part counts, text lengths, metadata, and attachments.
@@ -160,7 +172,9 @@ memory, and telemetry.
 ## Canonical documentation
 
 - Client protocol: https://docs.anvia.dev/packages/client/
+- Durable chat transport: https://docs.anvia.dev/packages/client/durable-chat
 - Server: https://docs.anvia.dev/packages/server/
+- Durable execution: https://docs.anvia.dev/sdk/advanced/durable-execution
 - React controllers: https://docs.anvia.dev/packages/react/
 - React UI: https://docs.anvia.dev/packages/react-ui/
 - CLI: https://docs.anvia.dev/packages/cli/

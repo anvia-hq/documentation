@@ -63,7 +63,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Agent skills](https://docs.anvia.dev/sdk/advanced/skills): Skill directories, `SKILL.md`, assets, loading, tools, and validation.
 - [Dynamic tools](https://docs.anvia.dev/sdk/advanced/dynamic-tools): Large tool catalogs, indexing, embedding, and safety.
 - [Think tool](https://docs.anvia.dev/sdk/advanced/think-tool): Explicit reasoning-tool configuration and privacy guidance.
-- [Sandbox execution](https://docs.anvia.dev/sdk/advanced/sandbox): Isolated execution and security boundaries.
+- [Sandbox execution](https://docs.anvia.dev/sdk/advanced/sandbox): Docker and remote sandboxes, terminals, tunnels, desktops, and security boundaries.
 - [Multimodal inputs](https://docs.anvia.dev/sdk/advanced/multimodal): Images, audio, documents, and other media.
 - [Parallel and batch work](https://docs.anvia.dev/sdk/advanced/parallel-and-batch): Concurrency and batch execution patterns.
 
