@@ -46,8 +46,10 @@ Some adapters require a specific Node.js version, browser runtime, native depend
 - UI packages require compatible React versions.
 - local embedding packages may download models or load native/WASM runtimes;
 - database and vector adapters require compatible client libraries and schemas;
-- `@anvia/sandbox` requires a supported Docker environment;
-- `@anvia/browser` requires Docker, a compatible browser image, and Playwright-compatible Chromium;
+- `@anvia/sandbox` requires a supported Docker environment for `DockerSandboxClient`, or a POSIX
+  daemon host with outbound WebSocket access for the remote runtime;
+- the sandbox desktop requires TigerVNC's `Xvnc` or the `Xvfb`/`x11vnc` pair, plus `xdotool`,
+  `xrandr`, and ImageMagick inside the image;
 - `@anvia/neo4j` requires Neo4j 2026.01 or newer and matching vector dimensions;
 - `@anvia/memgraph` requires Memgraph 3.6 or newer and matching vector dimensions;
 - `@anvia/mcp` requires Node.js 20 or newer and pins MCP protocol `2026-07-28` by default;

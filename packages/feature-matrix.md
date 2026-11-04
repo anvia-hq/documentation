@@ -56,11 +56,10 @@ Provider-specific support for images, audio, transcription, OCR, tools, reasonin
 
 ## Development
 
-| Package | Inspect agents | Run pipelines | Explore graphs | Isolated commands | Visible browser | Persistent workspace |
+| Package | Inspect agents | Run pipelines | Explore graphs | Isolated commands | Visible desktop | Persistent workspace |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: |
-| `@anvia/studio` | ✓ | ✓ | ✓ | Through sandbox adapters | Viewer | — |
-| `@anvia/sandbox` | — | — | — | ✓ | Infrastructure | Optional |
-| `@anvia/browser` | — | — | — | — | ✓ | Optional profile volume |
+| `@anvia/studio` | ✓ | ✓ | ✓ | Through sandbox adapters | Viewer and takeover | — |
+| `@anvia/sandbox` | — | — | — | ✓ | Remote desktop | Optional |
 
 ## Typed decisions and durable goals
 

@@ -378,10 +378,6 @@ export default defineConfig({
                 { text: 'Limits and security', link: '/sdk/advanced/sandbox/security' },
                 { text: 'Production checklist', link: '/sdk/advanced/sandbox/checklist' }
               ]
-            },
-            {
-              text: 'Visible browser agents',
-              link: '/sdk/advanced/browser'
             }
           ]
         },
@@ -657,7 +653,6 @@ export default defineConfig({
             },
             { text: 'Memory', link: '/studio/memory' },
             { text: 'Sandboxes', link: '/studio/sandboxes' },
-            { text: 'Browser desktop', link: '/studio/browser' },
             { text: 'Team runs', link: '/studio/team-runs' },
             { text: 'Runtime status', link: '/studio/runtime-status' }
           ]
@@ -1410,18 +1405,6 @@ export default defineConfig({
                 { text: 'Security', link: '/packages/sandbox/security' },
                 { text: 'API', link: '/packages/sandbox/api-reference' },
                 { text: 'Releases', link: '/packages/sandbox/releases' }
-              ]
-            },
-            {
-              text: '@anvia/browser',
-              collapsed: true,
-              items: [
-                { text: 'Overview', link: '/packages/browser' },
-                { text: 'Get started', link: '/packages/browser/get-started' },
-                { text: 'Capabilities', link: '/packages/browser/capabilities' },
-                { text: 'Security', link: '/packages/browser/security' },
-                { text: 'API', link: '/packages/browser/api-reference' },
-                { text: 'Releases', link: '/packages/browser/releases' }
               ]
             }
           ]

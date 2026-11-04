@@ -77,5 +77,4 @@ All packages below are maintained in the Anvia monorepo. “First-party” descr
 | Package | Purpose | Reference |
 | --- | --- | --- |
 | `@anvia/studio` | Local UI and HTTP runtime for agents and pipelines | [Open](/packages/studio) |
-| `@anvia/sandbox` | Docker-backed workspaces and agent tools | [Open](/packages/sandbox) |
-| `@anvia/browser` | Visible Docker Chromium and semantic browser tools | [Open](/packages/browser) |
+| `@anvia/sandbox` | Docker and remote sandboxes, terminals, tunnels, desktops, and agent tools | [Open](/packages/sandbox) |
