@@ -45,8 +45,6 @@ A server emits it before retry content when a repeated `generation_start` target
 
 ## Public error boundaries
 
-## Public error boundaries
-
 `ClientProtocolError` from `@anvia/client` identifies invalid request/event/frame/message shapes and
 framed transport contract violations. Its optional `value` may retain the offending payload.
 A generic HTTP failure instead throws `EventStreamHttpError` from `@anvia/client/transport` with
