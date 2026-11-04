@@ -26,6 +26,8 @@ Namespaces expose small parts instead of a single all-in-one widget:
 
 Render-function children can customize a part while retaining its current context. Use the exported context hooks when a separate application component needs the same state.
 
+`ComposerPrimitive.Input` accepts `renderEntity` to customize how a mention token displays in the rich editor. It is a pure function of a `ComposerInputEntity`; returning `null` or `undefined` shows `entity.text`. The saved input and entities do not change.
+
 ## Styling choices
 
 The package exports no CSS. The application owns overflow, editor focus, textarea sizing, image

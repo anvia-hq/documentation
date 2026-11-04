@@ -105,6 +105,8 @@ connection; the sandbox hub authorizes the session and any read-only grant.
 
 Components such as `MessagePrimitive`, `ComposerPrimitive`, and `HumanInputPrimitive` are objects containing individually renderable parts. Add product-specific layout around those parts instead of forking the controller logic.
 
+`ComposerPrimitive.Input` accepts `renderEntity` to change how a mention token displays in the rich editor without changing the saved text or submitted entities. Returning `null` or `undefined` falls back to `entity.text`. See [composer entity rendering](/packages/react-ui/api-reference#anvia-react-ui-chat) for the `ComposerInputEntity` shape and purity requirement.
+
 ### Integrate a design system with `asChild`
 
 Interactive and structural primitives accept regular element props, and many accept `asChild` through the shared primitive types. This lets a design-system component become the rendered element while retaining Anvia behavior and accessibility wiring.

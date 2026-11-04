@@ -94,7 +94,7 @@ Renders completion context usage. A render-function child receives the resolved 
 | Streaming | `StreamMarkdown`, `StreamMarkdownProps` |
 | ThreadPrimitive list | `ThreadListPrimitive`, `ThreadListItemPrimitive`, `ThreadListProvider`, `useThreadList`, `useThreadListItem`, `ThreadListController`, `ThreadListItemContextValue`, `ThreadListProviderProps`, `ThreadListRecord` |
 | Shared context types | `ApprovalContextValue`, `AttachmentContextValue`, `ChatController`, `ChatProviderProps`, `CompletionController`, `CompletionInputContextValue`, `CompletionProviderProps`, `ComposerContextValue`, `ImageContextValue`, `MessageContextValue`, `MessagePartContextValue`, `QuestionContextValue`, `QuestionPromptContextValue`, `SelectionToolbarContextValue`, `ThreadContextValue` |
-| ComposerPrimitive types | `ComposerAttachmentInput`, `ComposerAttachmentsUpdate`, `ComposerEntitiesUpdate`, `ComposerEntity`, `ComposerEntityData`, `ComposerMessageMetadata`, `ComposerQuote`, `ComposerTriggerDefinition`, `ComposerTriggerItem`, `ComposerTriggerItems`, `ComposerTriggerItemsArgs`, `ComposerTriggerState`, `ComposerTriggerStateUpdate` |
+| ComposerPrimitive types | `ComposerAttachmentInput`, `ComposerAttachmentsUpdate`, `ComposerEntitiesUpdate`, `ComposerEntity`, `ComposerEntityData`, `ComposerInputEntity`, `ComposerMessageMetadata`, `ComposerQuote`, `ComposerTriggerDefinition`, `ComposerTriggerItem`, `ComposerTriggerItems`, `ComposerTriggerItemsArgs`, `ComposerTriggerState`, `ComposerTriggerStateUpdate` |
 | Primitive types | `PrimitiveProps`, `PrimitiveRef` |
 
 ## `@anvia/react-ui/chat`
@@ -117,7 +117,7 @@ import {
 | Part | Role |
 | --- | --- |
 | `ComposerPrimitive.Root` | Form, controlled/uncontrolled input state, attachments, entities, quote, and submission |
-| `ComposerPrimitive.Input` | Tiptap-backed rich input |
+| `ComposerPrimitive.Input` | Tiptap-backed rich input; accepts `renderEntity` for mention-token display |
 | `ComposerPrimitive.TextareaInput` | Native textarea alternative |
 | `ComposerPrimitive.Attachments` | Renders the attachment collection |
 | `ComposerPrimitive.AddAttachment` | Opens an attachment input |
@@ -166,13 +166,26 @@ type ComposerSubmitMessage<Data extends ClientDataMap = ClientDataMap> = (
 ) => Promise<void> | void
 ```
 
+`ComposerPrimitive.Input` also accepts an editor-only renderer for mention tokens:
+
+```ts
+type ComposerInputEntity = Omit<ComposerEntity, 'range'>
+
+// ComposerPrimitive.Input prop
+renderEntity?: (entity: ComposerInputEntity) => ReactNode
+```
+
+`ComposerInputEntity` carries `id`, `triggerId`, `trigger`, `label`, `text`, and optional `data`; `range` is omitted because it is meaningful only in the saved message. `renderEntity` changes how the token displays inside the editor, for example an avatar or display name from `entity.data`. It does not change the saved input text or submitted entities. Return `null` or `undefined` to fall back to `entity.text`.
+
+Keep the function a pure function of `entity`: a token re-renders only when its Tiptap node changes, not when state captured by the function's closure changes. `ComposerPrimitive.TextareaInput` does not accept `renderEntity`. `ComposerInputEntity` is exported from both `@anvia/react-ui/chat` and the root entry point.
+
 ### `ThreadPrimitive`
 
 `ThreadPrimitive` exposes `Root`, `Viewport`, `ViewportFooter`, `Messages`, `Empty`, `Status`, `Loading`, `Error`, `Suggestions`, `Suggestion`, and `ScrollToBottom`. The parts consume the current chat controller and thread context; ordinary DOM props and refs are forwarded.
 
 ### Other exports
 
-The chat subpath also exports `ChatController`, `ChatProviderProps`, `ComposerAttachmentInput`, `ComposerAttachmentsUpdate`, `ComposerContextValue`, `ComposerEntitiesUpdate`, `ComposerEntity`, `ComposerEntityData`, `ComposerMessageMetadata`, `ComposerQuote`, `ComposerTriggerDefinition`, `ComposerTriggerItem`, `ComposerTriggerItems`, `ComposerTriggerItemsArgs`, `ComposerTriggerState`, `ComposerTriggerStateUpdate`, and `ThreadContextValue`.
+The chat subpath also exports `ChatController`, `ChatProviderProps`, `ComposerAttachmentInput`, `ComposerAttachmentsUpdate`, `ComposerContextValue`, `ComposerEntitiesUpdate`, `ComposerEntity`, `ComposerEntityData`, `ComposerInputEntity`, `ComposerMessageMetadata`, `ComposerQuote`, `ComposerTriggerDefinition`, `ComposerTriggerItem`, `ComposerTriggerItems`, `ComposerTriggerItemsArgs`, `ComposerTriggerState`, `ComposerTriggerStateUpdate`, and `ThreadContextValue`.
 
 ## `@anvia/react-ui/completion`
 
