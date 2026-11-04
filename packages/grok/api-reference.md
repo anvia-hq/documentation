@@ -68,7 +68,7 @@ function mcp(options: GrokMcpOptions): GrokProviderTool
 const tools = { webSearch, xSearch, codeInterpreter, fileSearch, mcp }
 ```
 
-`webSearch()` validates mutually exclusive allowed/excluded domains. `xSearch()` does the same for handles and validates its date range. `fileSearch()` requires vector-store IDs. `mcp()` requires an HTTPS server URL and validates its labels, credentials, headers, and tool allow-list.
+`webSearch()` validates mutually exclusive allowed/excluded domains. `xSearch()` does the same for handles and validates its date range. `fileSearch()` requires vector-store IDs. `mcp()` requires an HTTPS server URL that is not a private or reserved host, and validates its labels, credentials, headers, and tool allow-list.
 
 ## Other exports
 
