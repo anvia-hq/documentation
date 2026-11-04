@@ -1,16 +1,20 @@
 # Releases
 
-The reviewed source release is `@anvia/studio` **1.3.16**. The entries below summarize recent v1
+The reviewed source release is `@anvia/studio` **1.3.24**. The entries below summarize recent v1
 changes and preserve notable v0 Studio milestones.
 
-## Changes through 1.3.14
+## Changes through 1.3.24
 
-Reviewed `1.3.5` → `1.3.14` against SDK source on 2026-10-15. Updated workspace dependencies across the Core, Durable, provider, observability, browser, and sandbox releases. These dependency updates do not introduce a durable goals UI; see [Durable scope](/packages/durable/capabilities).
+Reviewed `1.3.14` → `1.3.24` against SDK source on 2026-11-04. Added Host/Origin validation with `allowedHosts` (1.3.19), remote sandbox desktop views and asynchronous view control (1.3.22), the suspended-run guard in Playground (1.3.21), and provider-switch filtering for remembered model controls (1.3.24). Dependency releases also align Client, Server, React, React UI, and Graph.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/tool-studio/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/tool-studio/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.3.24` | Filtered replayed history when a conversation switches providers and kept only model controls the newly selected model offers, avoiding HTTP 400 responses. |
+| `1.3.22` | Let a sandbox desktop view open its own connection through a tunnel instead of a published port, and allowed asynchronous view control operations. |
+| `1.3.21` | Blocked composer submit, new chat, agent switch, and session load/delete while a run waits for an approval or question. |
+| `1.3.19` | Rejected non-loopback `Host` and foreign `Origin` requests with 403; added `allowedHosts` for non-wildcard deployments and returned 400 for invalid knowledge cursors. |
 | `1.3.5` | Dependency-only release updating Client, Server, React, and React UI. |
 | `1.3.4` | Dependency-only release updating Client, Server, Graph, React, and React UI. |
 | `1.3.3` | Dependency-only release updating Client, Server, Graph, React, and React UI. |
