@@ -12,7 +12,11 @@ const results = await retrieveDocuments({
 });
 ```
 
-`filterToPgVectorWhere` produces parameterized SQL and values. Equality serializes the metadata value for JSONB comparison; `gt` and `lt` require numeric metadata and reject other types.
+`filterToPgVectorWhere` produces parameterized SQL and values. `eq` serializes the metadata value
+for JSONB comparison; `ne` uses a null-safe `IS DISTINCT FROM` comparison. `gt`, `gte`, `lt`, and
+`lte` cast the stored value to `numeric` and reject non-numeric filter values. `in` becomes an `ANY`
+list and can include `null` to match a stored JSON null. N-ary `and`/`or` become parenthesized SQL
+`AND`/`OR`. Empty `in` lists and non-numeric range values throw.
 
 Cosine scores are `1 - distance`. L2 and inner-product scores are `-distance`; for inner product this negates pgvector's negative-inner-product operator result. Treat the result as adapter ranking data and calibrate any thresholds per metric.
 

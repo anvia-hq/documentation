@@ -38,6 +38,6 @@ await store.upsert({ documents, providerOptions })
 const results = await store.search({ vector, topK, minScore, filter, providerOptions, abortSignal })
 ```
 
-`filterToPgVectorWhere(filter)` returns a `{ sql, values }` `PgVectorWhere` value for direct queries.
+`filterToPgVectorWhere(filter)` returns a `{ sql, values }` `PgVectorWhere` value for direct queries. It binds keys and values as parameters, uses `IS DISTINCT FROM` for `ne`, emits `= ANY(...)` for `in`, and supports n-ary `and`/`or` with sequential placeholders. Range operators require numeric filter values; empty `in` lists and non-numeric ranges throw.
 
 Return to the [package guide](/packages/pgvector).

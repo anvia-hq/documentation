@@ -39,6 +39,6 @@ await store.upsert({ documents, providerOptions })
 const results = await store.search({ vector, topK, minScore, filter, providerOptions, abortSignal })
 ```
 
-`ensure()` creates a missing collection and validates its configuration. `validate()` never creates infrastructure. `filterToChromaWhere(filter)` converts an Anvia `VectorFilter` for direct Chroma calls.
+`ensure()` creates a missing collection and validates its configuration. `validate()` never creates infrastructure. `filterToChromaWhere(filter)` converts an Anvia `VectorFilter` for direct Chroma calls: all comparison operators plus `in` map to Chroma `$` operators, and n-ary `and`/`or` map to `$and`/`$or`. It unwraps a single-child logical filter and throws for empty `in` or empty logical lists.
 
 Return to the [package guide](/packages/chroma).

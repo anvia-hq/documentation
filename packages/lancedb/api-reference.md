@@ -37,7 +37,9 @@ const results = await store.search({ vector, topK, minScore, filter, providerOpt
 ```
 
 `ensure()` creates a missing table and validates it; `validate()` only checks an existing table.
-Metadata filters use Core's provider-neutral matcher after retrieval. The package no longer exports
-SQL-expression generation for the serialized metadata column.
+Metadata filters use Core's provider-neutral matcher after retrieval and therefore support every
+core operator: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, and n-ary `and`/`or`. The package no longer
+exports SQL-expression generation for the serialized metadata column, so filtering does not occur in
+the LanceDB query.
 
 Return to the [package guide](/packages/lancedb).
