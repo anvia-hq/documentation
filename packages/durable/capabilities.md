@@ -50,27 +50,55 @@ stable external key (run ID plus checkpoint key); the event's `operationId` and 
 manual recovery. It is rejected once a later submission has started and advanced the session. An explicit
 retry resets the attempt counters of unfinished model operations; completed results stay intact.
 
+If a run failed before its admission committed, `retry()` recomputes the inherited history from the
+session's latest settled run and persists it before execution. If that history still exceeds
+`limits.maxPayloadBytes`, `retry()` rejects with the same `DurableLimitError` and the run stays failed.
+A retry never executes with a shorter history than the original attempt.
+
 ## Supported and unsupported agent features
 
 Supported:
 
 - Static local tools and instructions.
+- `skills`, which flatten into static instructions and tools when the agent is constructed; replay does
+  not re-read them.
 - Approvals and questions through core's interaction protocol.
 - JSON-serializable structured output.
 - Provider-neutral completion models, including streaming models with `stream: true`.
 - Persisted session history, including image and file prompts.
+- Agent-level `temperature`, `maxTokens`, `providerOptions`, `controls`, `toolChoice`, and `outputSchema`,
+  which are frozen by the registration and sent with every request.
 
 Rejected at registration because they need additional persistence boundaries: agent memory, lifecycle
 callbacks, middleware, guardrails, context sources, MCP servers, provider tools, and dynamic tool indexes.
-Durable session history replaces the agent's memory store. New attempts invoke observers, but replayed
-model, tool, and context checkpoints do not emit
+The error lists only the groups that agent actually sets. Durable session history replaces the agent's
+memory store. New attempts invoke observers, but replayed model, tool, and context checkpoints do not emit
 duplicate spans or usage. Observers are not the authoritative journal; see [Tracing](/packages/durable/tracing).
+
+Agent-level `retries` is also rejected. The runtime executes every run with retries disabled so a replay
+never repeats an attempt that was not recorded; force-disabling the setting would make it look effective
+while never applying. `retries: false`, `retries: 0`, and `retries: { maxAttempts: 1 }` are accepted
+because they never retry. Configure [`modelRetry`](/packages/durable/configuration#model-retry) on the
+registration for durable retry and backoff.
+
+### Compatibility report
+
+`runtime.compatibility()` returns one detached, immutable report per registered agent:
+`agentId`, `version`, static `tools` (including skill tools), `streaming`, `compaction`, `modelRetry`,
+`frozen` agent options, and `unavailable` per-run settings. `DurableRuntimeOptions.onCompatibility`
+receives the same report after `open()` and after each successful `registerAgents()`. The callback is
+advisory: a throw or rejected promise is ignored, so logging cannot change whether registration succeeds.
+The report never implies support for a rejected feature. See [Configuration](/packages/durable/configuration#compatibility-reporting).
 
 ## Run states
 
 `queued`, `retry_wait`, `pending`, `running`, `waiting`, `needs_attention`, `completed`, `failed`, and
 `cancelled`. `waiting` means an approval or question is pending; `needs_attention` means a recovery block
 (version mismatch or an uncertain manual tool); `retry_wait` means a persisted model backoff deadline.
+
+A run whose prompt, input, or inherited history exceeds `limits.maxPayloadBytes` at admission ends in
+terminal `failed`, not `needs_attention`: no work is pending, so there is nothing for an operator to
+unblock. `run.result()` rejects with `DurableRunError` (`status: 'failed'`) and its event stream ends.
 
 ## Scope and limits
 
@@ -81,6 +109,9 @@ duplicate spans or usage. Observers are not the authoritative journal; see [Trac
   survive restart.
 - Each session runs one run at a time. Opt-in persisted successors wait in FIFO order; cross-session
   concurrency is bounded by `maxConcurrentRuns`. [Queued steering](/packages/durable/steering) applies input at safe execution boundaries.
+- `limits.maxPayloadBytes` caps each persisted value, not a whole session. The HTTP bridge's
+  `maxBodyBytes` (64 KiB by default) is the binding ceiling for uploads and applies before the payload
+  limit. See [admission and payload limits](/packages/durable/operations#admission-and-payload-limits).
 - Not yet available: Pipeline and team recovery, Studio integration, Postgres, retention,
   general migration tooling, execution deadlines, and distributed workers.
 - The database holds prompts, normalized responses, tool arguments and results, and interaction state. Keep it

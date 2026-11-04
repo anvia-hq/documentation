@@ -1,16 +1,17 @@
 # Releases
 
-The reviewed source release is `@anvia/durable` **0.12.0**. The package is experimental and its database records may
+The reviewed source release is `@anvia/durable` **0.13.0**. The package is experimental and its database records may
 change between releases.
 
-## Changes through 0.12.0
+## Changes through 0.13.0
 
-Reviewed `0.3.0` → `0.12.0` against SDK source on 2026-10-15. Added registration compaction (0.4), verified multi-session goals (0.5), per-submission goal agents (0.6), shared histories and bounded inspection (0.7), queued steering and SQLite schema 9 (0.8), goal controls (0.9), continuing rounds (0.10), stable run traces (0.11), and application-selected observability sessions (0.12). See [Goals](/packages/durable/goals), [Compaction](/packages/durable/compaction), [Steering](/packages/durable/steering), [Tracing](/packages/durable/tracing), and [Operations](/packages/durable/operations). Upgrade Core and Durable together for execution protocol 4; snapshots can contain linked history references, and database downgrades are unsupported.
+Reviewed `0.3.0` → `0.13.0` against SDK source on 2026-11-04. Added registration compaction (0.4), verified multi-session goals (0.5), per-submission goal agents (0.6), shared histories and bounded inspection (0.7), queued steering and SQLite schema 9 (0.8), goal controls (0.9), continuing rounds (0.10), stable run traces (0.11), and application-selected observability sessions (0.12). Version 0.13 makes agent compatibility explicit and settles over-limit admissions as terminal failures. See [Goals](/packages/durable/goals), [Compaction](/packages/durable/compaction), [Steering](/packages/durable/steering), [Tracing](/packages/durable/tracing), and [Operations](/packages/durable/operations). Upgrade Core and Durable together for execution protocol 4; snapshots can contain linked history references, and database downgrades are unsupported.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/durable/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/durable/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `0.13.0` | Rejects agent-level `retries` when it would retry; `retries: false`, `retries: 0`, and `retries: { maxAttempts: 1 }` remain accepted. Adds `runtime.compatibility()` and `onCompatibility`, reports static tools including skills, frozen options, and unavailable per-run settings, and lists only the unsupported feature groups an agent actually sets. Payload-limit admission now ends in terminal `failed`; `DurableLimitError` carries `code`, `field`, `limit`, and `actual`; HTTP maps payload to 413 and capacity to 429 with `{ error, code, field? }`; retry recomputes inherited history and never truncates a session. |
 | `0.3.0` | Accepted core structured user messages as durable prompts, enabling image and document inputs in runs, graph tasks, and owned agents. Multimodal content is validated and preserved across history and recovery, and request identities compare by canonical JSON. String prompts still work. Journals with structured prompts cannot be read by older releases. The client and server peer ranges allow the 0.3 line. |
 | `0.2.1` | Added validated runtime agent registration (`registerAgents`) and safe removal of idle registrations (`unregisterAgent`). Hosts can admit new immutable configurations without closing unrelated executions and unload archived ones while keeping journal history. Existing agent IDs cannot be overwritten, and unfinished runs or settling attempts prevent removal. |
 | `0.2.0` | Added opt-in durable agent streaming with persisted generation deltas, unique model-attempt identities, and validated streamed response checkpoints. Completed model and tool results are preserved across retries and restarts, and clients reconnect through the existing event cursor APIs. SQLite upgrades to schema 4 and requires core execution protocol version 2. Observer failures are excluded from automatic model retries, streamed responses commit before local completion callbacks, and primary stream errors are preserved when iterator cleanup also fails. |
@@ -25,8 +26,9 @@ See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a
 - `@anvia/server` 1.2.0 and `@anvia/client` 1.3.0 added the opt-in `./durable` subpaths (run, graph, and
   custom-task routes and methods, with owned-agent authorization mapped to the parent task session and root
   task identity in task event envelopes). Server 1.2.1 and client 1.3.1 added the 0.2 peer range, and server
-  1.2.2 and client 1.3.2 added 0.3, all through an optional `@anvia/durable` peer. The reviewed Server 1.3.4 and Client 1.4.4
-  ranges extend through Durable 0.12; use these for the full steering and tracing contracts.
+  1.2.2 and client 1.3.2 added 0.3, all through an optional `@anvia/durable` peer. The reviewed Server 1.3.6
+  and Client 1.7.0 ranges extend through Durable 0.13; use these for the payload mapping,
+  `message_reset`, and [`@anvia/client/durable-chat`](/packages/client/durable-chat) contracts.
 - `@anvia/cli` 1.5.0 bundles the `anvia-durable` skill (see [CLI](/packages/cli)).
 
 Read the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/durable/CHANGELOG.md).

@@ -13,6 +13,7 @@
 | `maxConcurrentTasks` | `4` | Simultaneous custom-task phases, independent of agent runs (1 to 1000). |
 | `limits` | see below | Admission, payload, and operation limits. |
 | `onFatalError` | none | Called once after a fatal storage or scheduler failure. |
+| `onCompatibility` | none | Receives a detached compatibility report after `open()` and each successful `registerAgents()`. |
 
 ## Agent registrations
 
@@ -39,6 +40,45 @@ agents: [
 
 Registration is validated eagerly: duplicate IDs, unsupported agent options, unknown recovery tools, invalid
 policies, and non-streaming models with `stream: true` throw at `open()` or `registerAgents()`.
+
+`skills` are supported because they flatten into static instructions and tools when the agent is
+constructed. Agent-level `retries` is rejected: every durable run executes with retries disabled so replay
+never repeats an unrecorded attempt. `retries: false`, `retries: 0`, and `retries: { maxAttempts: 1 }`
+are accepted because they never retry. Use the registration's [`modelRetry`](#model-retry) instead.
+Registering `memory`, `lifecycle`, `middlewares`, `guardrails`, `context`, `mcpServers`, provider tools, or
+dynamic tool indexes throws a `TypeError` naming the groups that agent actually sets.
+
+### Compatibility reporting
+
+`runtime.compatibility()` returns a detached, immutable report for each registration, in registration
+order. The `onCompatibility` option receives the same report after `open()` and after each successful
+`registerAgents()`.
+
+```ts
+const runtime = await DurableRuntime.open({
+  store: new SqliteDurableStore('./anvia-runs.sqlite'),
+  agents: [
+    {
+      agent: researcher,
+      version: '1',
+      modelRetry: { maxAttempts: 2, initialDelayMs: 100, maxDelayMs: 1_000 },
+    },
+  ],
+  onCompatibility: (report) => console.log('durable agents', report),
+})
+
+for (const entry of runtime.compatibility()) {
+  console.log(entry.agentId, entry.version, entry.tools)
+  console.log(entry.frozen) // for example ['maxTurns', 'temperature']
+  console.log(entry.unavailable) // per-run settings durable does not expose
+}
+```
+
+Each entry has `agentId`, `version`, `tools` (static tool names, including skill tools), `streaming`,
+`compaction`, `modelRetry` (undefined when no policy is set), `frozen` (agent options captured by the
+runtime), and `unavailable` (per-run settings the runtime does not expose). Reports are copies; retaining
+or mutating one cannot change the runtime's registrations. The hook is advisory: a throw or rejected
+promise is ignored.
 
 ### Registering and unregistering at runtime
 
@@ -104,9 +144,10 @@ Durable execution validates against the core contracts but does not fetch or tra
 `runtime.submit(input, { enqueue: true })` persists a successor behind the unfinished run in the same
 session. Without `enqueue`, submitting into an unfinished session fails; repeating a request ID returns the
 original run either way. Only the oldest unfinished run in a session is eligible. A queued run receives the
-latest completed session history when it starts; failed or cancelled predecessors add no partial history.
-Approvals and `needs_attention` pause their session queue while freeing global capacity. Cancelling an active
-run keeps its slot until its callbacks settle.
+latest started settled session history when it starts, including the settled progress of failed or cancelled
+predecessors; an unfinished tool exchange without a complete checkpoint is omitted. Approvals and
+`needs_attention` pause their session queue while freeing global capacity. Cancelling an active run keeps its
+slot until its callbacks settle.
 
 ## Model retry
 
@@ -132,7 +173,11 @@ limits: {
 }
 ```
 
-All four are positive integers with the defaults shown. See [Operations](/packages/durable/operations#admission-and-payload-limits).
+All four are positive integers with the defaults shown. `maxPayloadBytes` is a per-field cap, not a
+session budget; the same content is counted again in the model request and later history. A run that cannot
+admit its prompt, input, or inherited history ends in terminal `failed`, and retry recomputes that history
+rather than truncating it. The HTTP bridge's `maxBodyBytes` is separate and is the binding ceiling for
+uploads. See [Operations](/packages/durable/operations#admission-and-payload-limits).
 
 ## Goals, steering, and tracing
 
