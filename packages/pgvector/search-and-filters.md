@@ -13,8 +13,9 @@ const results = await retrieveDocuments({
 ```
 
 `filterToPgVectorWhere` produces parameterized SQL and values. `eq` serializes the metadata value
-for JSONB comparison; `ne` uses a null-safe `IS DISTINCT FROM` comparison. `gt`, `gte`, `lt`, and
-`lte` cast the stored value to `numeric` and reject non-numeric filter values. `in` becomes an `ANY`
+for JSONB text comparison; `ne` uses null-safe SQL, with `IS DISTINCT FROM` for non-null values and a
+negated JSON-null check for `null`. `gt`, `gte`, `lt`, and `lte` cast the stored value to `numeric`
+and reject non-numeric filter values. `in` becomes an `ANY`
 list and can include `null` to match a stored JSON null. N-ary `and`/`or` become parenthesized SQL
 `AND`/`OR`. Empty `in` lists and non-numeric range values throw.
 

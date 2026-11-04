@@ -87,7 +87,7 @@ matcher against each candidate's metadata.
 | [Chroma](/packages/chroma) | `$eq`, `$ne`, `$gt`, `$gte`, `$lt`, `$lte`, `$in` | Non-empty | `$and` / `$or`; a single child is unwrapped | Empty `in` list; empty logical list |
 | [LanceDB](/packages/lancedb) | None; post-retrieval core matcher | Empty list matches nothing | Evaluated by the core matcher | No filter-translation errors |
 | [Milvus](/packages/milvus) | `==`, `!=`, `>`, `>=`, `<`, `<=`, `in [...]` | Non-empty; no `null` | Parenthesized `&&` / `\|\|` | Empty or null `in`; invalid key or reserved keyword segment; non-finite number |
-| [PgVector](/packages/pgvector) | Bound SQL with `IS DISTINCT FROM` for `ne` and `numeric` casts for ranges | Non-empty; `null` supported | Parenthesized `AND` / `OR` | Empty `in`; non-numeric range value |
+| [PgVector](/packages/pgvector) | Bound SQL with null-safe `ne` and `numeric` casts for ranges | Non-empty; `null` supported | Parenthesized `AND` / `OR` | Empty `in`; non-numeric range value |
 | [Pinecone](/packages/pinecone) | `$eq`, `$ne`, `$gt`, `$gte`, `$lt`, `$lte`, `$in` | Non-empty | `$and` / `$or` | Empty `in` |
 | [Qdrant](/packages/qdrant) | `must`/`must_not` match and `range` conditions | Non-empty; all strings or all integers | `must` / `should` | Empty `in`; booleans, floats, `null`, or mixed types in `in` |
 | [Redis](/packages/redis) | TAG equality and numeric ranges | Non-empty; numeric fields use an OR of exact ranges | RediSearch intersection / union | Undeclared field; empty `in`; range on a non-numeric field; non-finite number |
