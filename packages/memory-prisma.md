@@ -8,7 +8,10 @@
 pnpm add @anvia/memory-prisma @anvia/core @prisma/client
 ```
 
-The package is ESM-only and should use a version compatible with its declared `@anvia/core` dependency range and `@prisma/client >=7.9.1 <8.0.0`.
+The package is ESM-only and should use a version compatible with its declared `@anvia/core`
+dependency range and `@prisma/client >=7.10.0 <8.0.0`. The separate
+[`/@anvia/memory-prisma/v8`](/packages/memory-prisma/get-started#prisma-8-postgresql) entrypoint
+targets Prisma 8 PostgreSQL through `@prisma/orm-postgres 8.0.0-rc.20`.
 
 ## Generate the model file
 

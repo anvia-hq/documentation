@@ -29,8 +29,8 @@ Prisma 8 uses a separate runtime and contract workflow. It requires Node.js 22.1
 Node 24) and TypeScript 5.9+:
 
 ```sh
-pnpm add @anvia/memory-prisma @anvia/core @prisma/orm-postgres@8.0.0-rc.11
-pnpm add -D prisma@8.0.0-rc.15
+pnpm add @anvia/memory-prisma @anvia/core @prisma/orm-postgres@8.0.0-rc.20
+pnpm add -D prisma@8.0.0-rc.27
 pnpm exec anvia-memory-prisma init --prisma-version 8 --contract src/prisma/contract.prisma
 ```
 
