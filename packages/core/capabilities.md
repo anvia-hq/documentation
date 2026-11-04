@@ -11,7 +11,7 @@ Core is split into focused package entry points. The root export contains common
 | Lifecycle | `@anvia/core/agent` | Typed run, turn, generation, tool, finish, and error observation |
 | Guardrails | `@anvia/core/guardrails` | Input/final-output allow, block, and rewrite policies |
 | Memory | `@anvia/core/memory` | Conversation store, inspection, save policy, durable compaction contracts |
-| Retrieval | `@anvia/core/embeddings`, `@anvia/core/vector-store` | Raw-text ingestion, dense/sparse embedding helpers, filters, in-memory search, search-tool contracts |
+| Retrieval | `@anvia/core/embeddings`, `@anvia/core/vector-store` | Raw-text ingestion, dense/sparse embedding helpers, native and n-ary metadata filters, in-memory search with selectable metrics and paginated inspection, search-tool contracts |
 | Pipelines | `@anvia/core/pipeline` | Typed composition, parallel branches, batch execution, graphs, run observers |
 | Extraction | `@anvia/core/extractor` | Completion-backed schema extraction with retry support |
 | Media | `@anvia/core/image-generation`, `speech-generation`, `transcription` | Provider-neutral helpers and model interfaces |

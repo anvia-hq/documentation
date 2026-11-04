@@ -304,20 +304,57 @@ const { documents: hybridDocuments } = await embedDocuments({
 
 It also exports dense, sparse, and hybrid model contracts plus distance helpers.
 
-`@anvia/core/vector-store` exports `InMemoryVectorStore`, `VectorStore`, `HybridVectorStore`,
-retrieval/search/inspection types, `vectorFilter`, `createVectorSearchTool`, `ingestVectorText`, and
-`ingestVectorDocuments`.
+`@anvia/core/vector-store` exports `InMemoryVectorStore`, `InMemoryVectorStoreOptions`,
+`InMemoryVectorStoreFromDocumentsOptions`, `VectorStore`, `HybridVectorStore`,
+`createVectorSearchTool`, `retrieveDocuments`, `ingestVectorText`, `ingestVectorDocuments`,
+`vectorFilter`, `matchesVectorFilter`, `parseVectorInspectCursor`, and `VectorInspectCursorError`.
+Its types include `VectorFilter`, `VectorFilterOperator`, `VectorFilterComparisonOperator`,
+`VectorFilterList`, `VectorMetric`, `VectorFusion`, `VectorSearchRequest`, `VectorSearchResult`,
+`VectorInspectRequest`, `VectorInspectPage`, `VectorInspectItem`, `VectorStoreUpsertOptions`,
+`IngestVectorDocumentsOptions`, `IngestVectorTextOptions`, and `IngestVectorDocumentsResult`.
+
+`InMemoryVectorStore` scores with cosine similarity by default. Pass `metric: 'cosine' | 'euclidean'
+| 'dotProduct'` to change it. Scores always remain higher-is-better: `euclidean` returns negated
+distance, so `minScore` acts as a negative distance threshold, and `dotProduct` returns the raw
+inner product. Non-cosine metrics are approximate with an LSH index.
+
+`vectorFilter` builds `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, and variadic `and`/`or` filters.
+`and()` and `or()` take one or more children; `in()` accepts an array of metadata values, and native
+adapters reject an empty array.
 
 ```ts
-const store = InMemoryVectorStore.fromDocuments({ documents: embedded })
+const store = InMemoryVectorStore.fromDocuments({
+  documents: embedded,
+  metric: 'euclidean',
+})
+
+const filter = vectorFilter.and(
+  vectorFilter.eq('tenantId', 'acme'),
+  vectorFilter.ne('status', 'archived'),
+  vectorFilter.in('product', ['billing', 'accounts']),
+  vectorFilter.gte('revision', 3),
+  vectorFilter.lte('revision', 8),
+  vectorFilter.or(
+    vectorFilter.eq('visibility', 'internal'),
+    vectorFilter.gte('priority', 2),
+  ),
+)
+
 const results = await retrieveDocuments({
   store,
   model: embeddingModel,
   query,
   topK: 5,
+  minScore: -0.25,
   filter,
 })
 ```
+
+`inspect({ limit, cursor?, filter? })` pages stored documents. In-memory cursors are opaque decimal
+offsets: pass `nextCursor` back unchanged. `parseVectorInspectCursor()` validates the canonical
+non-negative safe-integer form, and invalid input throws `VectorInspectCursorError`, a `RangeError`
+subclass identifiable with `VectorInspectCursorError.isCursorError(error)`. Other adapters may use
+different opaque cursor formats.
 
 For raw text, the ingestion helpers share Core's deterministic document chunking and replace the
 complete embedded representation for each stable source ID:
