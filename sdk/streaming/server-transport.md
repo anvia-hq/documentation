@@ -74,6 +74,9 @@ const transport = createFetchEventTransport<{ jobId: string }, Progress>({
   headers: () => ({ 'x-demo-client': 'progress' }),
   fetch: fakeFetch,
   mapEvent: (event) => eventSchema.parse(event),
+  onParseError: (error) => {
+    console.warn('Skipped malformed frame', error.format, error.line, error.event)
+  },
   validateResponse: (response) => {
     if (!response.headers.get('content-type')?.includes('text/event-stream')) {
       throw new Error('Expected SSE')
@@ -94,6 +97,27 @@ try {
 }
 console.log(received) // [{ type: 'progress', completed: 1 }]
 ```
+
+Malformed JSON is skipped by default and reported through `onParseError`; a frame that `mapEvent`
+rejects still fails the stream. Throwing from `onParseError` aborts the stream with your error. Set
+`strict: true` on `readJsonlStream`, `readSseStream`, or `readSseFrames` when a skipped frame must fail
+the whole stream instead:
+
+```ts
+import { readJsonlStream, EventStreamParseError } from '@anvia/client/transport'
+
+try {
+  for await (const value of readJsonlStream(response.body!, { strict: true })) {
+    console.log(value)
+  }
+} catch (error) {
+  if (!(error instanceof EventStreamParseError)) throw error
+  console.error('Invalid frame', error.format, error.line, error.raw)
+}
+```
+
+`readSseFrames` additionally exposes the SSE event name, last event ID, and retry hint. `DurableClient`
+streams always parse strictly because a skipped durable event would leave a cursor gap.
 
 Call `controller.abort()` from your cancellation owner. Breaking out of the loop cancels its body
 reader. Neither action reverses completed server operations. For JSONL, use the same mapper and
