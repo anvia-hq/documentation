@@ -59,11 +59,16 @@ function resolvePackageEntry(moduleName, packages) {
   const exported = packageInfo.manifest.exports?.[exportKey]
   const typesPath = typeof exported === 'string' ? exported : exported?.types
   if (!typesPath) return undefined
-  const targetPath = useSource
-    ? typesPath.replace(/^\.\/dist\//, './src/').replace(/\.d\.ts$/, '.ts')
-    : typesPath
-  const entryPath = resolve(packageInfo.directory, targetPath)
-  return existsSync(entryPath) ? entryPath : undefined
+  if (!useSource) {
+    const entryPath = resolve(packageInfo.directory, typesPath)
+    return existsSync(entryPath) ? entryPath : undefined
+  }
+  const sourceBase = typesPath.replace(/^\.\/dist\//, './src/').replace(/\.d\.ts$/, '')
+  const entryPath = [
+    resolve(packageInfo.directory, `${sourceBase}.ts`),
+    resolve(packageInfo.directory, sourceBase, 'index.ts'),
+  ].find(existsSync)
+  return entryPath
 }
 
 function codeBlocks(markdown) {
