@@ -56,3 +56,11 @@ const resumed = await client.resumeSandbox({ id: sandbox.id })
 `stop()` preserves the container for a later `resumeSandbox()` call. `destroy()` is terminal. Persist the sandbox ID only when the application has an authorization and cleanup policy for resumable containers.
 
 Destroying a sandbox also removes managed processes and published port mappings. Studio inspection is read-only and never assumes cleanup ownership.
+
+## Remote sandboxes
+
+`RemoteSandboxHub` authorizes and routes daemons; it has no `create`, `stop`, or `destroy` method. Provisioning, teardown, token issuance, and reconciliation of workloads that outlive a control-plane process remain application responsibilities.
+
+The daemon outlives the control plane. Restarting the control plane only reconnects daemons; their processes keep running. When your lifecycle code destroys a sandbox, call `hub.forget(id)` so a long-lived hub does not keep one record per sandbox id. `forget()` disconnects that sandbox's daemon and drops the runtime, configured workdir, and last reported workdir. A runtime object you still hold keeps working if the daemon connects again.
+
+See [Remote sandboxes](/sdk/advanced/sandbox/remote) for the token model and disconnected behavior.

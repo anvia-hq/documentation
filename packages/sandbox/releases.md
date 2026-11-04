@@ -1,15 +1,21 @@
 # Releases
 
-The reviewed source release is `@anvia/sandbox` **1.2.1**. The entries below preserve notable v0 history.
+The reviewed source release is `@anvia/sandbox` **1.3.2**. The entries below preserve notable v0 history.
 
-## Changes through 1.2.0
+## Changes through 1.3.2
+
+Reviewed `1.2.1` → `1.3.2` against SDK source on 2026-11-04. The 1.3 line added the provider-neutral runtime, the remote hub and daemon, interactive terminals, loopback tunnels, a desktop, and Studio views. See [Remote sandboxes](/sdk/advanced/sandbox/remote), [Remote terminals](/sdk/advanced/sandbox/terminals), and [Remote tunnels](/sdk/advanced/sandbox/tunnels).
 
 Reviewed `1.1.8` → `1.2.0` against SDK source on 2026-10-15. Natural commands in `exec_command` and `start_process` now prefer `/bin/bash -c`, falling back to `sh -c` only if Bash is unavailable. Allow policies check the selected executable; explicit argv and low-level APIs keep their behavior. See [Commands](/sdk/advanced/sandbox/commands#natural-command-lines).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/tool-sandbox/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/tool-sandbox/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.3.2` | Added `anvia-sandbox-daemon --check` and `--require`, desktop configuration from `ANVIA_SANDBOX_DESKTOP*` environment variables, `create-image --feature desktop`, and `studioSandbox`/`studioDesktopView` for Studio. Updated upstream runtime dependencies and the `zod` peer range. |
+| `1.3.1` | Fixed the browser tunnel and desktop relays on runtimes whose WebSocket cannot pause, such as Bun; a browser more than 4 MiB ahead of the service is closed with code 1008 instead of growing memory. |
+| `1.3.0` | Added the neutral `SandboxRuntime` and `createSandboxTools`; the remote runtime with `RemoteSandboxHub`, `SandboxDaemon`, and `operationId` deduplication; interactive terminals; loopback tunnels with binary framing; and the remote desktop with `createDesktopTools`. `DockerSandboxRuntime` now extends `SandboxRuntime`. |
+| `1.2.0` | Natural command lines in `exec_command` and `start_process` use `/bin/bash -c` when Bash is available, falling back to `sh -c`; allow policies check the selected executable. |
 | `1.1.8` | Refreshed the package README. |
 | `1.1.7` | Redacted sandbox `env` values (`--env KEY=<redacted>`) in Docker command error messages. |
 | `1.1.6` | Accepted natural shell command lines in `exec_command` (run as `sh -c`, rejected under block-mode policies), supported file listing in Alpine and other BusyBox images, and avoided false file-boundary errors from macOS temporary path aliases. |
