@@ -18,6 +18,27 @@ new Studio([supportAgent]).start({
 
 Studio does not provide built-in user authentication, authorization, or TLS. If remote access is unavoidable, place the entire Studio origin behind trusted network controls, TLS, and authentication—not just the HTML page.
 
+## Host and Origin validation
+
+Studio rejects a request with `403` and `error.code: "forbidden"` when its `Host` header is not a
+loopback hostname or an explicitly trusted hostname. It applies the same check to `Origin`, ignoring
+ports. Loopback names are always accepted, and an explicit non-wildcard `hostname` passed to
+`start()` or `serve()` is trusted automatically.
+
+Binding to `0.0.0.0` or `::` does not trust public names by itself. List every client-facing
+hostname in `allowedHosts`:
+
+```ts
+await new Studio([agent]).serve({
+  hostname: '0.0.0.0',
+  port: 4021,
+  allowedHosts: ['studio.lan'],
+})
+```
+
+This blocks DNS-rebinding and cross-origin page attacks on state-changing routes. It is not user
+authentication and does not replace a trusted network boundary.
+
 ## `protectShell` is not authentication
 
 The `ui.protectShell` option currently follows the same shell-registration path whether it is `true` or `false`. It does not verify a user, protect API routes, or create an authorization boundary.

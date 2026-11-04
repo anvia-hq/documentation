@@ -54,6 +54,7 @@ Both `start()` and `serve()` accept these server options:
 | --- | --- | --- |
 | `port` | `RUNNER_PORT`, then `4021` | TCP port used by the Studio server. An explicit value has highest priority. |
 | `hostname` | Node server default | Interface or hostname passed to the server. Set it explicitly when network exposure matters. |
+| `allowedHosts` | None | Extra client-facing hostnames accepted in `Host` and `Origin` headers. Required for public names when binding to `0.0.0.0` or `::`; ports are ignored. |
 | `log` | `true` | Prints the Studio UI or API address after startup. |
 
 `start()` additionally accepts `handleSignals`, which defaults to `true`. With it enabled, Studio installs a one-time `SIGINT` handler that closes the server and exits the process.
