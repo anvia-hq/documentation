@@ -160,6 +160,28 @@ for await (const event of streamCompletion({
 
 Messages are strict JSON-safe structural objects. Core exports role/content types plus `parseMessage`, `parseMessages`, `messageSchema`, and `messagesSchema` for runtime validation.
 
+## Model listing
+
+`@anvia/core/model-listing` exports `ModelId`, `ListedModel`, `ModelList`, `ModelListingClient`,
+and `ModelListingError`. Providers implement `ModelListingClient` and normalize their inventory into
+`ModelList.data`:
+
+```ts
+const inventory = await modelClient.listModels()
+
+for (const model of inventory.data) {
+  console.log(model.id, model.contextLength, model.supportedParameters)
+}
+```
+
+`ListedModel` carries `id`, optional display fields (`name`, `description`, `type`, `createdAt`,
+`ownedBy`), and optional advertised metadata: `contextLength`, `supportedParameters` (provider
+parameter names, not Anvia option names), and provider-specific `reasoning` and `pricing` objects.
+The metadata objects are passed through without sub-field normalization or schema validation.
+Missing metadata is unknown, not evidence of a missing capability; listed parameters and prices are
+inventory hints, not an availability, capability, or billing guarantee. `ModelListingError` exposes
+the provider, HTTP status when available, and the original `cause`.
+
 ## Tools
 
 Import from `@anvia/core` or `@anvia/core/tool`.
@@ -272,10 +294,14 @@ must not delete or overwrite canonical messages.
 Token-aware compaction uses `trigger.afterTokens`, optional `retention.recentTurns` (default `1`),
 an optional sync or async `tokenCounter`, and a `compactor`. Deprecated
 `retention.recentTokens` remains available as a mutually exclusive migration path. Core exports
-`estimateMemoryTokens` as the default provider-neutral estimate. `MemoryCompactionInfo` records
-original, compacted, retained, and result token/message counts, attempts, and summary-model usage.
-`agent.compactMemory({ session })` forces an eligible prefix compaction and returns
-`type: 'compacted'` or `type: 'skipped'`.
+`estimateMemoryTokens` as the default provider-neutral estimate; inline image and file data counts as
+a bounded 8,000 characters (about 2,000 tokens) regardless of payload size. `createSummaryMemoryCompactor()`
+sends no `temperature` unless configured, so models that reject the parameter work by default; set
+`temperature: 0` for deterministic summaries. `MemoryCompactionInfo` records original, compacted,
+retained, and result token/message counts, attempts, and summary-model usage.
+`MemoryCompactionError` includes the provider's error message, keeps the original error as `cause`,
+and reports usage accumulated before the failure. `agent.compactMemory({ session })` forces an
+eligible prefix compaction and returns `type: 'compacted'` or `type: 'skipped'`.
 
 ## Embeddings and vector stores
 
