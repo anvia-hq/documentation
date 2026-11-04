@@ -1,90 +1,50 @@
-# `@anvia/browser`
+# `@anvia/browser` (retired)
 
-`@anvia/browser` gives Anvia agents an application-owned, visible Chromium runtime. It combines an explicit Docker browser lifecycle, per-capability readiness, an isolated Playwright connection with bounded action scheduling, semantic browser tools, a noVNC desktop, and coordinated human takeover.
+`@anvia/browser` is retired. The package was removed from the Anvia source repository after
+`1.1.13`, and npm marks the published package as deprecated. It receives no further releases or
+security fixes.
 
-## Install
+The package combined a Docker-backed Chromium runtime, semantic `browser_*` tools, a noVNC
+desktop, and coordinated human takeover. Use the [`@anvia/sandbox` desktop](/sdk/advanced/sandbox/desktop)
+instead: a remote sandbox can run a virtual display with Chromium, an agent can drive it with
+`createDesktopTools()`, and a person can watch or take over the same display.
 
-```bash
-pnpm add @anvia/browser @anvia/core @anvia/sandbox
-```
+## What replaces what
 
-The package requires Node.js 20.12 or newer, Docker, and an application-selected Anvia browser image. `@anvia/sandbox` owns Docker infrastructure; `@anvia/browser` owns the Chromium workload, capability readiness, connection scheduling, and control arbitration inside it.
+| Retired surface | Current approach |
+| --- | --- |
+| Managed Chromium container and browser image | Build or pull an `@anvia/sandbox` desktop image and run `anvia-sandbox-daemon` |
+| `browser_snapshot`, `browser_click`, `browser_type`, and other semantic tools | `desktop_screenshot`, `desktop_click`, `desktop_type`, `desktop_key`, and the other tools from `createDesktopTools()` |
+| noVNC desktop and human-control lease | The sandbox desktop relay with `takeover()` and `release()`, or Studio's sandbox desktop view |
+| Session-scoped automation connection | The sandbox desktop capability exposed by `RemoteSandboxHub` |
 
-## Runtime boundary
+The migration is not a drop-in replacement. Semantic browser tools act on Playwright locators and
+ARIA snapshots; desktop tools act on screenshot pixels and keyboard input. They have no direct
+replacement, and the application must re-evaluate navigation policy, prompt-injection exposure, and
+action reliability for a desktop workflow.
 
-```ts
-import { DockerBrowserClient, createBrowserTools } from '@anvia/browser'
-import { DockerSandboxClient } from '@anvia/sandbox'
+## Migration outline
 
-const client = new DockerBrowserClient({
-  sandboxClient: new DockerSandboxClient(),
-  image: process.env.ANVIA_BROWSER_IMAGE!,
-})
+1. Install `@anvia/sandbox` and use a desktop image. The `create-image --feature desktop` builder
+   generates one, and the reference image under `packages/tool-sandbox/images/desktop` shows the
+   required programs.
+2. Run `anvia-sandbox-daemon` inside the sandbox and connect it to a `RemoteSandboxHub`.
+3. Open the desktop with `hub.desktop(sandboxId)` and pass `createDesktopTools({ sandbox })` to the
+   agent.
+4. Replace browser-specific readiness, navigation, and takeover code with the sandbox desktop's
+   status, screenshot, action, and control-lock contracts.
+5. Keep authorization, ticket issuance, network policy, tenant isolation, secrets, and cleanup in
+   the application. The hub does not create or destroy sandboxes.
 
-await client.pullImage()
-await using browser = await client.createBrowser({
-  workspace: { type: 'ephemeral' },
-  network: { mode: 'bridge' },
-  desktop: {
-    protocol: 'novnc',
-    password: process.env.ANVIA_BROWSER_VNC_PASSWORD!,
-    viewport: { width: 1440, height: 900 },
-  },
-})
-
-// Wait only for the capabilities this workflow requires.
-await browser.waitForCapabilities({
-  capabilities: ['automation', 'desktop'],
-  timeoutMs: 30_000,
-})
-await using connection = await browser.connect({
-  timeoutMs: 30_000,
-  scheduling: { mode: 'per-tab', maxConcurrentTabs: 8, maxQueuedActions: 1_000 },
-})
-
-const tools = createBrowserTools({
-  connection,
-  tools: [
-    'browser_list_tabs',
-    'browser_open_tab',
-    'browser_select_tab',
-    'browser_close_tab',
-    'browser_navigate',
-    'browser_snapshot',
-    'browser_click',
-    'browser_type',
-    'browser_press_key',
-    'browser_screenshot',
-  ],
-  navigation: { mode: 'origins', origins: ['https://docs.example.com'] },
-})
-```
-
-Construction performs no I/O. Image acquisition, browser creation, readiness, CDP connection, and cleanup are separate bounded operations. The browser owns its sandbox; each connection owns only its automation worker and CDP connection, and disconnecting it never destroys Chromium.
-
-## Capability readiness
-
-Readiness is per capability — `runtime`, `browser`, `automation`, and `desktop` — not all-or-nothing. `browser.readiness()` is synchronous and reports a `BrowserReadinessSnapshot` without probing: each capability carries an `unknown`, `checking`, `ready`, `failed`, `stopped`, or `destroyed` state, while the overall snapshot can be `partial` (some capabilities ready, others unchecked) or `degraded` (a checked capability failed while another remains usable). `waitForCapabilities({ capabilities, timeoutMs, abortSignal })` waits only for the capabilities a workflow requires and resolves with a fresh snapshot. `waitUntilReady({ timeoutMs })` survives as a thin wrapper that waits for all four capabilities.
-
-Desktop probing never establishes Playwright, so a failed `automation` probe can leave `desktop` ready and the snapshot degraded. Preserve healthy capabilities while the failed one is retried or restarted.
-
-## One connection, scheduled actions
-
-A `DockerBrowser` handle allows one active or pending automation connection; a second `connect()` rejects with `agent_action_busy`. Share that connection among agents that use the same browser and disconnect it before reconnecting, so one resource scheduler and navigation policy arbitrate the shared Chromium context.
-
-`connect({ scheduling })` defaults to serial scheduling, the compatibility mode: every tool call runs in one bounded FIFO queue against the selected tab. Opt into independent-tab concurrency with `{ mode: 'per-tab', maxConcurrentTabs, maxQueuedActions }`, and pass an explicit `tabId` to `browser_navigate`, `browser_snapshot`, `browser_click`, `browser_type`, `browser_press_key`, and `browser_screenshot`. Calls that omit `tabId` keep the selected-tab behavior. Obtain stable IDs from `browser_list_tabs` or `browser_open_tab`; IDs are scoped to one connection, so list tabs again after reconnecting.
-
-## What the tools expose
-
-Browser tools use strict Playwright locators and ARIA snapshots. They do not expose arbitrary JavaScript evaluation, raw CDP, coordinate clicks, shell access, hidden retries, or automatic reconnection.
-
-Use the allowlisted tool tuple and navigation policy as product policy, then enforce network isolation separately. Docker bridge networking is not an SSRF boundary.
+The last source release is available for historical reference at
+[commit `bbc56259`](https://github.com/anvia-hq/anvia/tree/bbc56259/packages/tool-browser), including
+its [changelog](https://github.com/anvia-hq/anvia/blob/bbc56259/packages/tool-browser/CHANGELOG.md)
+and [migration notes](https://github.com/anvia-hq/anvia/blob/bbc56259/packages/tool-browser/MIGRATION.md).
+Do not start new work on the retired package.
 
 ## Next steps
 
-- [Get started](/packages/browser/get-started)
-- [Capabilities](/packages/browser/capabilities)
-- [Security](/packages/browser/security)
-- [Public API](/packages/browser/api-reference)
-- [Visible browser guide](/sdk/advanced/browser)
-- [Studio browser desktop](/studio/browser)
+- [Sandbox desktop guide](/sdk/advanced/sandbox/desktop)
+- [Remote sandbox runtime](/sdk/advanced/sandbox/remote)
+- [`@anvia/sandbox` package](/packages/sandbox)
+- [Studio sandbox views](/studio/sandboxes)

@@ -1,28 +1,12 @@
-# Browser desktop
+# Browser desktop (retired)
 
-Studio can display a registered `@anvia/browser` desktop on the Sandboxes page and in a resizable Playground workspace while browser tools run.
+The dedicated Studio browser desktop belonged to the retired `@anvia/browser` package. Studio now
+shows a remote sandbox's desktop through the sandbox registration described in
+[Sandboxes](/studio/sandboxes).
 
-```ts
-const studio = new Studio([agent], {
-  sandboxes: [{
-    inspector: browser.inspector({ files: true, ports: true, processes: true }),
-    agentIds: [agent.id],
-    toolNames: browserTools.map((tool) => tool.name),
-    views: [{
-      id: 'desktop',
-      label: 'Chromium',
-      source: browser.desktop,
-      access: { mode: 'local' },
-      authentication: { type: 'password', password },
-    }],
-  }],
-})
-```
+Use `studioSandbox(hub, sandboxId, { agentIds, toolNames })` from `@anvia/sandbox/remote` to give
+Studio an inspector and a live desktop view for a remote sandbox. A person can watch the agent and
+take control; taking control pauses the agent's desktop inputs until the person releases the lease.
 
-When a registered agent uses a matching browser tool, Playground opens the current desktop automatically. Closing the panel does not stop Chromium; **Open browser** restores the view.
-
-Selecting **Take control** acquires a renewable browser-control lease. Studio waits for the active agent action, then blocks new browser tool actions until the lease is released or expires. This coordinates one trusted operator with the agent—it does not replace Studio authentication or application authorization.
-
-Use `access: { mode: 'authorize', authorize }` when the Studio origin is reachable remotely. The callback protects the viewer request, WebSocket upgrade, and control operations. Studio never owns or destroys the registered browser.
-
-Continue with [Sandboxes](/studio/sandboxes) and [Browser security](/packages/browser/security).
+See the [sandbox desktop guide](/sdk/advanced/sandbox/desktop) for the underlying desktop contract
+and the [`@anvia/browser` retirement notice](/packages/browser) for the package history.
