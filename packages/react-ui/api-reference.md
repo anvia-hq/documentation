@@ -14,7 +14,7 @@ import {
 } from '@anvia/react-ui'
 ```
 
-The root exports the principal components, providers, hooks, and shared types from every family, except the sandbox viewers. `SandboxTerminal` and `SandboxDesktop` are available only from their own subpaths, so applications that never render a viewer do not need xterm or noVNC.
+The root exports the principal components, providers, hooks, and shared types. The sandbox viewers are the exception: `SandboxTerminal` and `SandboxDesktop` are available only from their own subpaths, so applications that never render a viewer do not need xterm or noVNC.
 
 ### Providers
 
@@ -418,11 +418,11 @@ Import xterm's stylesheet once in the application:
 import '@xterm/xterm/css/xterm.css'
 ```
 
-The subpath also exports `terminalSubprotocol` (`"anvia.terminal.v1"`), `ticketSubprotocolPrefix` (`"anvia.ticket."`), and the `SandboxTerminalReconnectOptions`, `SandboxTerminalState`, `SandboxTerminalStatus`, and `SandboxTerminalHandle` types.
+The subpath also exports `terminalSubprotocol` (`"anvia.terminal.v1"`), `ticketSubprotocolPrefix` (`"anvia.ticket."`), and the `SandboxTerminalHandle`, `SandboxTerminalProps`, `SandboxTerminalReconnectOptions`, `SandboxTerminalState`, and `SandboxTerminalStatus` types.
 
 ### Authorization boundary
 
-The component does not choose who may see a session and does not mint or validate tickets. The application's backend mints the ticket, and the hub's `authorizeTerminal` redeems it and returns the sandbox, `sessionName`, and optional `readOnly` grant. That server-side grant is authoritative: the relay drops input and resize messages from a read-only viewer. Setting `readOnly` on the component is a UI and client-side guard, not an access-control decision. See [terminal behavior and security](/sdk/advanced/sandbox/terminals).
+The component does not choose who may see a session and does not mint or validate tickets. The application's backend mints the ticket, and the hub calls the application's `authorizeTerminal` callback, which redeems it and returns the sandbox, `sessionName`, and optional `readOnly` grant. That server-side grant is authoritative: the relay drops input and resize messages from a read-only viewer. Setting `readOnly` on the component is a UI and client-side guard, not an access-control decision. See [terminal behavior and security](/sdk/advanced/sandbox/terminals).
 
 ## `@anvia/react-ui/sandbox-desktop`
 
@@ -499,15 +499,15 @@ The component also accepts ordinary `div` props except `children` and `onError`.
 
 The desktop uses the shared relay states: `loading`, `connecting`, `open`, `reconnecting`, and `failed`. A relay that cannot set the viewer up closes with a reason such as `unsupported: ...`; that stops the viewer when retrying cannot help, while `sandbox_unavailable` and `timeout` are retried. The root element carries the state as `data-state`. The default status line is a `role="status"` element with `data-relay-status` and offers a Retry button after a failure.
 
-Until the relay says who has control, the viewer is view-only. `control` is undefined and the default bar is hidden. After the relay reports state, the bar shows "The agent has control", "`<holder>` has control", "You have control", or "View only". "Take over" asks the relay for control, which pauses the agent's inputs (`desktop_locked`) until "Release" or until the hold lease is released. While someone else holds control there is no take-over button, and this viewer sends no input. A refused request, such as taking over while someone else holds control, appears as `notice` until the next control update. Closing the tab releases the hold. `onControlChange` receives `SandboxDesktopControl`; control is forgotten while the link is down.
+Until the relay says who has control, the viewer is view-only. `control` is undefined and the default bar is hidden. After the relay reports state, the bar shows "The agent has control", "`<holder>` has control", "You have control", or "View only". "Take over" asks the relay for control, which pauses the agent's inputs (`desktop_locked`) until "Release" or until the hold lease is released. While someone else holds control there is no take-over button, and this viewer sends no input. A refused request, such as taking over while someone else holds control, appears as `notice` until the next control update. Closing the tab releases the hold. `onControlChange` receives `SandboxDesktopControl`. The component forgets the current control state while the link is down.
 
 The root also exposes `data-readonly` whenever this viewer is view-only, which includes the `readOnly` prop, a read-only ticket grant, and any time this viewer does not hold control. `data-control` is `you`, `other`, or `none`. A `ref` exposes `focus()`, `reconnect()`, `takeOver()`, and `release()`; `reconnect()` retries only after the viewer gave up.
 
 ### Authorization boundary
 
-The component does not authorize desktop access or control. The application's backend mints the ticket, and the hub's `authorizeDesktop` redeems it and returns the sandbox, optional `readOnly` grant, and holder identity. The relay is authoritative: it filters keyboard, pointer, clipboard, and resize input from read-only viewers, and only the current holder's input reaches the desktop. A `readOnly` prop is a local UI and client-side guard; a read-only grant in the ticket wins even when the prop is absent. The component's take-over action only asks the relay; it cannot grant control itself. See [desktop behavior and control](/sdk/advanced/sandbox/desktop).
+The component does not authorize desktop access or control. The application's backend mints the ticket, and the hub calls the application's `authorizeDesktop` callback, which redeems it and returns the sandbox, optional `readOnly` grant, and holder identity. The relay is authoritative: it filters keyboard, pointer, clipboard, and resize input from read-only viewers and from viewers that are not the current holder. The component also keeps noVNC view-only until this viewer holds control, so its input never mixes with the agent's. A `readOnly` prop is a local UI and client-side guard; a read-only grant in the ticket wins even when the prop is absent. The component's take-over action only asks the relay; it cannot grant control itself. See [desktop behavior and control](/sdk/advanced/sandbox/desktop).
 
-The subpath also exports `desktopSubprotocol` (`"anvia.desktop.v1"`), `ticketSubprotocolPrefix` (`"anvia.ticket."`), and the `SandboxDesktopControl`, `SandboxDesktopControlsState`, `SandboxDesktopHandle`, `SandboxDesktopNotice`, and `SandboxDesktopProps` types.
+The subpath also exports `desktopSubprotocol` (`"anvia.desktop.v1"`), `ticketSubprotocolPrefix` (`"anvia.ticket."`), and the `SandboxDesktopControl`, `SandboxDesktopControlsState`, `SandboxDesktopHandle`, `SandboxDesktopNotice`, `SandboxDesktopProps`, `SandboxDesktopReconnectOptions`, `SandboxDesktopState`, and `SandboxDesktopStatus` types.
 
 ## `@anvia/react-ui/stream`
 
