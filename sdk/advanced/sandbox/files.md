@@ -15,6 +15,12 @@ const fileTools = createDockerSandboxTools({
 
 Paths are workspace-relative (for example `notes/result.txt`). Agent tool calls also accept an absolute path inside the sandbox workdir (for example `/workspace/notes/result.txt` with the default workdir); paths outside the workdir are rejected. Command `cwd` values follow the same rule. `read_file` returns one bounded page of UTF-8 text; binary artifacts should use trusted runtime methods.
 
+File writes reject a destination or parent path component that is a symlink, including a dangling
+link, with `invalid_path`. The check runs before creating parent directories and again before
+copying bytes, so an existing link cannot redirect either operation outside the workspace. It
+requires `sh` in the image and is best-effort against a concurrent process swapping a path
+component between inspection and use.
+
 ## Use runtime methods from trusted code
 
 ```ts
