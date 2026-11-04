@@ -8,6 +8,8 @@
 Both modes support deterministic document replacement, logical document deletion and retrieval,
 paginated inspection, metadata filters, multiple embeddings per logical document, and `search`,
 with `retrieveDocuments` and `createVectorSearchTool` integration from `@anvia/core/vector-store`.
+Native filter translation covers `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, and n-ary `and`/`or`;
+`in` accepts only all-string or all-integer values.
 Mutations accept Qdrant wait, ordering, and timeout controls.
 
 Dense-only and hybrid collection/index modes cannot be mixed. Hybrid defaults to named vectors `dense` and `sparse`; configure matching names across creation, ingestion, and query.

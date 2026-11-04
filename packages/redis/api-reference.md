@@ -40,6 +40,6 @@ await store.upsert({ documents, providerOptions })
 const results = await store.search({ vector, topK, minScore, filter, providerOptions, abortSignal })
 ```
 
-`filterToRedisQuery({ filter, metadataSchema })` converts a supported Anvia filter into a Redis Search query.
+`filterToRedisQuery({ filter, metadataSchema })` converts an Anvia filter into a Redis Search query. It maps every comparison operator, `in`, and n-ary `and`/`or`, and requires every filtered field to be declared in `metadataSchema`. Undeclared fields, empty `in` lists, range filters on tag fields, and non-finite numeric values throw.
 
 Return to the [package guide](/packages/redis).
