@@ -37,8 +37,7 @@ await runtime.submit(
 )
 ```
 
-A queued run captures the latest completed session history when it starts. Failed or cancelled predecessors
-release the queue without adding partial work to history. Different sessions run in parallel up to
+A queued run receives the latest started settled session history when it starts, including failed or cancelled predecessors. Saved exhaustion or context checkpoints keep their partial work. Without loop compaction, saved model requests also provide a recovery transcript. Approval continuations keep completed tool call and result pairs. An unfinished tool exchange with no complete checkpoint is left out of inherited history. Different sessions run in parallel up to
 `maxConcurrentRuns` (default 4). Approvals and recovery blocks pause their own session queue but free capacity
 for others.
 
