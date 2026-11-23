@@ -20,7 +20,7 @@ const getOrder = createTool({
     id: z.string(),
     status: z.string(),
   }),
-  async execute({ orderId }) {
+  async handler({ orderId }) {
     await auth.requireOrderAccess(user.id, orderId)
     return orders.get(orderId)
   },

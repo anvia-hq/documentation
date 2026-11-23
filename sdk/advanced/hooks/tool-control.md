@@ -13,7 +13,7 @@ const deleteAccount = createTool({
   requiresApproval: {
     reason: 'Deleting an account requires reviewer approval.',
   },
-  async execute({ accountId }) {
+  async handler({ accountId }) {
     await accounts.delete(accountId)
     return 'Account deleted.'
   },
@@ -41,7 +41,7 @@ const requestRefund = createTool({
       reason: `Review refund above the automatic limit for ${context.run.agentId}.`,
     }
   },
-  async execute(input) {
+  async handler(input) {
     return refunds.request(input)
   },
 })

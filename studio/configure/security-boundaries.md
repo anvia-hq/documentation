@@ -68,6 +68,11 @@ Tool approval reduces accidental execution during an agent run, but it is not ac
 
 Run Studio with development credentials and the least authority needed for the task. Prefer test accounts, non-production databases, scoped API tokens, and sandboxed filesystems.
 
+Studio accepts JSON request bodies up to 10 MiB by default, including transcripts and inline attachment data.
+Set `maxBodyBytes` when callers send larger payloads; larger bodies receive HTTP 413 with `payload_too_large`.
+Size it with your authentication and reverse-proxy limits, and remember that a body reaching Studio is stored
+or rendered in the same trust boundary as any other trace input.
+
 Provider keys stay in the server process rather than being configured in the browser. However, prompts, outputs, trace payloads, errors, and logs returned to the browser can still contain sensitive information. Avoid placing secrets in prompts or tool results, and review what custom observers and tools record.
 
 ## Treat custom UI code as trusted code
