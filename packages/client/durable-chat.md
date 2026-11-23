@@ -31,7 +31,7 @@ const chat = useChat({ transport })
 
 | Option | Purpose |
 | --- | --- |
-| `client` | A `DurableChatClient`: the `submit`, `stream`, `respond`, `resolveTool`, `retry`, `cancel`, and `listRuns` methods of `DurableClient`. |
+| `client` | A `DurableChatClient`: `submit`, `stream`, `snapshot`, `respond`, `resolveTool`, `retry`, `cancel`, and `listRuns`, plus optional `steer` and `resolveMemoryWrite`. A custom client must provide `snapshot`, which the adapter reads when a settled status event omits the outcome. |
 | `agentId` | Registered agent used for every submission from this transport. |
 | `sessionId` | Durable session that owns the transcript and serializes unfinished work. |
 | `requestId` | Optional function returning a submission ID. Defaults to a new UUID per submission; return a stable value to deduplicate one prompt. |
@@ -61,7 +61,10 @@ The send `abortSignal` is forwarded to the submission and to the event stream. A
 
 ## Event mapping
 
-The adapter maps committed durable journal events to `anvia.client.v3` frames:
+The adapter maps committed durable journal events to `anvia.client.v3` frames. Since Durable 0.14 a settled
+`status` event does not embed the run outcome; when it carries none, the adapter reads `snapshot()` and maps the
+stored outcome. If the run has already moved past that status, the event maps without an outcome, so treat the
+snapshot as authoritative when you need the final result.
 
 | Durable event or status | Client frames |
 | --- | --- |
@@ -86,6 +89,25 @@ The adapter maps committed durable journal events to `anvia.client.v3` frames:
 | `blocked` outcome | `run_end` with status `blocked` |
 
 A retried model attempt keeps the assistant message identity and emits `message_reset` before new content, so the reducer discards the partial attempt instead of leaving an empty message. See [protocol and state](/packages/client/protocol-and-state#retries-and-message-reset).
+
+## Run controls
+
+`useChat` exposes the chat subscription, not the durable run. The transport also returns a `controller` for
+operations the hook does not model:
+
+| Control | Purpose |
+| --- | --- |
+| `activeRunId` | Run last submitted or reattached; undefined before the first successful send. |
+| `status` | Last known status (`running`, `waiting`, `retry_wait`, `needs_attention`, …), updated from the submit response, a resume snapshot, and status events. It is not a poll of the server. |
+| `subscribe(listener)` | Called after `activeRunId` or `status` changes; returns an unsubscribe function. |
+| `reattach(runId, after?)` | Point later interaction responses and `send({ resume })` at an existing run. |
+| `steer(input, runId?)` | Add user input to a running run at its next model step. |
+| `cancel(runId?)`, `retry(runId?)` | Persist cancellation or an explicit retry. |
+| `resolveTool(operationId, output, runId?)` | Reconcile an uncertain tool call. |
+| `resolveMemoryWrite(operationKey, resolution, runId?)` | Settle a blocked recorded memory write. |
+
+Do not confuse the hook's `stop()` with `controller.cancel()`: stopping detaches the subscriber and leaves the
+run executing, while cancelling persists a terminal decision.
 
 Frame `eventId` values are durable event sequences, which are global to the store and therefore not contiguous within one chat stream. Consume the frames through `useChat` or keep them opaque; do not wrap this transport in the contiguous frame validator used by `createHttpClientTransport()`.
 

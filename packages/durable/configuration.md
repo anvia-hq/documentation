@@ -43,7 +43,11 @@ agents: [
 | `compaction` | Optional trigger, retention, compactor, and token counter; see [Compaction](/packages/durable/compaction). |
 
 Registration is validated eagerly: duplicate IDs, unsupported agent options, unknown recovery tools, invalid
-policies, and non-streaming models with `stream: true` throw at `open()` or `registerAgents()`.
+policies, non-streaming models with `stream: true`, and enabled agent-level `retries` throw at `open()` or
+`registerAgents()`. An agent that pins MCP servers must be passed to `open()`: its fingerprint reads tool
+definitions that may be asynchronous, so `registerAgents()` rejects it and `runtime.handle(agent)` fetches the
+handle instead. Automatic versions (`version: 'auto'`) fingerprint the model, instructions, sampling, tool
+definitions, and output schema, but not tool implementations, guardrails, middleware, or lifecycle hooks.
 
 ### Registering and unregistering at runtime
 

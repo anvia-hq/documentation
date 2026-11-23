@@ -3,7 +3,7 @@
 `@anvia/react` exports React hooks and their state types. Create transports with `@anvia/client`.
 
 ```ts
-import { useChat, useCompletion, useSmoothStreamItems, useSmoothStreamText } from '@anvia/react'
+import { useChat, useCompletion, useDurableChat, useSmoothStreamItems, useSmoothStreamText } from '@anvia/react'
 import { useGraphExplorer } from '@anvia/react/graph-explorer'
 import { createHttpClientTransport } from '@anvia/client'
 ```
@@ -18,6 +18,7 @@ const chat = useChat({
   suggestions,
   onEvent,
   onError,
+  maxRetainedEvents,
 })
 ```
 
@@ -43,7 +44,29 @@ await chat.respondToInteraction({
 
 For a structured question, pass `{ type: 'tool-question', answers: [{ questionId, value }] }` as the response. The pending entry contains the complete `AgentInteractionRequest` under `request`.
 
+`maxRetainedEvents` bounds how many of the newest events the hook keeps. It is a positive safe integer and is
+unbounded by default. It truncates the retained event list, not the transcript or `messages`; `onEvent` still
+receives every event.
+
 `runUsage` holds the aggregate `Usage` for the latest run; the hook refreshes it from `run_end` and `error` events while per-message usage stays on each assistant message.
+
+## `useDurableChat`
+
+`useDurableChat({ transport, ...useChatOptions })` returns the same result as `useChat()` plus `run`:
+
+```ts
+const chat = useDurableChat({ transport })
+chat.run.id       // durable run ID, undefined before the first send
+chat.run.status   // durable status, independent of chat.status
+await chat.run.steer(input)
+await chat.run.cancel()
+await chat.run.retry()
+await chat.run.resolveTool(operationId, output)
+await chat.run.resolveMemoryWrite(operationKey, 'applied')
+```
+
+The transport must come from `@anvia/client/durable-chat` or expose an equivalent `controller`. Create it once,
+not on every render. See [Durable chat hook](/packages/react/durable-chat).
 
 ## `useCompletion`
 
@@ -62,7 +85,7 @@ completion.stop()
 completion.reset()
 ```
 
-The hook also exposes `completion`, `input`, `setInput`, `status`, `error`, `events`, `usage`, and `contextUsage`. `usage` is the `Usage` reported by the latest run and is replaced by each `complete()` call.
+The hook also exposes `completion`, `input`, `setInput`, `status`, `error`, `events`, `usage`, and `contextUsage`. It accepts `maxRetainedEvents` with the same bounded-retention behavior as `useChat`. `usage` is the `Usage` reported by the latest run and is replaced by each `complete()` call.
 
 ## Stream smoothing
 

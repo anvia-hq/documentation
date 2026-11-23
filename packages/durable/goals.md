@@ -1,7 +1,8 @@
 # Durable goals
 
 `defineGoal()` pursues an objective across bounded agent sessions. Register the definition in
-`DurableRuntime.open({ tasks })`, then call `submitGoal()`. A required application assessor decides
+`DurableRuntime.open({ tasks })`, then call `submitGoal()`. Goals run on an owning runtime or shared workers;
+a store-only `DurableClient` can read and control submitted tasks but cannot submit a goal. A required application assessor decides
 whether verified work is complete, blocked, or needs another session. A model's final answer alone
 does not complete the goal.
 

@@ -62,11 +62,13 @@ const research = defineTask({
   initial: () => ({ phase: 'plan' as const }),
   run: async (ctx) => {
     if (ctx.checkpoint.phase === 'plan') {
-      const ids = ['market', 'product'].map((question) =>
-        ctx.spawnAgent(`research-${question}`, {
-          agentId: 'researcher',
-          prompt: JSON.stringify({ topic: ctx.input.topic, question }),
-        }),
+      const ids = await Promise.all(
+        ['market', 'product'].map((question) =>
+          ctx.spawnAgent(`research-${question}`, {
+            agentId: 'researcher',
+            prompt: JSON.stringify({ topic: ctx.input.topic, question }),
+          }),
+        ),
       )
       return {
         status: 'waiting',
@@ -75,7 +77,7 @@ const research = defineTask({
       }
     }
     const findings: string[] = []
-    for (const child of ctx.children()) {
+    for (const child of await ctx.children()) {
       if (child.outcome?.status !== 'completed' || typeof child.outcome.output !== 'string')
         return { status: 'failed', error: 'A researcher did not succeed.' }
       findings.push(child.outcome.output)
@@ -85,7 +87,7 @@ const research = defineTask({
 })
 ```
 
-`ctx.spawnAgent(key, { agentId, prompt })` returns a **task ID**. Creation of the child task and its agent run
+`await ctx.spawnAgent(key, { agentId, prompt })` returns a **task ID**. Creation of the child task and its agent run
 is atomic and happens before the parent's next checkpoint commits. The key belongs to the parent for its whole
 lifetime: replaying the same key and input returns the same child, while changing the input conflicts. Derive
 keys from stable data (an index in a saved plan), never `Date.now()` or random IDs, and include an iteration
@@ -99,7 +101,7 @@ unvalidated prompts.
 
 A task waits only on distinct direct children. `allSettled` resumes after every child is terminal. `failFast`
 marks unfinished selected siblings for cancellation after the first failure, then resumes once they settle.
-Neither decides the parent's outcome; read `ctx.children()` and decide. Never block a phase with
+Neither decides the parent's outcome; read `await ctx.children()` and decide. Never block a phase with
 `await handle.result()` or an in-memory timer: return a `waiting` transition so capacity is released and the
 wait survives restart. A parent whose children are unfinished stays in `completing` or `cancelling` until they
 settle. Trees are limited to 1000 nodes and depth 32, and there are no detached children.
@@ -137,7 +139,7 @@ return {
   wait: { type: 'signal', name: 'review-1' },
 }
 // Later, in the continuation:
-const decision = ctx.signalValue('review-1') // undefined means not delivered
+const decision = await ctx.signalValue('review-1') // undefined means not delivered
 // From your application, after authorizing the delivery:
 await task.signal('review-1', 'delivery-123', { approved: true })
 ```

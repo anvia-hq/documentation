@@ -111,8 +111,9 @@ model backoff deadline.
 
 The current SQLite schema is **12**. Schemas 1–12 upgrade when the runtime acquires ownership. Schema 5 added
 conversation compaction, 6 active-loop compaction, 7 goal session exhaustion, 8 shared message histories, 9
-steering checkpoints, 10–11 blob overflow and escaping, and 12 oversized prompts. SQL backends verify the
-schema you generated and do not migrate it. Older engines reject newer schemas; downgrading a database is
+steering checkpoints, 10–11 blob overflow and escaping, and 12 oversized prompts. Postgres can create its
+tables with `{ schema: 'create' }`, otherwise it verifies them; Drizzle and Prisma always verify the schema you
+generated and never migrate it. Older engines reject newer schemas; downgrading a database is
 unsupported. Upgrade Core and Durable together for execution protocol 5. See
 [Operations](/packages/durable/operations).
 

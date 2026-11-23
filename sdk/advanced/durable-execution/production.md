@@ -5,9 +5,12 @@ production-readiness certification.
 
 ## 1. Host the runtime
 
-- Keep one application-scoped `DurableRuntime` per database. A second live owner is rejected.
-- Use a dedicated SQLite file on a **local filesystem**, with WAL and full synchronous commits. Do not share
-  it over a network filesystem. `:memory:` does not survive restart.
+- Keep one application-scoped owner **or** a set of shared workers per database, never both.
+- For SQLite, use a dedicated file on a **local filesystem**, with WAL and full synchronous commits. Do not
+  share it over a network filesystem. `:memory:` does not survive restart. A read-only observer is the only
+  second process.
+- For Postgres, Drizzle, or Prisma, give workers unique IDs and a lease longer than their slowest step; a
+  worker that loses its claim stops the run. Store-only clients and observers hold no lease.
 - Run under a process supervisor on a persistent volume. Durability does not wake a stopped machine, and
   timers do not keep Node alive by themselves.
 - On startup call `runtime.resume()`. On shutdown stop admitting work and await `runtime.close()`. Models and
@@ -64,16 +67,17 @@ await backupSqlite('./durable.sqlite', './backup.sqlite')
 await restoreSqlite('./backup.sqlite', './restored.sqlite') // always a new file
 ```
 
-Backup and restore are offline and write new destination files. They accept schemas 3–9, but backup
-ownership acquisition upgrades its source before writing a schema-9 archive. Keep an offline copy
-before upgrading if rollback to an older engine is required. Never run a restored copy alongside
-the original, and reconcile post-backup external effects before replaying. SQLite upgrades schemas
-1–8 to 9 on acquisition; older engines reject schema 9, and databases cannot be downgraded. Drain, back up, test against a restored copy, then restart one owner and admit a small
+SQLite backup and restore are offline and write new destination files. They accept schemas 3–12, but backup
+ownership acquisition upgrades its source before writing a schema-12 archive. For SQL stores, use your
+database's native backup and stop every runtime and worker first. Keep an offline copy before upgrading if
+rollback to an older engine is required. Never run a restored copy alongside the original, and reconcile
+post-backup external effects before replaying. SQLite upgrades schemas 1–12 on acquisition; older engines
+reject newer schemas, and databases cannot be downgraded. Drain, back up, test against a restored copy, then restart one owner and admit a small
 workload. See [Operations](/packages/durable/operations) for the full procedure.
 
 ## 6. Checklist
 
-- One owner, local disk, supervised process, `resume()` at startup, `close()` at shutdown.
+- One owner or a set of shared workers, supervised processes, `resume()` or worker startup, `close()` at shutdown. SQLite stays on local disk with one owner.
 - Every tool and effect classified `manual`, `safe`, or `idempotent`, with real deduplication where claimed.
 - Approval, `needs_attention`, and reconciliation paths built and authorized.
 - Agent versions bumped on incompatible changes, and old versions restorable.
