@@ -82,7 +82,7 @@ const result = await runEvalSuite({
 
 If `version` is omitted, Lens returns the most recently published version. Pin an explicit version in CI and release checks so the case set cannot change between executions.
 
-The client retrieves all pages for you, with 50 cases per request by default and at most 100. It authenticates with the Lens public and secret project keys; run it on a trusted server or CI worker, never in browser code.
+The client follows at most 100 pages, with 50 cases per request by default. This supports 5,000 cases; use `lens.datasetClient({ pageSize: 100 })` for up to 10,000. Exceeding the ceiling throws `LensDatasetError` with `code: 'pagination_limit'`, not a partial dataset. Inconsistent dataset identity/version or page counts yield `invalid_response`. It authenticates with the Lens public and secret project keys; run it on a trusted server or CI worker, never in browser code.
 
 ## Archive instead of deleting history
 

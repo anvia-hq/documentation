@@ -51,6 +51,8 @@ denominator. A run-wide case minimum cannot establish usable coverage for a part
 | `maxInvalidRate` | Maximum invalid judgments / all judgments for the metric; fraction 0–1 in the API. |
 | `maxUnknownRate` | Maximum unknown judgments / all judgments for the metric; fraction 0–1 in the API. |
 
+Keep reporter `publishInvalid: true` (the default). Evidence budgets count **received judgments**, not attempted evaluations; suppressing invalid results or omitting results for missing traces/export failures can make coverage misleading. Compare expected versus received case/metric populations before relying on a verdict.
+
 Provide all three settings together. The UI displays rate budgets as percentages. For `pass_rate`,
 both pass and fail judgments are valid evidence, including expected negative controls. Repeated
 judgments for one case and cases from other metrics cannot fill the case minimum. Unnamed judgments
