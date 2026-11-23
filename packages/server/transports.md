@@ -40,6 +40,17 @@ SSE writes serialized JSON as `data:` lines and uses `text/event-stream; charset
 
 The package does not emit heartbeat comments. Add a heartbeat at the application event-source layer when a proxy requires traffic during long idle periods.
 
+## Error responses
+
+A thrown source error is serialized as a final stream error event; that is not an HTTP error response.
+`createDurableHandler()` instead rejects a request before streaming with `{ error, code, field? }`:
+`payload_too_large` is HTTP 413, `capacity_exceeded` is HTTP 429, and an oversized request body is 413 with
+field `request.body` and the configured `limit`. `maxBodyBytes` is the binding ceiling for uploads. See
+[durable handler errors](/packages/server/api-reference#durable-handler-errors).
+
+Client-protocol responses validate outgoing events, including `message_reset` since Client 1.6.0. Keep the
+server's Client dependency aligned with the browser client that consumes the stream.
+
 ## Custom response metadata
 
 `headers`, `status`, and `statusText` pass through to the `Response`. Existing transport headers are respected rather than overwritten. Authentication and CORS headers remain route-owned.

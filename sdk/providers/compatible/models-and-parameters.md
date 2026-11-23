@@ -29,6 +29,8 @@ for (const available of inventory.data) {
 
 Use this for diagnostics or an allow-list workflow. Do not infer tools, media, schemas, context limits, or Responses support from presence in the list. Some compatible services omit `/models` or list models that require other APIs.
 
+When the endpoint advertises them, entries also preserve `supportedParameters`, `reasoning`, and `pricing`. `supportedParameters` comes from a string array in `supported_parameters`; `reasoning` and `pricing` are provider-specific objects passed through unchanged. None of these fields is a capability or availability guarantee, and the last two are not normalized below the object level. Validate them before using them for model selection, controls, or cost estimates, and treat missing metadata as unknown rather than unsupported. See [model-listing metadata](/sdk/providers/openai/model-listing#read-advertised-metadata) for the field shapes.
+
 ## Prefer normalized request options
 
 Keep portable settings on the Anvia completion call:

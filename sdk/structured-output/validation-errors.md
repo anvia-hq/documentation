@@ -109,7 +109,7 @@ or `@anvia/core/completion`. Its `code` is `ANVIA_COMPLETION_PROVIDER_OUTPUT`.
 
 | `kind` | Meaning |
 | --- | --- |
-| `malformed-tool-arguments`, `invalid-tool-arguments` | Arguments cannot be parsed or represented as strict JSON. |
+| `malformed-tool-arguments`, `invalid-tool-arguments` | Arguments cannot be parsed or represented as strict JSON. Empty or whitespace-only strings are treated as `{}`. |
 | `invalid-response`, `invalid-stream-event` | A normalized provider response/event violates the contract. |
 | `incomplete-stream`, `incomplete-tool-call`, `invalid-tool-call` | A stream/call did not finish correctly or cannot be consumed safely. |
 | `truncated-tool-call` | Tool arguments were cut off; `finishReason` is `length`. |
@@ -118,6 +118,11 @@ or `@anvia/core/completion`. Its `code` is `ANVIA_COMPLETION_PROVIDER_OUTPUT`.
 The error exposes `kind`, optional `toolCallId`, `finishReason`, and authoritative `usage`. It
 intentionally omits raw tool arguments. Keep call IDs and even normalized diagnostic fields within
 your application's logging policy; do not attach the provider response as a fallback.
+
+Empty or whitespace-only tool-call argument strings are normalized to `{}` before parsing, so
+zero-argument calls from OpenAI-compatible backends (including OpenRouter, Ollama, and vLLM) and
+Mistral succeed. Validation is otherwise unchanged: any non-empty argument string must still be
+strict JSON, and malformed non-empty JSON still raises `malformed-tool-arguments`.
 
 This complete offline example exercises the provider-output catch boundary and retry budget:
 

@@ -5,8 +5,8 @@ only validate APIs present in examples; they cannot reveal an exported API that 
 
 ## Source and inventory
 
-`scripts/sdk-coverage.json` records 81 public entrypoints across 38 public SDK packages at reviewed
-source revision `10977b75a1518a553b7d5deb0193b788258ba093`. Each entry links its owning guide and
+`scripts/sdk-coverage.json` records 85 public entrypoints across 37 public SDK packages at reviewed
+source revision `e751560f4a02c8989928966c203ed8747c0072fb`. Each entry links its owning guide and
 reference, with an export-name count and SHA-256 snapshot. The checker resolves TypeScript exports
 from source, including re-exports and types; private packages and `@anvia/core/internal/*` are
 excluded. A new/removed entrypoint or changed exported name set requires editorial review.
@@ -18,10 +18,11 @@ runtime tests. Types and aliases can belong to an existing feature/reference wit
 tutorial. The `features` entries tie selected APIs to complete examples and named offline tests;
 `utilities` records reference coverage or a reason for excluding a dedicated tutorial.
 
-The 2026-10-16 release-baseline refresh updates source versions and export-name snapshots only.
-Pipeline decision and routing documentation remains tracked in
-[documentation PR #10](https://github.com/anvia-hq/documentation/pull/10); refreshing the snapshot
-does not establish feature coverage for those additions.
+The 2026-11-04 review covers the sandbox remote runtime, terminals, tunnels, and desktop;
+`@anvia/client/durable-chat`; the React UI sandbox viewers; richer vector filters and metrics;
+durable agent compatibility and payload admission; and the retirement of `@anvia/browser`. It
+refreshes export-name snapshots and adds the new entrypoints, but a hash only records names. The
+guides and checked examples establish behavior coverage.
 
 ## Run the checks
 
@@ -96,6 +97,7 @@ the full reviewed SDK revision from the inventory and runs these gates. The depl
 | Provider output | [Catch and retry boundary](/sdk/structured-output/validation-errors#_4-handle-invalid-provider-output) | Retry kinds and streaming progress; adapter/tool errors tested separately. |
 | Memory keys | [Custom-store factory](/sdk/memory/custom-stores#_6-reuse-the-official-scope-key-helper) | Scope separation and consistent keys across operations. |
 | Embedding helpers | [Distance reference](/packages/core/api-reference#embedding-distances) | Zero vectors and dimension mismatches. |
+| Vector filters and metrics | [Metadata filters](/sdk/knowledges/metadata-filters) | N-ary operators, `ne`/`in`/`gte`/`lte`, euclidean scoring, and filtered search. |
 | Graph helpers | [Schema adapter reference](/packages/graph/api-reference#schema-adapter-helpers) | Invalid property values and reserved names. |
 
 ## Integration utility decisions

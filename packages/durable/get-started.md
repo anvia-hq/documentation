@@ -22,6 +22,9 @@ const runtime = await DurableRuntime.open({
   maxConcurrentRuns: 4,
 })
 
+// `runtime.compatibility()` now reports each registered agent's tools, streaming,
+// compaction, frozen options, and per-run settings durable does not expose.
+
 try {
   await runtime.resume() // discover unfinished work from the previous process
   const run = await runtime.submit({
@@ -80,6 +83,20 @@ read-only observer. See [Capabilities](/packages/durable/capabilities#deployment
 content under the same pair is rejected. Reuse the request ID when you retry a client request. Session IDs
 organize history and deduplication; they are not authentication.
 
+## Agent options and limits
+
+Register only replayable agent code. Static tools, instructions, and `skills` are supported. Agent-level
+`retries` is rejected when it would retry; use the registration's `modelRetry` for persisted retry and
+backoff. Memory, lifecycle callbacks, middleware, guardrails, context sources, MCP servers, provider tools,
+and dynamic tool indexes are also rejected at registration. See
+[compatibility reporting](/packages/durable/configuration#compatibility-reporting).
+
+A run whose prompt, input, or inherited history exceeds `limits.maxPayloadBytes` fails terminally instead
+of waiting for attention. Retrying recomputes the inherited history; if it still does not fit, retry rejects
+with the same `DurableLimitError` and the run stays failed. An HTTP bridge adds its own `maxBodyBytes`
+ceiling, which binds uploads before the payload limit. See
+[admission and payload limits](/packages/durable/operations#admission-and-payload-limits).
+
 ## Image and document prompts
 
 `prompt` is a nonblank string or a core `UserMessage`, so images and files work without a separate API:
@@ -124,4 +141,6 @@ cursor to avoid missing or repeating events.
 
 - [Capabilities](/packages/durable/capabilities) for recovery policies and what is supported.
 - [Configuration](/packages/durable/configuration) for streaming, retry, queues, and limits.
+- [HTTP server and client](/packages/durable/http) for run routes and the browser client.
+- [Durable chat transport](/packages/client/durable-chat) to connect a durable session to `useChat`.
 - [Durable execution guide](/sdk/advanced/durable-execution) for task-oriented walkthroughs.

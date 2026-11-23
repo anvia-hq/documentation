@@ -1,9 +1,10 @@
 # Releases
 
-Reviewed source release: `1.2.2`. The entries below preserve notable v0 history.
+Reviewed source release: `1.3.0`. The entries below preserve notable v0 history.
 
 Notable package releases include:
 
+- `1.3.0` moved the Prisma 8 PostgreSQL target to `@prisma/orm-postgres 8.0.0-rc.20` with the `prisma 8.0.0-rc.27` CLI, and raised the Prisma 7 peer floor to `@prisma/client >=7.10.0 <8.0.0`.
 - `1.2.1` fixed schema CLI invocation through package-manager symlinks and paths containing spaces or URL-special characters.
 - `1.2.0` added the `/v8` entrypoint for Prisma 8 PostgreSQL memory, preserved Prisma 7 at the root entrypoint, made each Prisma runtime peer independently optional, and added explicit Prisma 8 initialization support.
 - `1.1.3` declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents.

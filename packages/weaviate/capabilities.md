@@ -4,7 +4,7 @@
 - Weaviate v3 collections API integration.
 - Batch object ingestion with deterministic UUIDs.
 - Cosine, dot, or L2-squared distance configuration.
-- Equality, comparison, `and`, and `or` filter translation.
+- Equality, inequality, membership, comparison, and n-ary `and`/`or` filter translation.
 - Multi-embedding logical result collapsing.
 - `search` plus `createVectorSearchTool()` tool integration from `@anvia/core/vector-store`.
 

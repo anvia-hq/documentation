@@ -1,6 +1,10 @@
 # Releases
 
-Reviewed source release: `0.1.3`. `@anvia/azure` is a new package, so its release history starts here.
+Reviewed source release: `0.1.9`. `@anvia/azure` is a new package, so its release history starts here.
+
+## Patch releases through 0.1.9
+
+Reviewed `0.1.4` → `0.1.9` against SDK source on 2026-11-04. These releases track the OpenAI adapter's model listing, argument parsing, usage handling, and provider-switch fixes. Azure has no separate decision factory; use the documented Responses completion adapter.
 
 ## HTTPS requirement in 0.1.3
 

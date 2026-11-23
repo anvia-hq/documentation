@@ -47,6 +47,24 @@ export function SupportChat() {
 
 The hook converts local `UIMessage` values into core messages, sends a `ClientStreamRequest`, validates framed client events, and reduces those events back into UI state.
 
+For a durable backend, create a transport from `@anvia/client/durable-chat` instead:
+
+```ts
+import { DurableClient } from '@anvia/client/durable'
+import { createDurableChatTransport } from '@anvia/client/durable-chat'
+import { useChat } from '@anvia/react'
+
+const client = new DurableClient({ endpoint: '/durable' })
+const transport = createDurableChatTransport({
+  client,
+  agentId: 'researcher',
+  sessionId: 'chat-42',
+})
+const chat = useChat({ transport })
+```
+
+The adapter maps durable journal events to the same v3 frames, routes interaction responses to the active run, and uses a durable run ID plus sequence as its resume cursor. `chat.stop()` only detaches the subscription; use `transport.controller.cancel()` to cancel the run. See [Durable chat transport](/packages/client/durable-chat) for the event mapping, controller, busy-session handling, and known limitations.
+
 ## Key features
 
 - `useChat`: messages, events, send/regenerate/stop/reset, suggestions, usage, stream resume, and pending agent interactions.

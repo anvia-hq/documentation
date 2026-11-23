@@ -40,6 +40,6 @@ await store.upsert({ documents, providerOptions })
 const results = await store.search({ vector, topK, minScore, filter, providerOptions, abortSignal })
 ```
 
-`filterToWeaviateWhere(filter)` converts an Anvia `VectorFilter` for direct Weaviate calls.
+`filterToWeaviateWhere(filter)` converts an Anvia `VectorFilter` for direct Weaviate calls. Comparison and membership operators map to native `Equal`, `NotEqual`, `GreaterThan`, `GreaterThanEqual`, `LessThan`, `LessThanEqual`, and `ContainsAny` structures; n-ary `and`/`or` map to `And`/`Or`. Empty `in` lists and `null` values inside `in` throw.
 
 Return to the [package guide](/packages/weaviate).

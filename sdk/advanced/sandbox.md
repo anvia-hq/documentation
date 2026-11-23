@@ -2,6 +2,8 @@
 
 `@anvia/sandbox` gives an agent a disposable Docker-backed workspace for commands, files, processes, and preview ports. A live runtime can be exposed as ordinary Anvia tools without running model-selected commands in the application process.
 
+A remote sandbox runs the same runtime behind a daemon that dials out to your own hub, so the agent host and sandbox host can differ. Remote sandboxes can also expose interactive terminals, loopback tunnels, and a virtual desktop.
+
 A container reduces host exposure. It does not make arbitrary hostile code safe by itself.
 
 ## 1. Create a bounded workspace
@@ -86,5 +88,9 @@ In allow mode, the command policy blocks shell interpreters (`sh`, `bash`, `zsh`
 - [Execute commands](/sdk/advanced/sandbox/commands)
 - [Manage processes and previews](/sdk/advanced/sandbox/processes)
 - [Control lifecycle and cleanup](/sdk/advanced/sandbox/sessions)
+- [Run sandboxes remotely](/sdk/advanced/sandbox/remote)
+- [Open interactive terminals](/sdk/advanced/sandbox/terminals)
+- [Tunnel loopback ports](/sdk/advanced/sandbox/tunnels)
+- [Give an agent a desktop](/sdk/advanced/sandbox/desktop)
 - [Set limits and security policy](/sdk/advanced/sandbox/security)
 - [Review the production checklist](/sdk/advanced/sandbox/checklist)

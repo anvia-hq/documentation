@@ -5,7 +5,7 @@
 - `search` through the common vector index; agent tool integration via `createVectorSearchTool()` from `@anvia/core/vector-store`.
 - Multiple physical embeddings collapsed to one logical document result.
 - All metadata serialized into a single `__anvia_metadata` JSON column.
-- Post-retrieval filtering with `eq`, `gt`, `lt`, `and`, and `or` via core's `matchesVectorFilter`.
+- Post-retrieval filtering with `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, and n-ary `and`/`or` via core's `matchesVectorFilter`.
 
 The adapter stores reserved columns for the row ID, document ID, serialized document, metadata, and vector. Metadata keys beginning with `__anvia_` are rejected.
 

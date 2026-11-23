@@ -69,11 +69,17 @@ function resolvePackageEntry(moduleName, packages) {
 
   if (!typesPath) return { error: `${moduleName} is not a public package export` }
 
-  const targetPath = useSource
-    ? typesPath.replace(/^\.\/dist\//, './src/').replace(/\.d\.ts$/, '.ts')
-    : typesPath
-  const entryPath = resolve(packageInfo.directory, targetPath)
-  if (!existsSync(entryPath)) return { error: `${moduleName} entry is missing at ${entryPath}` }
+  if (!useSource) {
+    const entryPath = resolve(packageInfo.directory, typesPath)
+    if (!existsSync(entryPath)) return { error: `${moduleName} entry is missing at ${entryPath}` }
+    return { entryPath }
+  }
+  const sourceBase = typesPath.replace(/^\.\/dist\//, './src/').replace(/\.d\.ts$/, '')
+  const entryPath = [
+    resolve(packageInfo.directory, `${sourceBase}.ts`),
+    resolve(packageInfo.directory, sourceBase, 'index.ts'),
+  ].find(existsSync)
+  if (!entryPath) return { error: `${moduleName} entry is missing for ${sourceBase}.ts or ${sourceBase}/index.ts` }
 
   return { entryPath }
 }

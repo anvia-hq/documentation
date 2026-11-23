@@ -1,9 +1,12 @@
 # Releases
 
-Reviewed source release: `1.1.5`. The entries below preserve notable v0 history.
+Reviewed source release: `1.2.0`. The entries below preserve notable v0 history.
+
+Reviewed `1.1.5` → `1.2.0` against SDK source on 2026-11-04. Added native `ne`, `in`, `gte`, and `lte` metadata filters and n-ary `and`/`or`; empty `in` lists and empty logical lists are rejected. See [search and filters](/packages/chroma/search-and-filters).
 
 The available changelog records:
 
+- `1.2.0` added native `ne`, `in`, `gte`, and `lte` filter translation and n-ary `and`/`or`.
 - `1.1.5` refreshed the package README.
 - `1.1.4` rejected reserved `__anvia_`-prefixed metadata keys during document upsert, validating metadata before the existing document is deleted.
 - `1.1.3` declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents.
@@ -16,4 +19,4 @@ The available changelog records:
 - `0.2.6` recorded the repository's flattened package layout.
 - `0.2.0` aligned imports with the focused core public surface.
 
-Earlier visible entries are dependency updates. Read the complete [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/vector-chroma/CHANGELOG.md) for exact versions and hashes.
+Earlier visible entries are dependency updates. Read the complete [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/vector-chroma/CHANGELOG.md) for exact versions and hashes.

@@ -4,7 +4,7 @@
 - Query search through the common `VectorStore` interface; agent tool integration via `createVectorSearchTool()` from `@anvia/core/vector-store`.
 - Logical document reconstruction from stored text and metadata.
 - Multiple embeddings per logical document; results collapse to one best logical result.
-- Equality, greater-than, less-than, `and`, and `or` filter translation.
+- Native `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, and `in` filter translation, with n-ary `and`/`or`.
 - Collection creation with custom `metadata` and `configuration`.
 
 Scores are `1 - distance` for cosine and dot metrics and `-distance` for euclidean, so compare rankings within the same collection rather than assuming a universal threshold across backends.

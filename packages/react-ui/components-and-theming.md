@@ -26,6 +26,8 @@ Namespaces expose small parts instead of a single all-in-one widget:
 
 Render-function children can customize a part while retaining its current context. Use the exported context hooks when a separate application component needs the same state.
 
+`ComposerPrimitive.Input` accepts `renderEntity` to customize how a mention token displays in the rich editor. It is a pure function of a `ComposerInputEntity`; returning `null` or `undefined` shows `entity.text`. The saved input and entities do not change.
+
 ## Styling choices
 
 The package exports no CSS. The application owns overflow, editor focus, textarea sizing, image
@@ -46,6 +48,15 @@ Style through ordinary props or stable attributes:
 Inspect the rendered attributes for the part being styled. The stable semantic surface is ARIA plus
 `data-state` and `data-role`; internal structure is not a styling API. Prefer explicit `className`
 values on the exact primitives your application composes.
+
+The sandbox viewers expose connection state on their root:
+
+- `SandboxTerminal` sets `data-state` to the relay state and adds `data-readonly` while the viewer is read-only.
+- `SandboxDesktop` sets `data-state`, adds `data-readonly` whenever this viewer is view-only (the prop, a ticket grant, or not holding control), and sets `data-control` to `you`, `other`, or `none`.
+- The default status lines use `role="status"` with `data-relay-status`; the desktop's default bar uses `data-sandbox-desktop-controls`.
+
+Replace the status or control markup with `renderStatus` and `renderControls` when the application
+needs its own presentation.
 
 To start from editable Tailwind components, follow the
 [CLI component guide](/packages/cli/components) and modify the generated application files directly.

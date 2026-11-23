@@ -20,7 +20,6 @@ export function compactingRegistration(agent: Agent<unknown>): DurableAgentRegis
       compactor: createSummaryMemoryCompactor({
         model: agent.model,
         maxTokens: 2_000,
-        temperature: null,
         retries: false,
       }),
     },
@@ -28,9 +27,11 @@ export function compactingRegistration(agent: Agent<unknown>): DurableAgentRegis
 }
 ```
 
-Pass the returned registration in `DurableRuntime.open({ agents })`. `temperature: null` omits the
-parameter for summary models that reject it; omission or `undefined` keeps the compactor's default
-temperature of zero. Main-agent sampling settings do not control the summary request.
+Pass the returned registration in `DurableRuntime.open({ agents })`. The compactor sends no
+`temperature` unless you set one, so summary models that reject the parameter work without extra
+configuration. Set `temperature: 0` for deterministic summaries; explicit finite values are forwarded
+unchanged, and `null` also omits the parameter. Main-agent sampling settings do not control the
+summary request.
 
 ## Triggers and retention
 

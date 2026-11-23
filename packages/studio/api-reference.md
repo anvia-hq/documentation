@@ -19,7 +19,11 @@ class Studio implements AnviaStudio {
 ```
 
 `start()` starts a server and returns immediately. `serve()` resolves after active runs drain and
-shutdown completes. `shutdown()` exposes the same asynchronous draining for an application-owned
+shutdown completes. `allowedHosts` lists additional client-facing hostnames that may appear in the
+`Host` or `Origin` header; ports are ignored. Loopback hostnames are always accepted, and an
+explicit non-wildcard `hostname` is trusted automatically. Binding to `0.0.0.0` or `::` still
+requires every public hostname to be listed. Requests with a foreign `Host` or `Origin` receive
+`403` with `error.code: "forbidden"`. `shutdown()` exposes the same asynchronous draining for an application-owned
 lifecycle. `close()` is synchronous, aborts active work, and does not wait for observers. `fetch()`
 makes the same application usable in runtimes or servers that accept a Fetch handler.
 
@@ -27,6 +31,7 @@ makes the same application usable in runtimes or servers that accept a Fetch han
 type StudioServeOptions = {
   port?: number
   hostname?: string
+  allowedHosts?: readonly string[]
   log?: boolean
   handleSignals?: boolean
   shutdownTimeoutMs?: number

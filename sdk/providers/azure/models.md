@@ -33,7 +33,7 @@ const speech = azure.speechGenerationModel({ modelId: 'my-speech-deployment' })
 const transcription = azure.transcriptionModel({ modelId: 'my-transcription-deployment' })
 ```
 
-These share the OpenAI adapters' behavior; see [Embeddings](/sdk/providers/openai/embeddings) and [Media models](/sdk/providers/openai/media). Availability of tools, media options, and model listing depends on your Azure endpoint and deployment. `listModels()` calls the endpoint's model listing API; it does not enumerate Azure Resource Manager deployments.
+These share the OpenAI adapters' behavior; see [Embeddings](/sdk/providers/openai/embeddings) and [Media models](/sdk/providers/openai/media). Availability of tools, media options, and model listing depends on your Azure endpoint and deployment. `listModels()` calls the endpoint's model listing API; it does not enumerate Azure Resource Manager deployments. It uses the same normalization as the OpenAI adapter, so `supportedParameters`, `reasoning`, and `pricing` are preserved when the endpoint returns them; they remain provider metadata, not an availability guarantee. See [model-listing metadata](/sdk/providers/openai/model-listing#read-advertised-metadata).
 
 ## Custom deployment names
 

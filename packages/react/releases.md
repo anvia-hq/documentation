@@ -1,15 +1,18 @@
 # Releases
 
-The reviewed source release is `@anvia/react` **1.1.4**. The entries below preserve notable v0 protocol milestones.
+The reviewed source release is `@anvia/react` **1.1.5**. The entries below preserve notable v0 protocol milestones.
 
-## Changes through 1.1.4
+## Changes through 1.1.5
+
+Reviewed `1.1.4` → `1.1.5` against SDK source on 2026-11-04. Preserved detailed chat stream errors and reported them once when the stream ends with an error status. See [streaming state](/packages/react/state-and-streaming).
 
 Reviewed `1.1.3` → `1.1.4` against SDK source on 2026-10-15. Refreshed package READMEs with current overviews, quickstarts, and links to the detailed guides. Review the source changelog for any dependency changes included in your upgrade.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/react/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/react/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.1.5` | Preserved detailed chat stream errors and reported them once when the stream ended with an error status. |
 | `1.0.0` | Adopted client protocol v3, persisted interaction-aware resume state, added `waiting` status, and replaced separate approval/question methods with `interactions` plus `respondToInteraction()`. |
 | `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
 | `1.1.2` | Updated the Core, Graph, and Client dependencies. |

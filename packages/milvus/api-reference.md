@@ -37,6 +37,6 @@ await store.upsert({ documents, providerOptions })
 const results = await store.search({ vector, topK, minScore, filter, providerOptions, abortSignal })
 ```
 
-`filterToMilvusExpr(filter)` converts an Anvia `VectorFilter` to a Milvus expression.
+`filterToMilvusExpr(filter)` converts an Anvia `VectorFilter` to a Milvus expression. Comparison and `in` operators map to native syntax, and n-ary `and`/`or` become parenthesized `&&`/`||`. It validates filter keys, rejects reserved keyword segments, requires finite numeric values, and throws for empty `in` lists or `null` values inside `in`.
 
 Return to the [package guide](/packages/milvus).

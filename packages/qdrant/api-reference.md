@@ -75,6 +75,6 @@ const results = await store.searchHybrid({
 })
 ```
 
-`QdrantMutationOptions` supports `wait`, `ordering`, and `timeout`. Native distances are `'Cosine' | 'Dot' | 'Euclid'`; `QdrantFusion` follows the core `'rrf' | 'dbsf'` values. `filterToQdrantFilter(filter)` converts an Anvia filter for direct client calls.
+`QdrantMutationOptions` supports `wait`, `ordering`, and `timeout`. Native distances are `'Cosine' | 'Dot' | 'Euclid'`; `QdrantFusion` follows the core `'rrf' | 'dbsf'` values. `filterToQdrantFilter(filter)` converts an Anvia filter for direct client calls: comparisons map to `must`/`must_not` match and `range`, n-ary `and`/`or` map to `must`/`should`, and `in` requires a non-empty all-string or all-integer list.
 
 Return to the [package guide](/packages/qdrant).

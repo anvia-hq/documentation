@@ -64,4 +64,21 @@ const studio = new Studio([agent], {
 
 `start()` launches a Node HTTP server and returns immediately. If `port` is omitted, Studio checks `RUNNER_PORT` and then uses `4021`. Use `fetch(request)` or the exposed Hono `app` when another server owns request dispatch.
 
+Studio rejects requests whose `Host` header is not loopback or an explicitly trusted hostname. An
+explicit non-wildcard `hostname` is trusted automatically; binding to `0.0.0.0` or `::` requires
+listing client-facing names in `allowedHosts`. The same allowlist applies to `Origin` hostnames,
+with ports ignored:
+
+```ts
+await new Studio([agent]).serve({
+  hostname: '0.0.0.0',
+  port: 4021,
+  allowedHosts: ['studio.lan'],
+})
+```
+
+List hostnames without schemes or ports. This check blocks DNS-rebinding and cross-origin attacks
+on state-changing routes; it supplements, and does not replace, network controls and application
+authentication.
+
 See [runtime boundary](/packages/studio/runtime-boundary) and [UI/server options](/studio/configure/ui-and-server-options).

@@ -93,6 +93,11 @@ work, and reopening the runtime neither discards a pending interaction nor runs 
 recovery, is rejected once a later submission has advanced the session, and resets the attempt counters of
 unfinished model operations while keeping completed results.
 
+If admission rolled back before the run saved any history, `retry()` recomputes the inherited history from
+the session's latest settled run and persists it before execution. If that history still exceeds
+`limits.maxPayloadBytes`, `retry()` rejects with the same `DurableLimitError` and the run stays failed. A
+retry never executes with a shorter history than the original attempt.
+
 For transient model failures opt in to persisted backoff on the registration:
 
 ```ts

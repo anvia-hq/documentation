@@ -1,16 +1,18 @@
 # Releases
 
-The reviewed source release is `@anvia/react-ui` **1.1.8**. It is strictly headless and pairs with
+The reviewed source release is `@anvia/react-ui` **1.3.0**. It is strictly headless and pairs with
 the `@anvia/cli` installer. The entries below preserve notable v0 history.
 
-## Changes through 1.1.7
+## Changes through 1.3.0
 
-Reviewed `1.1.5` → `1.1.7` against SDK source on 2026-10-15. Updated the Markdown parser dependency and refreshed package guidance. The package remains headless; application styling and CLI-installed source remain application-owned.
+Reviewed `1.1.8` → `1.3.0` against SDK source on 2026-11-04. Added optional sandbox viewers on their own subpaths and an editor-only entity renderer for the rich composer. The package remains headless; application styling and CLI-installed source remain application-owned.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/react-ui/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/react-ui/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.3.0` | Added `renderEntity` to `ComposerPrimitive.Input` to customize how a mention token displays in the editor without changing the saved text or entities. |
+| `1.2.0` | Added `SandboxTerminal` at `@anvia/react-ui/sandbox-terminal` and `SandboxDesktop` at `@anvia/react-ui/sandbox-desktop`, with optional xterm.js and noVNC peers kept off the root export. Both viewers share relay reconnection with backoff and a fresh single-use ticket per attempt; the desktop adds scaling, quality controls, and agent/viewer control handoff. |
 | `1.1.5` | Showed response actions and metrics only on the final assistant response of a completed exchange, including the shared `Message.Actions` group, and aligned fallback metrics with user exchanges. |
 | `1.1.4` | Updated upstream runtime and schema dependencies across the workspace. |
 | `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
