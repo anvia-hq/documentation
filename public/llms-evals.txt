@@ -197,6 +197,8 @@ model-judged cases to estimate variance.
 - Alerts and channels: https://docs.anvia.dev/lens/observability/alerts/channels
 - Model pricing: https://docs.anvia.dev/lens/observability/costs
 - Workspace access: https://docs.anvia.dev/lens/workspace
+- Prompt management: https://docs.anvia.dev/lens/prompts
+- Prompt SDK: https://docs.anvia.dev/lens/connect/anvia/versioned-prompts
 - OIDC/SSO: https://docs.anvia.dev/lens/workspace/oidc
 - MCP access: https://docs.anvia.dev/lens/workspace/mcp-access
 - System Health: https://docs.anvia.dev/lens/self-hosting/system-health

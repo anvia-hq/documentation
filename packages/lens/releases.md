@@ -3,6 +3,8 @@
 Reviewed source release: `1.2.4`. The entries below summarize recent v1 changes and preserve notable
 v0 history.
 
+Prompt retrieval/compilation is already included in this reviewed source baseline. The published 1.2.5 artifact was independently checked for `promptClient()` on 2026-11-23; that does not change the inventory revision or establish the first supporting published version. Server features use the separate [Lens v0.20.0 review](/lens/#reviewed-baselines).
+
 ## Changes through 1.2.3
 
 Reviewed `1.2.0` → `1.2.3` against SDK source on 2026-10-15. Refreshed package guidance and aligned OpenTelemetry dependencies. Parentless durable roots now finish correctly in Lens, and `LensClient` installs `createAnviaIdGenerator()` automatically. See [Durable tracing](/packages/durable/tracing).

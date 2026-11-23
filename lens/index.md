@@ -50,6 +50,7 @@ After the first trace arrives, continue to [Connect Anvia](/lens/connect/anvia) 
 
 ## Operate the workspace
 
+- [Prompt management](/lens/prompts): commit versions and move deployment labels.
 - [Notification channels](/lens/observability/alerts/channels): send new incidents to supported destinations.
 - [OIDC and SSO](/lens/workspace/oidc): configure identity-provider admission.
 - [MCP access](/lens/workspace/mcp-access): expose read-only diagnostics to an assistant.

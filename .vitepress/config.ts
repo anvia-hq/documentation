@@ -742,6 +742,12 @@ export default defineConfig({
           ]
         },
         {
+          text: 'Prompts',
+          items: [
+            { text: 'Manage prompts', link: '/lens/prompts' }
+          ]
+        },
+        {
           text: 'Evaluations',
           items: [
             { text: 'Overview', link: '/lens/evaluations' },

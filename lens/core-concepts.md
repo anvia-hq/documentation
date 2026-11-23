@@ -77,6 +77,10 @@ Lens has two dataset lifecycles:
 
 Managed drafts are editable. Published versions are immutable so the same named version produces a repeatable evaluation input. Observed data can be promoted into a managed workflow when its cases are complete and usable.
 
+## Versioned prompts
+
+[Prompt management](/lens/prompts) stores text or chat templates and JSON configuration in immutable numeric versions. A mutable label such as `production` selects the deployed version. Committing a version does not deploy it; moving a label does. Record the resolved name/version on traces and evaluation runs for reproducibility.
+
 ## Releases, comparisons, and gates
 
 A **release comparison** places evaluation runs from different releases side by side. Use immutable release identifiers so the result maps back to deployable code.
@@ -107,6 +111,7 @@ Workspace
     │   ├── Metric results
     │   └── Linked traces
     ├── Observed and managed datasets
+    ├── Prompts ── immutable versions and deployment labels
     └── Release comparisons and quality gates
 ```
 
