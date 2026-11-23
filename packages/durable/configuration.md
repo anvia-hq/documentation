@@ -12,7 +12,10 @@
 | `maxConcurrentRuns` | `4` | Simultaneous agent executions across sessions (integer, 1 to 1000). |
 | `maxConcurrentTasks` | `4` | Simultaneous custom-task phases, independent of agent runs (1 to 1000). |
 | `limits` | see below | Admission, payload, and operation limits. |
+| `pollIntervalMs` | off | Re-reads the store on an interval so work made eligible elsewhere is scheduled. Covers agent runs. |
+| `worker` | none | `{ workerId, leaseMs, heartbeatMs }` runs this store as a shared worker instead of an owner. |
 | `onFatalError` | none | Called once after a fatal storage or scheduler failure. |
+| `onCompatibility` | none | Called after `open()` and each `registerAgents()` with detached compatibility reports. |
 
 ## Agent registrations
 
@@ -31,9 +34,11 @@ agents: [
 | Field | Purpose |
 | --- | --- |
 | `agent` | An `Agent` with a unique `id`. |
-| `version` | Required nonblank string. Bump it when code, model, tools, schemas, or instructions change incompatibly. |
+| `version` | Required nonblank string, or `'auto'` to fingerprint the model, instructions, sampling, tools, and output schema. Bump an explicit version when code, tools, or schemas change incompatibly. |
 | `stream` | Execute with `agent.stream()` and persist generation deltas. Needs a streaming-capable model. |
 | `toolRecovery` | Map of tool name to `'safe'`, `'idempotent'`, or `'manual'`. Unlisted tools are `manual`. Every named tool must exist on the agent. |
+| `toolConcurrency` | Positive integer limiting concurrent tool calls in one model turn. |
+| feature markers | `memory`, `context`, `middlewares`, `guardrails`, `hooks`, `lifecycle`, `mcpServers`, `providerTools`, and `toolIndexes`. See [Capabilities](/packages/durable/capabilities#supported-agent-features). |
 | `modelRetry` | Opt-in persisted retry for model and compactor errors. |
 | `compaction` | Optional trigger, retention, compactor, and token counter; see [Compaction](/packages/durable/compaction). |
 
@@ -132,7 +137,9 @@ limits: {
 }
 ```
 
-All four are positive integers with the defaults shown. See [Operations](/packages/durable/operations#admission-and-payload-limits).
+The first, second, and fourth are positive integers with the defaults shown. `maxPayloadBytes` accepts a number
+or per-field budgets (`default`, `prompt`, `operation`, `event`, `outcome`). See
+[Operations](/packages/durable/operations#admission-and-payload-limits).
 
 ## Goals, steering, and tracing
 

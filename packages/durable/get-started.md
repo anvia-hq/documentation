@@ -1,7 +1,7 @@
 # Get started
 
-Register an agent with an explicit version, open a runtime on a dedicated SQLite file, resume unfinished
-work, then submit and observe a run.
+Register an agent with an explicit version, open a runtime on SQLite (or a Postgres, Drizzle, or Prisma
+store), resume unfinished work, then submit and observe a run.
 
 ```ts
 import { Agent } from '@anvia/core/agent'
@@ -40,6 +40,27 @@ try {
   await runtime.close()
 }
 ```
+
+## Storage and process topology
+
+The example above is an owning runtime. `new SqliteDurableStore(path)` is the only backend that creates its
+schema automatically; Postgres, Drizzle, and Prisma stores use schemas you create or generate. On those SQL
+backends you can replace the single owner with shared workers:
+
+```ts
+import { DurableWorker } from '@anvia/durable'
+
+const worker = await DurableWorker.start({
+  store,
+  agents: [{ agent: researcher, version: '1' }],
+  workerId: 'worker-a',
+  leaseMs: 30_000,
+})
+```
+
+A `DurableClient.connect({ store })` process submits and controls runs without agents, and
+`DurableObserver.connect({ store })` reads them read-only. SQLite supports only the owning runtime and a
+read-only observer. See [Capabilities](/packages/durable/capabilities#deployment-scope).
 
 ## Lifecycle
 

@@ -2,7 +2,8 @@
 
 Durable has two ways to coordinate more than one agent run: a **static task graph** for dependencies known
 up front, and **custom tasks** for dynamic children, timers, signals, and external effects. Both are
-experimental and run in the same single-owner runtime.
+experimental. Graphs run on an owning runtime, shared workers, or a store-only client; custom tasks and goals
+run on an owning runtime or shared workers. All task APIs are asynchronous.
 
 ## Static task graphs
 
@@ -75,6 +76,10 @@ active callbacks; it cannot undo external effects, and cancelled graphs cannot b
 `runtime.resume()` rediscovers eligible nodes; completed outputs are reused, approvals stay pending, and
 uncertain effects still need explicit decisions.
 
+With shared workers, graphs are stored unadmitted for agents the submitting process does not register and are
+admitted by the worker that runs them; a graph task whose agent records memory is rejected. A store-only
+`DurableClient` provides the same submit, read, stream, and cancel methods without executing anything.
+
 `runtime.getGraph(id)` returns a handle, and `runtime.listGraphs({ sessionId, after, limit })` pages
 insertion-ordered summaries, at most 100 per page. Graph cursors are separate from event cursors. Graph child
 runs use isolated sessions and are discovered through the graph, not `listRuns({ sessionId })`.
@@ -132,7 +137,8 @@ A handler runs one phase and returns one transition:
 | `{ status: 'failed' \| 'cancelled', error }` | Record the outcome and cancel unfinished owned children. |
 
 If the process dies before a transition commits, the handler re-enters with its previous checkpoint, so phases
-must be replayable. External work belongs in `ctx.effect()`.
+must be replayable. External work belongs in `ctx.effect()`. Await every context operation: `spawn`,
+`spawnAgent`, `children`, `agentRun`, `effect`, and `signalValue` return promises.
 
 ### Children and joins
 
@@ -152,7 +158,9 @@ const sum = defineTask({
   initial: () => 'spawn' as const,
   run: async (ctx) => {
     if (ctx.checkpoint === 'spawn') {
-      const ids = ctx.input.map((value, index) => ctx.spawn(`item-${index}`, increment, value))
+      const ids = await Promise.all(
+        ctx.input.map((value, index) => ctx.spawn(`item-${index}`, increment, value)),
+      )
       return {
         status: 'waiting',
         checkpoint: 'sum' as const,
@@ -160,7 +168,7 @@ const sum = defineTask({
       }
     }
     let output = 0
-    for (const child of ctx.children()) {
+    for (const child of await ctx.children()) {
       if (child.outcome?.status !== 'completed') {
         return { status: 'failed', error: 'A child did not complete successfully.' }
       }
@@ -229,7 +237,7 @@ return {
 Timer deadlines survive restart and release capacity while parked; the host process must still be running.
 A signal wait is `{ type: 'signal', name: 'review-decision' }`, delivered with
 `await task.signal('review-decision', 'delivery-123', { approved: true })` and read by the continuation with
-`ctx.signalValue('review-decision')`. Each name accepts one value for the task's lifetime, including early
+`await ctx.signalValue('review-decision')`. Each name accepts one value for the task's lifetime, including early
 delivery, an identical request and value is idempotent, and a different one conflicts. A task allows at most
 1000 signals; names are nonblank, trimmed, at most 256 characters, and not `__proto__`.
 
@@ -250,8 +258,8 @@ See [HTTP server and client](/packages/durable/http) for remote controls.
 
 ## Continue a sibling conversation
 
-`ctx.spawnAgent(key, { agentId, prompt, maxModelTurns?, continueFrom? })` can cap the child's total
+`await ctx.spawnAgent(key, { agentId, prompt, maxModelTurns?, continueFrom? })` can cap the child's total
 model calls, including its initial response. `continueFrom` selects a finished agent sibling by its
 stable child key, preserving its conversation, including partial turn-exhausted work. It cannot
-reference another parent's child. `ctx.agentRun(childId)` reads a direct owned agent's persisted
+reference another parent's child. `await ctx.agentRun(childId)` reads a direct owned agent's persisted
 record. Use [goals](/packages/durable/goals) for the built-in verified session controller.

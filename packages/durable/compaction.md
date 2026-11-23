@@ -1,8 +1,9 @@
 # Durable conversation compaction
 
-Configure `compaction` on a durable agent registration. Durable session history replaces `Agent.memory`,
-so configuring an agent memory store remains unsupported. Compaction reduces model context while keeping
-the canonical transcript and journal intact.
+Configure `compaction` on a durable agent registration. Compaction reduces model context while keeping the
+canonical transcript and journal intact. It cannot be combined with `memory: { mode: 'recorded' }`: recorded
+memory keeps history in the memory store, so registration compaction would silently do nothing and the
+combination is rejected.
 
 ```ts anvia-check durable-compaction-example
 import type { Agent } from '@anvia/core/agent'

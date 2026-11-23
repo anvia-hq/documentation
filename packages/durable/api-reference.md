@@ -3,28 +3,52 @@
 ```ts
 import {
   DurableRuntime,
+  DurableWorker,
+  DurableClient,
+  DurableObserver,
   DurableRun,
+  DurableRunView,
   DurableTaskGraph,
   DurableTaskHandle,
+  DurableAgentHandle,
   defineTask,
   defineGoal,
-  goalControlSignal,
+  agentVersion,
+  isDurableEvent,
   DurableConflictError,
   DurableLimitError,
   DurableNotFoundError,
+  DurableBlockedError,
+  DurableClaimLostError,
   DurableRecoveryError,
   DurableRunError,
   DurableStorageError,
   type DurableAgentRegistration,
   type DurableRuntimeOptions,
+  type DurableLimits,
   type DurableSnapshot,
 } from '@anvia/durable'
 import { SqliteDurableStore } from '@anvia/durable/sqlite'
+import { PostgresDurableStore } from '@anvia/durable/postgres'
 import { backupSqlite, restoreSqlite } from '@anvia/durable/maintenance'
 ```
 
 `@anvia/durable/protocol` exports browser-safe validators and types for runs, graphs, and tasks. It is used
-by `@anvia/client/durable` and is not normally imported by applications.
+by `@anvia/client/durable` and is not normally imported by applications. SQL backends live in separate
+subpaths so the root never imports `pg`, `drizzle-orm`, or `@prisma/client`.
+
+## Stores
+
+```ts
+new SqliteDurableStore(path, { readOnly?: boolean })
+new PostgresDurableStore({ pool } | { connectionString }, { schema: 'verify' | 'create' })
+new DrizzleDurableStore(db, { /* schema is verified; generate it with the CLI */ })
+new PrismaDurableStore(client, { /* schema is verified; generate it with the CLI */ })
+```
+
+Only SQLite creates its schema automatically. For Drizzle and Prisma, run `anvia-durable-drizzle init` or
+`anvia-durable-prisma init` to add the tables or models, then apply your normal migration workflow. Store
+interfaces are asynchronous.
 
 ## DurableRuntime
 
@@ -37,50 +61,45 @@ class DurableRuntime {
   // Agent runs
   submit(input: DurableSubmission, options?: DurableSubmitOptions): Promise<DurableRun>
   getRun(id: string): Promise<DurableRun>
-  status(id: string): DurableRunSummary
-  run(id: string): DurableRunRecord
-  operationRequest(id: string, key: string): CompletionRequest
-  steer(id: string, input: AgentSteerInput, options?: DurableSteerOptions): AgentSteerReceipt
-  submitGoal(definition: DefinedGoal, input: GoalInput & {
-    sessionId: string; requestId: string; trace?: DurableTraceOptions
-  }): Promise<DurableTaskHandle<GoalResult>>
+  run(id: string): Promise<DurableRunRecord>
+  status(id: string): Promise<DurableRunSummary>
+  operationRequest(id: string, key: string): Promise<CompletionRequest>
+  steer(id: string, input: AgentSteerInput, options?: DurableSteerOptions): Promise<AgentSteerReceipt>
   listRuns(options?: DurableListOptions): Promise<DurableRunPage>
-  runScope(runId: string): DurableRunScope
+  runScope(runId: string): Promise<DurableRunScope>
+  agent(registration: DurableAgentRegistration): DurableAgentHandle
+  handle(agent: Agent): DurableAgentHandle
 
   // Registration
   registerAgents(registrations: readonly DurableAgentRegistration[]): void
-  unregisterAgent(id: string): boolean
+  unregisterAgent(id: string): Promise<boolean>
+  compatibility(): readonly DurableAgentCompatibility[]
+  limits(): DurableLimits
 
   // Static graphs
   submitGraph(input: DurableGraphSubmission): Promise<DurableTaskGraph>
   getGraph(id: string): Promise<DurableTaskGraph>
   listGraphs(options?: DurableGraphListOptions): Promise<DurableGraphPage>
+  graphSnapshot(id: string): Promise<DurableGraphSnapshot>
+  graphEvents(id: string, after: number): Promise<DurableEvent[]>
+  cancelGraph(id: string): Promise<void>
 
-  // Custom tasks
+  // Custom tasks and goals
   submitTask<I, S, R>(
     definition: DefinedTask<I, S, R>,
     input: { sessionId: string; requestId: string; input: I; trace?: DurableTraceOptions },
   ): Promise<DurableTaskHandle<R>>
-  submitRegisteredTask(input: {
-    name: string
-    version: number
-    sessionId: string
-    requestId: string
-    input: JsonValue
-    trace?: DurableTraceOptions
-  }): Promise<DurableTaskHandle>
+  submitRegisteredTask(input: TaskSubmission): Promise<DurableTaskHandle>
+  submitGoal(definition: DefinedGoal, input: GoalInput & {
+    sessionId: string; requestId: string; trace?: DurableTraceOptions
+  }): Promise<DurableTaskHandle<GoalResult>>
   getTask(id: string): Promise<DurableTaskHandle>
   listTasks(options?: TaskListOptions): Promise<TaskPage>
   taskGraph(id: string): Promise<TaskGraphSnapshot>
 
   // Operations
-  health(): {
-    status: 'ready' | 'failed' | 'closing' | 'closed'
-    ready: boolean
-    activeRuns: number
-    activeTasks: number
-  }
-  metrics(): DurableMetrics
+  health(): { status: 'ready' | 'failed' | 'closing' | 'closed'; ready: boolean; activeRuns: number; activeTasks: number }
+  metrics(): Promise<DurableMetrics>
 }
 ```
 
@@ -91,30 +110,102 @@ type DurableRuntimeOptions = {
   store: DurableStore
   limits?: Partial<DurableLimits>
   onFatalError?: (error: unknown) => void
+  onCompatibility?: (reports: readonly DurableAgentCompatibility[]) => void
   agents?: readonly DurableAgentRegistration[]
   tasks?: readonly { readonly registration: RegisteredTask }[]
   maxConcurrentTasks?: number
   maxConcurrentRuns?: number
+  pollIntervalMs?: number
+  worker?: { workerId: string; leaseMs?: number; heartbeatMs?: number }
 }
 ```
 
-`DurableRuntime` also has lower-level methods (`snapshot`, `events`, `respond`, `resolveTool`, `retry`,
-`cancel`, `graphSnapshot`, `graphEvents`, `cancelGraph`) that the handles delegate to; prefer the handles.
-`runScope()` returns lightweight owner metadata (`runId`, `agentId`, `sessionId`, and optional `graphId`,
-`taskId`, `rootTaskId`, `taskName`) for trusted authorization code.
+`runScope()` returns owner metadata (`runId`, `agentId`, `sessionId`, and optional `graphId`, `taskId`,
+`rootTaskId`, `taskName`) for trusted authorization code.
+
+## DurableWorker
+
+```ts
+class DurableWorker {
+  static start(options: DurableWorkerStartOptions): Promise<DurableWorker>
+  readonly workerId: string
+  registerAgents(values: readonly DurableAgentRegistration[]): void
+  unregisterAgent(id: string): Promise<boolean>
+  compatibility(): readonly DurableAgentCompatibility[]
+  limits(): DurableLimits
+  health(): { status: string; ready: boolean; activeRuns: number; activeTasks: number }
+  metrics(): Promise<DurableMetrics>
+  close(): Promise<void>
+}
+```
+
+A worker executes claimed runs, graphs, tasks, and goals and exposes no submit or control methods. Start
+several workers on one SQL database; one that stops lets its runs be taken over after the lease lapses. A
+worker cannot share a database with an owning runtime.
+
+## DurableClient and DurableObserver
+
+```ts
+class DurableClient {
+  static connect(options: { store: DurableStore }): Promise<DurableClient>
+  submit(input: DurableSubmission, options?: DurableSubmitOptions): Promise<DurableRun>
+  getRun(id: string): Promise<DurableRun>
+  status(id: string): Promise<DurableRunSummary>
+  snapshot(id: string, options?: { operations?: boolean }): Promise<DurableSnapshot>
+  events(id: string, after: number): Promise<DurableEvent[]>
+  listRuns(options?: DurableListOptions): Promise<DurableRunPage>
+  runScope(runId: string): Promise<DurableRunScope>
+  steer(id: string, input: AgentSteerInput, options?: DurableSteerOptions): Promise<AgentSteerReceipt>
+  respond(id: string, interactionId: string, value: AgentInteractionResponse): Promise<void>
+  resolveTool(id: string, operationId: string, output: ToolResultOutput): Promise<void>
+  resolveMemoryWrite(id: string, operationKey: string, resolution: MemoryWriteResolution): Promise<void>
+  retry(id: string): Promise<void>
+  cancel(id: string): Promise<void>
+  submitGraph(input: DurableGraphSubmission): Promise<DurableTaskGraph>
+  getGraph(id: string): Promise<DurableTaskGraph>
+  graphSnapshot(id: string): Promise<DurableGraphSnapshot>
+  graphEvents(id: string, after: number): Promise<DurableEvent[]>
+  listGraphs(options?: DurableGraphListOptions): Promise<DurableGraphPage>
+  cancelGraph(id: string): Promise<void>
+  submitRegisteredTask(input: TaskSubmission): Promise<DurableTaskHandle>
+  getTask(id: string): Promise<DurableTaskHandle>
+  listTasks(options?: TaskListOptions): Promise<TaskPage>
+  taskGraph(id: string): Promise<TaskGraphSnapshot>
+  close(): Promise<void>
+}
+
+class DurableObserver {
+  static connect(options: { store: DurableStore }): Promise<DurableObserver>
+  getRun(id: string): Promise<DurableRunView>
+  listRuns(options?: DurableListOptions): Promise<DurableRunPage>
+  run(id: string): Promise<DurableRunRecord>
+  status(id: string): Promise<DurableRunSummary>
+  snapshot(id: string, options?: { operations?: boolean }): Promise<DurableSnapshot>
+  events(id: string, after: number): Promise<DurableEvent[]>
+  close(): Promise<void>
+}
+```
+
+A client holds no agents and no lease, so it needs no registration. It can submit tasks by registered name
+but not by definition. An observer opens the store read-only; SQLite requires a store constructed with
+`{ readOnly: true }` and a schema a runtime already initialised.
 
 ## DurableRun
 
 ```ts
-class DurableRun {
+class DurableRunView<Output = unknown> {
   readonly id: string
   status(): Promise<DurableRunSummary>
   snapshot(options?: { operations?: boolean }): Promise<DurableSnapshot>
-  steer(input: AgentSteerInput, options?: DurableSteerOptions): Promise<AgentSteerReceipt>
   stream(options?: { after?: number; abortSignal?: AbortSignal }): AsyncIterable<DurableEvent>
-  result(options?: { abortSignal?: AbortSignal }): Promise<AgentOutcome<unknown>>
+  result(options?: { abortSignal?: AbortSignal; onBlocked?: 'wait' | 'throw' }): Promise<AgentOutcome<Output>>
+}
+
+class DurableRun<Output = unknown> extends DurableRunView<Output> {
+  steer(input: AgentSteerInput, options?: DurableSteerOptions): Promise<AgentSteerReceipt>
   respond(interactionId: string, response: AgentInteractionResponse): Promise<void>
   resolveTool(operationId: string, output: ToolResultOutput): Promise<void>
+  resolveMemoryWrite(operationKey: string, resolution: 'applied' | 'discarded'): Promise<void>
   retry(): Promise<void>
   cancel(): Promise<void>
 }
@@ -122,8 +213,24 @@ class DurableRun {
 
 `stream()` reads committed events after `after` (default 0), polls while idle, and finishes when the run is
 `completed`, `failed`, or `cancelled`. It stays open during approvals and recovery blocks and throws a
-`TypeError` if the cursor is ahead of the store. `result()` throws `DurableRunError` for a failed or
-cancelled run; it does not approve interactions.
+`TypeError` if the cursor is ahead of the store. `result()` waits through `needs_attention` by default;
+`onBlocked: 'throw'` rejects with `DurableBlockedError` instead. It does not approve interactions.
+
+`resolveMemoryWrite` settles a recorded memory write that blocked: `'applied'` means the store already holds
+the messages, `'discarded'` drops them, and either way the run sends its remaining writes without a version
+check and completes.
+
+`DurableAgentHandle`, returned by `runtime.agent()` or `runtime.handle()`, submits without an `agentId` string
+and returns a `DurableRun` typed from the agent:
+
+```ts
+const handle = runtime.handle(researcher)
+const run = await handle.submit({
+  sessionId: 'research-session',
+  requestId: 'research-job-42',
+  prompt: 'Summarize these notes.',
+})
+```
 
 ## Submission and record types
 
@@ -139,11 +246,21 @@ type DurableSubmitOptions = { enqueue?: boolean }
 
 type DurableAgentRegistration = {
   agent: Agent<unknown>
-  version: string
+  version: string | 'auto'
   stream?: boolean
   toolRecovery?: Readonly<Record<string, 'safe' | 'idempotent' | 'manual'>>
+  toolConcurrency?: number
   modelRetry?: { maxAttempts: number; initialDelayMs: number; maxDelayMs: number }
   compaction?: DurableCompactionOptions
+  memory?: { mode: 'recorded' }
+  context?: { mode: 'recorded' }
+  middlewares?: { mode: 'pure' }
+  guardrails?: { mode: 'record' }
+  hooks?: { mode: 'record' }
+  lifecycle?: { mode: 'observe' }
+  mcpServers?: { mode: 'pinned' }
+  providerTools?: { mode: 'stateless' }
+  toolIndexes?: { mode: 'recorded' }
 }
 
 type DurableRunStatus =
@@ -179,170 +296,6 @@ type DurableListOptions = {
 type DurableRunPage = { runs: DurableRunSummary[]; nextCursor?: number }
 ```
 
-`DurableRunRecord` includes the submission fields plus `id`, `version`, `status`, timestamps, `graphId`,
-`taskId`, `dependencies`, `epoch`, `input`, `modelTurns`, `maxModelTurns`, `usage`, `history`, `outcome`,
-`error`, `blockedOperation`, `modelRetry`, `nextAttemptAt`, `stream`, and `responses`. `DurableOperation`
-has `key`, `kind` (`model`, `tool`, `context`, or `effect`), `input`, `status` (`started` or `completed`), `recovery`,
-`result`, `attempts`, and `attemptId`.
-
-## Graphs
-
-```ts
-type DurableTask = {
-  id: string
-  agentId: string
-  prompt: AgentPrompt
-  dependsOn?: readonly string[]
-}
-type DurableGraphSubmission = {
-  sessionId: string
-  requestId: string
-  tasks: readonly DurableTask[] // 1 to 100
-}
-
-class DurableTaskGraph {
-  readonly id: string
-  snapshot(): Promise<DurableGraphSnapshot>
-  stream(options?: { after?: number; abortSignal?: AbortSignal }): AsyncIterable<DurableGraphEvent>
-  cancel(): Promise<void>
-}
-```
-
-`DurableGraphSnapshot` has `id`, `sessionId`, `requestId`, `createdAt`, `status` (`running`, `waiting`,
-`blocked`, `completed`, `cancelled`), `nodes` (`DurableGraphNode` with `id`, `agentId`, `runId`, `status`,
-`wait`, `output`, `interaction`, `error`), `edges`, and `cursor`. `DurableGraphEvent` is a `DurableEvent`
-plus `graphId` and `taskId`. `DurableTaskWait` is one of `dependencies`, `dependency_failed`, `capacity`,
-`interaction`, `retry`, or `recovery`.
-
-## Custom tasks
-
-```ts
-function defineTask<I, S, R>(definition: TaskDefinition<I, S, R>): DefinedTask<I, S, R>
-
-type TaskDefinition<I, S, R> = {
-  name: string
-  version: number // positive integer
-  input: z.ZodType<I>
-  checkpoint: z.ZodType<S>
-  output: z.ZodType<R>
-  initial: (input: I) => S
-  run: (context: TaskContext<I, S>) => Promise<TaskTransition<S, R>>
-  migrate?: (input: JsonValue, checkpoint: JsonValue, fromVersion: number) => { input: I; checkpoint: S }
-}
-
-type TaskContext<I, S> = {
-  readonly id: string
-  readonly input: I
-  readonly checkpoint: S
-  readonly signal: AbortSignal
-  spawn(key: string, task: TaskDefinition<CI, CS, CR>, input: CI): string
-  spawnAgent(key: string, input: TaskAgentInput): string
-  agentRun(childId: string): DurableRunRecord
-  children(): TaskRecord[]
-  signalValue(name: string): JsonValue | undefined
-  effect<T extends JsonValue>(
-    key: string,
-    input: JsonValue,
-    execute: (operationId: string, signal: AbortSignal) => Promise<T>,
-    recovery?: 'safe' | 'idempotent' | 'manual',
-  ): Promise<T>
-}
-
-type TaskWait =
-  | { type: 'children'; ids: string[]; policy: 'allSettled' | 'failFast' }
-  | { type: 'timer'; until: string }
-  | { type: 'agent'; runId: string; status: DurableRunStatus }
-  | { type: 'signal'; name: string }
-
-class DurableTaskHandle<R = JsonValue> {
-  readonly id: string
-  snapshot(options?: { operations?: boolean }): Promise<{ task: TaskRecord; operations: DurableOperation[]; cursor: number }>
-  graph(): Promise<TaskGraphSnapshot>
-  stream(options?: { after?: number; abortSignal?: AbortSignal }): AsyncIterable<TaskEvent>
-  result(options?: { abortSignal?: AbortSignal }): Promise<R>
-  signal(name: string, requestId: string, value: JsonValue): Promise<void>
-  resolveEffect(key: string, value: JsonValue): Promise<void>
-  retry(): Promise<void>
-  cancel(options?: { expectedTreeIds?: readonly string[] }): Promise<void>
-}
-```
-
-Task statuses are `pending`, `running`, `waiting`, `completing`, `cancelling`, `completed`, `failed`,
-`cancelled`, and `needs_attention`. `TaskGraphSnapshot` is `{ rootId, nodes, edges, cursor }` with edge types
-`owns` and `waits`. The name `anvia.agent` is reserved.
-
-## Errors
-
-| Error | Meaning |
-| --- | --- |
-| `DurableRunError` | `run.result()` or `task.result()` on a failed or cancelled execution. Has `runId` and `status`. |
-| `DurableRecoveryError` | A saved checkpoint no longer matches code, or a manual operation is uncertain. Has `operationId`. |
-| `DurableNotFoundError` | Unknown run, graph, or task. |
-| `DurableConflictError` | Conflicting submission, duplicate registration, or unregistering an agent that is still needed. |
-| `DurableStorageError` | Fatal journal failure. The runtime stops accepting work. |
-| `DurableLimitError` | An admission, payload, or operation limit was exceeded. |
-
-## Storage and maintenance
-
-```ts
-class SqliteDurableStore implements DurableStore {
-  constructor(path: string)
-}
-
-function backupSqlite(source: string, destination: string): Promise<DurableBackupInfo>
-function restoreSqlite(source: string, destination: string): Promise<DurableBackupInfo>
-type DurableBackupInfo = { createdAt: string; schemaVersion: number }
-```
-
-`DurableLimits` is `{ maxPendingRuns, maxPendingTasks, maxPayloadBytes, maxOperations }`, and
-`DurableMetrics` is `{ observedAt, runs, tasks, oldestPendingAgeMs, operations, events, databaseBytes }`.
-
-## Server and client
-
-```ts
-import { createDurableHandler, type DurableAuthorization } from '@anvia/server/durable'
-import { DurableClient, DurableHttpError } from '@anvia/client/durable'
-```
-
-See [HTTP server and client](/packages/durable/http) for options, routes, and methods.
-
-## Goals and continuing agent children
-
-`defineGoal(definition: GoalDefinition): DefinedGoal` creates a registered task controller.
-`GoalDefinition` has `name`, `version`, optional default `agentId`, optional `rounds: 'fresh' | 'continue'`,
-and required `assess(input: GoalAssessment, signal: AbortSignal): Promise<GoalDecision>`.
-See [Goals](/packages/durable/goals) for input, limits, result, assessment, and control contracts.
-
-The root exports `GoalDefinition`, `DefinedGoal`, `GoalAssessment`, `GoalSession`, `GoalInput`,
-`GoalLimits`, `GoalDecision`, `GoalCheckpoint`, `GoalResult`, `GoalPauseReason`, `GoalResume`,
-`GoalControls`, `GoalEdit`, and `GoalMessage`. It also exports `goalDecisionSchema`, `goalEditSchema`,
-`goalMessageSchema`, `goalPauseSchema`, and `goalResumeSchema`.
-`goalControlSignal(task, family)` accepts `pause`, `edit`, or `message` and returns the next unused
-indexed name; delivery still uses `taskHandle.signal()`.
-
-`TaskAgentInput` is `{ agentId, prompt, maxModelTurns?, continueFrom? }`. The optional turn cap
-includes the initial call. `continueFrom` is the key of a finished agent sibling owned by the same
-parent task, including a turn-exhausted sibling. `context.agentRun(childId)` reads only direct owned
-agent children. See [Tasks and graphs](/packages/durable/tasks-and-graphs).
-
-## Compaction, steering, and trace types
-
-`DurableCompactionPolicy` is `{ trigger: { afterTokens }, retention?: { recentTurns?, recentToolTurns? } }`.
-`DurableCompactionOptions` adds required `compactor: MemoryCompactor` and optional
-`tokenCounter: MemoryTokenCounter`. `DurableContextCheckpoint` is `{ summary, compactedMessageCount }`.
-See [Compaction](/packages/durable/compaction) for recovery and usage semantics.
-
-`DurableSteerOptions` is `{ requestId?: string }`. `DurableSteeringEntry` is `{ id, messages }`;
-`DurableSteeringState` contains `pending`, boundary `checkpoints`, and `closed`.
-`AgentSteerInput` and `AgentSteerReceipt` come from `@anvia/core/agent`.
-The browser-safe protocol entrypoint exports `parseDurableSteering`, `parseDurableSteerReceipt`,
-and the durable steering types. See [Steering](/packages/durable/steering).
-
-`DurableTraceOptions` contains optional `sessionId`, `name`, `userId`, `tags`, JSON `metadata`, and
-`version`. The runtime assigns trace IDs and durable metadata. See [Tracing](/packages/durable/tracing).
-
-Records additionally capture `continueFrom`, `compaction`, `contextCheckpoint`, `contextPrepared`,
-`loopCompaction`, `exhaustion`, and `steering` when applicable. SQLite operation envelopes may have
-`historyEncoding: 'linked-v1'`; use `operationRequest()` to expand a model request. Run snapshots
-include operations by default; task snapshots omit them by default. See
-[bounded inspection](/packages/durable/operations#bounded-inspection-and-shared-histories).
+`isDurableEvent(event, 'model_delta')` narrows a `DurableEvent` by type and types its payload, with
+`DurableEventPayloads`, `DurableEventOf`, and `DurableEventType`. The guard checks the type tag only and does
+not validate the payload. `agentVersion(agent)` returns the fingerprint used by `version: 'auto'`.
