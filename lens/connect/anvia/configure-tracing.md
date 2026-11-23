@@ -63,13 +63,13 @@ One tracing instance can observe multiple agents in the same process:
 const supportAgent = new Agent({
   id: 'support',
   model: supportModel,
-  observability: { observers: { tracing } },
+  observability: { observers: { tracing }, primaryTrace: 'tracing' },
 })
 
 const triageAgent = new Agent({
   id: 'triage',
   model: triageModel,
-  observability: { observers: { tracing } },
+  observability: { observers: { tracing }, primaryTrace: 'tracing' },
 })
 ```
 

@@ -44,9 +44,11 @@ jobs:
       - name: Install SDK dependencies
         working-directory: anvia-source
         run: pnpm install --frozen-lockfile
-      - name: Build Core for SDK workspace imports
+      - name: Build Core and OTel for SDK workspace imports
         working-directory: anvia-source
-        run: pnpm --filter @anvia/core build
+        run: |
+          pnpm --filter @anvia/core build
+          pnpm --filter @anvia/otel build
       - name: Verify export coverage and imports
         run: node scripts/check-sdk-coverage.mjs
       - name: Test coverage failure detection

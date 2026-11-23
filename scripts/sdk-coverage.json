@@ -749,6 +749,36 @@
       "page": "packages/durable/compaction.md",
       "marker": "durable-compaction-example",
       "runtimeTest": "durable compaction example preserves canonical history and omits summary temperature"
+    },
+    {
+      "title": "Lens eval correlation",
+      "module": "@anvia/lens",
+      "symbols": [
+        "LensClient"
+      ],
+      "page": "lens/evaluations/run-evaluations.md",
+      "marker": "lens-eval-correlation-example",
+      "runtimeTest": "Lens examples preserve tracing, dataset, and prompt contracts"
+    },
+    {
+      "title": "Lens dataset versions",
+      "module": "@anvia/lens",
+      "symbols": [
+        "LensClient"
+      ],
+      "page": "lens/evaluations/datasets/versions.md",
+      "marker": "lens-dataset-version-example",
+      "runtimeTest": "Lens examples preserve tracing, dataset, and prompt contracts"
+    },
+    {
+      "title": "Lens prompt compilation",
+      "module": "@anvia/lens",
+      "symbols": [
+        "LensClient"
+      ],
+      "page": "packages/lens/api-reference.md",
+      "marker": "lens-prompt-example",
+      "runtimeTest": "Lens examples preserve tracing, dataset, and prompt contracts"
     }
   ],
   "utilities": [

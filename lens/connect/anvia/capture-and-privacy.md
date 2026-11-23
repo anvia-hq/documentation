@@ -48,7 +48,7 @@ The built-in redactor replaces matching values for:
 - Common `sk-`, `sk_`, `pk-`, and `pk_` key shapes.
 - Payment-card-like number sequences.
 
-Redaction walks strings inside arrays and objects without mutating the original value. It is a useful final safeguard, not a guarantee that every sensitive value will match a pattern.
+Redaction walks strings inside arrays and objects without mutating the original value. It is a useful final safeguard, not a guarantee that every sensitive value will match a pattern. The redactor deliberately preserves base64 data URLs of the form `data:<media-type>;base64,...`, binary buffers, and string `data` fields on objects tagged with `type: 'base64'`, `'encrypted'`, `'image'`, or `'redacted'`. For multimodal full capture, remove or sanitize sensitive media before export; text redaction does not make encoded content safe.
 
 Add application-specific patterns when the default set does not cover your identifiers:
 
@@ -139,7 +139,7 @@ Before enabling full capture:
 
 1. Use synthetic data to inspect exactly what arrives in trace detail.
 2. Redact sensitive input and output values before export.
-3. Confirm project membership and roles match the data classification.
+3. Confirm workspace membership and roles match the data classification; every workspace member can access every project.
 4. Set an appropriate retention and deletion policy.
 5. Check that trace metadata and tags do not carry sensitive payloads around the capture policy.
 

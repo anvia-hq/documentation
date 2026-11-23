@@ -8,7 +8,7 @@ Attach one Lens observer to an agent and Lens can show:
 
 - The complete run from prompt to final response.
 - A generation for every model turn, including model, duration, status, and usage.
-- Tool calls nested under the generation that requested them.
+- Tool calls and generations as siblings beneath the Agent run, correlated by turn/call attributes; child-agent work nests through its invoking tool.
 - Errors on the run, generation, or tool where they occurred.
 - User, session, tag, version, and custom metadata supplied for the request.
 
@@ -44,7 +44,7 @@ ANVIA_LENS_SERVICE_NAME=support-api
 ANVIA_LENS_ENVIRONMENT=production
 ```
 
-Create the observer once, then reuse it across agents in the process:
+Create the observer once, then reuse it across agents in the process. `model` below is your application-owned [completion model](/sdk/models):
 
 ```ts
 import { Agent } from '@anvia/core'
@@ -57,7 +57,7 @@ const supportAgent = new Agent({
   id: 'support',
   model: model,
   name: 'Support agent',
-  observability: { observers: { tracing } },
+  observability: { observers: { tracing }, primaryTrace: 'tracing' },
 })
 
 const response = await supportAgent.generate({
