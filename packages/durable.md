@@ -26,7 +26,7 @@ runtime opens.
 To expose durable runs over HTTP, add `@anvia/server` (`@anvia/server/durable`) and `@anvia/client`
 (`@anvia/client/durable`). Reviewed Client 1.9.0 and Server 1.5.0 accept Durable `>=0.8.0 <1.0.0`. Steering
 requires Durable 0.8+, HTTP task agent binding requires 0.6+, and tracing requires 0.11+ (0.12+ for an
-observability session override). Remote memory-write reconciliation and shared workers require 0.18+.
+observability session override). Remote memory-write reconciliation requires 0.14+; shared workers and the store-only client require 0.18+.
 
 ## Storage and deployment roles
 

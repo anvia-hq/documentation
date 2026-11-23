@@ -52,9 +52,10 @@ backends you can replace the single owner with shared workers:
 
 ```ts
 import { DurableWorker } from '@anvia/durable'
+import { PostgresDurableStore } from '@anvia/durable/postgres'
 
 const worker = await DurableWorker.start({
-  store,
+  store: new PostgresDurableStore({ connectionString: process.env.DATABASE_URL! }),
   agents: [{ agent: researcher, version: '1' }],
   workerId: 'worker-a',
   leaseMs: 30_000,
