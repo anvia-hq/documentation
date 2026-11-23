@@ -49,6 +49,12 @@ For feedback or automated production checks, record a trace-correlated runtime s
 numeric and categorical scores support richer product signals. Mark authenticated user-submitted
 feedback with `source: 'end_user'`; this provenance is observable metadata, not authorization.
 
+## Inspect retained production activity
+
+Connect [your first Lens trace](/lens/your-first-trace), then use [Traces](/lens/observability/traces) to investigate model/tool work, [runtime scoring](/packages/lens/runtime-scoring) for feedback, and [Alerts](/lens/observability/alerts) for regressions. Supported [notification channels](/lens/observability/alerts/channels) deliver incident-opening events; [System Health](/lens/self-hosting/system-health) diagnoses ingestion and worker backlogs.
+
+Project separation does not isolate human access: workspace members can inspect all projects in their workspace. Review capture, [membership](/lens/workspace/members-and-roles), and retention together before retaining production payloads.
+
 ## Inspect locally
 
 `@anvia/studio` provides a browser surface for running agents and inspecting sessions, traces, tools, memory, status, knowledge, pipelines, evaluations, and MCP configuration when those capabilities are enabled.

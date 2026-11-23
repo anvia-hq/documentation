@@ -5,14 +5,14 @@ Trace comparison places two to four individual traces in one grid. Use it for vi
 ## Start a comparison
 
 1. Open the [Trace explorer](/lens/observability/traces/explorer).
-2. Select at least two rows. You can select up to four.
+2. Select two to four rows. Larger selections are allowed for bulk actions but disable Compare.
 3. Choose **Compare**.
 
 Each tile loads the complete trace independently. Its header shows status, start time, trace ID, duration, span count, token usage, and cost. Use **Open trace** when one tile needs the larger detail workspace.
 
 ## Compare structure and timing
 
-Each tile has its own span tree, timeline, search, collapsed branches, and selected span. This lets you align equivalent operations without forcing traces into the same structure.
+Comparison tiles support Tree/Timeline only, not Graph. Each tile has its own span tree, timeline, search, collapsed branches, and selected span. This lets you align equivalent operations without forcing traces into the same structure.
 
 For a latency regression:
 

@@ -45,11 +45,13 @@ The explorer aggregates traces that start inside the selected time window.
 
 | Field | Meaning |
 | --- | --- |
-| Status | `error` when at least one included trace failed; otherwise `success`. |
+| Status | `error` if any included trace failed; otherwise `running` if any trace is running; otherwise `success`. |
 | Duration | Time from the earliest included trace start to the latest included trace end. It is not the sum of trace durations. |
 | Traces and spans | Total runtime activity grouped into the session. |
 | Tokens and cost | Sums across the included traces. |
 | Last seen | Most recent telemetry update for the grouped traces. |
+
+Running can mean incomplete telemetry or an Agent awaiting continuation/input, not necessarily a model call still executing.
 
 Because the explorer is range-scoped, an older session can appear with only its recent traces included. Opening the session loads its retained history rather than preserving the explorer's range filter.
 

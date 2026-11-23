@@ -13,7 +13,7 @@ Choose **24h**, **7d**, or **30d**. Lens recalculates every card, chart, breakdo
 | Signal | What it tells you |
 | --- | --- |
 | Total tokens and cost | The overall model-usage load in the selected window. |
-| Tokens per generation | Whether model calls are becoming larger on average. |
+| Tokens per generation | Trace token totals (including embeddings) divided by generation count; not a pure mean generation size. |
 | Active models | How many distinct model names handled generation work. |
 | Traces and error rate | Request volume and the share of traces that ended in error. |
 | P95 generation duration | The duration under which 95% of generation observations completed. |
@@ -34,7 +34,7 @@ Suppose response time increased after a deployment:
 5. Open a model or service name to continue in the trace explorer with that filter already applied.
 6. Inspect a slow trace and its observation tree to locate the model, tool, or application span responsible.
 
-Keep the same time range as you move between views. Otherwise, a breakdown and its underlying trace list may describe different traffic.
+Keep the same time range as you move between views. Model breakdowns aggregate generation spans, but model drilldown filters each trace’s first representative model. A multi-model trace can contribute to a model row yet be absent from its drilldown. Inspect representative trace IDs when that narrower filter misses contributing work. The per-model token average is generation-only, unlike the headline ratio that includes embeddings.
 
 ## Read the charts
 
@@ -61,9 +61,9 @@ Model and service rows link to filtered traces. Tool health is a directional sig
 
 ## Refresh live activity
 
-Use the live control to refresh immediately or choose an automatic interval. Fast refresh is useful while verifying a new integration. For historical analysis, turn it off so the selected population does not move while you compare values.
+Use the live control to refresh immediately or choose an automatic interval. Fast refresh is useful while verifying a new integration. For careful reading, choose Off to stop scheduled polling. This does not freeze relative time bounds: reloads and later requests resolve the range again.
 
-If no activity appears, send a traced request, flush the exporter when running a short-lived process, and verify the project credentials. Start with [Your first trace](/lens/your-first-trace) for a complete check.
+If no activity appears, send a traced request, flush the exporter when running a short-lived process, and verify the project credentials. Start with [Your first trace](/lens/your-first-trace) for a connection check. If export appears successful but data is delayed, owners/admins should open [System Health](/lens/self-hosting/system-health) to distinguish ingestion rejection, dependency problems, and worker/queue backlog.
 
 ## Know what context is required
 
