@@ -1,8 +1,10 @@
 # Langfuse compatibility limits
 
-Lens is a compatible ingestion target for the OpenTelemetry trace format emitted by `@langfuse/otel` v5. It is not a drop-in implementation of the complete Langfuse service API.
+Lens is a compatible ingestion target for the OpenTelemetry trace format emitted by `@langfuse/otel` 6.0.2. It is not a drop-in implementation of the complete Langfuse service API.
 
 Use this page to decide whether an existing Langfuse feature can be pointed at Lens or needs to remain connected to another backend.
+
+The checked-in compatibility test at [Lens `b06101f`](https://github.com/anvia-hq/lens/blob/b06101f36392d4b1bab5a1b69a53d29e67fc22f5/packages/telemetry/test/langfuse-otel.test.ts) resolves `@langfuse/otel` and `@langfuse/tracing` **6.0.2** in that revision’s lockfile, reviewed 2026-11-23. This identifies the contract-test baseline, not proof that every older/newer release is compatible or that a live deployment has been tested.
 
 ## Supported contract
 
@@ -12,9 +14,9 @@ The integration covers trace batches sent by `LangfuseSpanProcessor` to:
 POST /api/public/otel/v1/traces
 ```
 
-The processor authenticates with HTTP Basic authentication derived from `LANGFUSE_PUBLIC_KEY` and `LANGFUSE_SECRET_KEY`. Lens accepts OTLP JSON or protobuf trace bodies and identity or gzip content encoding. The tested `@langfuse/otel` v5 path sends JSON to this endpoint.
+The processor authenticates with HTTP Basic authentication derived from `LANGFUSE_PUBLIC_KEY` and `LANGFUSE_SECRET_KEY`. Lens accepts OTLP JSON or protobuf trace bodies and identity or gzip content encoding. The tested `@langfuse/otel` 6.0.2 path sends JSON to this endpoint.
 
-Lens preserves valid trace and span IDs, parent-child relationships, timing, status, resource attributes, span attributes, events, and links. It recognizes these Langfuse v5 observation types:
+Lens preserves valid trace and span IDs, parent-child relationships, timing, status, resource attributes, span attributes, events, and links. It recognizes these Langfuse 6.0.2 observation types:
 
 | Observation type | How Lens treats it |
 | --- | --- |
@@ -27,7 +29,7 @@ An `evaluator` or `guardrail` observation remains part of the trace. Its presenc
 
 ## Supported generation data
 
-For v5 `generation` observations, Lens normalizes the following when the Langfuse processor exports them:
+For 6.0.2 `generation` observations, Lens normalizes the following when the Langfuse processor exports them:
 
 - Model name.
 - Input and output payloads.
@@ -36,7 +38,7 @@ For v5 `generation` observations, Lens normalizes the following when the Langfus
 - Status and status message.
 - Observation timing and hierarchy.
 
-Lens does not infer missing values. For example, a generation without exported usage details will not gain token counts during ingestion.
+Lens does not estimate unreported usage. Missing token fields normalize to zero; total cost can be derived arithmetically from reported cost buckets. Zero defaults are not proof of zero actual usage, and ingestion does not reconstruct missing model payloads.
 
 ## Not supported as Langfuse APIs
 
@@ -65,7 +67,7 @@ Set `LANGFUSE_BASE_URL` to the Lens application origin:
 LANGFUSE_BASE_URL=https://lens.example.com
 ```
 
-Do not set it to the full OTLP path. The v5 processor appends `/api/public/otel/v1/traces` and sends Basic authentication automatically.
+Do not set it to the full OTLP path. The 6.0.2 processor appends `/api/public/otel/v1/traces` and sends Basic authentication automatically.
 
 The public and secret keys must belong to the same active Lens project key. A revoked key, a deleted project, or an inactive project cannot ingest traces.
 
@@ -89,6 +91,6 @@ Lens returns success after accepting and queueing valid normalized spans. The tr
 
 ## When to use the native Lens integration
 
-Prefer the native Anvia Lens integration when you need Anvia-aware tracing plus Lens evaluation runs, managed datasets, comparisons, and quality gates. Use Langfuse compatibility when preserving existing v5 trace instrumentation is the priority.
+Prefer the native Anvia Lens integration when you need Anvia-aware tracing plus Lens evaluation runs, managed datasets, comparisons, and quality gates. Use Langfuse compatibility when preserving existing 6.0.2 trace instrumentation is the priority.
 
 For setup, continue with [Connect existing instrumentation](./connect-existing-instrumentation.md).
