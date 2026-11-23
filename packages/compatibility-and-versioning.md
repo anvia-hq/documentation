@@ -41,7 +41,7 @@ public behavior did not change.
 
 ## Lens server versus SDK
 
-Lens server documentation has its own [v0.20.0 source/release review](/lens/#reviewed-baselines) dated 2026-11-23. The SDK inventory remains at `10977b75` with `@anvia/lens` source 1.2.4; npm’s 1.2.5 artifact was independently checked for prompt APIs. Server and adapter versions are not synchronized. Use release-matched Compose assets and verify declared SDK ranges rather than refreshing coverage snapshots solely for a newer server.
+Lens server documentation has its own [source/release review](/lens/#reviewed-baselines) dated 2026-11-23, with deployment/startup guidance checked against v0.20.1. The SDK inventory remains at `10977b75` with `@anvia/lens` source 1.2.4; npm’s 1.2.5 artifact was independently checked for prompt APIs. Server and adapter versions are not synchronized. Use release-matched Compose assets and verify declared SDK ranges rather than refreshing coverage snapshots solely for a newer server.
 
 ## Runtime compatibility
 

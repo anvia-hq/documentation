@@ -42,4 +42,4 @@ Compose does not define a worker healthcheck. A running worker container is not 
 
 For light hosts, use the matching [constrained profile](/lens/self-hosting/deployment#constrained-vm-profile). Persistent backlog, query memory exhaustion, or Redis admission failures require reduced load or more capacity—not simply larger request-rate limits.
 
-Reviewed against [Lens health collection](https://github.com/anvia-hq/lens/blob/b06101f36392d4b1bab5a1b69a53d29e67fc22f5/apps/api/src/modules/system/health.ts), UI, and Compose at v0.20.0 on 2026-11-23.
+Reviewed against [Lens health collection](https://github.com/anvia-hq/lens/blob/2dc16cc7e1cf32e3b3bde365c7164bb704212a4c/apps/api/src/modules/system/health.ts), UI, and Compose at v0.20.1 on 2026-11-23.

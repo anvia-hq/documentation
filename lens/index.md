@@ -6,7 +6,7 @@ Use Lens when a log line can tell you that a request failed, but cannot explain 
 
 ## Reviewed baselines
 
-Lens server guides were reviewed on **2026-11-23** against [v0.20.0 source](https://github.com/anvia-hq/lens/tree/b06101f36392d4b1bab5a1b69a53d29e67fc22f5) (`b06101f36392d4b1bab5a1b69a53d29e67fc22f5`). Its [published release](https://github.com/anvia-hq/lens/releases/tag/v0.20.0) and release workflow were checked separately; that is not proof of your deployment’s health.
+Lens server guides were fully reviewed on **2026-11-23** against [v0.20.0 source](https://github.com/anvia-hq/lens/tree/b06101f36392d4b1bab5a1b69a53d29e67fc22f5). The deployment and startup guidance was then checked against [v0.20.1 source](https://github.com/anvia-hq/lens/tree/2dc16cc7e1cf32e3b3bde365c7164bb704212a4c) (`2dc16cc7e1cf32e3b3bde365c7164bb704212a4c`). The [v0.20.1 release](https://github.com/anvia-hq/lens/releases/tag/v0.20.1), its successful release workflow, and both `0.20.1` image tags were verified separately; publication is not proof of your deployment’s health.
 
 The SDK has an independent [reviewed baseline](/packages/compatibility-and-versioning): `@anvia/lens` source 1.2.4. The published 1.2.5 artifact was also checked for prompt APIs. A server review does not refresh the SDK inventory or establish compatibility with every package version.
 
