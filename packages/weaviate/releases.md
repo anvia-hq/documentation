@@ -1,6 +1,6 @@
 # Releases
 
-Reviewed source release: `1.2.1`. The entries below preserve notable v0 history.
+Reviewed source release: `1.2.2`. The entries below preserve notable v0 history.
 
 Reviewed `1.1.5` → `1.2.1` against SDK source on 2026-11-04. Version 1.2.0 added native `ne`, `in`, `gte`, and `lte` filters and n-ary `and`/`or`; 1.2.1 updates upstream dependencies. See [search and filters](/packages/weaviate/search-and-filters).
 
@@ -18,6 +18,10 @@ Notable releases include:
 - `0.2.0` introduced the Weaviate v3 collections adapter and near-vector queries.
 
 See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-weaviate/CHANGELOG.md).
+
+## Changes in 1.2.2
+
+Reviewed `1.2.1` → `1.2.2` against SDK source on 2026-11-23. Refreshes runtime dependencies.
 
 ## Changes through 1.1.4
 

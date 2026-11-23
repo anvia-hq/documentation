@@ -1,7 +1,11 @@
 # Releases
 
-The reviewed source release is `@anvia/react-ui` **1.3.0**. It is strictly headless and pairs with
+The reviewed source release is `@anvia/react-ui` **1.3.3**. It is strictly headless and pairs with
 the `@anvia/cli` installer. The entries below preserve notable v0 history.
+
+## Changes in 1.3.3
+
+Reviewed `1.3.0` → `1.3.3` against SDK source on 2026-11-23. Rejects active URL schemes in attachment links and image sources, and refreshes dependencies.
 
 ## Changes through 1.3.0
 

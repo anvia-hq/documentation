@@ -1,6 +1,10 @@
 # Releases
 
-The reviewed source release is `@anvia/mcp` **1.2.5**.
+The reviewed source release is `@anvia/mcp` **1.2.8**.
+
+## Changes in 1.2.8
+
+Reviewed `1.2.5` → `1.2.8` against SDK source on 2026-11-23. Refreshes runtime dependencies.
 
 ## Changes through 1.2.4
 

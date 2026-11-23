@@ -5,7 +5,7 @@ Grok’s provider adapter connects Anvia to xAI completions, provider-executed s
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.1.1` |
+| Version | `1.2.0` |
 | Runtime | ESM, server-side JavaScript with `fetch` |
 | Peer | Matching `@anvia/core` stable release |
 

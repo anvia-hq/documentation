@@ -1,6 +1,6 @@
 # Releases
 
-Reviewed source release: `1.2.0`. The entries below preserve notable v0 history.
+Reviewed source release: `1.2.1`. The entries below preserve notable v0 history.
 
 Reviewed `1.1.5` → `1.2.0` against SDK source on 2026-11-04. Added bound `ne`, `in`, `gte`, and `lte` filters and n-ary `and`/`or`; `ne` is null-safe and range comparisons cast `numeric`. See [search and filters](/packages/pgvector/search-and-filters).
 
@@ -19,6 +19,10 @@ The visible changelog records:
 - `0.1.6` refreshed pgvector support dependencies.
 
 See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-pgvector/CHANGELOG.md) for every patch entry.
+
+## Changes in 1.2.1
+
+Reviewed `1.2.0` → `1.2.1` against SDK source on 2026-11-23. Refreshes runtime dependencies.
 
 ## Changes through 1.1.4
 

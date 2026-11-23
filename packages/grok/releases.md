@@ -1,6 +1,10 @@
 # Releases
 
-Reviewed source release: `1.1.11`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Reviewed source release: `1.2.0`. The entries below summarize the 1.0 line and preserve notable v0 history.
+
+## Changes in 1.2.0
+
+Reviewed `1.1.11` → `1.2.0` against SDK source on 2026-11-23. Aligns model IDs and controls (including Grok 4.7), guards remote MCP URLs, and refreshes dependencies.
 
 ## Changes through 1.1.10
 

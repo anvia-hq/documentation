@@ -1,6 +1,10 @@
 # Releases
 
-Reviewed source release: `1.1.5`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Reviewed source release: `1.3.0`. The entries below summarize the 1.0 line and preserve notable v0 history.
+
+## Changes in 1.3.0
+
+Reviewed `1.1.5` → `1.3.0` against SDK source on 2026-11-23. Aligns model IDs and controls, and treats blank tool-call arguments as `{}`.
 
 ## Changes through 1.1.5
 

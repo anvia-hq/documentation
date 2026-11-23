@@ -1,6 +1,10 @@
 # Releases
 
-The reviewed source release is `@anvia/neo4j` **1.1.5**.
+The reviewed source release is `@anvia/neo4j` **1.1.9**.
+
+## Changes in 1.1.9
+
+Reviewed `1.1.5` → `1.1.9` against SDK source on 2026-11-23. Refreshes runtime dependencies.
 
 ## Changes through 1.1.5
 

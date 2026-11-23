@@ -1,6 +1,10 @@
 # Releases
 
-The reviewed source release is `@anvia/client` **1.7.0**.
+The reviewed source release is `@anvia/client` **1.9.0**.
+
+## Changes in 1.9.0
+
+Reviewed `1.7.0` → `1.9.0` against SDK source on 2026-11-23. Adds durable run status, subscription, and steering to the chat controller; documents `resolveMemoryWrite`; maps settled status events from snapshots; supports per-field payload budgets, `Retry-After`, and small status events.
 
 ## Changes through 1.7.0
 

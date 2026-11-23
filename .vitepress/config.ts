@@ -135,7 +135,8 @@ export default defineConfig({
                 { text: 'Save policies', link: '/sdk/memory/save-policies' },
                 { text: 'Compaction', link: '/sdk/memory/compaction' },
                 { text: 'Store adapters', link: '/sdk/memory/store-adapters' },
-                { text: 'Custom stores', link: '/sdk/memory/custom-stores' }
+                { text: 'Custom stores', link: '/sdk/memory/custom-stores' },
+                { text: 'Versioned writes', link: '/sdk/memory/versioned-writes' }
               ]
             },
             {
@@ -318,6 +319,7 @@ export default defineConfig({
                 { text: 'Tool catalog', link: '/sdk/advanced/dynamic-tools/tool-sets' },
                 { text: 'Tool index', link: '/sdk/advanced/dynamic-tools/index' },
                 { text: 'Embedding text', link: '/sdk/advanced/dynamic-tools/embedding-text' },
+                { text: 'Domain search', link: '/sdk/advanced/dynamic-tools/domain-search' },
                 { text: 'Static and dynamic', link: '/sdk/advanced/dynamic-tools/static-and-dynamic' },
                 { text: 'Safety', link: '/sdk/advanced/dynamic-tools/safety' },
                 { text: 'Checklist', link: '/sdk/advanced/dynamic-tools/checklist' }
@@ -414,6 +416,7 @@ export default defineConfig({
                 { text: 'Setup', link: '/sdk/providers/anthropic/setup' },
                 { text: 'Capabilities', link: '/sdk/providers/anthropic/capabilities' },
                 { text: 'Model options', link: '/sdk/providers/anthropic/model-options' },
+                { text: 'Prompt caching', link: '/sdk/providers/anthropic/prompt-caching' },
                 { text: 'Vertex AI', link: '/sdk/providers/anthropic/vertex-ai' },
                 { text: 'Production', link: '/sdk/providers/anthropic/production' }
               ]
@@ -969,6 +972,7 @@ export default defineConfig({
                 { text: 'Get started', link: '/packages/react/get-started' },
                 { text: 'Capabilities', link: '/packages/react/capabilities' },
                 { text: 'State and streaming', link: '/packages/react/state-and-streaming' },
+                { text: 'Durable chat', link: '/packages/react/durable-chat' },
                 { text: 'API', link: '/packages/react/api-reference' },
                 { text: 'Releases', link: '/packages/react/releases' }
               ]

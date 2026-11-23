@@ -1,6 +1,6 @@
 # Releases
 
-Reviewed source release: `1.3.1`. The entries below preserve notable v0 history.
+Reviewed source release: `1.3.2`. The entries below preserve notable v0 history.
 
 Reviewed `1.2.1` → `1.3.1` against SDK source on 2026-11-04. Version 1.3.0 added native `ne`, `in`, `gte`, and `lte` filters and n-ary `and`/`or`; 1.3.1 updates upstream dependencies. See [search and filters](/packages/pinecone/search-and-filters).
 
@@ -19,6 +19,10 @@ Notable releases include:
 - `0.3.0` introduced the Pinecone adapter with filters, multi-embedding support, and `asTool()`.
 
 See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-pinecone/CHANGELOG.md).
+
+## Changes in 1.3.2
+
+Reviewed `1.3.1` → `1.3.2` against SDK source on 2026-11-23. Refreshes runtime dependencies.
 
 ## Changes through 1.2.1
 

@@ -1,6 +1,10 @@
 # Releases
 
-The reviewed source release is `@anvia/memgraph` **1.1.5**.
+The reviewed source release is `@anvia/memgraph` **1.1.10**.
+
+## Changes in 1.1.10
+
+Reviewed `1.1.5` → `1.1.10` against SDK source on 2026-11-23. Scopes entity/relationship identity and exploration to the managed graph and rejects NUL bytes in identifiers.
 
 ## Changes through 1.1.5
 

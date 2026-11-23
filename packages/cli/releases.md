@@ -1,7 +1,11 @@
 # CLI releases
 
 The CLI package versions independently from React UI and the runtime SDK. The reviewed source
-release is `@anvia/cli` **1.5.2**.
+release is `@anvia/cli` **1.5.6**.
+
+## Changes in 1.5.6
+
+Reviewed `1.5.2` → `1.5.6` against SDK source on 2026-11-23. Adds richer vector filter support in the bundled guidance, updates the recorded-memory durable skill, and refreshes runtime dependencies.
 
 ## Changes through 1.5.1
 

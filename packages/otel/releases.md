@@ -1,7 +1,11 @@
 # Releases
 
-Reviewed source release: `1.3.1`. The entries below summarize recent v1 changes and preserve notable
+Reviewed source release: `1.4.1`. The entries below summarize recent v1 changes and preserve notable
 v0 history.
+
+## Changes in 1.4.1
+
+Reviewed `1.3.1` → `1.4.1` against SDK source on 2026-11-23. Upgrades OpenTelemetry to 3.x and propagates trace-level correlation context to child spans.
 
 ## Changes through 1.3.0
 

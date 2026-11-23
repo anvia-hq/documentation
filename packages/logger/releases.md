@@ -1,6 +1,10 @@
 # Releases
 
-Reviewed source release: `1.2.1`. The entries below preserve notable v0 history.
+Reviewed source release: `1.3.0`. The entries below preserve notable v0 history.
+
+## Changes in 1.3.0
+
+Reviewed `1.2.1` → `1.3.0` against SDK source on 2026-11-23. Adds `fileMode` for file destinations.
 
 ## Changes through 1.2.0
 

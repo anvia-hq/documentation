@@ -1,6 +1,10 @@
 # Releases
 
-Reviewed source release: `1.1.6`. The entries below preserve notable v0 history.
+Reviewed source release: `1.1.7`. The entries below preserve notable v0 history.
+
+## Changes in 1.1.7
+
+Reviewed `1.1.6` → `1.1.7` against SDK source on 2026-11-23. Refreshes runtime dependencies.
 
 ## Changes through 1.1.5
 

@@ -1,6 +1,10 @@
 # Releases
 
-Reviewed source release: `0.2.0`. This is the first functional release of `@anvia/jev`.
+Reviewed source release: `0.3.0`. This is the first functional release of `@anvia/jev`.
+
+## Changes in 0.3.0
+
+Reviewed `0.2.0` → `0.3.0` against SDK source on 2026-11-23. Aligns model IDs (including `JEV_PREVIEW`), context limits, and reasoning controls.
 
 ## Recent changes
 

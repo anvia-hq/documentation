@@ -1,6 +1,10 @@
 # Releases
 
-Reviewed source release: `1.1.8`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Reviewed source release: `1.4.0`. The entries below summarize the 1.0 line and preserve notable v0 history.
+
+## Changes in 1.4.0
+
+Reviewed `1.1.8` → `1.4.0` against SDK source on 2026-11-23. Adds prompt caching, aligns model IDs and reasoning controls with the current Claude line, accepts empty argument deltas for zero-argument tools, and fixes cross-provider conversation continuation.
 
 ## Changes through 1.1.7
 

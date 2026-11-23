@@ -1,6 +1,10 @@
 # Releases
 
-The reviewed source release is `@anvia/graph` **1.1.5**.
+The reviewed source release is `@anvia/graph` **1.2.0**.
+
+## Changes in 1.2.0
+
+Reviewed `1.1.5` → `1.2.0` against SDK source on 2026-11-23. Adds `maxEntityTextLength` for entity embedding text.
 
 ## Changes through 1.1.5
 

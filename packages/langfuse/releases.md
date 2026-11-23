@@ -1,7 +1,11 @@
 # Releases
 
-Reviewed source release: `1.2.2`. The entries below summarize recent v1 changes and preserve notable
+Reviewed source release: `1.4.2`. The entries below summarize recent v1 changes and preserve notable
 v0 history.
+
+## Changes in 1.4.2
+
+Reviewed `1.2.2` → `1.4.2` against SDK source on 2026-11-23. Adds transient retries to prompt and dataset requests, propagates trace-level correlation to child spans, and upgrades OpenTelemetry to 3.x.
 
 ## Changes through 1.2.1
 
