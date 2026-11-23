@@ -33,6 +33,8 @@ docker compose logs migrate
 
 Common causes are missing/invalid `LENS_ALERT_SECRET_KEY`, unavailable databases, passwords that no longer match persisted database users, insufficient storage, filesystem permissions, or a migration error.
 
+Since v0.20.1, the runner waits for dependency readiness: PostgreSQL and ClickHouse healthchecks verify the network service, and transient failures while connecting to PostgreSQL, acquiring its migration lock, or creating ClickHouse’s migration table are retried with bounded backoff (up to 20 attempts, 500 ms initial, capped at 2 s). It does not retry every migration statement. Authentication, configuration, and SQL errors still fail immediately, so repeated readiness messages usually mean the dependency is not actually reachable or is still initializing.
+
 Do not manually start the API against an unverified schema. If this happened during an upgrade, preserve the pre-upgrade recovery point and follow [Upgrades and backups](/lens/self-hosting/upgrades-and-backups).
 
 ## The API is live but not ready
