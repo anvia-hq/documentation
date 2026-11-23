@@ -39,6 +39,10 @@ Use your workspace's preferred lockfile and update packages intentionally rather
 unreviewed range change. An internal dependency-only patch can advance an adapter even when its own
 public behavior did not change.
 
+## Lens server versus SDK
+
+Lens server documentation has its own [v0.20.0 source/release review](/lens/#reviewed-baselines) dated 2026-11-23. The SDK inventory remains at `10977b75` with `@anvia/lens` source 1.2.4; npm’s 1.2.5 artifact was independently checked for prompt APIs. Server and adapter versions are not synchronized. Use release-matched Compose assets and verify declared SDK ranges rather than refreshing coverage snapshots solely for a newer server.
+
 ## Runtime compatibility
 
 Some adapters require a specific Node.js version, browser runtime, native dependency, database extension, or external service. These constraints differ by package. In particular:

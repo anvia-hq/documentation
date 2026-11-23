@@ -8,7 +8,7 @@ The **workspace** is the Lens installation. It owns members and organization-wid
 
 A **project** isolates an application's telemetry, evaluations, managed datasets, ingestion credentials, and retention policy. Every ingestion key belongs to one project, and every telemetry query runs in a project context.
 
-Use separate projects when applications must not share credentials, access, or retention. Use environments inside one project for the same application running in development, staging, and production.
+Use separate projects for independent telemetry, credentials, configuration, and retention—not human access isolation. Every workspace member can access every project in that workspace. Use separate installations for mutually isolated groups; see [Workspace scopes](/lens/workspace#understand-the-two-scopes). Use environments inside one project for the same application running in development, staging, and production.
 
 ## Traces and observations
 
