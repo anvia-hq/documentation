@@ -18,23 +18,25 @@ Capacity depends on trace volume, payload size, retention, and query activity. S
 
 ## Download the release configuration
 
+This example uses the published [Lens v0.20.0 release](https://github.com/anvia-hq/lens/releases/tag/v0.20.0), reviewed on 2026-11-23. Download configuration from the same release ref as the images; do not pair moving `main` assets with an older image tag.
+
 Create a dedicated directory and download the production files:
 
 ```sh
 mkdir lens
 cd lens
-curl -fsSLO https://raw.githubusercontent.com/anvia-hq/lens/main/docker-compose.yml
-curl -fsSL https://raw.githubusercontent.com/anvia-hq/lens/main/.env.example -o .env
+curl -fsSLO https://raw.githubusercontent.com/anvia-hq/lens/v0.20.0/docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/anvia-hq/lens/v0.20.0/.env.example -o .env
 ```
 
 Keep both files under change control, but never commit the populated `.env` file.
 
 ## Configure the installation
 
-Pin an immutable release and set the exact browser-facing origin:
+Pin the reviewed numeric release tag and set the exact browser-facing origin. Tags are not content digests; record image digests when your recovery policy requires immutable artifacts:
 
 ```dotenv
-LENS_VERSION=0.4.1
+LENS_VERSION=0.20.0
 
 PUBLIC_APP_URL=https://lens.example.com
 WEB_ORIGIN=https://lens.example.com
@@ -53,9 +55,29 @@ CLICKHOUSE_PASSWORD=replace-with-a-different-random-value
 REDIS_PASSWORD=replace-with-another-random-value
 BETTER_AUTH_SECRET=replace-with-at-least-32-random-characters
 INGESTION_KEY_PEPPER=replace-with-an-independent-random-value
+LENS_ALERT_SECRET_KEY=replace-with-key-id-and-base64-of-32-random-bytes
 ```
 
-Do not reuse one value across services. Database credentials, the authentication secret, and the ingestion-key pepper have different rotation and recovery consequences. See [Configuration](/lens/self-hosting/configuration) before rotating an existing installation.
+For `LENS_ALERT_SECRET_KEY`, generate an independent 32-byte key with an explicit ID:
+
+```sh
+printf 'lens-key-1:%s\n' "$(openssl rand -base64 32)"
+```
+
+Paste this output into the alert-key setting. Do not reuse one value across services. Database credentials, the authentication secret, and the ingestion-key pepper have different rotation and recovery consequences. See [Configuration](/lens/self-hosting/configuration) before rotating an existing installation.
+
+## Constrained VM profile
+
+For low-volume deployments, download the matching resource override:
+
+```sh
+curl -fsSLO https://raw.githubusercontent.com/anvia-hq/lens/v0.20.0/docker-compose.small.yml
+docker compose -f docker-compose.yml -f docker-compose.small.yml up -d
+```
+
+Use both `-f` files for every subsequent Compose command, including `pull`, `logs`, and `down`. The profile caps steady-state container memory at roughly 3.3 GiB, sets Redis data `maxmemory` to 192 MiB with `noeviction`, limits ClickHouse queries to two threads and 384 MiB, accepts OTLP bodies up to 2 MiB, and returns retryable `503` when 500 ingestion jobs are waiting. It also reduces worker concurrency and retained queue history.
+
+A 2-vCPU/4-GB host is a starting point for light workloads, not a capacity guarantee. Start with the supported 7-day retention option and monitor [System Health](/lens/self-hosting/system-health). Persistent backlogs, rejected Redis writes, or exhausted query memory call for reduced load or more capacity. See [Configuration](/lens/self-hosting/configuration#capacity-and-queue-history) for individual controls.
 
 ## Start Lens
 
@@ -77,7 +99,7 @@ Startup follows this dependency order:
 
 The completed `migrate` container remaining in an exited state is normal. It should report exit code `0`.
 
-Inspect startup if any long-running service does not become healthy:
+Inspect startup if any service exits unexpectedly or an expected healthcheck fails:
 
 ```sh
 docker compose ps
@@ -86,7 +108,7 @@ docker compose logs --tail=200 migrate api worker web
 
 ## Create the owner
 
-Open the configured public origin. The first account created becomes the workspace owner, and public account creation closes after that owner exists. Later users join through workspace invitations.
+Open the configured public origin. The first account created becomes the workspace owner, and public account creation closes after that owner exists. Later users join through invitations or optional [OIDC domain provisioning](/lens/workspace/oidc). Owner bootstrap still uses the password setup form, even when ordinary password login is disabled.
 
 Protect the owner account and make account recovery part of the deployment runbook. Configure SMTP if the installation must deliver password-reset email.
 
@@ -109,7 +131,7 @@ Expected responses are:
 { "status": "ready" }
 ```
 
-Readiness checks PostgreSQL, ClickHouse, and Redis. It does not prove that the worker is processing jobs, so also review worker logs and send a test trace from a non-production project.
+Readiness checks PostgreSQL, ClickHouse, and Redis. It does not prove that the worker is processing jobs, so also open owner/admin [System Health](/lens/self-hosting/system-health), review worker logs, and send a test trace from a non-production project.
 
 ## Stop without deleting data
 

@@ -84,6 +84,6 @@ An incident keeps a snapshot of the condition that produced it, so later rule ch
 - Rule names are unique per project, ignoring case.
 - Runtime scopes use exact string matching; there are no patterns or grouped scopes.
 - Only 5, 15, and 60-minute runtime windows are supported.
-- Alerts are displayed in Lens only; outbound notification channels are not implemented.
+- Outbound delivery uses the rule’s selected [notification channels](/lens/observability/alerts/channels) when a new incident opens.
 
 When a rule triggers, continue with [Incidents](/lens/observability/alerts/incidents).

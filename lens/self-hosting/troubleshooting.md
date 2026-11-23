@@ -31,7 +31,7 @@ Inspect its complete log first:
 docker compose logs migrate
 ```
 
-Common causes are unavailable databases, passwords that no longer match persisted database users, insufficient storage, filesystem permissions, or a migration error.
+Common causes are missing/invalid `LENS_ALERT_SECRET_KEY`, unavailable databases, passwords that no longer match persisted database users, insufficient storage, filesystem permissions, or a migration error.
 
 Do not manually start the API against an unverified schema. If this happened during an upgrade, preserve the pre-upgrade recovery point and follow [Upgrades and backups](/lens/self-hosting/upgrades-and-backups).
 
@@ -67,7 +67,7 @@ If the containers are healthy, verify the external proxy target matches `WEB_POR
 
 Confirm `PUBLIC_APP_URL` and `WEB_ORIGIN` are identical to the origin in the browser, including scheme and non-default port. Ensure the proxy forwards `Host`, `X-Forwarded-For`, and `X-Forwarded-Proto`.
 
-If the owner already exists, public account creation is closed; add users through invitations. If a secret was recently rotated, restore the intended authentication secret or expect users to establish new sessions.
+If the owner already exists, public password account creation is closed; add users through invitations or configured OIDC provisioning. For SSO failures, check the [OIDC callback, token method, and admission rules](/lens/workspace/oidc). If a secret was recently rotated, restore the intended authentication secret or expect users to establish new sessions.
 
 ## Telemetry is rejected
 
@@ -77,7 +77,9 @@ Use the API status and logs to identify the response:
 | --- | --- |
 | `401` | Public and secret keys belong to the same active project key and were not revoked. |
 | `413` | Exporter batch size and every proxy body limit. |
-| `429` | Per-credential request rate against `OTLP_RATE_LIMIT_PER_MINUTE`. |
+| `429` | Project-scoped request rate against `OTLP_RATE_LIMIT_PER_MINUTE`; trace/log buckets are separate. |
+| `503 ingestion_busy` | Waiting ingestion backlog; honor `Retry-After: 5` and restore processing capacity. |
+| `503 ingestion_unavailable` | Redis/queue admission failed, including OOM; honor `Retry-After: 5` and inspect infrastructure. |
 | Browser works, exporter cannot connect | Exporter base URL, DNS, TLS trust, and network egress. |
 | Short-lived process sends nothing | Exporter flush or shutdown before process exit. |
 
@@ -85,7 +87,7 @@ The application base URL is the public Lens origin, without an appended `/api` o
 
 ## Telemetry is accepted but does not appear
 
-An accepted request still requires worker processing. Inspect Redis, API, and worker state:
+An accepted request still requires worker processing. Owners/admins can open [System Health](/lens/self-hosting/system-health) to inspect throughput, rejection counters, worker heartbeats, and per-queue waiting/active/failed counts. Inspect Redis, API, and worker state:
 
 ```sh
 docker compose ps redis api worker
@@ -94,7 +96,7 @@ docker compose logs --tail=300 api worker redis
 
 Look for queue connection failures, repeated job failures, ClickHouse write errors, or a worker that is restarting. Redis uses `noeviction` in production; when it reaches its memory or storage limit, new queue work can fail instead of silently evicting jobs.
 
-After the worker recovers, allow queued jobs time to process, then clear trace filters and search a recent time range.
+After dependency recovery, pending/delayed work can resume, but exhausted failed jobs do not recover merely by waiting. Preserve retained failure evidence before history expires. Identical trace/log batch resubmission can retry retained failed ingestion; downstream materialization needs targeted retained-job replay by an operator. Review project state, recovery-set compatibility, and external side effects first; do not bulk-retry notifications or deletion jobs blindly. Follow the upstream [recovery procedure](https://github.com/anvia-hq/lens/blob/b06101f36392d4b1bab5a1b69a53d29e67fc22f5/docs/release-verification.md), then verify readable telemetry, not only an empty queue.
 
 ## Storage grows or fills
 

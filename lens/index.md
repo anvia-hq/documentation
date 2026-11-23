@@ -48,6 +48,13 @@ Observability and evaluation use the same project context. A trace discovered du
 
 After the first trace arrives, continue to [Connect Anvia](/lens/connect/anvia) for capture policy and runtime configuration, or open [Traces](/lens/observability/traces) to learn the investigation workflow.
 
+## Operate the workspace
+
+- [Notification channels](/lens/observability/alerts/channels): send new incidents to supported destinations.
+- [OIDC and SSO](/lens/workspace/oidc): configure identity-provider admission.
+- [MCP access](/lens/workspace/mcp-access): expose read-only diagnostics to an assistant.
+- [System Health](/lens/self-hosting/system-health): diagnose capacity, ingestion, and queues.
+
 ## What Lens does not replace
 
 Lens is operational telemetry, not application state. Keep conversation memory, authorization, business records, and user-visible job status in the systems that own those concerns.

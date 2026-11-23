@@ -1,6 +1,6 @@
 # Anvia Evaluations and Observability
 
-> Current stable v1 context for tracing, runtime scoring, evaluation suites, datasets, and release gates. Updated 2026-08-28.
+> Current stable v1 context for tracing, runtime scoring, evaluation suites, datasets, and release gates. Lens guidance reviewed 2026-11-23 against server v0.20.0; SDK review remains at the compatibility inventory baseline.
 
 Use unit and integration tests for deterministic code. Use evaluations for model behavior whose
 wording or reasoning can vary. Observability explains runtime activity; it is not application state.
@@ -141,8 +141,10 @@ try {
 }
 ```
 
-Attach the Lens observer to the evaluated agent when results should correlate with traces. Configure
-`onMissingTrace` deliberately rather than accepting uncorrelated results silently.
+Use an observer from the same client as the reporter, registered under `lens`, and select
+`primaryTrace: 'lens'`. Custom names must match reporter `traceObserver`. Configure `onMissingTrace`
+deliberately; `ignore`/`warn` omit uncorrelated results. Keep `publishInvalid: true` for evidence
+budgets, which measure received judgments rather than attempted evaluations.
 
 The public dataset client reads published immutable versions:
 
@@ -154,8 +156,24 @@ const dataset = await datasets.getDataset<string, string>({
 })
 ```
 
+Dataset retrieval is capped at 100 pages: default 50/page supports 5,000 cases; 100/page supports
+10,000. Exceeding it throws `pagination_limit`. Run-detail case summaries/search/outcome filters
+cover the current 100-result page; header/metric totals cover the entire run.
+
 Pin dataset, prompt, model, retrieval, runtime, and evaluator versions in CI. Drafting, publishing,
 archiving, comparison, and quality-gate configuration live in Lens; the SDK client is read-only.
+
+## Workspace and prompt operations
+
+Lens members can access all projects in their workspace; projects separate telemetry/keys/retention,
+not member-access groups. MCP tokens independently grant workspace-wide read-only diagnostics; raw
+payloads need token permission plus an explicit includePayload request. Revoke exposed tokens
+separately from membership removal and review OIDC provisioning eligibility during offboarding.
+
+Lens prompt UI commits immutable numeric versions and moves labels to deploy or roll back. The
+SDK reads/compiles templates; pass the resolved prompt.ref as trace.promptRef or run.promptRef.
+Notifications support Slack, Discord, Telegram, and webhook on incident opening. System Health
+provides owner/admin diagnostics for host capacity, rejected ingestion, worker heartbeats, and queues.
 
 ## Release gates
 
@@ -175,6 +193,13 @@ model-judged cases to estimate variance.
 - Lens eval integration: https://docs.anvia.dev/packages/lens/evals-and-datasets
 - Lens runtime scoring: https://docs.anvia.dev/packages/lens/runtime-scoring
 - Lens concepts: https://docs.anvia.dev/lens/core-concepts
+- Trace investigation: https://docs.anvia.dev/lens/observability/traces
+- Alerts and channels: https://docs.anvia.dev/lens/observability/alerts/channels
+- Model pricing: https://docs.anvia.dev/lens/observability/costs
+- Workspace access: https://docs.anvia.dev/lens/workspace
+- OIDC/SSO: https://docs.anvia.dev/lens/workspace/oidc
+- MCP access: https://docs.anvia.dev/lens/workspace/mcp-access
+- System Health: https://docs.anvia.dev/lens/self-hosting/system-health
 - Evaluation runs: https://docs.anvia.dev/lens/evaluations/runs
 - Results: https://docs.anvia.dev/lens/evaluations/results
 - Managed datasets: https://docs.anvia.dev/lens/evaluations/datasets

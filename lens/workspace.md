@@ -20,6 +20,8 @@ Use the Lens mark at the top of the project rail to return to workspace navigati
 - **Projects** opens the project directory and lets owners or admins create another project.
 - **Members** shows everyone who can access the workspace and its projects.
 - **Cost Settings** configures model pricing shared across the workspace.
+- **MCP Access** lets owners/admins manage [assistant access tokens](/lens/workspace/mcp-access).
+- **System Health** lets owners/admins inspect [installation health](/lens/self-hosting/system-health).
 
 Inside a project, **Settings** controls only that project's ingestion credentials, retention, and deletion.
 

@@ -20,7 +20,7 @@ Also protect, separately and encrypted:
 - reverse-proxy and certificate configuration;
 - a short restore runbook for the storage platform.
 
-Without the original `INGESTION_KEY_PEPPER`, existing ingestion secret hashes cannot be verified. Without database passwords, restored services cannot reconnect. A volume-only backup is therefore incomplete.
+Without the original `INGESTION_KEY_PEPPER`, existing ingestion secret hashes cannot be verified. Without the alert encryption keyring, stored channel secrets cannot be decrypted. Without database passwords, restored services cannot reconnect. Preserve MCP credentials, prompt versions/labels, and notification configuration as part of the PostgreSQL recovery set. A volume-only backup is therefore incomplete.
 
 ## Create a consistent recovery point
 
@@ -59,11 +59,17 @@ Before upgrading:
 
 1. Read the target release notes.
 2. Record the currently running `LENS_VERSION`.
-3. Confirm `docker compose ps` is healthy.
+3. Confirm expected Compose healthchecks and System Health worker/queue status.
 4. Create and verify a recovery point.
 5. Avoid concurrent retention changes, project deletion, or cost recalculation.
 
-Change only `LENS_VERSION` to the target release, then pull and reconcile the stack:
+Download the target release’s Compose/environment templates and review their configuration diff without overwriting populated secrets. Set the target `LENS_VERSION` and add new required settings. When upgrading to releases with alert encryption, set `LENS_ALERT_SECRET_KEY` before migration; the migration automatically encrypts existing plaintext channel rows.
+
+When upgrading from stable-ID materialization workers, pause producers, drain **ingestion and materialization**, and replace every worker together. Mixed worker versions do not provide current follow-up convergence. Review queue/schema compatibility and the upstream [upgrade/recovery rehearsal](https://github.com/anvia-hq/lens/blob/b06101f36392d4b1bab5a1b69a53d29e67fc22f5/docs/release-verification.md); exhausted failures require operational replay, not just waiting.
+
+Earlier project-scoped MCP tokens are revoked by migration; recreate them from **MCP Access**. Organization-scoping migration assigns workspace-wide tokens to their creator’s workspace and removes tokens without a surviving membership. See [MCP access upgrades](/lens/workspace/mcp-access#upgrading-existing-tokens).
+
+Then pull and reconcile the stack (include both Compose files if using the constrained profile):
 
 ```sh
 docker compose pull
@@ -72,6 +78,22 @@ docker compose ps
 ```
 
 The new `migrate` container waits for PostgreSQL and ClickHouse, applies unapplied migrations, and must exit successfully before the API or worker starts.
+
+## Rotate alert-channel encryption
+
+Use a new key ID for each independent 32-byte key. Preserve the recovery set before rotating.
+
+1. Add `new-id:new-key,old-id:old-key` to `LENS_ALERT_SECRET_KEY`; the first key encrypts new values and the others decrypt older envelopes.
+2. Reconcile every API/worker instance with that keyring. Ensure no writer still encrypts with the old active key.
+3. Re-encrypt stored rows using the published-image helper:
+
+```sh
+docker compose run --rm api node packages/db/dist/encrypt-alert-channels.js rotate
+```
+
+4. Re-run until `updated=0`, verify channel test delivery, then remove the old key from live configuration and reconcile services again. Retain old keys securely with backups that still contain old envelopes.
+
+Do not change a key’s bytes while reusing its ID or drop old material before all writers and rows are migrated. The separate `migrate` helper encrypts plaintext rows; it does not rotate already encrypted rows.
 
 ## Verify the upgrade
 
