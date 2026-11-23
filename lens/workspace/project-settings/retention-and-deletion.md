@@ -1,8 +1,8 @@
 # Retention and deletion
 
-Retention expires a project's telemetry over time. Project deletion permanently removes the project itself and all project-owned data. Use retention for routine data lifecycle; use deletion only when the entire project is no longer needed.
+Retention expires a project's telemetry over time. Project deletion permanently removes the project itself and all project-owned data. Use retention for routine lifecycle, selective deletion for individual records, and project deletion when the entire project is no longer needed.
 
-Both actions require the `owner` or `admin` workspace role.
+Retention changes and deletion actions require the `owner` or `admin` workspace role.
 
 ## Choose a retention period
 
@@ -38,9 +38,23 @@ Expiration is calculated from each record's own event time, not from the day you
 - **Unlimited** moves retained telemetry to a non-expiring horizon.
 - No retention change can restore data that storage has already deleted.
 
+Already accepted jobs retain the expiration calculated at admission. If a new policy must cover accepted-but-unwritten data, pause producers and drain ingestion before changing retention, then let reconciliation run.
+
 Because reconciliation and physical cleanup are asynchronous, old records may remain visible briefly after saving a shorter period.
 
 Choose the period together with capture policy. Full prompt and response capture may require a shorter window or stricter access than metadata-only traces.
+
+## Delete selected telemetry
+
+Owners/admins can delete traces, sessions, or evaluation runs from their investigation views without removing the project. Requests accept 1–100 IDs and run asynchronously. Confirm the entity and preserve required evidence first.
+
+| Scope | Removed telemetry |
+| --- | --- |
+| Trace | Spans, trace summary, and linked evaluation results. |
+| Session | Matching traces and their linked telemetry. |
+| Evaluation run | Run and evaluation results; underlying traces remain. |
+
+Follow request progress through queued/running/completed/failed status; worker availability is required. These are point-in-time cleanups, not identifier blocklists. Producers and previously accepted jobs can recreate those IDs. Pause producers and drain ingestion before deleting when the data must stay absent.
 
 ## Delete the project
 
@@ -66,6 +80,8 @@ The operation has no restore workflow. Project-owned managed datasets, gates, al
 
 Project deletion depends on the maintenance worker. A project can remain in the deleting state if that worker is unavailable or its job repeatedly fails.
 
-Check the worker and queue health before retrying infrastructure changes. Sending with an old key will not resume ingestion because keys are revoked when deletion begins.
+The deleting row remains and ingestion stays blocked while cleanup fails; maintenance retries and exhausted jobs need operator recovery. Cleanup waits for mutations on all four ClickHouse telemetry tables before removing the project row. Check [System Health](/lens/self-hosting/system-health) and worker/queue failures before changing infrastructure. Sending with an old key will not resume ingestion because keys are revoked when deletion begins.
+
+Project fencing coordinates writers with PostgreSQL row locks; it is not a transaction across databases. If PostgreSQL connectivity is lost while an unacknowledged ClickHouse write is still executing, stop writers, wait for outstanding queries to finish, and repeat project telemetry cleanup before treating erasure as verified. All writers must run the fenced implementation.
 
 For credential-only incidents, revoke the affected key instead of deleting the project; see [Ingestion keys](/lens/workspace/project-settings/ingestion-keys).

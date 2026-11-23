@@ -9,12 +9,15 @@ Lens separates synchronous HTTP work from asynchronous telemetry processing. The
 | `web` | Serves the browser app and proxies `/api/` and `/health/` to the API | None | `WEB_PORT` |
 | `api` | Authentication, workspace APIs, OTLP ingestion, and health endpoints | Uses PostgreSQL, ClickHouse, and Redis | None |
 | `worker` | Persists and materializes telemetry, evaluations, alerts, retention, deletion, and cost jobs | Uses PostgreSQL, ClickHouse, and Redis | None |
+| `monitor` | Read-only Linux host resource collector on a separate private network | None; reads host mounts | None |
 | `migrate` | Applies PostgreSQL and ClickHouse migrations before application startup | Updates both databases | None |
 | `postgres` | Accounts, sessions, projects, settings, credentials, managed datasets, and operational job state | `lens-postgres` | None |
 | `clickhouse` | Spans, trace summaries, evaluation telemetry, and analytical data | `lens-clickhouse` | None |
 | `redis` | BullMQ transport and pending background jobs | `lens-redis` with append-only persistence | None |
 
 The production Compose file runs backend containers with a read-only root filesystem, a temporary `/tmp`, an unprivileged image user, and `no-new-privileges`. The web image uses unprivileged Nginx on container port `8080`.
+
+The monitor reads host `/proc`, the root filesystem, and the Docker-data filesystem through read-only mounts. `SYSTEM_MONITOR_DATA_PATH` defaults to `/var/lib/docker`; set it to the actual host data path when different. The collector does not expose a public port or Docker socket. Treat host mounts and operator access as part of the deployment trust boundary; see [System Health](/lens/self-hosting/system-health).
 
 ## Browser request flow
 

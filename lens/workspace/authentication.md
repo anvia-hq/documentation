@@ -1,6 +1,6 @@
 # Authentication
 
-Lens uses email-and-password accounts with browser sessions. The first account bootstraps the workspace as its owner; every later account must join through an invitation.
+Lens supports password accounts and a deployment-configured OpenID Connect provider. The first account bootstraps the workspace as its owner using the password setup form. Later users join through invitations or optional verified-email domain provisioning. See [OIDC and SSO](/lens/workspace/oidc) for setup and admission rules.
 
 ## Create the workspace owner
 
@@ -17,20 +17,22 @@ Bootstrap is rate-limited and closes as soon as the first account exists. Refres
 
 ## Sign in and out
 
-Open the Lens origin, enter the account email and password, and select **Sign in**. Use the sign-out action beside your account at the bottom of either workspace or project navigation when finished.
+Open the Lens origin and use **Sign in** with password credentials or **Continue with** the configured SSO provider. SSO-only deployments hide ordinary password login; initial owner setup remains available on a fresh installation. Use the sign-out action beside your account at the bottom of either workspace or project navigation when finished.
 
 A browser session grants access only while its user still has workspace membership. Removing a member makes authenticated workspace and project requests fail even if an older session cookie remains in their browser.
 
 ## Join through an invitation
 
-An owner or admin creates an invitation from **Members** and shares the generated link privately. The recipient opens the exact link and supplies a name, password, and confirmation.
+An owner or admin creates an invitation from **Members** and shares the generated link privately. The recipient opens the exact link and supplies a name, password, and confirmation, or accepts through the configured SSO provider. Password claiming is unavailable when password login is disabled.
 
 The email address and role come from the invitation and cannot be changed while accepting it. Invitations:
 
 - expire after seven days;
 - work only while their status is `pending`;
 - cannot be reused after acceptance or cancellation;
-- cannot create a second account for an email that already exists.
+- cannot create a second password account for an email that already exists.
+
+OIDC has an account-linking and re-invitation path for eligible existing users; see [Members and roles](/lens/workspace/members-and-roles#accept-an-invitation).
 
 An expired, cancelled, accepted, or unknown invitation appears as unavailable. Ask an owner or admin to cancel the old invitation if necessary and create a new one.
 

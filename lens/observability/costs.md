@@ -18,6 +18,8 @@ Cost follows this precedence for generation and embedding observations:
 
 Configured pricing is organization-wide. An exact model entry applies to matching telemetry from every project in that Lens organization.
 
+All members can view pricing and recalculation history. Changing prices or starting a historical recalculation requires the workspace owner/admin role and affects matching telemetry across the workspace.
+
 ## Configure a model price
 
 Open **Cost Settings**. Models already seen in generation or embedding telemetry appear automatically as **Observed**. A model without a price is marked **Unconfigured**. You can also choose **Add model** before the first matching trace arrives.
@@ -86,4 +88,4 @@ Check these in order:
 
 Cost is an operational estimate derived from the telemetry and rates available to Lens. Keep invoices and financial accounting in the systems that own those records.
 
-Return to [Observability](/lens/observability) to see cost by time, model, service, and trace. Use [Sessions](/lens/observability/sessions) or [Users](/lens/observability/users) to attribute it to application interactions.
+Return to [Observability](/lens/observability) for the selected window’s total cost, or open [Traces](/lens/observability/traces) for per-trace attribution. The overview does not provide cost breakdown charts by time, model, or service. Use [Sessions](/lens/observability/sessions) or [Users](/lens/observability/users) to attribute it to application interactions.

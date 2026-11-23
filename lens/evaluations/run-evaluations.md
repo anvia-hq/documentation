@@ -21,14 +21,19 @@ The key pair selects the project. `serviceName`, `environment`, and `release` ma
 
 ## Run a complete suite
 
-The target must use an observer from the same client as the reporter when each result must link to its agent trace:
+The target must select an observer from the same client as the reporter when each result must link to its agent trace. Install `@anvia/openai` and set server-side `OPENAI_API_KEY` and `OPENAI_MODEL` to your provider credentials and model ID:
 
-```ts
+```ts anvia-check lens-eval-correlation-example
 import { Agent } from '@anvia/core'
 import type { AgentResponse } from '@anvia/core/agent'
 import { agentEvalTarget, contains, runEvalSuite } from '@anvia/core/evals'
 import { LensClient } from '@anvia/lens'
+import { OpenAIClient } from '@anvia/openai'
 
+const model = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! }).completionModel({
+  modelId: process.env.OPENAI_MODEL!,
+  api: 'chat',
+})
 const lens = new LensClient()
 const observer = lens.observer()
 const reporter = lens.evalReporter<string, AgentResponse<string>, string>({
@@ -46,7 +51,7 @@ const agent = new Agent({
     'Refunds are available for 30 days.',
     'Workspace owners can change billing settings.',
   ].join('\n'),
-  observability: { observers: { observer } },
+  observability: { observers: { lens: observer }, primaryTrace: 'lens' },
 })
 
 try {
@@ -83,6 +88,7 @@ try {
     reporterErrorPolicy: 'throw',
   })
 
+  if (suite.cases.total !== 2) throw new Error('Evaluation case coverage is incomplete')
   await lens.flush()
   console.log('Lens run ID:', suite.run.id)
   console.log(suite.metrics)
@@ -95,9 +101,13 @@ Open **Evaluations → Runs** and search for the printed run ID. The run should 
 
 ## Understand trace correlation
 
-`agentEvalTarget()` returns the completed `AgentResponse`, which carries its trace reference. The eval runner resolves that reference and the Lens reporter associates the metric result with the relevant trace and observation.
+`agentEvalTarget()` returns the completed `AgentResponse`. Its trace reference is present only when `observability.primaryTrace` selects an active observer. Match that registry name to reporter `traceObserver` (default `lens`); merely attaching an observer is insufficient. The eval runner resolves that reference and the Lens reporter associates the metric result with the relevant trace and observation.
 
-`onMissingTrace` accepts `emit`, `ignore`, `warn`, or `throw`. Use `throw` in controlled CI when trace linkage is required evidence. Use `emit` when evaluating a plain untraced function.
+`onMissingTrace` accepts `emit`, `ignore`, `warn`, or `throw`. Use `throw` in controlled CI when trace linkage is required evidence. Use `emit` when evaluating a plain untraced function. `ignore` and `warn` omit results without usable matching trace context. Keep `publishInvalid: true` (the default) for gate evidence budgets. Local trace-reference checks do not prove Lens has ingested/retained the linked trace; verify received results and trace coverage after export.
+
+## Record the prompt actually executed
+
+When using a [resolved Lens prompt](/lens/connect/anvia/versioned-prompts), pass its numeric `prompt.ref` as `run.promptRef` alongside dataset identity. Fetching a template does not attribute a run automatically. For example, the run fragment is `run: { datasetName: dataset.name, datasetVersion: dataset.version, promptRef: prompt.ref }`, where `dataset` and `prompt` are application-owned resolved snapshots.
 
 ## Choose what to capture
 

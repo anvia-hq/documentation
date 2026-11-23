@@ -79,6 +79,12 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Your first trace](https://docs.anvia.dev/lens/your-first-trace): Capture and inspect runtime telemetry.
 - [Lens observability](https://docs.anvia.dev/lens/observability): Traces, sessions, users, costs, and alerts.
 - [Lens self-hosting](https://docs.anvia.dev/lens/self-hosting/architecture): Self-hosted architecture and operational guidance.
+- [Lens prompt management](https://docs.anvia.dev/lens/prompts): Immutable prompt versions and mutable deployment labels.
+- [Lens notification channels](https://docs.anvia.dev/lens/observability/alerts/channels): Slack, Discord, Telegram, and webhooks for new incidents.
+- [Lens workspace](https://docs.anvia.dev/lens/workspace): Workspace-wide member access; projects are not human-access isolation boundaries.
+- [Lens OIDC and SSO](https://docs.anvia.dev/lens/workspace/oidc): Provider configuration, invitations, provisioning, and recovery.
+- [Lens MCP access](https://docs.anvia.dev/lens/workspace/mcp-access): Workspace-wide read-only assistant diagnostics and payload permission.
+- [Lens System Health](https://docs.anvia.dev/lens/self-hosting/system-health): Host capacity, ingestion, dependencies, workers, and queues.
 - [Channels](https://docs.anvia.dev/channels/): Discord, Slack, and Telegram adapters that connect platforms to agents and support proactive delivery.
 - [Build applications](https://docs.anvia.dev/use-cases/build-applications): Connect Anvia runtime behavior to an application.
 - [Observe systems](https://docs.anvia.dev/use-cases/observe-systems): Add runtime observability.

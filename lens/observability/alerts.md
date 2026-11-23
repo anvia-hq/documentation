@@ -28,15 +28,15 @@ Start with [Alert rules](/lens/observability/alerts/rules) to configure a signal
 
 ## Delivery today
 
-Lens currently surfaces incidents in the web application. The project sidebar shows the number of active incidents, and the **Incidents** tab provides the complete active and resolved history. Lens does not currently send alert email, Slack, PagerDuty, or webhook notifications.
+Lens currently surfaces incidents in the web application. The project sidebar shows the number of active incidents, and the **Incidents** tab provides the complete active and resolved history. Owners/admins can configure Slack, Discord, Telegram, and webhook [notification channels](/lens/observability/alerts/channels), then select them in a rule’s **Send to** field. Native email and PagerDuty channels are not included.
 
-Treat Lens alerts as an in-product operational workflow. If an incident must page an on-call team, use your existing monitoring system until an outbound integration is available.
+Delivery is triggered when an incident opens, not on every acknowledgement or resolution. Inspect its **Deliveries** card for status, attempts, and errors. Keep your paging and escalation policy application-owned; Lens does not guarantee on-call response.
 
 ## Access and ownership
 
 Every member with access to a project can view, acknowledge, and resolve its incidents. Only project owners and admins can create, edit, enable, disable, or delete rules. Owners and admins can also promote retained evidence traces into a managed dataset draft.
 
-Rules and incidents are project-scoped. A member cannot use an alert to inspect telemetry from another project.
+Rules and incidents are project-scoped. Incident links retain their project context; this is not human access isolation, since workspace members can access every project in that workspace.
 
 ## Operational requirements
 

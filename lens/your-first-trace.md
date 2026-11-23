@@ -32,7 +32,7 @@ Attach the tracing instance when constructing the agent:
 
 ```ts
 import { Agent } from '@anvia/core/agent'
-import { tracing } from './tracing'
+import { lens, tracing } from './tracing'
 import { model } from './model'
 
 const supportAgent = new Agent({
@@ -40,11 +40,11 @@ const supportAgent = new Agent({
   model: model,
   name: 'Support agent',
   instructions: 'Answer support questions clearly and concisely.',
-  observability: { observers: { tracing } },
+  observability: { observers: { tracing }, primaryTrace: 'tracing' },
 })
 ```
 
-The observer records runtime activity without changing the agent result.
+`primaryTrace` selects the named observer whose IDs appear on `response.trace`. Registering an observer alone still exports telemetry but does not return that identity. The imported `./model` and `./tracing` modules are application-owned; the earlier tracing block belongs in `tracing.ts`.
 
 ## Send one request
 

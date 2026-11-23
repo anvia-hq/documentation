@@ -25,12 +25,18 @@ Switch from **Tree** to **Timeline** to position spans relative to the full trac
 
 A long tool span usually points to an external operation. A long generation span points toward model, prompt, or provider behavior. Parent duration can include child work, so inspect the longest relevant child before optimizing the parent.
 
+## Use Graph
+
+Switch to **Graph** to inspect branches and joins, then pan, zoom, or fit the view. Connections are inferred from span timing and hierarchy; they are not proof of causal dependencies. Event observations are excluded. Complexity budgets can make a graph unavailable; use Tree or Timeline when the view reports that fallback. Comparison tiles do not support Graph.
+
+The detail URL preserves selected `span` and `view`, so share it to point a colleague at the investigation location. Running traces poll every five seconds; terminal traces stop after two stable refreshes, and detected late spans restart stabilization. This is not a permanently live subscription.
+
 ## Inspect captured data
 
 The inspector reports the selected span's status and observation type, then shows available duration, token, cost, model, service, span ID, and parent ID values. Payload sections expose captured input, output, metadata, and error information.
 
 Use the formatted view for conversational message content and raw JSON when exact serialization matters. Payloads can be absent because capture was disabled, redacted, omitted upstream, or removed by retention; identifiers and timing remain useful in those cases.
 
-On narrow screens, tree, timeline, and data become separate tabs. Selecting a span moves to its data tab without changing the underlying trace.
+On narrow screens, tree, timeline, graph, and data become separate tabs. Selecting a span moves to its data tab without changing the underlying trace.
 
 To put several runs beside one another, continue with [Compare traces](/lens/observability/traces/compare). To label the trace outcome, see [Trace reviews](/lens/observability/traces/reviews).

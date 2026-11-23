@@ -735,9 +735,16 @@ export default defineConfig({
               items: [
                 { text: 'Overview', link: '/lens/observability/alerts' },
                 { text: 'Alert rules', link: '/lens/observability/alerts/rules' },
-                { text: 'Incidents', link: '/lens/observability/alerts/incidents' }
+                { text: 'Incidents', link: '/lens/observability/alerts/incidents' },
+                { text: 'Notification channels', link: '/lens/observability/alerts/channels' }
               ]
             }
+          ]
+        },
+        {
+          text: 'Prompts',
+          items: [
+            { text: 'Manage prompts', link: '/lens/prompts' }
           ]
         },
         {
@@ -829,6 +836,8 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/lens/workspace' },
             { text: 'Authentication', link: '/lens/workspace/authentication' },
+            { text: 'OIDC and SSO', link: '/lens/workspace/oidc' },
+            { text: 'MCP access', link: '/lens/workspace/mcp-access' },
             { text: 'Projects', link: '/lens/workspace/projects' },
             { text: 'Members and roles', link: '/lens/workspace/members-and-roles' },
             {
@@ -849,6 +858,7 @@ export default defineConfig({
             { text: 'Deployment', link: '/lens/self-hosting/deployment' },
             { text: 'Architecture', link: '/lens/self-hosting/architecture' },
             { text: 'Configuration', link: '/lens/self-hosting/configuration' },
+            { text: 'System Health', link: '/lens/self-hosting/system-health' },
             { text: 'HTTPS and networking', link: '/lens/self-hosting/https-and-networking' },
             { text: 'Upgrades and backups', link: '/lens/self-hosting/upgrades-and-backups' },
             { text: 'Troubleshooting', link: '/lens/self-hosting/troubleshooting' }

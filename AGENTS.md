@@ -54,9 +54,11 @@ and build the packages needed by the checks. CI uses pnpm 11.0.4 there and runs:
 # Run inside the Anvia source checkout.
 pnpm install --frozen-lockfile
 pnpm --filter @anvia/core build
+pnpm --filter @anvia/otel build
 ```
 
-Core's built `dist/` output is required even though checks import source: provider
+Core and OTel built `dist/` output is required even though checks import source: Lens
+resolves OTel through its public package exports, while provider
 and Durable workspace imports resolve through Core's package exports. Rebuild
 after changing the SDK revision; source dependencies alone are insufficient.
 

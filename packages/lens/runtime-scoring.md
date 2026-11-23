@@ -48,3 +48,5 @@ A disabled optional client treats scoring as a no-op, while a closed client reje
 
 The client rejects invalid trace or observation IDs, empty names and explicit IDs, non-finite
 numbers, values that do not match `dataType`, and comments longer than 2,000 characters.
+
+Lens ingestion separately limits metric `name`, explicit `id`, `suiteName`, and `responseId` to 128 characters; evaluation case/run IDs have the same server bound. Validate application identifiers before calling the SDK. Passing client validation does not prove server acceptance: rejected evaluation records can appear in an HTTP-200 OTLP partial-success response. Monitor exporter/ingestion diagnostics as well as synchronous errors.

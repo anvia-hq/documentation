@@ -33,7 +33,7 @@ This context travels with the run and makes the same request discoverable throug
 | `version` | The prompt or workflow version used by this request | `prompt-v3` |
 | `metadata` | Small structured investigation context | team, channel, feature flag |
 | `traceId` | An existing valid trace id when explicit trace correlation is required | 32-character hexadecimal id |
-| `failOnObserverError` | Make observer failures fail this request | `true` in a telemetry contract test |
+| `parentObservationId` | Nest beneath an existing observation, together with its `traceId` | 16-character hexadecimal span ID |
 | `promptRef` | A named and optionally versioned prompt reference | `{ name: 'support-summary', version: 3 }` |
 
 Most applications should set `name`, then add `userId` and `sessionId` when those concepts exist in the product.
@@ -91,7 +91,7 @@ Do not put access tokens, secrets, raw documents, full customer records, or unre
 
 ## Record the returned identity
 
-Anvia returns the trace identity with the response:
+Select the intended named observer through constructor `observability.primaryTrace` to return its trace identity with the response. The connection examples select `tracing`; registration alone does not return IDs:
 
 ```ts
 const response = await supportAgent.generate({

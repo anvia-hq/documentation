@@ -59,6 +59,8 @@ Open a row to see the run summary and its cases together. The header reports:
 
 The **Cases** tab is the best starting point for a regression. Search case or metric names, filter by outcome, and select a case. The inspector shows its input, expected value, actual output, context, retrieval context, metric results, and related trace when those values are available.
 
+Run detail loads **100 metric results per page**, not 100 whole cases. Case summaries, case outcomes, search, and outcome filters apply only to the current page; one case can span pages. Use Previous/Next to inspect all results. A shared case link preserves the result page; a case absent from that page is reported as missing there, not automatically located. Header and Metrics totals cover the entire run.
+
 The **Metrics** tab answers which evaluator caused the run to fail. It aggregates results by metric so a broadly failing metric is not mistaken for one isolated case.
 
 ## Follow a failure to its trace
@@ -87,6 +89,8 @@ Lens can retain the metric outcome while its input or output payload is unavaila
 - rejected by the capture-size limit;
 - unavailable because serialization failed;
 - unavailable because the associated retained evidence is incomplete.
+
+For a run linked to a published, unarchived managed dataset version, Lens can hydrate the current page’s input, expected, context, and retrieval context from the fixture. The inspector labels this **Managed dataset definition**; it is not captured execution data and cannot restore an uncaptured target output or change payload status.
 
 Do not interpret an unavailable payload as a failed metric. Use the evaluator outcome and explanation for the decision, then decide whether future runs may safely capture more evidence.
 

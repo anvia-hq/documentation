@@ -25,7 +25,7 @@ Trace IDs are shown in full so you can correlate a row with application logs or 
 
 ## Open or compare traces
 
-Select a row to open [Trace details](/lens/observability/traces/details). To compare individual runs, select between two and four rows and choose **Compare**. Lens limits selection to four traces so every trace remains usable in the comparison grid.
+Select a row to open [Trace details](/lens/observability/traces/details). To compare individual runs, select between two and four rows and choose **Compare**. Selection supports up to 100 traces for bulk actions, but **Compare** requires exactly two to four. If a larger selection disables Compare, reduce it to that range. Owner/admin [selective deletion](/lens/workspace/project-settings/retention-and-deletion#delete-selected-telemetry) uses the larger selection limit.
 
 Use comparison for questions such as:
 

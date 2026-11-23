@@ -33,6 +33,8 @@ const tracing = lens.observer()
 
 Open **Evaluations → Compare**, choose the candidate, then choose a compatible baseline. Once a candidate is selected, Lens limits the baseline selector to runs with the same suite and environment.
 
+The dropdowns list up to the latest 100 completed runs. For older retained runs, locate them in Runs and select the two compatible runs there. CI should use explicit run IDs; the backend comparison is not restricted to the dropdown population.
+
 Verify both identity cards before reading the deltas. They show release, status, suite, time, environment, service, dataset version, pass rate, evaluated cases, and trace coverage.
 
 ## Read the aggregate changes
@@ -45,7 +47,7 @@ Lens compares three run-level values:
 
 Operational values come from traces linked to evaluation results. A run with incomplete trace coverage can still be compared, but Lens warns you and an operational quality-gate rule will return `insufficient_data`.
 
-Lens also warns when the runs use different datasets or versions. Treat such a comparison as directional: a delta may come from the changed case population rather than the release.
+Lens also warns when the runs use different dataset names/versions or prompt names/versions. Record the prompt actually executed through `run.promptRef`; a warning does not make compatible runs invalid or automatically enforce prompt equality in a gate. Treat such a comparison as directional: a delta may come from the changed case population rather than the release.
 
 ## Compare evaluator metrics
 

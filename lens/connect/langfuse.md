@@ -1,6 +1,6 @@
 # Langfuse
 
-Lens can receive traces from applications already instrumented with `@langfuse/otel` v5. Point the existing Langfuse OpenTelemetry processor at Lens and keep the application’s trace structure intact.
+Lens can receive traces from applications already instrumented with `@langfuse/otel` 6.0.2. Point the existing Langfuse OpenTelemetry processor at Lens and keep the application’s trace structure intact.
 
 This integration is useful when you already use Langfuse instrumentation but want to inspect the resulting traces in Lens. New Anvia applications should generally use the native Anvia Lens integration instead, because it also covers Anvia-specific evaluation workflows.
 
@@ -8,7 +8,7 @@ This integration is useful when you already use Langfuse instrumentation but wan
 
 `LangfuseSpanProcessor` exports an OTLP trace request to Lens. Lens authenticates the request with the project’s public and secret ingestion keys, normalizes the Langfuse attributes, and makes the trace available in the trace explorer.
 
-Lens recognizes the complete Langfuse v5 observation taxonomy:
+Lens recognizes the complete Langfuse 6.0.2 observation taxonomy:
 
 - `span`
 - `generation`
@@ -29,7 +29,7 @@ You need:
 
 - A Lens project.
 - An active ingestion key for that project.
-- A Node.js application using the v5 generation of `@langfuse/otel` and `@langfuse/tracing`.
+- A Node.js application using the 6.0.2 generation of `@langfuse/otel` and `@langfuse/tracing`.
 - A Lens URL reachable from the application process.
 
 Create or manage ingestion keys from the project’s **Settings** page. Copy the secret when the key is created; Lens does not show it again.

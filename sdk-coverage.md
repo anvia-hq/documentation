@@ -27,7 +27,8 @@ does not establish feature coverage for those additions.
 
 Keep an installed Anvia checkout beside the docs, or set `ANVIA_REPO` to its absolute path.
 
-In that SDK checkout, run `pnpm --filter @anvia/core build` before the runtime checks. Provider
+In that SDK checkout, run `pnpm --filter @anvia/core build` and
+`pnpm --filter @anvia/otel build` before runtime checks. Lens imports OTel through its public exports; provider
 source imports Core through workspace exports that resolve to `dist/`; a clean checkout has no
 generated Core files until this build runs. Both CI validation jobs perform this prerequisite.
 
@@ -78,6 +79,9 @@ the full reviewed SDK revision from the inventory and runs these gates. The depl
 
 | Contract | Complete example | Offline checks |
 | --- | --- | --- |
+| Lens eval correlation | [Complete evaluation suite](/lens/evaluations/run-evaluations) | Actual trace/exported-result ID linkage with a scripted model and local receiver. |
+| Lens datasets | [Published-version helper](/lens/evaluations/datasets/versions) | Object-form options, authenticated reads, and pinned dataset identity. |
+| Lens prompts | [Compile helper](/packages/lens/api-reference#versioned-prompts) | Deployment selector, numeric identity, compilation failures, and closed-client behavior. |
 | OpenAI decisions | [Provider example](/packages/openai/decisions) | Provider confidence, encoded state, disabled SDK retries, and refusal identity. |
 | Durable goals | [Goal runtime](/packages/durable/goals) | Verified completion and reuse after database reopen. |
 | Durable steering | [Queued input](/packages/durable/steering) | Deduplicated receipts, conflicting input, and committed application events. |
