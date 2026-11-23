@@ -1,6 +1,6 @@
 # Releases
 
-Reviewed source release: `1.1.5`. The entries below preserve notable v0 history.
+Reviewed source release: `1.2.1`. The entries below preserve notable v0 history.
 
 Notable package releases include:
 
@@ -15,6 +15,10 @@ Notable package releases include:
 - `0.1.0` introduced the Drizzle store and PostgreSQL table exports.
 
 Read the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-drizzle/CHANGELOG.md) before regenerating schema or upgrading peer dependencies.
+
+## Changes in 1.2.1
+
+Reviewed `1.1.5` → `1.2.1` against SDK source on 2026-11-23. Implements the versioned, idempotent memory contract with `agent_memory_writes`, and rejects non-positive list limits.
 
 ## Changes through 1.1.5
 

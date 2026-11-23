@@ -28,4 +28,8 @@ const dataset = await datasets.getDataset({ name: 'support-cases' })
 
 The dataset client can create datasets, paginate items, upsert cases, and publish experiment run items. Per-item experiment failures are returned in `errors`; successful items can still be posted.
 
-Prompt and dataset calls are ordinary authenticated HTTP requests. Plan for timeouts, transient network failures, cache staleness, and schema validation at the application boundary.
+Prompt and dataset calls are authenticated HTTP requests with a built-in retry: network failures, HTTP 429, and
+5xx responses are retried up to three attempts with short 25 ms/50 ms backoff. Other statuses return
+immediately, and there are no public retry-tuning options. Plan for timeouts, cache staleness, and schema
+validation at the application boundary. Retries can repeat a write, so keep dataset mutations idempotent where
+the Langfuse API allows it.

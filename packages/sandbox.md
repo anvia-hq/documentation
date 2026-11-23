@@ -89,7 +89,7 @@ Start the daemon inside the sandbox with `ANVIA_CONTROL_URL` and `ANVIA_SANDBOX_
 ```sh
 ANVIA_CONTROL_URL=wss://agents.example.com/daemon \
 ANVIA_SANDBOX_TOKEN=<token> \
-npx anvia-sandbox-daemon
+npm exec --package=@anvia/sandbox -- anvia-sandbox-daemon
 ```
 
 The hub authorizes, routes, and reports connected sandboxes. It never creates, stops, or destroys one. The same hub exposes `hub.terminal(id)` for interactive shells and `hub.tunnel(id)` for loopback byte streams. See [Remote sandboxes](/sdk/advanced/sandbox/remote) for connection behavior, terminals, and tunnels.

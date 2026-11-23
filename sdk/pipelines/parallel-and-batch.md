@@ -73,7 +73,25 @@ const normalized = await normalizeTicket.runBatch({
 
 Batch results preserve input order even when individual executions finish in a different order. Start concurrency low for provider calls and database work, then tune it against actual rate and connection limits.
 
-`runBatch()` records each item independently as completed or failed. Inspect the settled union:
+`runBatch()` settles item failures independently: a rejected item becomes `{ status: 'failed' }` while the
+others continue. External cancellation is different. If the batch's `abortSignal` aborts, the whole call
+rejects with an abort error, pending items stop being scheduled, and you do not receive a settled array.
+Distinguish those cases in application code:
+
+```ts
+try {
+  const items = await normalizeTicket.runBatch({ inputs, concurrency: 2, abortSignal })
+  for (const item of items) {
+    if (item.status === 'completed') console.log(item.output)
+    else console.error(item.runId, item.error)
+  }
+} catch (error) {
+  if (abortSignal.aborted) return // the operator cancelled the batch
+  throw error
+}
+```
+
+Inspect the settled union when the call returns:
 
 ```ts
 for (const item of normalized) {

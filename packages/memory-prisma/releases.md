@@ -1,6 +1,6 @@
 # Releases
 
-Reviewed source release: `1.3.0`. The entries below preserve notable v0 history.
+Reviewed source release: `1.4.1`. The entries below preserve notable v0 history.
 
 Notable package releases include:
 
@@ -18,6 +18,10 @@ Notable package releases include:
 - `0.2.0` introduced the durable Prisma adapter family release.
 
 Release entries are generated through Changesets. Consult the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-prisma/CHANGELOG.md) before migrating schema or changing peer versions.
+
+## Changes in 1.4.1
+
+Reviewed `1.3.0` → `1.4.1` against SDK source on 2026-11-23. Implements the versioned, idempotent memory contract with the `AgentMemoryWrite` model, and rejects non-positive list limits.
 
 ## Changes through 1.2.2
 

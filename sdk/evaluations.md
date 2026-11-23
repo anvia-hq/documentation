@@ -139,7 +139,7 @@ const model: CompletionModel = {
 }
 const agent = new Agent({ id: 'eval-interactions', model, tools: [
   createTool({ name: 'record', description: 'Record a synthetic result',
-    inputSchema: z.object({}), requiresApproval: true, execute: () => 'recorded' }),
+    inputSchema: z.object({}), requiresApproval: true, handler: () => 'recorded' }),
   createQuestionTool({ name: 'ask', description: 'Ask the test operator' }),
 ] })
 const target = agentEvalTarget<string, string, string>({

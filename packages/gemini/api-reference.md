@@ -39,7 +39,7 @@ class GeminiClient {
 ```
 
 API-key, Vertex AI, and injected-client modes are mutually exclusive. All model factories require an options object and model ID.
-When `controls` is omitted on `completionModel()`, known model IDs receive typed reasoning-effort controls resolved through `geminiControlsForModel` — efforts `minimal`, `low`, `medium`, and `high` (exported as `GEMINI_REASONING_EFFORTS`), tiered per model; unknown IDs expose no controls.
+When `controls` is omitted on `completionModel()`, known model IDs receive typed reasoning-effort controls resolved through `geminiControlsForModel` — efforts `minimal`, `low`, `medium`, `high`, and `xhigh` (exported as `GEMINI_REASONING_EFFORTS`), tiered per model; the Hydrogen and Neon families accept `xhigh`, and unknown IDs expose no controls.
 
 ## Embedding options
 

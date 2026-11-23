@@ -12,7 +12,7 @@ const checkOrderStatus = createTool({
   description: 'Check the current status of one order.',
   inputSchema: z.object({ orderId: z.string() }),
   outputSchema: z.string(),
-  async execute({ orderId }) {
+  async handler({ orderId }) {
     const order = await orders.get(orderId)
     return `Order ${order.id} is ${order.status}.`
   },
@@ -34,7 +34,7 @@ const searchOrders = createTool({
       status: z.string(),
     })),
   }),
-  async execute({ query }) {
+  async handler({ query }) {
     return {
       matches: await orders.search({ userId: user.id, query }),
     }
@@ -55,7 +55,7 @@ const renderChart = createTool({
   name: 'render_chart',
   description: 'Render a chart image for a metric.',
   inputSchema: z.object({ metricId: z.string() }),
-  async execute({ metricId }) {
+  async handler({ metricId }) {
     const chart = await charts.render(metricId)
 
     return ToolOutput.content([

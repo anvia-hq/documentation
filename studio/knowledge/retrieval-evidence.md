@@ -25,8 +25,8 @@ The log reads the model-facing `documents` and `tools` arrays from the recorded 
 
 - documents may include static context as well as dynamically retrieved context;
 - tools may include static, dynamic, and MCP-backed definitions;
-- the compact log records tool names, not whether the model called them;
-- the inferred query is a debugging summary, not a stored similarity-search request.
+- the compact log records tool names and, when a dynamic index selected them, match scores; it does not show whether the model called them;
+- the inferred query is a debugging summary, not a stored similarity-search request; a match score ranks an item for selection and is not proof that the model used it or that the retrieval was correct.
 
 To verify the origin of a definition, compare it with [Dynamic tools](/studio/knowledge/dynamic-tools), [Tools](/studio/tools), or [MCP](/studio/mcp). To verify execution, open the trace and select the tool observation.
 

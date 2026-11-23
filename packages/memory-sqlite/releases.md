@@ -1,6 +1,6 @@
 # Releases
 
-Reviewed source release: `1.2.1`. The entries below preserve notable v0 history.
+Reviewed source release: `1.3.1`. The entries below preserve notable v0 history.
 
 Notable package releases include:
 
@@ -14,6 +14,10 @@ Notable package releases include:
 - `0.1.0` introduced the SQLite store.
 
 Dependency and patch details remain authoritative in the [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-sqlite/CHANGELOG.md). Review it together with [Schema and migrations](/packages/memory-sqlite/schema-and-migrations) before upgrading a managed schema.
+
+## Changes in 1.3.1
+
+Reviewed `1.2.1` → `1.3.1` against SDK source on 2026-11-23. Implements the versioned, idempotent memory contract with `anvia_memory_idempotency_keys`, and rejects non-positive list limits.
 
 ## Changes through 1.2.1
 

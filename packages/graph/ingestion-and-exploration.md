@@ -37,6 +37,10 @@ another model request:
 await vectorStore.upsert({ documents: result.vectorDocuments })
 ```
 
+`conflict` and `orphanEntities` are required by the exported options type; there are no helper defaults, so
+choose them explicitly. `conflict` decides how an existing entity or relationship is merged, and
+`orphanEntities` decides what happens to entities whose source document is replaced or removed.
+
 Every result also carries a `receipt: GraphIngestionReceipt` with `documentIds`, `entityKeys`,
 `relationshipKeys`, `vectorDocumentIds`, the `graphWrite` change counts, the `vectorWrite` status,
 `warnings`, and the optional caller-supplied `revision`.
@@ -55,6 +59,8 @@ const result = await ingestGraphTextToStores({
   },
   extractionModel,
   embeddingModel,
+  conflict: 'error',
+  orphanEntities: 'delete',
 })
 ```
 

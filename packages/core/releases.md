@@ -1,7 +1,11 @@
 # Releases
 
-The reviewed source release is `@anvia/core` **1.17.3**. The source changelog is authoritative; the
+The reviewed source release is `@anvia/core` **1.21.1**. The source changelog is authoritative; the
 entries below summarize recent v1 changes and preserve notable v0 compatibility milestones.
+
+## Changes in 1.21.1
+
+Reviewed `1.17.3` → `1.21.1` against SDK source on 2026-11-23. Adds the context token breakdown, `searchTool()`, tool `examples`, compact embedding text, `handler` (deprecating `execute`), per-turn `toolConcurrency`, and PEM/AWS redaction patterns; aligns provider model IDs and durable protocol 5.
 
 ## Changes through 1.17.3
 

@@ -32,6 +32,14 @@ Provider-generation events such as `text_delta`, `reasoning_delta`, `tool_call_d
 
 ## Agent runtime events
 
+`tool_selection` reports the tools a turn offered and what the agent's tool indexes returned to select them:
+`{ type: 'tool_selection', turn, tools: string[], matches: { toolName, index, score }[] }`. `tools` lists every
+offered tool in prompt order; `matches` lists only indexed selections, with the index's position in the agent's
+tool list and its score. The event appears only when the turn's text hit an index, so it answers “why wasn't my
+tool offered”. Replayed durable turns carry no matches because they do not search again, and a lexical or
+semantic index that returns nothing emits no event. If you switch exhaustively on agent event types, add this
+variant, and use `toolMatches` on the generation-start observer args for the same data outside the stream.
+
 `tool_result` contains the tool name, call identifiers, arguments, text result, and optional structured result.
 
 `agent_tool_event` wraps a nested child event from an agent used as a tool.

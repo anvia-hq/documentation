@@ -34,6 +34,11 @@ Use model listing for an admin inventory or selection UI. A listed ID does not p
 
 `AnthropicVertexClient` does not have `listModels()` because Vertex AI does not expose Anthropic's Models API.
 
+## Cache a stable prefix
+
+Set `promptCache` on the model to reuse tools, instructions, and conversation prefixes across turns; see
+[Prompt caching](/sdk/providers/anthropic/prompt-caching).
+
 ## Set portable request options
 
 Use Anvia's normalized request fields whenever they cover the behavior:

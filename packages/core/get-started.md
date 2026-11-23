@@ -23,7 +23,7 @@ const currentTime = createTool({
   description: 'Return the current server time.',
   inputSchema: z.object({}),
   outputSchema: z.object({ iso: z.string() }),
-  execute: async () => ({ iso: new Date().toISOString() }),
+  handler: async () => ({ iso: new Date().toISOString() }),
 })
 
 const agent = new Agent({

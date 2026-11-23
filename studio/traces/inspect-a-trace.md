@@ -68,6 +68,7 @@ Studio reports metrics only when they exist in the recorded data:
 - **Duration** is elapsed time for the selected trace, turn, or observation.
 - **First delta** is the delay before the first streamed model delta.
 - **Usage** shows input, output, and total tokens for a trace or generation.
+- **Context** splits input tokens into instructions, messages, tool results, documents, tools, MCP tools, provider tools, and output schema. Values are local estimates; once the provider reports usage, Studio scales the split proportionally to the reported total, so the buckets add up but are not exact vendor accounting.
 
 Turn duration is the sum of its recorded observation durations. Use it as a quick local breakdown, not as a wall-clock critical-path calculation when work overlaps.
 
@@ -79,6 +80,7 @@ Metadata complements the readable payload. Depending on the selected observation
 - provider, requested model, and resolved model;
 - message, document, and tool counts;
 - tool names, parameter keys, call IDs, and approval behavior;
+- tool-index matches and scores that selected this turn's tools;
 - response usage and message IDs;
 - start, end, duration, and first-delta timing.
 

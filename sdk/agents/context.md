@@ -100,4 +100,46 @@ const result = await docsAgent.generate({
 
 Trace metadata is for observability. It does not automatically become model context and must not be treated as a permission check.
 
+When a run uses a memory session, `sessionId` and `userId` reach observers even if `trace` omits them; explicit
+`trace` fields win field by field. Session identity therefore enters configured telemetry, so review exporter
+destinations and redaction when those identifiers are sensitive. Observers still must not use them for
+authorization.
+
+## 3. Account for input tokens
+
+`@anvia/core/context` estimates how a request's input tokens are spent, without another model call:
+
+```ts anvia-check context-breakdown-example
+import { estimateContextBreakdown, scaleContextBreakdown } from '@anvia/core/context'
+
+const breakdown = estimateContextBreakdown({
+  instructions: 'Answer briefly and cite the policy.',
+  chatHistory: [{ role: 'user', content: 'Where is my order?' }],
+  documents: [{ id: 'shipping-policy', text: 'Orders ship within two business days.' }],
+  tools: [],
+})
+
+console.log(breakdown.estimatedTokens)
+for (const segment of breakdown.segments) {
+  console.log(segment.id, segment.tokens, segment.characters, segment.items)
+}
+
+// Once the provider reports usage, keep the local split but adopt its total.
+const exact = scaleContextBreakdown(breakdown, 1_234)
+```
+
+The eight segments are `instructions`, `messages`, `toolResults`, `documents`, `tools`, `mcpTools`,
+`providerTools`, and `outputSchema`. `estimateContextTextTokens()` is the default provider-neutral counter
+(about four characters per token); pass `tokenCounter` for a model-specific estimate, and `mcpToolNames` to
+report MCP-served tools separately. Inline base64 media counts as at most 8,000 characters because providers
+bill media by pixels or duration rather than payload bytes. Estimates are local, and although the provider's
+input count may include fields this split does not model, `scaleContextBreakdown()` keeps the proportions and
+makes the segments add up to the reported total.
+
+Agent observers receive the same structure on generation start and scaled on end through
+`args.context`; a failed generation carries the estimate. This is observability data, not authoritative
+billing. Structured-output retries report the final attempt's input tokens rather than cumulative retry usage.
+Durable runs persist requests, not these breakdowns, so they are not part of a terminal outcome or the client
+event protocol.
+
 Continue with [Per-run controls](/sdk/agents/per-run-controls).

@@ -4,6 +4,6 @@ Automatic creation defines Anvia ID, logical document ID, serialized document, a
 
 Those values are a development baseline, not a universal production configuration. Provision collections and indexes through infrastructure when shard count, consistency, replicas, partitions, or build parameters matter, then call `validate()` at startup.
 
-The configured `dimensions` must match the embedding model and existing field dimension. Metadata names beginning with `__anvia_` are reserved.
+The configured `dimensions` must match the embedding model and existing field dimension. Metadata names beginning with `__anvia_` are reserved, and the literal keys `id` and `vector` are rejected because they collide with Anvia's row fields. Rename application fields before ingestion.
 
 Ingestion is a replacement upsert: `upsert()` deletes rows for each supplied document ID before inserting, so re-ingesting a document replaces it instead of duplicating it.
