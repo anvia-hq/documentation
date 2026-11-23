@@ -11,14 +11,14 @@ Download the production Compose file and environment template into a dedicated d
 ```sh
 mkdir lens
 cd lens
-curl -fsSLO https://raw.githubusercontent.com/anvia-hq/lens/v0.20.0/docker-compose.yml
-curl -fsSL https://raw.githubusercontent.com/anvia-hq/lens/v0.20.0/.env.example -o .env
+curl -fsSLO https://raw.githubusercontent.com/anvia-hq/lens/v0.20.1/docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/anvia-hq/lens/v0.20.1/.env.example -o .env
 ```
 
 For local use, set the public origin and generate a different value for every secret:
 
 ```dotenv
-LENS_VERSION=0.20.0
+LENS_VERSION=0.20.1
 PUBLIC_APP_URL=http://localhost
 WEB_ORIGIN=http://localhost
 WEB_PORT=80

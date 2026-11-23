@@ -18,15 +18,15 @@ Capacity depends on trace volume, payload size, retention, and query activity. S
 
 ## Download the release configuration
 
-This example uses the published [Lens v0.20.0 release](https://github.com/anvia-hq/lens/releases/tag/v0.20.0), reviewed on 2026-11-23. Download configuration from the same release ref as the images; do not pair moving `main` assets with an older image tag.
+This example uses the published [Lens v0.20.1 release](https://github.com/anvia-hq/lens/releases/tag/v0.20.1), checked on 2026-11-23. Download configuration from the same release ref as the images; do not pair moving `main` assets with an older image tag. The release adds deployment/startup fixes, so an existing v0.20.0 installation should also adopt the v0.20.1 Compose healthchecks rather than changing only `LENS_VERSION`; see [Upgrades and backups](/lens/self-hosting/upgrades-and-backups).
 
 Create a dedicated directory and download the production files:
 
 ```sh
 mkdir lens
 cd lens
-curl -fsSLO https://raw.githubusercontent.com/anvia-hq/lens/v0.20.0/docker-compose.yml
-curl -fsSL https://raw.githubusercontent.com/anvia-hq/lens/v0.20.0/.env.example -o .env
+curl -fsSLO https://raw.githubusercontent.com/anvia-hq/lens/v0.20.1/docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/anvia-hq/lens/v0.20.1/.env.example -o .env
 ```
 
 Keep both files under change control, but never commit the populated `.env` file.
@@ -36,7 +36,7 @@ Keep both files under change control, but never commit the populated `.env` file
 Pin the reviewed numeric release tag and set the exact browser-facing origin. Tags are not content digests; record image digests when your recovery policy requires immutable artifacts:
 
 ```dotenv
-LENS_VERSION=0.20.0
+LENS_VERSION=0.20.1
 
 PUBLIC_APP_URL=https://lens.example.com
 WEB_ORIGIN=https://lens.example.com
@@ -71,7 +71,7 @@ Paste this output into the alert-key setting. Do not reuse one value across serv
 For low-volume deployments, download the matching resource override:
 
 ```sh
-curl -fsSLO https://raw.githubusercontent.com/anvia-hq/lens/v0.20.0/docker-compose.small.yml
+curl -fsSLO https://raw.githubusercontent.com/anvia-hq/lens/v0.20.1/docker-compose.small.yml
 docker compose -f docker-compose.yml -f docker-compose.small.yml up -d
 ```
 
