@@ -55,6 +55,10 @@ const agent = new Agent({
 
 `errorPolicy: 'ignore'` is the default; observer dispatch failures do not fail the agent. Use `'throw'` when losing telemetry should fail the run. A thrown lifecycle callback fails the run independently of this observer setting. Choose that behavior deliberately.
 
+Generation-start observer args also carry `toolMatches` when dynamic indexes selected the turn's tools:
+`{ toolName, index, score }[]`, where `index` is the index's position in the agent's tool list. Use it to explain
+selection; it does not prove the model called the tool.
+
 ## Correlate traces
 
 Supply per-run `trace` fields such as `name`, `userId`, `sessionId`, `metadata`, tags, and prompt version. Use stable product IDs and avoid putting private prompts into metadata.

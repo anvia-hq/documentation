@@ -1,13 +1,17 @@
 # Releases
 
-The reviewed source release is `@anvia/react-ui` **1.3.0**. It is strictly headless and pairs with
+The reviewed source release is `@anvia/react-ui` **1.3.3**. It is strictly headless and pairs with
 the `@anvia/cli` installer. The entries below preserve notable v0 history.
+
+## Changes in 1.3.3
+
+Reviewed `1.3.0` → `1.3.3` against SDK source on 2026-11-23. Rejects active URL schemes in attachment links and image sources, and refreshes dependencies.
 
 ## Changes through 1.3.0
 
 Reviewed `1.1.8` → `1.3.0` against SDK source on 2026-11-04. Added optional sandbox viewers on their own subpaths and an editor-only entity renderer for the rich composer. The package remains headless; application styling and CLI-installed source remain application-owned.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/react-ui/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/react-ui/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

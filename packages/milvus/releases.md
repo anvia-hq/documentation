@@ -1,6 +1,6 @@
 # Releases
 
-Reviewed source release: `1.2.0`. The entries below preserve notable v0 history.
+Reviewed source release: `1.2.2`. The entries below preserve notable v0 history.
 
 Reviewed `1.1.5` → `1.2.0` against SDK source on 2026-11-04. Added native `ne`, `in`, `gte`, and `lte` filters and n-ary `and`/`or`; empty or null `in` lists, invalid keys, and non-finite numbers are rejected. See [search and filters](/packages/milvus/search-and-filters).
 
@@ -21,8 +21,12 @@ Notable releases include:
 
 See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-milvus/CHANGELOG.md).
 
+## Changes in 1.2.2
+
+Reviewed `1.2.0` → `1.2.2` against SDK source on 2026-11-23. Rejects metadata keys that collide with reserved `id` and `vector` fields; refreshes dependencies.
+
 ## Changes through 1.1.5
 
 Reviewed `1.1.3` → `1.1.5` against SDK source on 2026-10-15. Refreshed package guidance and updated the Milvus client dependency. Check the source changelog alongside server compatibility.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/vector-milvus/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/vector-milvus/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.

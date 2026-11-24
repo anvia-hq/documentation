@@ -36,7 +36,7 @@ const getWeather = createTool({
     city: z.string(),
     forecast: z.string(),
   }),
-  async execute({ city }) {
+  async handler({ city }) {
     return {
       city,
       forecast: await weather.getCurrent(city),
@@ -107,7 +107,7 @@ const refundOrder = createTool({
   requiresApproval: ({ orderId }) => ({
     reason: `Approve refund for ${orderId}`,
   }),
-  execute: async ({ orderId }) => billing.refund(orderId),
+  handler: async ({ orderId }) => billing.refund(orderId),
 })
 ```
 

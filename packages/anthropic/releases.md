@@ -1,20 +1,26 @@
 # Releases
 
-Reviewed source release: `1.2.1`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Reviewed source release: `1.4.1`. The entries below summarize the 1.0 line and preserve notable v0 history.
 
-## Changes through 1.2.1
+## Changes in 1.4.1
 
-Reviewed `1.1.8` → `1.2.1` against SDK source on 2026-11-04. `1.1.9` accepts empty argument deltas for no-argument tools without weakening malformed or truncated tool-argument validation. `1.2.0` refreshes upstream Anthropic, Vertex, Mistral, and Langfuse dependencies, raises the `zod` peer range to `^4.6.7`, and adopts `@typesafe-ai/sdk` 0.7. `1.2.1` fixes conversations that continue on another provider: reasoning from that provider is no longer replayed, assistant turns left empty are omitted, and tool-call ids are unique within a request.
+Reviewed `1.4.0` → `1.4.1` against SDK source on 2026-11-23. Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and guards against non-object provider responses in the embedding, image, and transcription adapters.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/provider-anthropic/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+## Changes in 1.4.0
+
+Reviewed `1.1.8` → `1.4.0` against SDK source on 2026-11-23. Adds prompt caching, aligns model IDs and reasoning controls with the current Claude line, accepts empty argument deltas for zero-argument tools, and fixes cross-provider conversation continuation.
+
+## Changes through 1.1.7
+
+Reviewed `1.1.4` → `1.1.7` against SDK source on 2026-10-15. Refreshed package guidance and updated upstream Anthropic and Vertex SDK dependencies. Review the source changelog for the dependency versions crossed by your upgrade.
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/provider-anthropic/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 
 | Version | Type | Summary |
 | --- | --- | --- |
-| `1.2.1` | Patch | Fixed cross-provider conversation replay: foreign reasoning is no longer sent, empty assistant turns are omitted, tool-call ids are unique per request, and Studio keeps a remembered control only when the newly selected model offers it. |
-| `1.2.0` | Minor | Updated upstream Anthropic, Vertex, Mistral, and Langfuse dependencies; the `zod` peer range is now `^4.6.7`; Jev adapts to `@typesafe-ai/sdk` 0.7. |
-| `1.1.9` | Patch | Accepted empty argument deltas for no-argument tools without weakening malformed or truncated tool-argument validation. |
+| `1.4.1` | Patch | Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and guards against non-object provider responses in the embedding, image, and transcription adapters. |
 | `1.1.4` | Patch | Updated upstream runtime and schema dependencies across the workspace. |
 | `1.1.3` | Patch | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
 | `1.1.2` | Patch | Updated the Core dependency to `1.1.2`. |

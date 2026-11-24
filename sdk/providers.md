@@ -83,4 +83,6 @@ Adapter capabilities describe what Anvia can map. They do not prove that every m
 
 Before shipping, exercise the exact production path for streaming, tool choice, structured output, media, and provider parameters. Model listing proves inventory, not behavior.
 
+Provider adapters share request/response normalization and model-control helpers through `@anvia/core/internal/provider`. That subpath exists for Anvia integration packages, not application code: depend on the provider packages, and treat an unexpected vendor payload as a provider error rather than as documented output.
+
 Continue with the [model boundary](/sdk/providers/model-boundary), [provider selection](/sdk/providers/choose-a-provider), and [capability declarations](/sdk/providers/capability-matrix).

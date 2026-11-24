@@ -19,7 +19,7 @@ const getInvoice = createTool({
     status: z.enum(['draft', 'open', 'paid', 'void']),
     totalCents: z.number().int(),
   }),
-  async execute({ invoiceId }) {
+  async handler({ invoiceId }) {
     await auth.requireInvoiceAccess(user.id, invoiceId)
 
     const invoice = await billing.getInvoice(invoiceId)
@@ -33,7 +33,27 @@ const getInvoice = createTool({
 })
 ```
 
-The input schema gives `execute(...)` typed arguments and rejects invalid model input before the handler runs. The optional output schema validates the handler result and prevents undeclared fields from reaching the model.
+The input schema gives `handler(...)` typed arguments and rejects invalid model input before the handler runs. The optional output schema validates the handler result and prevents undeclared fields from reaching the model.
+
+`handler` is the current name for the callback; `execute` has the same signature but is deprecated and will be removed in the next major release. Pass exactly one of them — passing both throws. Migrating is a rename.
+
+Add worked calls when seeing an example helps the model choose correctly:
+
+```ts
+const getInvoice = createTool({
+  name: 'get_invoice',
+  description: 'Look up one invoice available to the current user.',
+  inputSchema: z.object({ invoiceId: z.string().min(1) }),
+  examples: [
+    { input: { invoiceId: 'inv_123' }, note: 'Read one invoice after the user names it.' },
+  ],
+  async handler({ invoiceId }) {
+    return billing.getInvoice(invoiceId)
+  },
+})
+```
+
+Example inputs are validated when the tool is created and rendered into the description, so they are prompt tokens on **every** turn. Keep the list short and representative.
 
 ## Name and describe it clearly
 
@@ -51,7 +71,7 @@ export function createGetInvoiceTool(scope: BillingScope) {
     name: 'get_invoice',
     description: 'Look up one invoice available to the current user.',
     inputSchema: z.object({ invoiceId: z.string().min(1) }),
-    async execute({ invoiceId }) {
+    async handler({ invoiceId }) {
       await scope.auth.requireInvoiceAccess(scope.user.id, invoiceId)
       return scope.billing.getInvoice(invoiceId)
     },

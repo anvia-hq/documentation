@@ -1,20 +1,20 @@
 # CLI releases
 
 The CLI package versions independently from React UI and the runtime SDK. The reviewed source
-release is `@anvia/cli` **1.5.4**.
+release is `@anvia/cli` **1.5.6**.
 
-## Changes through 1.5.4
+## Changes in 1.5.6
 
-Reviewed `1.5.1` → `1.5.4` against SDK source on 2026-11-04. `1.5.1` bundled durable-goals guidance for persisted handoffs, verified completion, cumulative budgets, and resumable sessions. `1.5.2` updated runtime dependencies. `1.5.3` added richer vector metadata filters (`ne`, `in`, `gte`, `lte`, and variadic `and`/`or`) across the in-memory store, LanceDB post-filtering, seven native adapters, and the bundled `anvia-rag` skill. `1.5.4` refreshed upstream dependencies and raised the `zod` peer range to `^4.6.7`. UI installation and skills installation remain separate workflows.
+Reviewed `1.5.2` → `1.5.6` against SDK source on 2026-11-23. Adds richer vector filter support in the bundled guidance, updates the recorded-memory durable skill, and refreshes runtime dependencies.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/cli/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+## Changes through 1.5.1
+
+Reviewed `1.5.0` → `1.5.1` against SDK source on 2026-10-15. Bundled the durable-goals skill guidance for persisted handoffs, verified completion, budgets, and resumable sessions. UI installation and skills installation remain separate workflows.
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/cli/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
-| `1.5.4` | Updated upstream runtime dependencies; the `zod` peer range is now `^4.6.7`. |
-| `1.5.3` | Added richer vector metadata filters: `ne`, `in`, `gte`, `lte`, and variadic `and`/`or`, translated by the in-memory store, LanceDB post-filtering, and seven native adapters; the bundled `anvia-rag` skill documents them. |
-| `1.5.2` | Updated runtime dependencies to the latest compatible minor and patch releases. |
-| `1.5.1` | Added durable goals that continue across bounded agent sessions with persisted handoffs, verified completion, budgets, admission limits, stall detection, and signal-based resumption; SQLite journals upgrade to schema 7. |
 | `1.5.0` | Bundled the experimental `anvia-durable` skill (durable main agents, owned subagents, replay-safe effects, approvals, persisted waits, task graphs, remote controls, operations, and a local restart smoke check), exposed through `skills list` and `skills init`. |
 | `1.4.1` | Refreshed the package README. |
 | `1.4.0` | Grouped UI commands as `anvia ui init`, `ui add`, and `ui update`, keeping root `init`, `add`, and `update` as aliases. UI and skills updates now preview without writing any file (including `AGENTS.md`) and write only with `--apply`; `ui update --overwrite` and `skills update --force` remain aliases. Unknown commands and options are rejected, help is grouped, and generated registry dependencies use the matching React UI package version. |

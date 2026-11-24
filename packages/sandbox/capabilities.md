@@ -23,7 +23,7 @@ The package exposes Docker sandboxes, a remote runtime, an inspection adapter, p
 ## Image builder
 
 ```sh
-pnpm dlx @anvia/sandbox create-image \
+pnpm dlx --package=@anvia/sandbox anvia-sandbox create-image \
   --name reports \
   --runtime node \
   --runtime python \

@@ -15,7 +15,7 @@ const requestRefund = createTool({
     amountCents: z.number().int().positive(),
     reason: z.string().min(1),
   }),
-  async execute(args) {
+  async handler(args) {
     await auth.requireRefundPermission(user.id, args.orderId)
     await policy.assertRefundAllowed(args.orderId, args.amountCents)
 

@@ -1,6 +1,10 @@
 # Releases
 
-The reviewed source release is `@anvia/sandbox` **1.3.2**. The entries below preserve notable v0 history.
+The reviewed source release is `@anvia/sandbox` **1.3.5**. The entries below preserve notable v0 history.
+
+## Changes in 1.3.5
+
+Reviewed `1.3.2` → `1.3.5` against SDK source on 2026-11-23. Stops desktop helper and agent processes reliably and kills terminal sessions that ignore SIGHUP.
 
 ## Changes through 1.3.2
 
@@ -8,7 +12,7 @@ Reviewed `1.2.1` → `1.3.2` against SDK source on 2026-11-04. The 1.3 line adde
 
 Reviewed `1.1.8` → `1.2.0` against SDK source on 2026-10-15. Natural commands in `exec_command` and `start_process` now prefer `/bin/bash -c`, falling back to `sh -c` only if Bash is unavailable. Allow policies check the selected executable; explicit argv and low-level APIs keep their behavior. See [Commands](/sdk/advanced/sandbox/commands#natural-command-lines).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/tool-sandbox/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/tool-sandbox/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

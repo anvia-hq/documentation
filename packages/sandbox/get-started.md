@@ -64,13 +64,14 @@ const tools = createSandboxTools({
 })
 ```
 
-Start the daemon in the sandbox:
+Start the daemon in the sandbox. `anvia-sandbox-daemon` is a binary shipped by `@anvia/sandbox`, so name the
+package when it is not already installed locally:
 
 ```sh
 ANVIA_CONTROL_URL=wss://agents.example.com/daemon \
 ANVIA_SANDBOX_TOKEN=<token> \
 ANVIA_SANDBOX_WORKDIR=/workspace \
-npx anvia-sandbox-daemon
+npm exec --package=@anvia/sandbox -- anvia-sandbox-daemon
 ```
 
 The hub authorizes each daemon to one sandbox and routes calls; it does not create or destroy sandboxes. The same hub exposes interactive terminals, loopback tunnels, and a desktop for a sandbox. See [Remote sandboxes](/sdk/advanced/sandbox/remote).
@@ -80,7 +81,7 @@ The hub authorizes each daemon to one sandbox and routes calls; it does not crea
 For a virtual display that an agent can see and drive, generate an image with the desktop programs and daemon:
 
 ```sh
-pnpm dlx @anvia/sandbox create-image --name desk --feature desktop
+pnpm dlx --package=@anvia/sandbox anvia-sandbox create-image --name desk --feature desktop
 docker run --rm anvia-sandbox-desk:latest \
   /opt/anvia-daemon/node_modules/.bin/anvia-sandbox-daemon --check --require=desktop
 ```

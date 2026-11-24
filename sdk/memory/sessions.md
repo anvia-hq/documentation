@@ -80,4 +80,9 @@ await memoryStore.clear({ scope: session })
 
 Use the store's `clear()` method for an authorized deletion request, retention cleanup, or isolated test setup. The adapter deletes the conversation addressed by the full storage scope.
 
+Clearing is not a complete erasure when the store keeps an idempotency ledger for versioned writes: the
+adapters intentionally retain committed write keys across `clear()`, so a retried key stays a duplicate instead
+of restoring deleted history. For a retention policy that requires removing every trace, delete those ledger
+rows through an application-owned maintenance path as well. Do not remove them routinely.
+
 Continue with [Save policies](/sdk/memory/save-policies).

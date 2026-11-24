@@ -1,15 +1,23 @@
 # Releases
 
-Reviewed source release: `1.2.4`. The entries below summarize recent v1 changes and preserve notable
+Reviewed source release: `1.3.2`. The entries below summarize recent v1 changes and preserve notable
 v0 history.
 
 Prompt retrieval/compilation is already included in this reviewed source baseline. The published 1.2.5 artifact was independently checked for `promptClient()` on 2026-11-23; that does not change the inventory revision or establish the first supporting published version. Server features use the separate [Lens server review](/lens/#reviewed-baselines), with deployment guidance checked at v0.20.1.
+
+## Changes in 1.3.2
+
+Reviewed `1.3.1` → `1.3.2` against SDK source on 2026-11-23. Inherits the new evaluation reporter fields from `@anvia/otel`; `LensDatasetItem` accepts optional `tags` and types `metadata` as `JsonObject`, so dataset items pass straight into `runEvalSuite`.
+
+## Changes in 1.3.1
+
+Reviewed `1.2.4` → `1.3.1` against SDK source on 2026-11-23. Upgrades OpenTelemetry to 3.x and refreshes transitive dependencies.
 
 ## Changes through 1.2.3
 
 Reviewed `1.2.0` → `1.2.3` against SDK source on 2026-10-15. Refreshed package guidance and aligned OpenTelemetry dependencies. Parentless durable roots now finish correctly in Lens, and `LensClient` installs `createAnviaIdGenerator()` automatically. See [Durable tracing](/packages/durable/tracing).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/observability-lens/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/observability-lens/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Notable history
 

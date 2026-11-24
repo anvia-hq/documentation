@@ -1,6 +1,6 @@
 # Releases
 
-Reviewed source release: `1.3.1`. The entries below preserve notable v0 history.
+Reviewed source release: `1.3.2`. The entries below preserve notable v0 history.
 
 Reviewed `1.2.1` → `1.3.1` against SDK source on 2026-11-04. Version 1.3.0 added native `ne`, `in`, `gte`, and `lte` filters and n-ary `and`/`or`; 1.3.1 updates upstream dependencies. See [search and filters](/packages/pinecone/search-and-filters).
 
@@ -20,8 +20,12 @@ Notable releases include:
 
 See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-pinecone/CHANGELOG.md).
 
+## Changes in 1.3.2
+
+Reviewed `1.3.1` → `1.3.2` against SDK source on 2026-11-23. Refreshes runtime dependencies.
+
 ## Changes through 1.2.1
 
 Reviewed `1.2.0` → `1.2.1` against SDK source on 2026-10-15. Refreshed package READMEs with current overviews, quickstarts, and links to the detailed guides. Review the source changelog for any dependency changes included in your upgrade.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/vector-pinecone/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/vector-pinecone/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.

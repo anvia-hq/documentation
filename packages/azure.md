@@ -5,7 +5,7 @@ The Azure provider adapter connects Anvia agents to Azure OpenAI and Azure AI Fo
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `0.1.9` |
+| Version | `0.1.12` |
 | Runtime | ESM, server-side JavaScript |
 | Peer | Matching `@anvia/core` stable release |
 | Depends on | `@anvia/openai`, official `openai` SDK |

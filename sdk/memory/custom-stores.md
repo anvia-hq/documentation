@@ -35,6 +35,12 @@ export class ProductMemoryStore implements MemoryStore {
     })
   }
 
+  // Optional: enables optimistic concurrency and durable recorded memory.
+  async loadVersioned({ scope }: { scope: MemoryScope }) {
+    const state = await readConversationState(scopeKey(scope))
+    return { messages: state.messages, version: String(state.revision) }
+  }
+
   async clear({ scope }: { scope: MemoryScope }): Promise<void> {
     await deleteConversation({ scopeKey: scopeKey(scope) })
   }
@@ -43,6 +49,11 @@ export class ProductMemoryStore implements MemoryStore {
 
 `load()`, `append()`, and `clear()` are required. Preserve every normalized message field and return
 canonical history in model order. Compaction must not change what `load()` returns.
+
+`append()` may return `void` (interpreted as `committed`) or `{ status, version? }`. Implementing
+`loadVersioned()` plus idempotency-key handling enables `expectedVersion` checks, durable recorded memory, and
+duplicate-safe retries; see [Versioned memory writes](/sdk/memory/versioned-writes). The version must change on
+every committed append and on `clear`, and idempotency records must survive `clear`.
 
 The core runtime passes the same context shape to every method:
 

@@ -19,4 +19,8 @@ The available changelog records:
 - `0.2.6` recorded the repository's flattened package layout.
 - `0.2.0` aligned imports with the focused core public surface.
 
-Earlier visible entries are dependency updates. Read the complete [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/vector-chroma/CHANGELOG.md) for exact versions and hashes.
+Earlier visible entries are dependency updates. Read the complete [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/vector-chroma/CHANGELOG.md) for exact versions and hashes.
+
+## Changes in 1.2.0
+
+Reviewed `1.2.0` → `1.2.0` against SDK source on 2026-11-23. No source changes beyond dependency alignment in this review window.

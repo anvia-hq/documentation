@@ -73,4 +73,5 @@ Use `isToolIndex()` to check unknown adapter values, but treat that as a structu
 
 Rebuild or re-index when a tool name, description, parameters, embedding text, metadata, or implementation set changes. A stored match must name a tool present in the backing catalog; unmatched records are skipped at runtime.
 
-Next, improve [embedding text](/sdk/advanced/dynamic-tools/embedding-text).
+For domain entries behind one searchable tool, use [domain search](/sdk/advanced/dynamic-tools/domain-search).
+Otherwise, improve [embedding text](/sdk/advanced/dynamic-tools/embedding-text).

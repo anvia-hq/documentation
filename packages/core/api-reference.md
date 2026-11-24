@@ -198,13 +198,13 @@ const tool = createTool({
   requiresApproval: ({ orderId }) => ({
     reason: `Review access to ${orderId}.`,
   }),
-  async execute(input, context) {
+  async handler(input, context) {
     return orders.lookup(input.orderId, context)
   },
 })
 ```
 
-`inputSchema` always validates arguments before execution. `outputSchema` is optional; when present, it validates and types the handler result. `requiresApproval` accepts a boolean, `{ reason? }`, or a callback returning one of those values or `false`.
+`inputSchema` always validates arguments before execution. `outputSchema` is optional; when present, it validates and types the handler result. `requiresApproval` accepts a boolean, `{ reason? }`, or a callback returning one of those values or `false`. Use `handler`; the older `execute` spelling still works but is deprecated for the next major, and supplying both throws. Optional `examples: [{ input, note? }]` are validated at creation and appended to the model-facing description, costing prompt tokens on every turn.
 
 Create a semantic tool catalog with:
 
@@ -619,8 +619,13 @@ The subpath also exports `Redactor`, `RedactionOptions`, and `RedactionPattern`.
 non-mutating copies and provides `redactString()`, `redactObject()`, `redactMessages()`, and
 `patternNames()`. Custom `patterns` replace the defaults rather than extending them. Default patterns
 cover email addresses, validated payment cards, IPv4 addresses, standalone phone-number runs, JWTs,
-common API-key prefixes, and bearer tokens. Traversal marks circular references and values deeper
+common API-key prefixes, bearer tokens, complete and truncated PEM private keys, and context-labelled AWS
+secret access keys. An arbitrary bare 40-character string is not treated as an AWS secret: the pattern needs a
+`secret_access_key`-style label. This is pattern matching, not a guarantee that every secret is found. Traversal marks circular references and values deeper
 than 16 levels instead of exporting them unchanged.
+
+Provider adapters also validate a provider-executed tool's normalized shape with
+`assertProviderToolShape(tool)`, which throws on a definition the durable or streaming paths cannot persist.
 
 ## Observability
 
@@ -661,8 +666,18 @@ Import these APIs from `@anvia/core/evals`:
 | `evalExitCode(result, expectations?)` | Compute `0`, `1`, or `2` without changing process state. |
 | `runEvalCli(options)` | Run, print, and optionally raise the process exit code. |
 | `formatEvalResult(result, options?)` / `printEvalResult(result, options?)` | Format or write pretty/JSON/quiet output with optional truncation and redaction. |
-| `agentEvalTarget({ agent, request, interactions?, output? })` | Map inputs, resume with a bounded responder, select completed output. |
+| `agentEvalTarget({ agent, request?, interactions?, output? })` | Map inputs, resume with a bounded responder, select completed output. `request` is required only when a case input is not a string. |
 | `AgentEvalSuspensionError` | Missing responder or exhausted response limit; inspect `result`. |
+| `agentEvalTarget(agent)` | Short form for string-prompt cases; the adapter sends `{ prompt: input }`. |
+| `createJudgeMetrics({ model, ...defaults })` | Share one judge model and defaults across the judge metrics, with `model` optional per metric. |
+| `createMemoryEvalCache()` / `createFileEvalCache(path)` / `cachedEvalTarget(target, cache)` | Reuse target outputs; a hit reports `cached: true` and restores the recorded duration. |
+| `defaultEvalCacheKey(testCase, trial)` | The default cache key: case id, trial, and serialized input. |
+| `loadEvalCases(path, { format?, autoId?, schema? })` | Load cases from JSON, `{ cases }`, or JSONL/NDJSON with optional Zod validation. |
+| `saveEvalResult(path, result, options?)` / `loadEvalResult(path)` | Persist and reload a baseline snapshot. |
+| `compareEvalResults(baseline, candidate, options?)` | Classify regressions, improvements, added/removed cases, missing metrics, and metric deltas. |
+| `compareEvalTargets({ targets, baselineTarget?, ...suite })` | Run several targets over one case set and compare each with a baseline target. |
+| `assertEvalPassed(result, expectations?)` | Throw `EvalAssertionError` with per-metric or per-expectation details. |
+| `parseEvalCliArgs(argv)` | Parse CLI flags into suite overrides without running a suite. |
 
 See [expectations](/sdk/evaluations#assert-intentional-negative-cases) and the
 [offline interaction example](/sdk/evaluations#respond-to-agent-interactions-in-evaluations).
@@ -743,7 +758,7 @@ specified public subpath; a discriminator or formatter is not a complete validat
 | `evals` | `selectPromptOutput(args)` requires an output object with a string `output` field. |
 | `evals` | `resolveEvalTraceRef({ output?, input?, metadata? })` selects a trace from output, input, then metadata; `defaultEvalTraceSelector(args)` applies that order to a case. |
 | `evals` | `projectEvalOutcome(outcome, dataType, projectScore?)` maps outcomes/scores into reporter projections, with optional numeric/categorical fields and explanation. |
-| `evals` | `EvalTimeoutError.timeoutMs` identifies case timeout; suite cancellation rejects with its abort reason (`EvalAbortError` when no reason is available). `EvalFailFastError` has `caseId`/`outcome`; `EvalReporterDispatchError` has `phase`/aggregate `errors`. |
+| `evals` | `EvalTimeoutError.timeoutMs` identifies case timeout; suite cancellation rejects with its abort reason (`EvalAbortError` when no reason is available). `EvalFailFastError` has `caseId`, `outcome`, `caseResult`, and `partialResults`; `EvalReporterDispatchError` has `phase`/aggregate `errors`. |
 | `redaction` | `passesLuhn(digits)` checks a digit-string checksum only; it does not establish a valid card, issuer, ownership, or permission. |
 
 Low-level `runInputGuardrails`, `runOutputGuardrails`, `normalizeGuardrailPolicies`,

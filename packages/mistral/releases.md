@@ -1,19 +1,26 @@
 # Releases
 
-Reviewed source release: `1.2.0`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Reviewed source release: `1.3.1`. The entries below summarize the 1.0 line and preserve notable v0 history.
 
-## Changes through 1.2.0
+## Changes in 1.3.1
 
-Reviewed `1.1.5` → `1.2.0` against SDK source on 2026-11-04. `1.1.6` treats empty or whitespace-only tool-call argument strings as `{}` instead of failing, so zero-argument tool calls from OpenAI-compatible backends and Mistral succeed; malformed non-empty JSON arguments are still rejected. `1.2.0` refreshes upstream Anthropic, Mistral, and Langfuse dependencies and raises the `zod` peer range to `^4.6.7`.
+Reviewed `1.3.0` → `1.3.1` against SDK source on 2026-11-23. Split completion modules and moved shared helpers to the internal `@anvia/core/internal/provider` subpath.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/provider-mistral/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+## Changes in 1.3.0
+
+Reviewed `1.1.5` → `1.3.0` against SDK source on 2026-11-23. Aligns model IDs and controls, and treats blank tool-call arguments as `{}`.
+
+## Changes through 1.1.5
+
+Reviewed `1.1.4` → `1.1.5` against SDK source on 2026-10-15. Refreshed package READMEs with current overviews, quickstarts, and links to the detailed guides. Review the source changelog for any dependency changes included in your upgrade.
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/provider-mistral/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 
 | Version | Type | Summary |
 | --- | --- | --- |
-| `1.2.0` | Minor | Updated upstream Anthropic, Mistral, and Langfuse dependencies; the `zod` peer range is now `^4.6.7`. |
-| `1.1.6` | Patch | Treated empty or whitespace-only tool-call argument strings as `{}` instead of failing with `malformed-tool-arguments`. |
+| `1.3.1` | Patch | Split completion modules and moved shared helpers to the internal `@anvia/core/internal/provider` subpath. |
 | `1.1.4` | Patch | Updated upstream runtime and schema dependencies across the workspace. |
 | `1.1.3` | Patch | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
 | `1.1.2` | Patch | Updated the Core dependency to `1.1.2`. |

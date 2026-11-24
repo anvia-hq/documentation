@@ -169,6 +169,12 @@ retried with a truncated history. The handler's `maxBodyBytes` is the binding ce
 - Sanitize public errors and keep credentials and observability payloads server-side.
 - Test aborts, reconnects, duplicate interaction decisions, cross-tenant IDs, and proxy buffering.
 
+## Durable chat
+
+`createDurableChatTransport()` adapts durable runs to the chat transport contract. In React, `useDurableChat()`
+returns the chat plus the durable run identity, status, and controls (`steer`, `cancel`, `retry`,
+`resolveTool`, `resolveMemoryWrite`). `chat.stop()` detaches the stream; `run.cancel()` cancels execution.
+
 ## Canonical documentation
 
 - Client protocol: https://docs.anvia.dev/packages/client/

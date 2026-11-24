@@ -1,12 +1,16 @@
 # Releases
 
-The reviewed source release is `@anvia/server` **1.3.6**. The entries below preserve notable v0 transport milestones.
+The reviewed source release is `@anvia/server` **1.5.0**. The entries below preserve notable v0 transport milestones.
+
+## Changes in 1.5.0
+
+Reviewed `1.3.6` → `1.5.0` against SDK source on 2026-11-23. Accepts a store-only Durable client as the HTTP backend (task submission answers 503), serves memory-write reconciliation, per-field payload budgets, body-limit warnings, and `Retry-After` capacity hints.
 
 ## Changes through 1.3.6
 
 Reviewed `1.1.4` → `1.3.6` against SDK source on 2026-11-04. Added authorized durable run, graph, and task routes and operational controls, then multimodal prompts, goal agent authorization, `POST /runs/:id/steer`, and trace context from `trace(request, resource)`. Version 1.3.5 validated resumable cursors, bounded retained closed streams, and rejected reopening a running stream. Version 1.3.6 maps payload limits to HTTP 413 and capacity to 429 with `{ error, code, field? }`. See [Durable HTTP](/packages/durable/http) and [Streaming](/packages/server/streaming).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/server/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/server/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

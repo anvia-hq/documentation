@@ -6,10 +6,10 @@ agents: direct `agent.generate()` and `agent.stream()` remain available, and dur
 `runtime.submit()` and a `DurableRun` handle instead.
 
 ::: warning Experimental
-The package is experimental and its database records may change. It targets **one runtime owner per local
-SQLite database**, on one host, supervised by your own process manager. It is not a distributed worker
-service and is not presented as production-ready. See [Capabilities](/packages/durable/capabilities) for the
-exact scope.
+The package is experimental and its database records may change. A SQLite database has **one owner** on one
+host. Postgres, Drizzle, and Prisma databases support one owning runtime **or** several shared workers, never
+both at once. Durable is not presented as production-ready. See [Capabilities](/packages/durable/capabilities)
+for the exact scope.
 :::
 
 ## Install
@@ -19,14 +19,40 @@ pnpm add @anvia/durable @anvia/core zod
 ```
 
 Add a provider package such as `@anvia/openai` for the model. SQLite storage uses Node's built-in
-`node:sqlite`, so the package requires **Node.js 22.16 or newer**. Use the accompanying `@anvia/core`
-release: the durable package requires core's agent execution protocol version 4 and rejects an
-incompatible core release when agents are registered. `zod` is a peer dependency.
+`node:sqlite`, so that backend requires **Node.js 22.16 or newer**. Durable requires core's agent execution
+protocol version **5** and declares `@anvia/core` `>=1.19.1 <2`; older core versions are rejected when a
+runtime opens.
 
 To expose durable runs over HTTP, add `@anvia/server` (`@anvia/server/durable`) and `@anvia/client`
-(`@anvia/client/durable`). Use mutually compatible releases: the reviewed Client and Server manifests accept Durable through
-0.13. Steering requires Durable 0.8+, HTTP task agent binding requires 0.6+, and tracing requires
-0.11+ (0.12+ for an observability session override).
+(`@anvia/client/durable`). Reviewed Client 1.9.0 and Server 1.5.0 accept Durable `>=0.8.0 <1.0.0`. Steering
+requires Durable 0.8+, HTTP task agent binding requires 0.6+, and tracing requires 0.11+ (0.12+ for an
+observability session override). Remote memory-write reconciliation requires 0.14+; shared workers and the store-only client require 0.18+.
+
+## Storage and deployment roles
+
+| Store | Import | Ownership |
+| --- | --- | --- |
+| SQLite file | `@anvia/durable/sqlite` | One owning runtime. `readOnly: true` for observation only. |
+| Postgres | `@anvia/durable/postgres` | One owning runtime, or shared workers with per-run claims. |
+| Drizzle | `@anvia/durable/drizzle` | Same as Postgres; the schema is yours. |
+| Prisma | `@anvia/durable/prisma` | Same as Postgres; the models are yours. |
+| Custom | your module | Implement the async `DurableStore` contract. |
+
+Postgres accepts a `pg` pool or connection string; run with `schema: 'create'` once to create tables, or keep
+the default verification mode. Drizzle and Prisma use schemas you generate with `anvia-durable-drizzle` or
+`anvia-durable-prisma`, then verify them. `pg`, `drizzle-orm`, and `@prisma/client` are optional peers.
+
+A deployment separates four roles that can run in different processes:
+
+| Role | API | Lease | Executes |
+| --- | --- | --- | --- |
+| Owning runtime | `DurableRuntime.open()` | Exclusive owner | Its own queued work. |
+| Shared worker | `DurableRuntime.open({ worker })` or `DurableWorker.start()` | Per-run claims | Runs, graphs, tasks, and goals. |
+| Store-only client | `DurableClient.connect({ store })` | None | Nothing; submits and controls only. |
+| Observer | `DurableObserver.connect({ store })` | None, read-only | Nothing; reads status, snapshots, events, and results. |
+
+An owning runtime and shared workers exclude each other on the same database. SQLite stores support only the
+owning runtime and a read-only observer.
 
 ## What it provides
 
@@ -37,10 +63,11 @@ submit → queued request + event (atomic) → model/tool checkpoints → outcom
 
 | Capability | Summary |
 | --- | --- |
-| SQLite storage | WAL, full synchronous commits, atomic run state, operation results, and events. |
+| Storage backends | SQLite, Postgres, Drizzle, Prisma, or a custom async store. |
 | Deduplicated submissions | One run per `(sessionId, requestId)`; changed content under the same ID conflicts. |
 | Checkpoints | Normalized model responses and tool results are committed and reused on recovery. |
 | Restart recovery | `runtime.resume()` reschedules unfinished work; completed operations are never repeated. |
+| Shared workers | Postgres/Drizzle/Prisma workers claim runs and tasks with renewable leases and fencing. |
 | Approvals and questions | Core interactions persist across restarts and accept one response per interaction ID. |
 | Progress events | Committed, ordered events with cursors for reconnectable observation. |
 | Agent streaming | Opt-in persisted model deltas, grouped by unique attempt IDs. |
@@ -59,10 +86,13 @@ submit → queued request + event (atomic) → model/tool checkpoints → outcom
 
 | Import | Purpose |
 | --- | --- |
-| `@anvia/durable` | `DurableRuntime`, `defineTask`, `defineGoal`, run/task/graph handles, errors, and types. |
+| `@anvia/durable` | Runtime, worker, client, observer, handles, tasks, goals, errors, and types. |
 | `@anvia/durable/sqlite` | `SqliteDurableStore`. Kept separate so the root never imports `node:sqlite`. |
+| `@anvia/durable/postgres` | `PostgresDurableStore` over a `pg` pool or connection string. |
+| `@anvia/durable/drizzle` | `DrizzleDurableStore`, schema exports, and its generator. |
+| `@anvia/durable/prisma` | `PrismaDurableStore`, schema exports, and its generator. |
 | `@anvia/durable/protocol` | Browser-safe validators and types used by the HTTP client. |
-| `@anvia/durable/maintenance` | Offline `backupSqlite` and `restoreSqlite`. |
+| `@anvia/durable/maintenance` | Offline `backupSqlite` and `restoreSqlite` for SQLite. |
 
 ## Continue
 

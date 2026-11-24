@@ -12,7 +12,28 @@ By default, `embedTools()` and `createToolIndex()` embed three parts of each res
 
 Clear tool names, descriptions, and input schemas are therefore the first retrieval improvement.
 
-## 2. Add precise domain language
+## 2. Choose compact text
+
+`createToolIndex()` and `embedTools()` accept `embeddingText: 'compact'` to embed only the tool name and
+description, leaving parameters out. The default, `'default'`, embeds name, description, and JSON parameters.
+Compact mode suits large parameter schemas whose field names add noise, and cuts embedding cost; it can hurt
+recall for tools distinguished mainly by their inputs.
+
+```ts
+import { createToolIndex } from '@anvia/core/tool'
+
+const billingIndex = await createToolIndex({
+  model: embeddingModel,
+  tools: billingTools,
+  topK: 5,
+  embeddingText: 'compact',
+})
+```
+
+An explicit `content()` takes precedence over `embeddingText`. Whatever the mode, a change to the text,
+metadata, or tool set requires re-embedding.
+
+## 3. Add precise domain language
 
 ```ts
 import { createToolIndex } from '@anvia/core/tool';
@@ -34,7 +55,7 @@ const billingIndex = await createToolIndex({
 
 Useful additions include product terminology, common synonyms, and concrete user intents that genuinely match the operation.
 
-## 3. Describe one actionable capability
+## 4. Describe one actionable capability
 
 Weak text:
 
@@ -50,7 +71,7 @@ Request a refund for an eligible paid order after validating the amount and reas
 
 The stronger version identifies the action, target, and conditions. It is easier to distinguish from invoice lookup, credit creation, or dispute review.
 
-## 4. Keep eligibility in metadata
+## 5. Keep eligibility in metadata
 
 ```ts
 import { vectorFilter } from '@anvia/core/vector-store';
@@ -72,8 +93,8 @@ const billingIndex = await createToolIndex({
 
 Embedding text controls semantic relevance. Metadata filters control eligibility before exposure. The tool handler must still enforce the real authorization boundary at execution time.
 
-## 5. Evaluate positive and negative examples
+## 6. Evaluate positive and negative examples
 
 Test common wording, domain synonyms, ambiguous prompts, and unrelated requests. Tune `topK` and minScore using measured selection results rather than keyword stuffing.
 
-Next, combine [static and dynamic tools](/sdk/advanced/dynamic-tools/static-and-dynamic).
+Next, learn about [domain search](/sdk/advanced/dynamic-tools/domain-search) or combine [static and dynamic tools](/sdk/advanced/dynamic-tools/static-and-dynamic).

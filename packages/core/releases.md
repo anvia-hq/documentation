@@ -1,13 +1,21 @@
 # Releases
 
-The reviewed source release is `@anvia/core` **1.17.3**. The source changelog is authoritative; the
+The reviewed source release is `@anvia/core` **1.22.0**. The source changelog is authoritative; the
 entries below summarize recent v1 changes and preserve notable v0 compatibility milestones.
+
+## Changes in 1.22.0
+
+Reviewed `1.21.1` → `1.22.0` against SDK source on 2026-11-23. Adds the evaluation developer-experience release: case `passed` and `metricSummaries`, case tags, multi-trial runs (`trials`, `pass@k`, `minPassRate`), target caching (`createMemoryEvalCache`, `createFileEvalCache`, `cachedEvalTarget`), metric shorthands, `createJudgeMetrics`, agent trajectory and budget metrics, `runEvalCli` flag parsing with `--failed-only`, baseline comparison and dataset loading, and a bare-agent `agentEvalTarget(agent)` short form for string prompts.
+
+## Changes in 1.21.1
+
+Reviewed `1.17.3` → `1.21.1` against SDK source on 2026-11-23. Adds the context token breakdown, `searchTool()`, tool `examples`, compact embedding text, `handler` (deprecating `execute`), per-turn `toolConcurrency`, and PEM/AWS redaction patterns; aligns provider model IDs and durable protocol 5.
 
 ## Changes through 1.17.3
 
 Reviewed `1.9.0` → `1.17.3` against SDK source on 2026-11-04. Added OpenAI Decisions and typed refusal errors (1.10), active-loop compaction and broader credential redaction (1.11), summary temperature omission (1.11.1), question-tool defaults and input limits (1.12), durable steering protocol 4 (1.13), observer failure reporting (1.14), replay-aware durable tracing (1.14.1), Pipeline decision and route stages (1.15), richer vector metrics and filters (1.16), model-listing metadata (1.17.0 and 1.17.1), and bounded media estimates plus optional compaction temperature (1.17.3). See [Decisions](/sdk/decisions), [compaction](/sdk/memory/compaction), [observability](/sdk/observability), and [Pipeline decisions and routing](/sdk/pipelines/decisions-and-routing).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/core/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/core/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

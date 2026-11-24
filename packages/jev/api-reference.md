@@ -33,7 +33,8 @@ The constructor and factory require one options object. The model ID is explicit
 
 ```ts
 const JEV_LATEST = 'jev-latest'
-type KnownJevDecisionModelId = typeof JEV_LATEST
+const JEV_PREVIEW = 'jev-preview'
+type KnownJevDecisionModelId = typeof JEV_LATEST | typeof JEV_PREVIEW
 type JevDecisionModelId = ModelId<KnownJevDecisionModelId>
 ```
 

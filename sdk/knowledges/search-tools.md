@@ -2,6 +2,10 @@
 
 A search tool lets the model decide when to query a vector store. Use it when retrieval is optional, when the first query may need refinement, or when an agent has several specialized knowledge sources.
 
+Two APIs search different things: `createVectorSearchTool()` below queries a vector store, while
+`searchTool()` from `@anvia/core/tool` searches a set of plain domain entries. Use the latter for runbooks,
+policies, or commands whose text should reach the model; see [domain search](/sdk/advanced/dynamic-tools/domain-search).
+
 ## Create the tool
 
 ```ts

@@ -10,7 +10,10 @@ const sql = createPostgresMemorySchemaSql({
 })
 ```
 
-The SQL creates `pgcrypto`, session, message, and error tables plus the unique message-position index. Apply it with your migration system, review privileges, and call `store.validate()` at runtime.
+The SQL creates `pgcrypto`, session, message, error, and action-idempotency tables plus the unique
+message-position index. The ledger table defaults to `anvia_memory_idempotency_keys` (rename it with
+`tableNames.idempotencyKeys`); `append()` needs it when a caller supplies `idempotencyKey` or
+`expectedVersion`, and a missing table fails the write rather than silently dropping the guarantee. Apply it with your migration system, review privileges, and call `store.validate()` at runtime.
 
 The session table includes nullable JSONB `compaction_state`. It stores the latest summary checkpoint
 and canonical message boundary; compaction does not remove covered messages. The generated SQL uses

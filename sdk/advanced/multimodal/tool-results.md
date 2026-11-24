@@ -15,7 +15,7 @@ const renderChart = createTool({
   inputSchema: z.object({
     metricId: z.string(),
   }),
-  async execute({ metricId }) {
+  async handler({ metricId }) {
     const chart = await charts.render(metricId)
 
     return ToolOutput.content([

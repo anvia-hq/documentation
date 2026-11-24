@@ -27,8 +27,8 @@ const handleRequest = createDurableHandler({
 
 `authorize` is required for every operation, including reads and event subscriptions. It receives a
 `DurableAuthorization` resource with `action` (`list`, `submit`, `inspect`, `events`, `respond`,
-`steer`, `resolve-tool`, `retry`, `cancel`, `signal`, or `resolve-effect`), the owning `sessionId`, and where
-applicable `runId`, `agentId`, `graphId`, `taskId`, `rootTaskId`, and `taskName`. Existing-run authorization
+`steer`, `resolve-tool`, `resolve-memory-write`, `retry`, `cancel`, `signal`, or `resolve-effect`), the owning
+`sessionId`, and where applicable `runId`, `agentId`, `graphId`, `taskId`, `rootTaskId`, and `taskName`. Existing-run authorization
 uses the session stored in the database, never a client-supplied one. Owned agent runs map to their parent
 task's session. Graph children authorize against the graph's owning session, and graph-wide operations
 authorize every task. Listings require a `sessionId`. Your host supplies identity, CORS and CSRF policy, and
@@ -45,6 +45,7 @@ lifecycle. SSE authorization is checked at connection time (task tree events rea
 | POST | `/runs/:id/steer` | `{ input: { prompt } }` or `{ input: { messages }, requestId? }`; persisted receipt (202). |
 | POST | `/runs/:id/respond` | `{ interactionId, response }` (204). |
 | POST | `/runs/:id/resolve-tool` | `{ operationId, output }` (204). |
+| POST | `/runs/:id/resolve-memory-write` | `{ operationKey, resolution: 'applied' \| 'discarded' }` (204). |
 | POST | `/runs/:id/retry` | Explicit retry (204). |
 | POST | `/runs/:id/cancel` | Persist cancellation (204). |
 | POST | `/graphs` | Submit a graph and return its snapshot (202). |
@@ -62,22 +63,15 @@ lifecycle. SSE authorization is checked at connection time (task tree events rea
 | POST | `/tasks/:id/retry` | Resume a task needing attention. |
 | POST | `/tasks/:id/cancel` | Cancel the selected subtree. |
 
-JSON bodies default to a 64 KiB limit (`maxBodyBytes`). This is the binding ceiling for uploads: an
-encoded request body must fit before the runtime applies `limits.maxPayloadBytes`. The default body limit
-is far below the default payload limit, so raise `maxBodyBytes` for large images or documents.
+JSON bodies default to a 64 KiB limit (`maxBodyBytes`). `createDurableHandler` logs one advisory warning at
+creation when that limit is below the runtime's largest payload budget; the default 64 KiB body limit is below
+the default 1 MiB payload budget, so the warning appears for default setups. It never throws. The check is
+exported as `durableBodyLimitWarning` for tests and tooling.
 
-Errors map to 400 (validation), 403 (denied), 404, 409 (conflict), 413 (oversized body or payload), 415
-(media type), 429 (capacity), and 500 without internal diagnostics. Payload and capacity responses use
-`{ error, code, field? }`: `payload_too_large` is 413, `capacity_exceeded` is 429, and a body over
-`maxBodyBytes` is 413 with code `payload_too_large`, field `request.body`, and the configured `limit`.
-A run whose prompt, input, or inherited history exceeds `maxPayloadBytes` ends in terminal `failed`; it
-does not wait in `needs_attention`.
-
-Responses disable caching, and SSE frames use the durable event sequence as their `id`. The events route
-rejects an invalid `after` or `Last-Event-ID` cursor (not a nonnegative safe integer, or ahead of the stored
-cursor) with 400. A transport error closes the stream without cancelling execution. Task cancellation
-returns 409 without mutating the tree if children appeared during authorization; retry to authorize the
-new tree.
+Errors map to 400 (validation), 403 (denied), 404, 409 (conflict), 413 (oversized body or payload), 415 (media
+type), 429 (capacity) with `Retry-After: 1`, and 500 without internal diagnostics. Responses disable caching, and SSE frames use the durable event sequence as their `id`. A
+transport error closes the stream without cancelling execution. Task cancellation returns 409 without
+mutating the tree if children appeared during authorization; retry to authorize the new tree.
 
 Executable code is registered on the server. Clients only select registered names and versions and supply
 JSON, so allowlist the task definitions and agents each caller may use: granting submission or retry of a
@@ -115,22 +109,20 @@ for await (const event of client.stream(accepted.run.id, { after: snapshot.curso
 
 | Area | Methods |
 | --- | --- |
-| Runs | `submit`, `snapshot`, `listRuns`, `stream`, `steer`, `respond`, `resolveTool`, `retry`, `cancel` |
+| Runs | `submit`, `snapshot`, `listRuns`, `stream`, `steer`, `respond`, `resolveTool`, `resolveMemoryWrite`, `retry`, `cancel` |
 | Graphs | `submitGraph`, `graphSnapshot`, `listGraphs`, `streamGraph`, `cancelGraph` |
 | Tasks | `submitTask`, `taskSnapshot`, `taskGraph`, `listTasks`, `streamTask`, `signalTask`, `resolveEffect`, `retryTask`, `cancelTask` |
 
 Requests accept an `abortSignal`; aborting a stream detaches only that subscriber. The client validates
-incoming snapshots and events, rejects wrong-run, wrong-root, and out-of-order events, and parses SSE
-strictly. A failed response throws `DurableHttpError` with `status`, `code`, `field`, and the server
-message; empty, non-JSON, or oversized error bodies fall back to a status-based message. It never retries
-mutations automatically. On a connection failure, reconnect from a fresh snapshot or from the last event
-cursor your application applied. Durable progress events are not the token-delta chat protocol used by the
-standard client transport.
+incoming snapshots and events, rejects wrong-run, wrong-root, and out-of-order events, and throws
+`DurableHttpError` with the HTTP status, code, field, server message, and `retryAfterSeconds` (from an integer
+`Retry-After` header) on a failed response. It never retries mutations automatically. On a
+connection failure, reconnect from a fresh snapshot or from the last event cursor your application applied.
+Durable progress events are not the token-delta chat protocol used by the standard client transport.
 
-For `useChat` from `@anvia/react` and the `@anvia/react-ui` chat primitives, wrap the client with
-`createDurableChatTransport({ client, agentId, sessionId })` from `@anvia/client/durable-chat`. See
-[Durable chat transport](/packages/client/durable-chat) for event mapping, resume, interaction routing, and
-the `DurableBusyError` 409 behavior.
+The handler accepts a `DurableRuntime`, a shared worker runtime, or a store-only `DurableClient`. A client
+backend can serve runs, graphs, and task reads and controls, but submitting a task over HTTP answers 503
+because authorizing each declared agent needs the definitions.
 
 ## Steering, goals, and trace context
 

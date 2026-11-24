@@ -1,12 +1,16 @@
 # Releases
 
-The reviewed source release is `@anvia/client` **1.7.0**.
+The reviewed source release is `@anvia/client` **1.9.0**.
+
+## Changes in 1.9.0
+
+Reviewed `1.7.0` → `1.9.0` against SDK source on 2026-11-23. Adds durable run status, subscription, and steering to the chat controller; documents `resolveMemoryWrite`; maps settled status events from snapshots; supports per-field payload budgets, `Retry-After`, and small status events.
 
 ## Changes through 1.7.0
 
 Reviewed `1.2.0` → `1.7.0` against SDK source on 2026-11-04. Added durable discovery, queues, graphs, custom tasks, and operations support, followed by multimodal prompts and compatibility with compaction and goals. Queued steering is available through `DurableClient.steer()`; releases now accept Durable 0.8–0.13 for goal controls, continuing rounds, tracing, and the payload/agent-compatibility changes. HTTP submission types exclude server-owned trace context. Stream readers hardened malformed-frame handling and SSE parsing, the protocol gained `message_reset`, and `@anvia/client/durable-chat` added a `useChat` transport for durable runs. See [Durable HTTP](/packages/durable/http) and [Durable chat transport](/packages/client/durable-chat).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/client/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/client/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

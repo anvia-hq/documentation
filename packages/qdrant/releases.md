@@ -22,8 +22,12 @@ Notable releases include:
 
 See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-qdrant/CHANGELOG.md).
 
+## Changes in 1.2.1
+
+Reviewed `1.2.1` → `1.2.1` against SDK source on 2026-11-23. No source changes beyond dependency alignment in this review window.
+
 ## Changes through 1.1.4
 
 Reviewed `1.1.3` → `1.1.4` against SDK source on 2026-10-15. Refreshed package READMEs with current overviews, quickstarts, and links to the detailed guides. Review the source changelog for any dependency changes included in your upgrade.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/vector-qdrant/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/vector-qdrant/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.

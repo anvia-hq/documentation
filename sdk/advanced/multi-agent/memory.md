@@ -34,7 +34,7 @@ function createPolicyMemoryTool(input: {
             prompt: z.string().min(1),
         }),
         outputSchema: z.string(),
-        async execute({ prompt }) {
+        async handler({ prompt }) {
             const session = { sessionId: `policy:${input.user.tenantId}:${input.threadId}`, userId: input.user.id, metadata: { tenantId: input.user.tenantId } };
             const response = await policyAgent.generate({
                 prompt: prompt,

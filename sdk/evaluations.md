@@ -35,27 +35,67 @@ Case IDs identify stable scenarios. Required metric failures make the case fail;
 
 ## Evaluate an agent
 
-Use `agentEvalTarget({ agent, request })` to adapt an agent. Map the input with `request: ({ input }) => ({ prompt: input })`, then select `output.output` in metrics that inspect the agent's validated response. The adapter expects a completed response; blocked and suspended outcomes need a deliberate test or continuation strategy. See the complete [agent evaluation example](/examples/production/evaluations).
+`agentEvalTarget` adapts an agent in two forms. When every case input is a string, pass the agent directly and the adapter sends `{ prompt: input }`:
 
-Use `createEvalTypes<Input, Output, Expected>()` and `EvalOutcome.pass`, `.fail`, or `.invalid` for typed custom metrics. Cases must contain the expected or context fields implicitly required by their metrics; explicit value selectors can replace those requirements.
+```ts
+import { agentEvalTarget, contains } from '@anvia/core/evals'
+
+await runEvalSuite({
+  name: 'support',
+  cases: [{ id: 'window', input: 'How long are refunds?', expected: '30 days' }],
+  target: agentEvalTarget(agent),
+  metrics: [contains()],
+})
+```
+
+When you need to shape the run, pass an options object. `request` becomes required as soon as the case input is not a string:
+
+```ts
+const target = agentEvalTarget({
+  agent,
+  request: ({ input }) => ({ prompt: input }),
+  output: ({ response }) => response.output,
+})
+```
+
+Use `output` to select a completed response; without it the adapter returns the full `AgentResponse`. The adapter expects a completed response, and blocked and suspended outcomes need a deliberate test or continuation strategy. See the complete [agent evaluation example](/examples/production/evaluations).
+
+Use `createEvalTypes<Input, Output, Expected>()` and `EvalOutcome.pass`, `.fail`, or `.invalid` for typed custom metrics; the zero-argument `defineEvalSuite()` overload is deprecated in favor of it. Cases must contain the expected or context fields implicitly required by their metrics; explicit value selectors can replace those requirements.
 
 ## Choose metrics and judges
 
-Start with deterministic metrics such as `exactMatch`, `contains`, `matches`, `maxLength`, and `requiredFields`. `semanticSimilarity` calls an embedding model. `llmJudge`, `llmScore`, and task-specific judge metrics call a completion model and add evaluation usage, cost, and variance.
+Start with deterministic metrics such as `exactMatch`, `contains`, `matches`, `maxLength`, and `requiredFields`. Each one accepts a positional value, an options object, or nothing at all: with no expectation it reads `case.expected`, and the case type then requires that field.
+
+```ts
+metrics: [
+  contains('30 days'),
+  exactMatch({ caseSensitive: false, trim: true }),
+  requiredFields(['status']),
+  predicate('mentions_window', ({ output }) => ({ pass: String(output).includes('30 days') })),
+]
+```
+
+Agent trajectories have their own metrics: `toolCalled`, `toolNotCalled`, `toolCallOrder`, `maxTurns`, `maxTokens`, and `maxDurationMs`. `semanticSimilarity` calls an embedding model. `llmJudge`, `llmScore`, and task-specific judge metrics call a completion model and add evaluation usage, cost, and variance; `createJudgeMetrics({ model })` shares one judge model and defaults across all of them.
 
 Choose a metric for a defined product requirement. Pin dataset, prompt, model, and evaluator versions before comparing changes. Use approved or synthetic inputs and redact private data before external judges or reporters. See the [metric reference](/lens/evaluations/metrics) and [quality gates](/examples/production/quality-gates).
 
 ## Control execution and report results
 
-`targetConcurrency` and `metricConcurrency` bound those phases separately; `concurrency` is a shorthand for both. Targets receive an optional third argument with a case `signal`, and metrics receive `signal` in their context. Pass it to external calls.
+`targetConcurrency` and `metricConcurrency` bound those phases separately; `concurrency` is a shorthand for both. Targets receive an optional third argument with the case `signal` and the one-based `trial`, and metrics receive `signal` in their context. Pass them to external calls and to anything that must behave differently per sample.
 
-`caseTimeoutMs` covers the target and its metrics. A suite-level `signal` stops scheduling and rejects on abort with the original abort reason, including an explicit `null`. `failFast: true` rejects with `EvalFailFastError` after the first completed required failure or invalid case; it is distinct from pipeline batch behavior.
+`caseTimeoutMs` covers the target and its metrics, once per trial. A suite-level `signal` stops scheduling and rejects on abort with the original abort reason, including an explicit `null`. `failFast: true` rejects with `EvalFailFastError` after the first completed required failure or invalid case; the error carries the case ID, its outcome, that case's result, and the partial results, and it is distinct from pipeline batch behavior.
 
 Select cases with `caseIds`, `caseFilter`, or `shard: { index, count }`. `selectEvalCaseIds(previousResult)` selects failed and invalid cases for a rerun. `onProgress` receives case, target, metric, and completion events.
 
 Reporters receive run-start, per-metric, and run-end contexts. Their default `reporterErrorPolicy: 'collect'` records dispatch errors; `'throw'` fails the run. Inspect `reporterErrors` even when the suite resolves. `targetUsage` selects target usage, and `cost` configures cost accounting; keep target and evaluation usage distinct.
 
 Use `runEvalCli({ ...suite, exitCode: true })` without expectations for a CI exit code: `1` for required failures and `2` for required invalid judgments. `formatEvalResult()` formats results without printing. Both support truncation and redaction; unredacted JSON may contain inputs, outputs, metadata, and error details. Your CI owns thresholds and release decisions.
+
+## Read results, repeat, and gate
+
+- [Results](/sdk/evaluations/results) covers suite totals, `passed`, `metricSummaries`, per-case records, progress events, and formatting.
+- [Trials and caching](/sdk/evaluations/trials-and-caching) covers repeated sampling with `pass@k` and `minPassRate`, tag filters, and target caches.
+- [CLI and baselines](/sdk/evaluations/cli-and-baselines) covers `runEvalCli` flags and exit codes, stored baselines and regression comparison, comparing two targets, and loading cases from files.
 
 Continue with [observability](/sdk/observability) to correlate target runs with evaluation evidence.
 
@@ -139,7 +179,7 @@ const model: CompletionModel = {
 }
 const agent = new Agent({ id: 'eval-interactions', model, tools: [
   createTool({ name: 'record', description: 'Record a synthetic result',
-    inputSchema: z.object({}), requiresApproval: true, execute: () => 'recorded' }),
+    inputSchema: z.object({}), requiresApproval: true, handler: () => 'recorded' }),
   createQuestionTool({ name: 'ask', description: 'Ask the test operator' }),
 ] })
 const target = agentEvalTarget<string, string, string>({

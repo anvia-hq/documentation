@@ -39,7 +39,7 @@ Images are explicit and must be local. Choose them in application configuration,
 ## Build a custom image
 
 ```sh
-pnpm dlx @anvia/sandbox create-image \
+pnpm dlx --package=@anvia/sandbox anvia-sandbox create-image \
   --name reports \
   --runtime python \
   --feature artifacts

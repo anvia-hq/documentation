@@ -135,7 +135,8 @@ export default defineConfig({
                 { text: 'Save policies', link: '/sdk/memory/save-policies' },
                 { text: 'Compaction', link: '/sdk/memory/compaction' },
                 { text: 'Store adapters', link: '/sdk/memory/store-adapters' },
-                { text: 'Custom stores', link: '/sdk/memory/custom-stores' }
+                { text: 'Custom stores', link: '/sdk/memory/custom-stores' },
+                { text: 'Versioned writes', link: '/sdk/memory/versioned-writes' }
               ]
             },
             {
@@ -196,7 +197,16 @@ export default defineConfig({
               ]
             },
             { text: 'Guardrails', link: '/sdk/guardrails' },
-            { text: 'Evaluations', link: '/sdk/evaluations' },
+            {
+              text: 'Evaluations',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/sdk/evaluations' },
+                { text: 'Results', link: '/sdk/evaluations/results' },
+                { text: 'Trials and caching', link: '/sdk/evaluations/trials-and-caching' },
+                { text: 'CLI and baselines', link: '/sdk/evaluations/cli-and-baselines' }
+              ]
+            },
             { text: 'Observability', link: '/sdk/observability' },
             {
               text: 'Streaming',
@@ -318,6 +328,7 @@ export default defineConfig({
                 { text: 'Tool catalog', link: '/sdk/advanced/dynamic-tools/tool-sets' },
                 { text: 'Tool index', link: '/sdk/advanced/dynamic-tools/index' },
                 { text: 'Embedding text', link: '/sdk/advanced/dynamic-tools/embedding-text' },
+                { text: 'Domain search', link: '/sdk/advanced/dynamic-tools/domain-search' },
                 { text: 'Static and dynamic', link: '/sdk/advanced/dynamic-tools/static-and-dynamic' },
                 { text: 'Safety', link: '/sdk/advanced/dynamic-tools/safety' },
                 { text: 'Checklist', link: '/sdk/advanced/dynamic-tools/checklist' }
@@ -414,6 +425,7 @@ export default defineConfig({
                 { text: 'Setup', link: '/sdk/providers/anthropic/setup' },
                 { text: 'Capabilities', link: '/sdk/providers/anthropic/capabilities' },
                 { text: 'Model options', link: '/sdk/providers/anthropic/model-options' },
+                { text: 'Prompt caching', link: '/sdk/providers/anthropic/prompt-caching' },
                 { text: 'Vertex AI', link: '/sdk/providers/anthropic/vertex-ai' },
                 { text: 'Production', link: '/sdk/providers/anthropic/production' }
               ]
@@ -770,7 +782,10 @@ export default defineConfig({
                     { text: 'Does not match', link: '/lens/evaluations/metrics/does-not-match' },
                     { text: 'Max length', link: '/lens/evaluations/metrics/max-length' },
                     { text: 'Required fields', link: '/lens/evaluations/metrics/required-fields' },
-                    { text: 'JSON correctness', link: '/lens/evaluations/metrics/json-correctness' }
+                    { text: 'JSON correctness', link: '/lens/evaluations/metrics/json-correctness' },
+                    { text: 'Schema match', link: '/lens/evaluations/metrics/schema-match' },
+                    { text: 'Not blank', link: '/lens/evaluations/metrics/not-blank' },
+                    { text: 'Predicate', link: '/lens/evaluations/metrics/predicate' }
                   ]
                 },
                 {
@@ -803,6 +818,13 @@ export default defineConfig({
                     { text: 'Knowledge retention', link: '/lens/evaluations/metrics/knowledge-retention' }
                   ]
                 },
+                {
+                  text: 'Agent trajectories',
+                  collapsed: true,
+                  items: [
+                    { text: 'Tool and budget metrics', link: '/lens/evaluations/metrics/agent-metrics' }
+                  ]
+                }
               ]
             },
             { text: 'Run evaluations', link: '/lens/evaluations/run-evaluations' },
@@ -969,6 +991,7 @@ export default defineConfig({
                 { text: 'Get started', link: '/packages/react/get-started' },
                 { text: 'Capabilities', link: '/packages/react/capabilities' },
                 { text: 'State and streaming', link: '/packages/react/state-and-streaming' },
+                { text: 'Durable chat', link: '/packages/react/durable-chat' },
                 { text: 'API', link: '/packages/react/api-reference' },
                 { text: 'Releases', link: '/packages/react/releases' }
               ]
