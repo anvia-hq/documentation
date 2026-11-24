@@ -4,7 +4,11 @@ Anvia Channels is a set of platform adapters that connect Discord, Slack, and Te
 
 Channels are a separate workspace from the [Anvia SDK](/sdk/). The SDK owns the model and agent runtime; Channels own platform input and delivery. Your application keeps owning credentials, persistence, and deployment.
 
-The five libraries are currently private workspace packages while live-platform verification completes. They are not published to npm yet; the package names below are the intended installation names.
+The five libraries are published on npm and require Node.js 24 or later. Install the channel contract and the adapters your application uses:
+
+```sh
+pnpm add @anvia/channel @anvia/channel-agent @anvia/discord @anvia/slack @anvia/telegram
+```
 
 ## Packages
 
