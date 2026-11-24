@@ -116,4 +116,4 @@ Agent streams can also include reasoning deltas, tool calls, tool results, turn 
 
 ## Next
 
-Continue with [Core concepts](/guide/core-concepts) to understand the runtime pieces, then [Build applications](/use-cases/build-applications) when you are ready to expose the agent from a server.
+Continue with [Core concepts](/guide/core-concepts) to understand the runtime pieces, then [Agent API and interfaces](/features/agent-api) when you are ready to expose the agent from a server.

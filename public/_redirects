@@ -1,3 +1,6 @@
 /v1-rc / 301
 /v1-rc/ / 301
 /v1-rc/* /:splat 301
+/use-cases/build-applications /features/agent-api 301
+/use-cases/observe-systems /features/observability 301
+/use-cases/production /features/security 301
