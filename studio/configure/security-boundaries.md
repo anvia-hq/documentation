@@ -18,26 +18,21 @@ new Studio([supportAgent]).start({
 
 Studio does not provide built-in user authentication, authorization, or TLS. If remote access is unavoidable, place the entire Studio origin behind trusted network controls, TLS, and authentication—not just the HTML page.
 
-## Host and Origin validation
+## Host and Origin checks
 
-Studio rejects a request with `403` and `error.code: "forbidden"` when its `Host` header is not a
-loopback hostname or an explicitly trusted hostname. It applies the same check to `Origin`, ignoring
-ports. Loopback names are always accepted, and an explicit non-wildcard `hostname` passed to
-`start()` or `serve()` is trusted automatically.
+Studio checks the `Host` and `Origin` headers before it routes a request. By default it trusts `localhost`, `127.0.0.1`, and `::1`. A request with another `Host`, or with an `Origin` that is present and not trusted, receives HTTP `403` with the `forbidden` error code. This blocks DNS rebinding and cross-origin pages from reaching state-changing routes. An explicit non-wildcard `hostname` is trusted automatically.
 
-Binding to `0.0.0.0` or `::` does not trust public names by itself. List every client-facing
-hostname in `allowedHosts`:
+For a wildcard bind such as `0.0.0.0`, list the client-facing hostnames in `allowedHosts`. List hostnames without schemes or ports. The same list applies to Origin hostnames, and ports are ignored:
 
 ```ts
-await new Studio([agent]).serve({
+await new Studio([supportAgent]).serve({
   hostname: '0.0.0.0',
   port: 4021,
   allowedHosts: ['studio.lan'],
 })
 ```
 
-This blocks DNS-rebinding and cross-origin page attacks on state-changing routes. It is not user
-authentication and does not replace a trusted network boundary.
+This check supplements authentication. It does not replace the network controls and TLS described above.
 
 ## `protectShell` is not authentication
 

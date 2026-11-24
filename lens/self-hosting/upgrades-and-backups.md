@@ -63,7 +63,7 @@ Before upgrading:
 4. Create and verify a recovery point.
 5. Avoid concurrent retention changes, project deletion, or cost recalculation.
 
-Download the target release’s Compose/environment templates and review their configuration diff without overwriting populated secrets. Set the target `LENS_VERSION` and add new required settings. When upgrading to releases with alert encryption, set `LENS_ALERT_SECRET_KEY` before migration; the migration automatically encrypts existing plaintext channel rows.
+Download the target release’s Compose/environment templates and review their configuration diff without overwriting populated secrets. Changing only `LENS_VERSION` selects new images but keeps the old Compose healthchecks and settings; adopt the release’s Compose file when it changes startup behavior. Set the target `LENS_VERSION` and add new required settings. When upgrading to releases with alert encryption, set `LENS_ALERT_SECRET_KEY` before migration; the migration automatically encrypts existing plaintext channel rows.
 
 When upgrading from stable-ID materialization workers, pause producers, drain **ingestion and materialization**, and replace every worker together. Mixed worker versions do not provide current follow-up convergence. Review queue/schema compatibility and the upstream [upgrade/recovery rehearsal](https://github.com/anvia-hq/lens/blob/b06101f36392d4b1bab5a1b69a53d29e67fc22f5/docs/release-verification.md); exhausted failures require operational replay, not just waiting.
 
@@ -77,7 +77,7 @@ docker compose up -d
 docker compose ps
 ```
 
-The new `migrate` container waits for PostgreSQL and ClickHouse, applies unapplied migrations, and must exit successfully before the API or worker starts.
+The new `migrate` container waits for PostgreSQL and ClickHouse, applies unapplied migrations, and must exit successfully before the API or worker starts. Transient failures while connecting to PostgreSQL, acquiring its migration lock, or creating ClickHouse’s migration table are retried with bounded backoff; individual migration statements, authentication, configuration, and SQL errors are not masked by those retries.
 
 ## Rotate alert-channel encryption
 

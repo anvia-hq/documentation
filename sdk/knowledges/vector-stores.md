@@ -67,6 +67,8 @@ to identify an invalid cursor without matching its message; `parseVectorInspectC
 same parser. Qdrant uses its own opaque cursor format, so treat every adapter's cursor as an opaque
 value rather than parsing or constructing it.
 
+The in-memory store accepts only a canonical nonnegative safe integer string as `cursor`. Signs, fractions, exponents, whitespace, and leading zeroes are rejected. Invalid cursors throw a `RangeError` subclass. Check for them with `VectorInspectCursorError.isCursorError(error)`, which is exported from `@anvia/core/vector-store`. Pass each returned `nextCursor` back unchanged.
+
 ## 2. Search the store
 
 ```ts

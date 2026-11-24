@@ -61,7 +61,9 @@ Back up and restore them as one recovery set. Restoring only PostgreSQL can reco
 
 ## Startup and migrations
 
-The migration container waits for PostgreSQL and ClickHouse health checks. It applies Drizzle migrations to PostgreSQL, then applies unapplied ordered SQL migrations to ClickHouse and records them in `schema_migrations`.
+The migration container waits for PostgreSQL and ClickHouse health checks. The production Compose healthchecks verify the network service itself—PostgreSQL over TCP and ClickHouse with an HTTP ping plus a query against the Lens database—instead of accepting a startup socket that is not ready to serve migrations.
+
+The migration runner applies Drizzle migrations to PostgreSQL, then applies unapplied ordered SQL migrations to ClickHouse and records them in `schema_migrations`. It retries a bounded set of transient startup operations: connecting to PostgreSQL and acquiring its migration advisory lock, and creating the ClickHouse `schema_migrations` table. These retries do not wrap every migration statement, and authentication, configuration, or SQL errors fail immediately.
 
 The API and worker do not start until the migration container completes successfully. This prevents a new application image from serving against a known outdated schema.
 
