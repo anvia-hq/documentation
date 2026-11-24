@@ -85,6 +85,8 @@ Keep `quality-gate.json` as a CI artifact. It explains which rule blocked a rele
 | `400 incomplete_runs` | Candidate or baseline is not completed. |
 | `400 incompatible_runs` | The runs do not share a suite and environment. |
 | `400 incompatible_gate` | The gate scope does not match the candidate's suite and environment. |
+| `429` | Public API rate limit; honor `Retry-After: 60`. |
+| `503` | Rate limiter unavailable; honor `Retry-After: 5` and restore infrastructure. |
 | `200 fail` | Evidence was sufficient and at least one rule failed. |
 | `200 insufficient_data` | A required case, metric, score, or trace value was unavailable. |
 
@@ -97,6 +99,6 @@ Each public check also records project-key usage and can drive a failed-quality-
 The endpoint evaluates the saved per-rule `evidence` settings using the same evaluator as Compare.
 The response includes them under `gate.rules` and `rules[].rule`. Missing valid cases or exceeded
 invalid/unknown budgets produces `insufficient_data`, even if the displayed pass rate is high.
-Accept only `verdict: "pass"`; HTTP 200 means evaluation succeeded, not that approval was granted.
+Keep the evaluation reporter’s default `publishInvalid: true` and verify expected/received coverage. The gate cannot budget results the producer suppressed or failed to export. Accept only `verdict: "pass"`; HTTP 200 means evaluation succeeded, not that approval was granted.
 Existing rules without evidence retain legacy behavior until explicitly upgraded. See
 [Require valid evidence](/lens/evaluations/quality-gates/configure#require-valid-evidence-per-metric).

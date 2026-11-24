@@ -38,7 +38,7 @@ const result = await runEvalSuite({
   ],
 })
 
-console.log(result.results[0]?.scores)
+console.log(result.results[0]?.scores.faithfulness)
 ```
 
 ## Read the result

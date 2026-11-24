@@ -13,7 +13,10 @@ Workspace membership controls who can sign in and which management actions they 
 | Change a non-owner role | Yes | Yes | No |
 | Remove another non-owner member | Yes | Yes | No |
 | Manage project ingestion keys | Yes | Yes | No |
-| Change retention or delete a project | Yes | Yes | No |
+| Change retention or delete telemetry/project data | Yes | Yes | No |
+| View model pricing and recalculation history | Yes | Yes | Yes |
+| Manage prices or recalculate historical costs | Yes | Yes | No |
+| Manage MCP tokens and inspect System Health | Yes | Yes | No |
 | Change or remove the owner | No | No | No |
 
 The first account created during workspace bootstrap is the owner. Admins can perform normal workspace and project administration, but they do not replace the protected owner.
@@ -30,7 +33,7 @@ Choose `Member` for people who investigate telemetry and evaluation results. Cho
 
 The recipient opens the invitation link, creates their account, and joins with the role selected by the inviter. The invited email is fixed.
 
-If the invitation has expired or was cancelled, create a new one. Invitations cannot attach a new membership to an email that already has a Lens account in the current onboarding flow.
+If the invitation has expired or was cancelled, create a new one. Password invitation claiming cannot attach an existing account. With [OIDC](/lens/workspace/oidc), an existing account linked to the configured provider and having no workspace membership can be invited again; signing in through that provider restores membership and consumes the invitation.
 
 ## Change a role
 
@@ -42,14 +45,14 @@ The owner's role is fixed and cannot be changed.
 
 ## Remove a member
 
-Select the remove action for a non-owner account and confirm. The person immediately loses access to the workspace and all of its projects.
+Select the remove action for a non-owner account and confirm. Subsequent membership-guarded browser and API requests fail, even if an old browser session remains.
 
 Two protections apply:
 
 - the owner cannot be removed;
 - the current user cannot remove themselves.
 
-Removal does not delete telemetry that the person's applications previously sent. If that person also had access to deployed ingestion secrets, rotate the affected keys separately; see [Ingestion keys](/lens/workspace/project-settings/ingestion-keys).
+Removal does not delete previously sent telemetry or revoke independently issued credentials. Complete offboarding by revoking [MCP tokens](/lens/workspace/mcp-access) the person could access and rotating exposed [project keys](/lens/workspace/project-settings/ingestion-keys). MCP authorization is tied to the token’s workspace, not its creator’s current membership. If OIDC auto-provisioning is enabled, also remove the person’s eligibility at the identity provider or change provisioning policy; a qualifying account can otherwise join again.
 
 ## Review access regularly
 

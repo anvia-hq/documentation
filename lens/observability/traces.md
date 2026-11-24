@@ -13,7 +13,7 @@ Use traces when an overview tells you **what changed** and you need to find **wh
 5. Record a human review when the output is clearly acceptable or unacceptable.
 6. Promote a failed review into a managed dataset draft when it should become a regression case.
 
-The trace explorer keeps its search, filters, sort, columns, and page in the URL. Share or bookmark that URL when another workspace member needs to examine the same population.
+The trace explorer keeps its search, filters, sort, columns, and page in the URL. Share it to preserve the query configuration, not a frozen population. Relative ranges such as 24h roll forward on later requests or reloads. Include incident timestamps and specific trace IDs for reproducible handoffs.
 
 ## Choose the next view
 

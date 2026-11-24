@@ -2,7 +2,7 @@
 
 `@anvia/lens` can retrieve versioned prompts from a Lens workspace, compile them with variables, and attribute agent runs to the exact prompt version they used.
 
-Availability: the prompt SDK is merged on anvia@main but not yet released — `@anvia/lens` 1.1.3 does not include it. Verify your installed version.
+Prompt APIs are present in the reviewed SDK source (`@anvia/lens` 1.2.4) and were verified in the published 1.2.5 package on 2026-11-23. See [package compatibility](/packages/compatibility-and-versioning) before changing your SDK baseline. Create and deploy templates through [Prompt management](/lens/prompts).
 
 ## Fetch a prompt
 

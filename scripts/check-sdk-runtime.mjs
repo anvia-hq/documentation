@@ -58,7 +58,7 @@ async function blocks(path) {
 }
 
 async function sourceEntry(specifier) {
-  if (specifier.startsWith('node:')) return specifier
+  if (specifier.startsWith('node:') || specifier.startsWith('file:')) return specifier
   if (!specifier.startsWith('@anvia/')) return pathToFileURL(coreRequire.resolve(specifier)).href
   const packageName = specifier.split('/').slice(0, 2).join('/')
   const directories = {
@@ -67,6 +67,7 @@ async function sourceEntry(specifier) {
     '@anvia/client': 'client',
     '@anvia/graph': 'graph',
     '@anvia/durable': 'durable',
+    '@anvia/lens': 'observability-lens',
   }
   const directory = directories[packageName]
   assert.ok(directory, `Add a source resolver for ${packageName}`)
@@ -113,7 +114,7 @@ async function runExample(code, fixtures = '', assertions = '') {
         assertions,
       ].join('\n'),
     )
-    await import(pathToFileURL(path).href)
+    return await import(pathToFileURL(path).href)
   } finally {
     await rm(directory, { recursive: true, force: true })
   }
@@ -949,4 +950,14 @@ test('vector filters combine n-ary operators and metric scoring', async () => {
     assert.deepEqual(results.map(({ id }) => id), ['invoice', 'accounts'])
     assert.ok(results[0].score >= results[1].score)
   `)
+})
+
+
+test('Lens examples preserve tracing, dataset, and prompt contracts', async (t) => {
+  const { verifyLensContracts } = await import('./lens-runtime-contracts.mjs')
+  await verifyLensContracts({ test: t.test.bind(t), blocks, runExample, sourceEntry,
+    OpenAIClient, fakeModel, textResponse, capabilities,
+    transpile: code => ts.transpileModule(code, {
+      compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
+    }).outputText })
 })

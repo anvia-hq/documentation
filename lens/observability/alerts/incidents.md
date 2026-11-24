@@ -65,6 +65,6 @@ The incident detail page makes this distinction explicit: missing telemetry does
 
 ## Current delivery behavior
 
-Lens does not currently send incident notifications outside the product. The sidebar's active count refreshes periodically, and an open incident detail refreshes periodically while you view it. Keep Lens open during active investigation; use an external monitoring and paging system for on-call delivery.
+Selected [notification channels](/lens/observability/alerts/channels) receive incident-opening notifications. The **Deliveries** card reports `pending`, `delivered`, or `failed` work, attempt counts, and errors; an incident can exist even if delivery fails. Acknowledging or resolving it is not an outbound lifecycle notification. The sidebar and active incident details refresh periodically; terminal records do not poll indefinitely.
 
 To tune what creates these records, return to [Alert rules](/lens/observability/alerts/rules).

@@ -14,11 +14,13 @@ try {
   const agent = createAgent({ observability: { observers: { tracing } } })
   const result = await agent.generate({ prompt: 'Run the smoke test.' })
   await lens.flush()
-  console.log(result.status)
+  console.log(result.type)
 } finally {
   await lens.close()
 }
 ```
+
+`createAgent` in this fragment is an application-owned factory returning an Anvia Agent with a configured model; it must pass the supplied observability configuration through to the constructor.
 
 `flush()` waits for current trace and log batches while leaving the client usable. `close()` shuts down the client's isolated providers and is idempotent. New observer operations after close fail.
 

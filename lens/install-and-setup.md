@@ -11,14 +11,14 @@ Download the production Compose file and environment template into a dedicated d
 ```sh
 mkdir lens
 cd lens
-curl -fsSLO https://raw.githubusercontent.com/anvia-hq/lens/main/docker-compose.yml
-curl -fsSL https://raw.githubusercontent.com/anvia-hq/lens/main/.env.example -o .env
+curl -fsSLO https://raw.githubusercontent.com/anvia-hq/lens/v0.20.0/docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/anvia-hq/lens/v0.20.0/.env.example -o .env
 ```
 
 For local use, set the public origin and generate a different value for every secret:
 
 ```dotenv
-LENS_VERSION=0.4.1
+LENS_VERSION=0.20.0
 PUBLIC_APP_URL=http://localhost
 WEB_ORIGIN=http://localhost
 WEB_PORT=80
@@ -28,9 +28,10 @@ CLICKHOUSE_PASSWORD=replace-with-a-random-value
 REDIS_PASSWORD=replace-with-a-random-value
 BETTER_AUTH_SECRET=replace-with-at-least-32-random-characters
 INGESTION_KEY_PEPPER=replace-with-an-independent-random-value
+LENS_ALERT_SECRET_KEY=replace-with-key-id-and-base64-of-32-random-bytes
 ```
 
-Generate suitable values with `openssl rand -hex 32`. Keep `INGESTION_KEY_PEPPER` independent from the database and authentication secrets.
+Generate the database, authentication, and pepper values independently with `openssl rand -hex 32`. Generate the alert encryption key separately with `printf 'lens-key-1:%s\n' "$(openssl rand -base64 32)"` and paste the output into `LENS_ALERT_SECRET_KEY`. It requires an explicit key ID and 32-byte key; leaving the template placeholder prevents migration. See [secret rotation](/lens/self-hosting/upgrades-and-backups#rotate-alert-channel-encryption).
 
 Start the services:
 
@@ -41,7 +42,7 @@ docker compose ps
 
 Open `http://localhost`. The first person to create an account becomes the workspace owner; public account creation closes after that owner exists.
 
-Lens exposes only its web entry point in the production Compose stack. PostgreSQL, ClickHouse, Redis, the API, and the worker remain on its private network.
+Lens exposes only its web entry point in the production Compose stack. PostgreSQL, ClickHouse, Redis, the API, worker, and host monitor remain private. See [Architecture](/lens/self-hosting/architecture) for the monitor’s read-only host mounts.
 
 ## Create a project
 
@@ -54,7 +55,7 @@ After creating the workspace owner:
 3. Create an ingestion key such as `Local development`.
 4. Copy both the public and secret keys immediately.
 
-The public key identifies the project. The secret key authenticates writes and is shown only once. Keep both in the server environment, never in browser code.
+The public key identifies the project. The secret key authenticates ingestion and supported project public APIs, including dataset and prompt reads and quality-gate checks, and is shown only once. Keep both in the server environment, never in browser code.
 
 ## Install the application integration
 
@@ -93,7 +94,7 @@ docker compose ps
 docker compose logs --tail=100 migrate api worker web
 ```
 
-The `migrate` service should exit with code `0`; the database, queue, API, worker, and web services should become healthy.
+The `migrate` service should exit with code `0`; the databases, Redis, API, and web services should become healthy. The worker has no Compose healthcheck: confirm it is running, then use owner/admin [System Health](/lens/self-hosting/system-health) to verify its heartbeat and queue processing.
 
 At this point the workspace is ready to receive telemetry. Continue with [Your first trace](/lens/your-first-trace).
 

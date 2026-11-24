@@ -58,7 +58,7 @@ const result = await runEvalSuite({
   ],
 })
 
-console.log(result.results[0]?.scores)
+console.log(result.results[0]?.scores['refund-window-present'], result.results[0]?.scores['not-blank'])
 ```
 
 Replace the fixed `target` with your agent or function. Both checks pass for this output. They do not establish that every claim is correct: an answer saying “Refunds are available for 30 days, plus an unlimited bonus” could also pass. If invented policy details are a real risk, add a grounding check with supporting context or a focused judge rubric.

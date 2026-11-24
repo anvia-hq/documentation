@@ -43,18 +43,25 @@ Publishing records the publication time and makes the version available through 
 
 ## Pin versions for reproducibility
 
-This fetches a fixed version:
+This complete helper fetches a fixed version from your application-owned Lens client:
 
-```ts
-const dataset = await datasetClient.getDataset('support-policy-cases', {
-  version: 'v2',
-})
+```ts anvia-check lens-dataset-version-example
+import type { LensClient } from '@anvia/lens'
+
+export async function loadPolicyDataset(lens: LensClient) {
+  return lens.datasetClient().getDataset<string, string>({
+    name: 'support-policy-cases',
+    version: 'v2',
+  })
+}
 ```
 
-This fetches the latest published version:
+To fetch the latest published version instead, omit `version`:
 
 ```ts
-const dataset = await datasetClient.getDataset('support-policy-cases')
+const dataset = await lens.datasetClient().getDataset<string, string>({
+  name: 'support-policy-cases',
+})
 ```
 
 Latest is convenient during interactive development. A pinned version is safer for a baseline, a release comparison, and CI. Always record the returned `dataset.name` and `dataset.version` in the evaluation run, even when the requested version was implicit.

@@ -1,6 +1,6 @@
 # Ingestion keys
 
-An ingestion key pair lets a server send telemetry to one Lens project. It is not a Lens user account and does not grant browser access to project data.
+An ingestion key pair lets a server send telemetry to one Lens project. The same pair also authenticates published [dataset reads](/lens/evaluations/datasets/managed), [prompt retrieval](/lens/connect/anvia/versioned-prompts), and [quality-gate checks](/lens/evaluations/quality-gates/ci). It is not a Lens user account and does not grant browser access or general trace-query access.
 
 Key management requires the `owner` or `admin` workspace role.
 
@@ -15,7 +15,7 @@ ANVIA_LENS_PUBLIC_KEY=pk-lens-...
 ANVIA_LENS_SECRET_KEY=sk-lens-...
 ```
 
-The public key identifies the project. The secret authenticates ingestion. Copy both before closing the reveal panel: the secret is returned only when the key is created and Lens stores a keyed hash rather than a recoverable copy.
+The public key identifies the project. The secret authenticates ingestion and those supported project public APIs. Copy both before closing the reveal panel: the secret is returned only when the key is created and Lens stores a keyed hash rather than a recoverable copy.
 
 Keep the secret in a server-side secret manager. Do not place it in browser code, commit it to source control, print it in build logs, or include it in screenshots.
 
@@ -41,7 +41,7 @@ Use names that reveal where a credential is installed:
 - `Staging worker`
 - `Local development — Indra`
 
-Avoid one shared key across unrelated services. Separate keys allow one deployment to be revoked without interrupting the others and make the **Last used** value useful during investigation.
+Avoid one shared key across unrelated services. Separate keys allow one deployment to be revoked without interrupting the others and make the **Last used** value useful during investigation. This timestamp can reflect dataset/prompt/gate API use as well as telemetry delivery.
 
 ## Rotate without interruption
 
@@ -57,7 +57,7 @@ Do not revoke first unless ingestion must stop immediately. Revocation takes eff
 
 ## Revoke a key
 
-Select the revoke action beside the active key and confirm. Existing telemetry remains in the project, but new writes using that pair are rejected.
+Select the revoke action beside the active key and confirm. Existing telemetry remains in the project, but ingestion and supported public API requests using that pair are rejected.
 
 Revoked keys disappear from the active-key list in the current interface. Create a new key if access is needed again; a revoked pair cannot be reactivated.
 

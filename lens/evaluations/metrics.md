@@ -4,6 +4,8 @@ Choose the behavior you need to check, then open the metric’s page. Each page 
 
 All 22 metrics are exported from `@anvia/core/evals` and run inside `runEvalSuite()`.
 
+Each case result exposes `scores`, a map keyed by metric export name. Read `scores.<metricName>` for that metric’s `outcome` (`pass`, `fail`, or `invalid`), `score`, and `comment`; the boolean or number a page calls "the score" is `scores.<metricName>.score`.
+
 ## Where to start
 
 - **A fixed value or phrase:** start with [exactMatch](/lens/evaluations/metrics/exact-match) or [contains](/lens/evaluations/metrics/contains).

@@ -1,16 +1,16 @@
 # Connect existing Langfuse instrumentation
 
-You do not need to replace existing `@langfuse/tracing` observations to send them to Lens. Retarget the v5 OpenTelemetry exporter, keep one processor for the application, and verify the first trace before changing capture policy.
+You do not need to replace existing `@langfuse/tracing` observations to send them to Lens. Retarget the 6.0.2 OpenTelemetry exporter, keep one processor for the application, and verify the first trace before changing capture policy.
 
-## Install the v5 packages
+## Install the 6.0.2 packages
 
-If the application is not already on the v5 OpenTelemetry integration, install the packages used by the supported path:
+If the application is not already on the 6.0.2 OpenTelemetry integration, install the packages used by the supported path:
 
 ```sh
-pnpm add @langfuse/otel @langfuse/tracing @opentelemetry/sdk-node
+pnpm add --save-prefix= @langfuse/otel@6.0.2 @langfuse/tracing@6.0.2 @opentelemetry/sdk-node@0.300.0
 ```
 
-Lens’s compatibility contract is tested against the v5 package generation. Older Langfuse SDKs that send data through a different ingestion API are not covered by this integration.
+Lens’s compatibility contract is tested against the 6.0.2 package generation. Older Langfuse SDKs that send data through a different ingestion API are not covered by this integration.
 
 ## Create an ingestion key
 
@@ -74,7 +74,7 @@ If the application already registers other processors or instrumentations, retai
 
 ## Keep existing observations
 
-Existing v5 observations can remain unchanged:
+Existing 6.0.2 observations can remain unchanged:
 
 ```ts
 import { startObservation } from '@langfuse/tracing'
@@ -92,7 +92,7 @@ try {
 }
 ```
 
-For generation observations, Lens recognizes the v5 attributes emitted for `input`, `output`, `model`, `usageDetails`, and cost details. Values appear only when the instrumentation exports them; Lens does not reconstruct missing model payloads or token counts.
+For generation observations, Lens recognizes the 6.0.2 attributes emitted for `input`, `output`, `model`, `usageDetails`, and cost details. Values appear only when the instrumentation exports them; Lens does not reconstruct missing model payloads or token counts.
 
 ## Flush at the correct lifecycle boundary
 
@@ -155,8 +155,9 @@ The Lens ingestion endpoint uses Basic authentication with the public and secret
 | --- | --- | --- |
 | `401` | Credentials are absent, invalid, revoked, or belong to an inactive project | Recreate or replace the project key pair |
 | `413` | The compressed or decompressed OTLP batch exceeds the configured limit | Reduce exporter batch size or adjust the Lens deployment limit |
-| `415` | The content type or content encoding is unsupported | Use the v5 processor’s JSON/protobuf OTLP transport and identity/gzip encoding |
+| `415` | The content type or content encoding is unsupported | Use the 6.0.2 processor’s JSON/protobuf OTLP transport and identity/gzip encoding |
 | `429` | The project exceeded its ingestion rate | Honor `Retry-After` and review the deployment rate limit |
+| `503` | Queue admission is unavailable or backlogged | Honor `Retry-After` and inspect [System Health](/lens/self-hosting/system-health) |
 
 See [Compatibility limits](./compatibility-limits.md) before enabling another Langfuse feature against the Lens URL.
 

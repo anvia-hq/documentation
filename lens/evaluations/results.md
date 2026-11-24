@@ -57,12 +57,13 @@ Results can carry a Boolean, numeric, or categorical data type. The displayed va
 
 ## Understand result sources
 
-Lens stores two result sources:
+Lens stores three result sources:
 
 | Source | Origin |
 | --- | --- |
 | Telemetry | Reported programmatically by an evaluation runner. |
 | Human | Created by a trace review in Lens. |
+| End-user feedback | Ingested with `anvia.eval.source: end_user`, distinct from Lens staff reviews. |
 
 Filter by source when automated and reviewer evidence use the same metric or case vocabulary. Human results include reviewer identity when it is available.
 

@@ -58,6 +58,8 @@ Lens examines completed runs for the selected dataset version and assigns one st
 | **Incomplete** | Lens cannot find a completed run with a captured definition for every case. | Check run completion and evaluation payload capture, then rerun the suite. |
 | **Conflict** | Complete runs with the same dataset version contain different case definitions. | Fix the inputs, expected values, or version label before promotion. |
 
+Complete means a captured snapshot of that run’s declared cases, not certification of the entire intended test population. Selected/sharded SDK runs report their selected case count. Lens does not union shards into a full snapshot; differing shard snapshots under one dataset version can conflict.
+
 Lens selects the earliest complete snapshot as the canonical run. It compares the case definition—input, expected value, context, and retrieval context—across complete runs. A changed model output does not create a dataset conflict.
 
 ::: warning A version is a contract

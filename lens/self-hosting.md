@@ -1,6 +1,6 @@
 # Self-hosting
 
-Self-host Lens when telemetry, evaluation data, and workspace administration must remain in infrastructure you control. The supported production starting point is the release `docker-compose.yml`: it runs the Lens web application, API, worker, migrations, PostgreSQL, ClickHouse, and Redis as one private stack.
+Self-host Lens when telemetry, evaluation data, and workspace administration must remain in infrastructure you control. The supported production starting point is the release `docker-compose.yml`: it runs the Lens web application, API, worker, host monitor, migrations, PostgreSQL, ClickHouse, and Redis as one private stack.
 
 Self-hosting also makes you responsible for HTTPS, secrets, storage capacity, backups, upgrades, and incident response. Decide who owns those tasks before sending production telemetry.
 
@@ -10,7 +10,7 @@ Self-hosting also makes you responsible for HTTPS, secrets, storage capacity, ba
 | --- | --- |
 | Run a stable Lens installation | Published images with `docker-compose.yml` |
 | Develop Lens itself | Source checkout with `docker-compose.dev.yml` |
-| Author only the Lens documentation site | `pnpm www:dev` in the Lens repository |
+| Author only the Lens documentation site | `pnpm docs:dev` in the separate documentation repository |
 
 The development Compose file exposes the API, databases, Redis, and Mailpit on host ports and uses development credentials. It is convenient on a trusted workstation, but it is not a production topology.
 
@@ -40,7 +40,8 @@ Only the web entry point should be reachable from outside the stack. The API, wo
 | --- | --- |
 | [Deployment](/lens/self-hosting/deployment) | Install and start a pinned production release. |
 | [Architecture](/lens/self-hosting/architecture) | Understand service responsibilities and data flow. |
-| [Configuration](/lens/self-hosting/configuration) | Configure origins, secrets, SMTP, ingestion limits, and logs. |
+| [Configuration](/lens/self-hosting/configuration) | Configure origins, secrets, SSO, capacity, SMTP, and ingestion limits. |
+| [System Health](/lens/self-hosting/system-health) | Inspect host capacity, dependencies, ingestion, workers, and queues. |
 | [HTTPS and networking](/lens/self-hosting/https-and-networking) | Publish the web endpoint without exposing private services. |
 | [Upgrades and backups](/lens/self-hosting/upgrades-and-backups) | Protect state, run migrations, and plan rollback. |
 | [Troubleshooting](/lens/self-hosting/troubleshooting) | Diagnose startup, authentication, ingestion, and worker failures. |
