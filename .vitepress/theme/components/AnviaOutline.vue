@@ -24,7 +24,7 @@ interface Metric {
 }
 
 const INDENT = 18
-const TRACK_X = 1
+const TRACK_X = 4
 const GAP = 3
 
 const { frontmatter, theme } = useData()
@@ -171,7 +171,7 @@ onUnmounted(() => {
             class="outline-link"
             :class="{ read: index <= activeIndex, active: index === activeIndex }"
             :href="item.link"
-            :style="{ paddingLeft: `${16 + Math.min(item.depth, 2) * INDENT}px` }"
+            :style="{ paddingLeft: `${TRACK_X + 15 + Math.min(item.depth, 2) * INDENT}px` }"
             :title="item.title"
           >
             {{ item.title }}
