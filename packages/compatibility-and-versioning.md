@@ -40,6 +40,10 @@ Use your workspace's preferred lockfile and update packages intentionally rather
 unreviewed range change. An internal dependency-only patch can advance an adapter even when its own
 public behavior did not change.
 
+## Lens server versus SDK
+
+Lens server documentation has its own [v0.20.0 source/release review](/lens/#reviewed-baselines) dated 2026-11-23. The SDK inventory remains at `e751560f` with `@anvia/lens` source 1.2.4; npm’s 1.2.5 artifact was independently checked for prompt APIs. Server and adapter versions are not synchronized. Use release-matched Compose assets and verify declared SDK ranges rather than refreshing coverage snapshots solely for a newer server.
+
 ## Runtime compatibility
 
 Some adapters require a specific Node.js version, browser runtime, native dependency, database extension, or external service. These constraints differ by package. In particular:
@@ -59,7 +63,7 @@ Some adapters require a specific Node.js version, browser runtime, native depend
   [React UI version-selection limitation](/packages/cli/troubleshooting#react-ui-version-cannot-be-found)
   fixed in `1.4.0`;
 - Core document helpers operate on application-normalized text and do not require a file-parser peer;
-- applications must use Zod 4: `@anvia/core` declares `zod ^4.6.5` as a peer, as does Durable, and schema conversion uses Zod-4-only APIs such as `z.toJSONSchema`;
+- applications must use Zod 4: `@anvia/core` declares `zod ^4.6.7` as a peer, as do Durable, `@anvia/graph`, and `@anvia/neo4j`, and schema conversion uses Zod 4 APIs such as `z.toJSONSchema`;
 - observability adapters require credentials and network access to their backend.
 
 ## Public API boundary

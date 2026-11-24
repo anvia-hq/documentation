@@ -69,7 +69,7 @@ All packages below are maintained in the Anvia monorepo. “First-party” descr
 | --- | --- | --- |
 | `@anvia/logger` | Structured console and Pino logging | [Open](/packages/logger) |
 | `@anvia/otel` | OpenTelemetry traces and evaluation logs | [Open](/packages/otel) |
-| `@anvia/lens` | Native Lens tracing, evaluations, and datasets | [Open](/packages/lens) |
+| `@anvia/lens` | Native Lens tracing, evaluations, datasets, and prompt retrieval | [Open](/packages/lens) |
 | `@anvia/langfuse` | Langfuse tracing, scoring, datasets, experiments, and prompts | [Open](/packages/langfuse) |
 
 ## Development tools

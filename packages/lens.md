@@ -1,7 +1,7 @@
 # `@anvia/lens`
 
 `@anvia/lens` is the native adapter between an Anvia application and Lens. It sends traces,
-evaluation results, and runtime scores and reads versioned managed datasets with the same project
+evaluation results, and runtime scores and reads versioned managed datasets and prompts with the same project
 credentials.
 
 ## Install

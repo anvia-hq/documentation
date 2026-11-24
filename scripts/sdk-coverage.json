@@ -788,6 +788,36 @@
       "page": "sdk/knowledges/metadata-filters.md",
       "marker": "vector-filter-example",
       "runtimeTest": "vector filters combine n-ary operators and metric scoring"
+    },
+    {
+      "title": "Lens eval correlation",
+      "module": "@anvia/lens",
+      "symbols": [
+        "LensClient"
+      ],
+      "page": "lens/evaluations/run-evaluations.md",
+      "marker": "lens-eval-correlation-example",
+      "runtimeTest": "Lens evaluation example exports matching primary traces and result links"
+    },
+    {
+      "title": "Lens dataset versions",
+      "module": "@anvia/lens",
+      "symbols": [
+        "LensClient"
+      ],
+      "page": "lens/evaluations/datasets/versions.md",
+      "marker": "lens-dataset-version-example",
+      "runtimeTest": "Lens dataset version example uses object options and preserves the published identity"
+    },
+    {
+      "title": "Lens prompt compilation",
+      "module": "@anvia/lens",
+      "symbols": [
+        "LensClient"
+      ],
+      "page": "packages/lens/api-reference.md",
+      "marker": "lens-prompt-example",
+      "runtimeTest": "Lens prompt reference example compiles the deployed version without implicit attribution"
     }
   ],
   "utilities": [

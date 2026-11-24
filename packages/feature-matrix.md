@@ -51,7 +51,7 @@ Provider-specific support for images, audio, transcription, OCR, tools, reasonin
 | --- | :---: | :---: | :---: | :---: | :---: |
 | `@anvia/logger` | ✓ | — | — | — | — |
 | `@anvia/otel` | OTel logs | ✓ | ✓ | — | — |
-| `@anvia/lens` | Export | ✓ | ✓ | Read | — |
+| `@anvia/lens` | Export | ✓ | ✓ | Read | Read/compile; author in Lens UI |
 | `@anvia/langfuse` | Export | ✓ | ✓ | Read/write | ✓ |
 
 ## Development
