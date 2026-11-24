@@ -7,7 +7,8 @@ No. The Anvia SDK runs inside your application without Studio or Lens. Both prod
 | Run and debug registered agents, tools, or pipelines locally | Studio |
 | Inspect local sessions, traces, retrieval, and configuration while developing | Studio |
 | Retain production traces across services, users, sessions, and releases | Lens |
-| Run team evaluation, dataset, comparison, and quality-gate workflows | Lens |
+| Run evaluation suites in tests or CI | Neither; use `@anvia/core/evals` |
+| Retain team evaluation history, datasets, release comparisons, and quality gates | Lens |
 | Execute Anvia agents in the application | Neither is required |
 
 Use Studio when it shortens the development loop. It is a trusted local console with real execution authority, so do not expose it as a production dashboard.

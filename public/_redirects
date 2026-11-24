@@ -4,3 +4,5 @@
 /use-cases/build-applications /features/agent-api 301
 /use-cases/observe-systems /features/observability 301
 /use-cases/production /features/security 301
+/faqs/production/bun-support /faqs/production/runtime-support 301
+/faqs/production/durable-workflows /faqs/production/durable-execution 301

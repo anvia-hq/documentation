@@ -7,6 +7,7 @@ Use a tool to expose an application capability to an agent. Use MCP when that ca
 | Call an app-owned service with a typed contract | [Local tool](/sdk/tools) |
 | Discover tools from an external protocol server | [MCP](/sdk/advanced/mcp) |
 | Pause a sensitive proposed action before execution | [Tool approval](/sdk/advanced/hooks/tool-control) |
+| Choose from a catalog too large to send every turn | [Tool index or `searchTool()`](/faqs/capabilities/large-tool-catalogs) |
 
 These choices compose: an MCP-adapted tool participates in the normal agent tool loop, and a local or dynamic tool can require approval.
 
@@ -24,4 +25,8 @@ Use [Studio approvals](/studio/playground/approvals-and-questions) to exercise t
 
 No. MCP servers are external capability sources. The application owns transport credentials, connection cleanup, the exposed tool allow-list, product permissions, and result filtering. Prefer app-owned tools when the operation needs product-specific authorization or idempotency.
 
-Model tool support is also provider- and model-dependent. Verify the exact completion model in the [capability matrix](/sdk/providers/capability-matrix).
+`@anvia/mcp` uses the official MCP TypeScript SDK v2 client, pins MCP protocol `2026-07-28` by default, and requires Node.js 20 or newer or Bun 1.3.14.
+
+Model tool support is also provider- and model-dependent. Verify the exact completion model in the [capability matrix](/sdk/providers/capability-matrix). See [Tools and MCP](/features/tools-and-mcp) for an overview.
+
+Reviewed against Anvia SDK `7aa42c0a` on 2026-11-24.

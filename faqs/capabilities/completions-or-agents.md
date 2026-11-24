@@ -22,4 +22,4 @@ No. A completion can return a model-requested tool call, but it does not run the
 
 No. The application still owns authentication, authorization, tenant scope, services, persistence policy, and the response exposed to users. Instructions guide model behavior; they do not enforce permissions.
 
-See [When to use completions](/sdk/completions/when-to-use) and [Agent runtime lifecycle](/sdk/agents/runtime-lifecycle) for the full boundaries.
+See [When to use completions](/sdk/completions/when-to-use), [Agent runtime](/features/agent-runtime), and [Agent runtime lifecycle](/sdk/agents/runtime-lifecycle) for the full boundaries.

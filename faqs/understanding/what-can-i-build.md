@@ -11,6 +11,10 @@ Common examples include:
 - Background workflows that combine deterministic steps with agents.
 - Evaluation and observability workflows around model behavior.
 - Multi-agent systems where the added coordination is justified.
+- Classification and routing with [typed decisions](/sdk/decisions).
+- Agents that answer in [Discord, Slack, or Telegram](/faqs/capabilities/chat-platforms).
+- Long-running agent runs that resume after a restart with experimental [durable execution](/features/durable-execution).
+- Agents that work in an isolated [sandbox](/sdk/advanced/sandbox), including a [remote desktop](/faqs/capabilities/desktop-agents).
 
 You do not need an agent for every feature. A one-call summarizer may only need [direct completions](/sdk/completions), while a schema-validated extraction flow may use [structured output](/sdk/structured-output). Use [agents](/sdk/agents) when the behavior needs reusable instructions, tools, multiple turns, memory, or run-level controls. Use [pipelines](/sdk/pipelines) when the workflow has explicit stages and typed transitions.
 

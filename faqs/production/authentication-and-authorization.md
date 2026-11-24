@@ -13,6 +13,11 @@ A tool schema confirms that model-produced arguments have the expected shape. It
 Capture trusted identity in the application service or tool factory and make the permission check there:
 
 ```ts
+import { createTool } from '@anvia/core'
+import { z } from 'zod'
+
+const refundSchema = z.object({ orderId: z.string() })
+
 function createRefundOrderTool(
   actor: AuthenticatedActor,
   operationId: string,
@@ -20,8 +25,8 @@ function createRefundOrderTool(
   return createTool({
     name: 'refund_order',
     description: 'Refund an order the current user may manage.',
-    input: refundSchema,
-    execute: async ({ orderId }) => {
+    inputSchema: refundSchema,
+    handler: async ({ orderId }) => {
       await orders.assertCanRefund(actor.userId, orderId)
       return orders.refund({
         orderId,
@@ -33,7 +38,7 @@ function createRefundOrderTool(
 }
 ```
 
-The exact context shape belongs to the application. Do not let the model declare its own user, role, tenant, or permission scope.
+`AuthenticatedActor` and `orders` are application-owned: your authenticated identity type and order service. The exact context shape belongs to the application. Do not let the model declare its own user, role, tenant, or permission scope.
 
 The application should create `operationId` and keep it stable across retries; it must not come from model-generated arguments.
 
@@ -45,4 +50,4 @@ The application should create `operationId` and keep it stable across retries; i
 - Studio is a trusted development surface; `protectShell` is not authentication.
 - Lens project credentials protect telemetry ingestion, not product routes.
 
-See [tool security](/sdk/tools/security), [memory sessions](/sdk/memory/sessions), and [Studio security boundaries](/studio/configure/security-boundaries).
+See [Security](/features/security), [tool security](/sdk/tools/security), [memory sessions](/sdk/memory/sessions), and [Studio security boundaries](/studio/configure/security-boundaries).

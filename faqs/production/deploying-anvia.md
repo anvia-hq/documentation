@@ -16,6 +16,8 @@ HTTP route → validate and enqueue → worker runs Anvia → persist result/eve
 
 Anvia does not require one queue implementation. Keep the job payload small, stable, and authorized again when the worker starts.
 
+When an agent run itself must survive a deploy or crash, the experimental `@anvia/durable` package can store and execute it. Several durable workers can share runs from one Postgres, Drizzle, or Prisma database, while a `DurableClient` submits and controls runs from a process that executes nothing. It does not recover pipelines; see [durable execution, pipelines, or a job queue](/faqs/production/durable-execution).
+
 ## Deployment checklist
 
 - Pin package and model configuration.
@@ -25,4 +27,6 @@ Anvia does not require one queue implementation. Keep the job payload small, sta
 - Keep Studio on a trusted development interface.
 - Provide health checks for the application and its dependencies.
 
-See [production workers](/sdk/pipelines/production-workers), [compatibility and versioning](/packages/compatibility-and-versioning), and [Lens self-hosting](/lens/self-hosting).
+- Confirm the target runtime meets each package's [runtime requirements](/faqs/production/runtime-support).
+
+See [Agent API](/features/agent-api), [production workers](/sdk/pipelines/production-workers), [durable execution](/features/durable-execution), [compatibility and versioning](/packages/compatibility-and-versioning), and [Lens self-hosting](/lens/self-hosting).

@@ -11,7 +11,20 @@ user presses Stop → client aborts fetch → response body is cancelled
                   → server transport asks the event iterator to return
 ```
 
-Closing the async iterator returned by `agent.stream(...)` stops further consumption. Cancelling an HTTP response normally propagates that closure through `@anvia/server`, but it cannot guarantee that a provider call or tool already in progress is interrupted. If a custom provider, tool, or worker operation supports an abort signal, the application must wire and enforce that cancellation at its own boundary.
+Closing the async iterator returned by `agent.stream(...)` stops further consumption. Cancelling an HTTP response normally propagates that closure through `@anvia/server`.
+
+To cancel the run itself, pass an `abortSignal` to `agent.generate(...)`, `agent.stream(...)`, or `generateCompletion(...)`. Anvia forwards it to model calls, and a tool handler receives it as `context.abortSignal`:
+
+```ts
+const controller = new AbortController()
+
+const result = await agent.generate({
+    prompt: input,
+    abortSignal: controller.signal
+})
+```
+
+A signal interrupts work only where the provider client, tool, or service honors it. Pass `context.abortSignal` to your own in-flight requests, and enforce cancellation in custom providers and workers.
 
 A resumable server stream is intentionally different: it keeps consuming and storing events after the client disconnects so the client can reconnect later.
 
@@ -40,4 +53,6 @@ Treat these as separate decisions:
 - entire job retry;
 - client reconnection or stream resume.
 
-See [stream errors and cancellation](/sdk/streaming/errors-and-cancellation), [cancellation boundaries](/sdk/advanced/hooks/cancellation), and [retry guidance](/sdk/advanced/parallel-and-batch/retries).
+For agent runs that must continue after a process restart, [durable execution](/faqs/production/durable-execution) persists model retry waits and replays committed results instead of repeating them.
+
+See [per-run controls](/sdk/agents/per-run-controls), [tool execution](/sdk/tools/validation-and-execution), [stream errors and cancellation](/sdk/streaming/errors-and-cancellation), [cancellation boundaries](/sdk/advanced/hooks/cancellation), and [retry guidance](/sdk/advanced/parallel-and-batch/retries).

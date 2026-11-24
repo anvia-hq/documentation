@@ -1505,14 +1505,19 @@ export default defineConfig({
           text: 'Capabilities',
           items: [
             { text: 'Models', link: '/faqs/capabilities/models-and-providers' },
+            { text: 'Azure OpenAI', link: '/faqs/capabilities/azure-openai' },
             { text: 'Completions or agents', link: '/faqs/capabilities/completions-or-agents' },
             { text: 'Tools and MCP', link: '/faqs/capabilities/tools-mcp-and-approvals' },
+            { text: 'Large tool catalogs', link: '/faqs/capabilities/large-tool-catalogs' },
             { text: 'Memory or knowledge', link: '/faqs/capabilities/memory-or-knowledge' },
             { text: 'Pipelines or agents', link: '/faqs/capabilities/pipelines-or-agents' },
             { text: 'Multi-agent', link: '/faqs/capabilities/multi-agent-systems' },
             { text: 'Structured output', link: '/faqs/capabilities/structured-output' },
+            { text: 'Decisions or output', link: '/faqs/capabilities/decisions-or-structured-output' },
             { text: 'Streaming and UI', link: '/faqs/capabilities/streaming-and-ui' },
-            { text: 'Sandboxes', link: '/faqs/capabilities/sandbox-execution' }
+            { text: 'Sandboxes', link: '/faqs/capabilities/sandbox-execution' },
+            { text: 'Desktop agents', link: '/faqs/capabilities/desktop-agents' },
+            { text: 'Chat platforms', link: '/faqs/capabilities/chat-platforms' }
           ]
         },
         {
@@ -1522,6 +1527,7 @@ export default defineConfig({
             { text: 'Studio in production?', link: '/faqs/studio-and-lens/is-studio-for-production' },
             { text: 'Lens', link: '/faqs/studio-and-lens/what-is-lens' },
             { text: 'Lens or Langfuse?', link: '/faqs/studio-and-lens/lens-or-langfuse' },
+            { text: 'Evals without Lens', link: '/faqs/studio-and-lens/evaluations-without-lens' },
             { text: 'Other applications', link: '/faqs/studio-and-lens/can-lens-observe-non-anvia-apps' },
             { text: 'Are they required?', link: '/faqs/studio-and-lens/do-i-need-studio-or-lens' }
           ]
@@ -1533,8 +1539,8 @@ export default defineConfig({
             { text: 'Auth and permissions', link: '/faqs/production/authentication-and-authorization' },
             { text: 'API keys', link: '/faqs/production/api-keys' },
             { text: 'Deployment', link: '/faqs/production/deploying-anvia' },
-            { text: 'Bun support', link: '/faqs/production/bun-support' },
-            { text: 'Durable workflows', link: '/faqs/production/durable-workflows' },
+            { text: 'Runtimes', link: '/faqs/production/runtime-support' },
+            { text: 'Durable execution', link: '/faqs/production/durable-execution' },
             { text: 'Persistence', link: '/faqs/production/persistence' },
             { text: 'Retries and cancellation', link: '/faqs/production/retries-and-cancellation' },
             { text: 'Vendor lock-in', link: '/faqs/production/vendor-lock-in' },
