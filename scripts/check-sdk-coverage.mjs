@@ -96,7 +96,10 @@ for (const feature of inventory.features) {
   if (!codeBlocks(page).some(block => block.flags.includes('anvia-check') && block.flags.split(/\s+/).includes(feature.marker))) {
     failures.push(`${feature.title}: missing complete checked example ${feature.marker}`)
   }
-  const tests = await readFile(join(docsRoot, 'scripts/check-sdk-runtime.mjs'), 'utf8')
+  const tests = [
+    await readFile(join(docsRoot, 'scripts', 'check-sdk-runtime.mjs'), 'utf8'),
+    await readFile(join(docsRoot, 'scripts', 'lens-runtime-contracts.mjs'), 'utf8'),
+  ].join('\n')
   if (!tests.includes(`test('${feature.runtimeTest}'`)) failures.push(`${feature.title}: missing named runtime test`)
 }
 for (const decision of inventory.utilities) {

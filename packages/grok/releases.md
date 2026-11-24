@@ -1,17 +1,20 @@
 # Releases
 
-Reviewed source release: `1.1.11`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Reviewed source release: `1.1.17`. The entries below summarize the 1.0 line and preserve notable v0 history.
 
-## Changes through 1.1.10
+## Changes through 1.1.17
 
-Reviewed `1.1.9` → `1.1.10` against SDK source on 2026-10-15. Aligned the OpenAI dependency with its Decisions-capable release. Grok retains its documented completion API; use the OpenAI package for OpenAI Decisions.
+Reviewed `1.1.11` → `1.1.17` against SDK source on 2026-11-04. `1.1.12`–`1.1.14` only advanced the bundled OpenAI dependency. `1.1.15` rejects MCP `serverUrl` values that target private, loopback, link-local, or otherwise reserved hosts. `1.1.16` refreshed upstream dependencies and raised the `zod` peer range to `^4.6.7`. `1.1.17` moved to `@anvia/openai` 1.3.7 for the cross-provider replay fix. Grok retains its documented completion API; use the OpenAI package for OpenAI Decisions.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/provider-grok/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/provider-grok/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 
 | Version | Type | Summary |
 | --- | --- | --- |
+| `1.1.17` | Patch | Updated the OpenAI dependency to 1.3.7 for the cross-provider conversation replay fix. |
+| `1.1.16` | Patch | Updated upstream runtime dependencies; the `zod` peer range is now `^4.6.7`. |
+| `1.1.15` | Patch | Rejected Grok MCP `serverUrl` values that target private, loopback, link-local, or otherwise reserved hosts. |
 | `1.1.9` | Patch | Updated to OpenAI adapter `1.2.0`, which adds the `@anvia/openai/adapters` export. |
 | `1.1.8` | Patch | Refreshed package README and usage guides. |
 | `1.1.7` | Patch | Updated the OpenAI SDK to `^7.23.0`. |

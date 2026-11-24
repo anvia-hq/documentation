@@ -166,7 +166,7 @@ For another base image, install the same packages: `tigervnc-standalone-server x
 
 ### Generated desktop image
 
-`create-image --feature desktop` generates an image for you:
+`create-image --name desk --feature desktop` generates an image for you:
 
 ```sh
 pnpm dlx @anvia/sandbox create-image --name desk --feature desktop --apt chromium

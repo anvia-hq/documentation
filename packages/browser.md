@@ -25,7 +25,7 @@ action reliability for a desktop workflow.
 
 ## Migration outline
 
-1. Install `@anvia/sandbox` and use a desktop image. The `create-image --feature desktop` builder
+1. Install `@anvia/sandbox` and use a desktop image. The `create-image --name <name> --feature desktop` builder
    generates one, and the reference image under `packages/tool-sandbox/images/desktop` shows the
    required programs.
 2. Run `anvia-sandbox-daemon` inside the sandbox and connect it to a `RemoteSandboxHub`.

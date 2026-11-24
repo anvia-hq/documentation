@@ -9,7 +9,7 @@ A Studio session belongs to one registered agent and records:
 - its generated ID, title, and optional metadata;
 - the messages used as conversation memory;
 - a transcript for each run, including reasoning, tool calls, approvals, and questions;
-- run status such as `running`, `success`, `error`, or `cancelled`;
+- run status such as `running`, `success`, `error`, `suspended`, or `cancelled`, where `suspended` means the run is waiting on an interaction;
 - session logs and links to associated traces.
 
 The **Sessions** table shows the title and ID, agent, message count, and last update. Sessions with the most recent activity appear first.

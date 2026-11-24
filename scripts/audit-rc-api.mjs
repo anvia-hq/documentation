@@ -23,6 +23,12 @@ if (typescriptPath === undefined) {
 const typescriptModule = await import(pathToFileURL(typescriptPath).href)
 const ts = typescriptModule.default ?? typescriptModule
 
+const inventory = JSON.parse(
+  await readFile(join(docsRoot, 'scripts', 'sdk-coverage.json'), 'utf8'),
+)
+const externalPackages = new Set(inventory.externalPackages ?? [])
+const modulePackageName = (moduleName) => moduleName.split('/').slice(0, 2).join('/')
+
 async function collectFiles(directory, predicate) {
   const files = []
 
@@ -60,7 +66,10 @@ function resolvePackageEntry(moduleName, packages) {
     .filter((name) => moduleName === name || moduleName.startsWith(`${name}/`))
     .sort((left, right) => right.length - left.length)[0]
 
-  if (!packageName) return { error: `unknown Anvia package ${moduleName}` }
+  if (!packageName) {
+    if (externalPackages.has(modulePackageName(moduleName))) return { excluded: true }
+    return { error: `unknown Anvia package ${moduleName}` }
+  }
 
   const packageInfo = packages.get(packageName)
   const exportKey = moduleName === packageName ? '.' : `.${moduleName.slice(packageName.length)}`
@@ -113,6 +122,7 @@ if (cliOnly) documentationFiles.push(join(docsRoot, 'packages', 'cli.md'))
 const imports = []
 const entryPaths = new Set()
 const failures = []
+let excludedImports = 0
 
 for (const markdownPath of documentationFiles) {
   const markdown = await readFile(markdownPath, 'utf8')
@@ -134,6 +144,11 @@ for (const markdownPath of documentationFiles) {
 
       const location = `${relative(docsRoot, markdownPath)}:${lineAt(markdown, block.offset + statement.getStart(sourceFile))}`
       const resolution = resolvePackageEntry(moduleName, packages)
+
+      if (resolution.excluded) {
+        excludedImports += 1
+        continue
+      }
 
       if (resolution.error) {
         failures.push(`${location}: ${resolution.error}`)
@@ -194,4 +209,9 @@ if (failures.length > 0) {
   console.log(
     `Verified ${imports.length} named/default Anvia imports across ${documentationFiles.length} documentation files.`,
   )
+  if (excludedImports > 0) {
+    console.log(
+      `Out of scope (sibling repository): ${excludedImports} import(s) from ${[...externalPackages].join(', ')}.`,
+    )
+  }
 }

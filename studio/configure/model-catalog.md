@@ -187,7 +187,7 @@ Studio treats compatibility metadata and policy violations differently:
 
 | Situation | Result |
 | --- | --- |
-| Reference does not use `provider:model` | The run is rejected as a bad request. |
+| Request `model` is not a `{ providerId, modelId }` object | The run is rejected as a bad request. |
 | Provider is not registered | The run is rejected as a bad request. |
 | Model is outside the agent's `allowed` policy | The run is rejected as a bad request. |
 | Image or document input is not declared by the static model | The run continues and Studio records a model warning. |

@@ -9,7 +9,7 @@ Use the [sandbox desktop guide](/sdk/advanced/sandbox/desktop) for the current a
 
 - `hub.desktop(sandboxId)` for screenshots, input, resizing, status, and control locks;
 - `createDesktopTools()` for agent-facing `desktop_*` tools;
-- the sandbox desktop image, daemon environment, and `create-image --feature desktop`; and
+- the sandbox desktop image, daemon environment, and `create-image --name <name> --feature desktop`; and
 - the Studio desktop viewer for a registered remote sandbox.
 
 For the retirement notice and migration table, see the [`@anvia/browser` package page](/packages/browser).

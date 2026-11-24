@@ -133,7 +133,7 @@ Markdown output and tool results may contain model-produced content. Treat custo
 | React peer dependency | `>=18` |
 | React DOM peer dependency | `>=18` |
 | `@anvia/react` peer dependency | Matching stable release |
-| Optional viewer peers | `@xterm/xterm`, `@xterm/addon-fit`, and `@novnc/novnc`; required only by their viewer subpaths |
+| Optional viewer peers | `@xterm/xterm` `>=5.5.0`, `@xterm/addon-fit` `>=0.10.0`, and `@novnc/novnc` `>=1.5.0`; required only by their viewer subpaths |
 | Styling | Application-owned; no package CSS exports. Import `@xterm/xterm/css/xterm.css` when using the terminal |
 
 The components target React DOM and use browser behavior for rich composer, selection, image, and attachment interactions. Render browser-dependent interactions on the client when using an SSR framework.

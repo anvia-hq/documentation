@@ -10,13 +10,13 @@ Reviewed `0.1.4` → `0.1.9` against SDK source on 2026-11-04. These releases tr
 
 Reviewed `0.1.3` against SDK source on 2026-10-16. Both `endpoint` and `baseUrl` now require HTTPS for non-loopback hosts. Plain `http://` is allowed only for loopback development hosts (`localhost`, `127.0.0.1`, or `[::1]`). Other HTTP URLs throw a `TypeError` during construction, preventing credentials from being sent over cleartext to remote hosts. Existing HTTPS configurations and local emulator URLs such as `http://127.0.0.1:10000` keep working.
 
-See the [0.1.3 source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/provider-azure/CHANGELOG.md#013) and [upgrade guidance](/packages/azure/migration#upgrade-to-0-1-3).
+See the [0.1.3 source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/provider-azure/CHANGELOG.md#013) and [upgrade guidance](/packages/azure/migration#upgrade-to-0-1-3).
 
 ## Changes through 0.1.1
 
 Reviewed `0.1.0` → `0.1.1` against SDK source on 2026-10-15. Aligned the OpenAI dependency with the Decisions-capable release. Azure continues to expose its documented Responses completion adapter; this dependency update does not add an Azure decision factory.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/provider-azure/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/provider-azure/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 

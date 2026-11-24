@@ -31,7 +31,7 @@ studio.start({
 | `path` | `'/ui'` | Sets the compatibility redirect and asset prefix. A missing leading slash is added and trailing slashes are removed. |
 | `rootRoutes` | `true` | Serves console pages such as `/playground`, `/sessions`, and `/tracing`. |
 | `redirectRoot` | `true` | Redirects `/` to `/playground`. |
-| `clientScript` | Bundled client | Supplies a custom JavaScript client through the compatibility asset route and uses the legacy shell. |
+| `clientScript` | None (bundled app) | Supplies a custom JavaScript client at `<path>/assets/client.js` and switches to the legacy shell. Without it that route returns `404` and the bundled app is served. |
 | `protectShell` | `false` | Reserved shell-registration flag. It currently does not add authentication or authorization. |
 
 The configured `path` is not a new base path for the application router. Paths such as `/ui/playground` redirect to `/playground`; the bundled page itself is served by the root route. Consequently, setting `rootRoutes: false` disables the built-in console pages even though compatibility redirects remain registered.
@@ -57,7 +57,7 @@ Both `start()` and `serve()` accept these server options:
 | `allowedHosts` | None | Extra client-facing hostnames accepted in `Host` and `Origin` headers. Required for public names when binding to `0.0.0.0` or `::`; ports are ignored. |
 | `log` | `true` | Prints the Studio UI or API address after startup. |
 
-`start()` additionally accepts `handleSignals`, which defaults to `true`. With it enabled, Studio installs a one-time `SIGINT` handler that closes the server and exits the process.
+`start()` additionally accepts `handleSignals`, which defaults to `true`. With it enabled, Studio installs one-time `SIGINT` and `SIGTERM` handlers that close the server and exit with 130 and 143.
 
 ```ts
 studio.start({

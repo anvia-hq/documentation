@@ -30,6 +30,7 @@ type CreateDockerSandboxOptions = {
   id?: string
   image: string
   workdir?: string
+  containerRuntime?: string
   workspace: { type: 'ephemeral' } | { type: 'docker-volume'; name: string }
   network: { mode: 'none' } | { mode: 'bridge'; ports?: readonly number[] }
   files?: Readonly<Record<string, string | Uint8Array>>

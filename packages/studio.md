@@ -47,7 +47,7 @@ const studio = new Studio([agent], {
 
 ## Security boundary
 
-Studio is a trusted local development surface. Binding to a public interface can expose prompts, tool execution, stored sessions, knowledge, and sandbox access. `protectShell` changes shell delivery behavior; it is not authentication or authorization. Put an explicit access-control proxy in front of Studio if it must cross a trusted boundary.
+Studio is a trusted local development surface. Binding to a public interface can expose prompts, tool execution, stored sessions, knowledge, and sandbox access. `protectShell` is accepted but currently has no effect on shell delivery; it is not authentication or authorization. Put an explicit access-control proxy in front of Studio if it must cross a trusted boundary.
 
 ## Common patterns
 

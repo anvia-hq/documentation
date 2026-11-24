@@ -46,7 +46,7 @@ type StudioServeLifecycleOptions = Omit<StudioServeOptions, 'handleSignals'> & {
 ## Targets and configuration
 
 ```ts
-type StudioTarget = Agent | Pipeline<any, any>
+type StudioTarget = Agent | AgentTeam<unknown> | Pipeline<any, any>
 
 type StudioOptions = {
   evals?: StudioEvalSuite<any, any, any>[]
@@ -149,7 +149,7 @@ Trace records use `StudioTrace`, `StudioTraceSummary`, `StudioTraceObservation`,
 
 ## Requests, events, and errors
 
-`AgentRunRequest` accepts a normalized `messages` array plus optional session ID, streaming, max-turn, tool-concurrency, model, metadata, and trace controls. `AgentRunResponse` aliases Core `AgentResponse`.
+`AgentRunRequest` is a `type`-discriminated union: `{ type: 'messages', messages, ... }` or `{ type: 'interaction_response', ... }`, with optional streaming, model, metadata, trace, and control fields. `AgentRunResponse` is core's `AgentOutcome` minus the interaction continuation: interaction outcomes are stripped of `continuation` and `messages`.
 
 `AgentRunStreamEvent` combines core agent events with Studio approval, question, session-log, pipeline-log, and pipeline-final events.
 
@@ -161,7 +161,7 @@ Registered `AgentTeam` targets gain live run routes. Team IDs occupy a separate 
 const studio = new Studio([agent, team])
 
 // Config exposure
-GET /teams                    // -> StudioTeamConfig[]
+GET /teams                    // -> { teams: StudioTeamConfig[] }
 GET /teams/:teamId            // -> StudioTeamConfig
 
 // Run lifecycle (JSONL event stream)
@@ -177,8 +177,10 @@ POST /teams/:teamId/runs/:runId/interactions/:interactionId       // AgentIntera
 type StudioErrorCode =
   | 'bad_request'
   | 'conflict'
+  | 'forbidden'
   | 'not_found'
   | 'payload_too_large'
+  | 'service_unavailable'
   | 'unsupported_capability'
   | 'internal_error'
 ```

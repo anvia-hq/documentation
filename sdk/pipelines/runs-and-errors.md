@@ -118,7 +118,7 @@ const pipeline = new Pipeline({
 const graph = pipeline.graph()
 ```
 
-The returned snapshot contains pipeline metadata, nodes, and edges. Node kinds include `input`, `step`, `pipeline`, `parallel`, `branch`, `agent`, `extractor`, and `output`.
+The returned snapshot contains pipeline metadata, nodes, and edges. Node kinds include `input`, `step`, `pipeline`, `parallel`, `branch`, `decision`, `route`, `agent`, `extractor`, and `output`.
 
 The graph describes workflow structure, not a particular run's inputs, outputs, timing, or errors. Use observer events for runtime state.
 

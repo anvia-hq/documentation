@@ -5,7 +5,7 @@ OpenAI’s provider adapter covers the broadest set of Anvia model contracts: co
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `1.2.0` |
+| Version | `1.3.7` |
 | Runtime | ESM, server-side JavaScript |
 | Peer | Matching `@anvia/core` stable release |
 

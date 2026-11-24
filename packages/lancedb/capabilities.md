@@ -9,4 +9,4 @@
 
 The adapter stores reserved columns for the row ID, document ID, serialized document, metadata, and vector. Metadata keys beginning with `__anvia_` are rejected.
 
-It does not create ANN indexes, compact tables, or delete stale versions; those responsibilities remain with the application's LanceDB workflow. It does validate `dimensions`: `validate()` throws when the persisted `__anvia_vector` column's list size differs from the configured dimensions.
+It does not create ANN indexes, compact tables, or delete stale versions; those responsibilities remain with the application's LanceDB workflow. It does validate `dimensions`: `validate()` throws when the persisted `__anvia_vector` column reports a list size that differs from the configured dimensions, and skips the comparison when the driver exposes no schema or no numeric list size.

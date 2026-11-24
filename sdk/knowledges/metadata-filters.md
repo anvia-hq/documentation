@@ -62,7 +62,7 @@ predicates to their backend and may apply provider-specific type rules.
 | --- | --- |
 | `eq(key, value)` | The stored value is strictly equal to `value`, including its type (`"3"` and `3` differ). |
 | `ne(key, value)` | The stored value is not strictly equal to `value`. A missing key satisfies `ne`; a document with no metadata object does not match any filter. |
-| `gt`, `gte`, `lt`, `lte` | Both sides are numbers, both are strings, or both are booleans, and the ordered comparison holds. Strings compare lexicographically and booleans compare `false` before `true`. Missing keys, `null`, and mixed types do not match instead of throwing. |
+| `gt`, `gte`, `lt`, `lte` | Both sides are numbers, both are strings, or both are booleans, and the ordered comparison holds. Strings compare lexicographically and booleans compare `false` before `true`. Missing keys, `null`, and mixed types do not match instead of throwing; the in-memory matcher falls back to a `0` comparison result, which never satisfies `gt` or `lt`. |
 | `in(key, values)` | The stored value is strictly equal to one of the listed values. `null` matches only when listed, and a missing key never matches. An empty list matches nothing in the in-memory matcher and in LanceDB; native adapters reject it. |
 | `and(...filters)` | Every child filter matches. |
 | `or(...filters)` | At least one child filter matches. |

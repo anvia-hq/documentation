@@ -8,7 +8,7 @@
 pnpm add @anvia/client @anvia/core @anvia/react react
 ```
 
-`@anvia/core` is a required peer dependency. `@anvia/graph` is an optional peer consumed by the `@anvia/react/graph-explorer` entry point.
+`@anvia/client`, `@anvia/core`, and React `>=18` are required peer dependencies. `@anvia/graph` is an optional peer consumed by the `@anvia/react/graph-explorer` entry point.
 
 ## Build a chat client
 

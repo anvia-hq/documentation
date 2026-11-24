@@ -18,7 +18,7 @@ import {
 
 ## SqliteMemoryClient
 
-The client owns a built-in `node:sqlite` database or wraps an injected database.
+The client owns a built-in SQLite database — `bun:sqlite` under Bun, with the `foreign_keys` pragma enforced, and `node:sqlite` otherwise — or wraps an injected database that satisfies the structural driver contract.
 
 ```ts
 class SqliteMemoryClient implements AsyncDisposable {

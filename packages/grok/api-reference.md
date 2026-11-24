@@ -39,7 +39,7 @@ class GrokClient {
     const Controls extends CompletionModelControls = GrokControlsFor<ModelId>,
   >(options: {
     modelId: ModelId
-    api: 'responses' | 'chat'
+    api?: 'responses' | 'chat'
     contextLimits?: ModelContextLimits
     controls?: Controls
   }): GrokCompletionModelHandle<Controls>
@@ -54,7 +54,7 @@ class GrokClient {
 }
 ```
 
-All model IDs and the completion API are explicit. Omitting `controls` applies per-model reasoning defaults derived from the model ID (`GrokControlsFor`). When injecting an OpenAI SDK client, supply `http` separately because Grok media endpoints also need credentials and transport settings.
+All model IDs are explicit. `api` is optional and defaults to `'chat'` when omitted. Omitting `controls` applies per-model reasoning defaults derived from the model ID (`GrokControlsFor`). When injecting an OpenAI SDK client, supply `http` separately because Grok media endpoints also need credentials and transport settings.
 
 ## Provider tools
 

@@ -102,7 +102,7 @@ The root URL redirects to the Playground by default.
 
 ## Port and process behavior
 
-`start()` uses the port you pass, then `RUNNER_PORT`, then `4021`. It also handles `SIGINT` by default, so pressing `Ctrl+C` closes the local server cleanly.
+`start()` uses the port you pass, then `RUNNER_PORT`, then `4021`. It also handles `SIGINT` and `SIGTERM` by default, so pressing `Ctrl+C` (or sending either signal) closes the local server cleanly.
 
 Keep the Studio entry point separate from the application entry point. That makes it easy to run during development without accidentally starting the browser console in production.
 

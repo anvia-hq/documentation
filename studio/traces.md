@@ -11,7 +11,7 @@ Run an agent from the Playground, then open **Traces**. Studio lists the latest 
 | Trace | The trace ID recorded for the run. |
 | Session | The Studio session that owns the run. |
 | Agent | The registered agent associated with the trace. |
-| Status | Whether the run succeeded, failed, or is still reported as running by the store. |
+| Status | Whether the run succeeded, failed, is `suspended` on an interaction, was `cancelled`, or is still reported as `running` by the store. |
 | Started | When the run began. |
 | Duration | Total elapsed time for the run. |
 | First delta | Time until the first recorded streamed model delta, when available. |

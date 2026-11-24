@@ -83,7 +83,7 @@ const embeddings = openai.embeddingModel({
 })
 ```
 
-`maxBatchSize` controls application batching, not provider concurrency. Keep it within endpoint limits. Do not put secrets or raw customer data into `user` merely for logging convenience.
+`maxBatchSize` controls application batching, not provider concurrency, and defaults to `1024`. Keep it within endpoint limits. Do not put secrets or raw customer data into `user` merely for logging convenience.
 
 ## Media options
 

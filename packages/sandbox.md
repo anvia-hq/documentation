@@ -107,7 +107,7 @@ const tools = createDesktopTools({
 })
 ```
 
-Use `create-image --feature desktop` to build an image with the daemon and desktop programs, or start from the reference image. The desktop is not available on the local `DockerSandboxClient` runtime. See [Remote desktop](/sdk/advanced/sandbox/desktop).
+Use `create-image --name desk --feature desktop` to build an image with the daemon and desktop programs, or start from the reference image. The desktop is not available on the local `DockerSandboxClient` runtime. See [Remote desktop](/sdk/advanced/sandbox/desktop).
 
 ## Workspace lifecycle
 

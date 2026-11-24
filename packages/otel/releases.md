@@ -7,7 +7,7 @@ v0 history.
 
 Reviewed `1.2.0` → `1.3.0` against SDK source on 2026-10-15. Refreshed package guidance, added durable run correlation through `anvia.run.id`, and fixed parentless roots with supplied trace IDs. Configure `createAnviaIdGenerator()` on an application-owned provider to keep durable attempts in one trace. See [Durable tracing](/packages/durable/tracing).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/observability-otel/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/observability-otel/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Notable history
 
