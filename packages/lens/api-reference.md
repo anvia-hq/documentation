@@ -9,6 +9,7 @@ import {
   resolveLensConfig,
   createLensRedactor,
   DEFAULT_PATTERNS,
+  passesLuhn,
 } from '@anvia/lens'
 ```
 
@@ -54,7 +55,7 @@ const dataset = await lens.datasetClient({ pageSize: 50 }).getDataset<Input, Exp
 })
 ```
 
-The returned `LensDataset` contains `name`, `version`, optional description and metadata, and normalized items. `LensDatasetError` exposes `status` and a stable `code`. Page size defaults to 50 and accepts 1–100; retrieval is capped at 100 pages and throws `pagination_limit` beyond that limit rather than returning partial data. Changing dataset identity/version or page counts during retrieval yields `invalid_response`.
+The returned `LensDataset` contains `name`, `version`, optional description and metadata, and normalized items. `LensDatasetError` exposes an optional `status` and a stable `code`. Page size defaults to 50 and accepts 1–100; retrieval is capped at 100 pages and throws `pagination_limit` beyond that limit rather than returning partial data. Changing dataset identity/version or page counts during retrieval yields `invalid_response`.
 
 ## Versioned prompts
 

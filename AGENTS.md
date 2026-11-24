@@ -11,7 +11,7 @@ lives in the separate `anvia-hq/anvia` repository.
 Workspace members in `pnpm-workspace.yaml` are the root site (`.`) and
 `examples/golden-path`, a runnable application with its own checks.
 
-Use Node from `.nvmrc` (24); `package.json` requires `^24.12.0`. Use pnpm from the
+Use Node from `.nvmrc` (26); `package.json` requires `^26.13.0`. Use pnpm from the
 repository root. CI uses pnpm **11.22.0** for the site and golden-path example,
 and **11.0.4** for the SDK validation jobs and their source checkout.
 

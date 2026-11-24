@@ -12,7 +12,9 @@ const results = await retrieveDocuments({
 });
 ```
 
-`filterToPineconeFilter` maps `eq`, `gt`, `lt`, `and`, and `or` to Pinecone's `$eq`, `$gt`, `$lt`, `$and`, and `$or` structure.
+`filterToPineconeFilter` maps `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `and`, and `or` to
+Pinecone's `$eq`, `$ne`, `$gt`, `$gte`, `$lt`, `$lte`, `$in`, `$and`, and `$or` structure. `and` and
+`or` are n-ary. An empty `in` list throws a descriptive error.
 
 Search is always executed inside the namespace chosen at connection time. Results from several physical embeddings are collapsed to the highest-scoring logical document.
 

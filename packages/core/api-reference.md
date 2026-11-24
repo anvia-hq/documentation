@@ -160,6 +160,28 @@ for await (const event of streamCompletion({
 
 Messages are strict JSON-safe structural objects. Core exports role/content types plus `parseMessage`, `parseMessages`, `messageSchema`, and `messagesSchema` for runtime validation.
 
+## Model listing
+
+`@anvia/core/model-listing` exports `ModelId`, `ListedModel`, `ModelList`, `ModelListingClient`,
+and `ModelListingError`. Providers implement `ModelListingClient` and normalize their inventory into
+`ModelList.data`:
+
+```ts
+const inventory = await modelClient.listModels()
+
+for (const model of inventory.data) {
+  console.log(model.id, model.contextLength, model.supportedParameters)
+}
+```
+
+`ListedModel` carries `id`, optional display fields (`name`, `description`, `type`, `createdAt`,
+`ownedBy`), and optional advertised metadata: `contextLength`, `supportedParameters` (provider
+parameter names, not Anvia option names), and provider-specific `reasoning` and `pricing` objects.
+The metadata objects are passed through without sub-field normalization or schema validation.
+Missing metadata is unknown, not evidence of a missing capability; listed parameters and prices are
+inventory hints, not an availability, capability, or billing guarantee. `ModelListingError` exposes
+the provider, HTTP status when available, and the original `cause`.
+
 ## Tools
 
 Import from `@anvia/core` or `@anvia/core/tool`.
@@ -272,10 +294,14 @@ must not delete or overwrite canonical messages.
 Token-aware compaction uses `trigger.afterTokens`, optional `retention.recentTurns` (default `1`),
 an optional sync or async `tokenCounter`, and a `compactor`. Deprecated
 `retention.recentTokens` remains available as a mutually exclusive migration path. Core exports
-`estimateMemoryTokens` as the default provider-neutral estimate. `MemoryCompactionInfo` records
-original, compacted, retained, and result token/message counts, attempts, and summary-model usage.
-`agent.compactMemory({ session })` forces an eligible prefix compaction and returns
-`type: 'compacted'` or `type: 'skipped'`.
+`estimateMemoryTokens` as the default provider-neutral estimate; inline image and file data counts as
+a bounded 8,000 characters (about 2,000 tokens) regardless of payload size. `createSummaryMemoryCompactor()`
+sends no `temperature` unless configured, so models that reject the parameter work by default; set
+`temperature: 0` for deterministic summaries. `MemoryCompactionInfo` records original, compacted,
+retained, and result token/message counts, attempts, and summary-model usage.
+`MemoryCompactionError` includes the provider's error message, keeps the original error as `cause`,
+and reports usage accumulated before the failure. `agent.compactMemory({ session })` forces an
+eligible prefix compaction and returns `type: 'compacted'` or `type: 'skipped'`.
 
 ## Embeddings and vector stores
 
@@ -304,20 +330,57 @@ const { documents: hybridDocuments } = await embedDocuments({
 
 It also exports dense, sparse, and hybrid model contracts plus distance helpers.
 
-`@anvia/core/vector-store` exports `InMemoryVectorStore`, `VectorStore`, `HybridVectorStore`,
-retrieval/search/inspection types, `vectorFilter`, `createVectorSearchTool`, `ingestVectorText`, and
-`ingestVectorDocuments`.
+`@anvia/core/vector-store` exports `InMemoryVectorStore`, `InMemoryVectorStoreOptions`,
+`InMemoryVectorStoreFromDocumentsOptions`, `VectorStore`, `HybridVectorStore`,
+`createVectorSearchTool`, `retrieveDocuments`, `ingestVectorText`, `ingestVectorDocuments`,
+`vectorFilter`, `matchesVectorFilter`, `parseVectorInspectCursor`, and `VectorInspectCursorError`.
+Its types include `VectorFilter`, `VectorFilterOperator`, `VectorFilterComparisonOperator`,
+`VectorFilterList`, `VectorMetric`, `VectorFusion`, `VectorSearchRequest`, `VectorSearchResult`,
+`VectorInspectRequest`, `VectorInspectPage`, `VectorInspectItem`, `VectorStoreUpsertOptions`,
+`IngestVectorDocumentsOptions`, `IngestVectorTextOptions`, and `IngestVectorDocumentsResult`.
+
+`InMemoryVectorStore` scores with cosine similarity by default. Pass `metric: 'cosine' | 'euclidean'
+| 'dotProduct'` to change it. Scores always remain higher-is-better: `euclidean` returns negated
+distance, so `minScore` acts as a negative distance threshold, and `dotProduct` returns the raw
+inner product. Non-cosine metrics are approximate with an LSH index.
+
+`vectorFilter` builds `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, and variadic `and`/`or` filters.
+`and()` and `or()` take one or more children; `in()` accepts an array of metadata values, and native
+adapters reject an empty array.
 
 ```ts
-const store = InMemoryVectorStore.fromDocuments({ documents: embedded })
+const store = InMemoryVectorStore.fromDocuments({
+  documents: embedded,
+  metric: 'euclidean',
+})
+
+const filter = vectorFilter.and(
+  vectorFilter.eq('tenantId', 'acme'),
+  vectorFilter.ne('status', 'archived'),
+  vectorFilter.in('product', ['billing', 'accounts']),
+  vectorFilter.gte('revision', 3),
+  vectorFilter.lte('revision', 8),
+  vectorFilter.or(
+    vectorFilter.eq('visibility', 'internal'),
+    vectorFilter.gte('priority', 2),
+  ),
+)
+
 const results = await retrieveDocuments({
   store,
   model: embeddingModel,
   query,
   topK: 5,
+  minScore: -0.25,
   filter,
 })
 ```
+
+`inspect({ limit, cursor?, filter? })` pages stored documents. In-memory cursors are opaque decimal
+offsets: pass `nextCursor` back unchanged. `parseVectorInspectCursor()` validates the canonical
+non-negative safe-integer form, and invalid input throws `VectorInspectCursorError`, a `RangeError`
+subclass identifiable with `VectorInspectCursorError.isCursorError(error)`. Other adapters may use
+different opaque cursor formats.
 
 For raw text, the ingestion helpers share Core's deterministic document chunking and replace the
 complete embedded representation for each stable source ID:

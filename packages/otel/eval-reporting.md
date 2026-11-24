@@ -9,7 +9,10 @@ import { createOtelEvalReporter } from '@anvia/otel'
 await runEvalSuite({
   name: 'support-regression',
   cases,
-  target: agentEvalTarget(agent),
+  target: agentEvalTarget({
+    agent,
+    request: ({ input }: { input: string }) => ({ prompt: input }),
+  }),
   metrics,
   reporters: [
     createOtelEvalReporter({

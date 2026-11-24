@@ -1,15 +1,17 @@
 # Releases
 
-The reviewed source release is `@anvia/server` **1.3.4**. The entries below preserve notable v0 transport milestones.
+The reviewed source release is `@anvia/server` **1.3.6**. The entries below preserve notable v0 transport milestones.
 
-## Changes through 1.3.4
+## Changes through 1.3.6
 
-Reviewed `1.1.4` → `1.3.4` against SDK source on 2026-10-15. Added authorized durable run, graph, and task routes and operational controls, then multimodal prompts, goal agent authorization, and `POST /runs/:id/steer`. The handler now derives trace context after authorization through `trace(request, resource)`, including an observability session override with Durable 0.12. See [Durable HTTP](/packages/durable/http).
+Reviewed `1.1.4` → `1.3.6` against SDK source on 2026-11-04. Added authorized durable run, graph, and task routes and operational controls, then multimodal prompts, goal agent authorization, `POST /runs/:id/steer`, and trace context from `trace(request, resource)`. Version 1.3.5 validated resumable cursors, bounded retained closed streams, and rejected reopening a running stream. Version 1.3.6 maps payload limits to HTTP 413 and capacity to 429 with `{ error, code, field? }`. See [Durable HTTP](/packages/durable/http) and [Streaming](/packages/server/streaming).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/server/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/server/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.3.6` | Payload-limit admission now ends a durable run in terminal `failed`, and the handler returns 413 with `payload_too_large` or 429 with `capacity_exceeded` as `{ error, code, field? }`. Body-too-large 413 includes the `maxBodyBytes` limit, and retry recomputes inherited history without truncating it. `DurableHttpError` exposes `status`, `code`, `field`, and the server message. |
+| `1.3.5` | Validated resumable `after` cursors as nonnegative safe integers and returned a typed 400 `invalid_resumable_after` response. Evicted closed in-memory streams by TTL and count, oldest first, while never evicting running streams. Reopening a running stream now fails without disturbing its history instead of silently discarding it. |
 | `1.1.4` | Kept `code`, `retryable`, and JSON-safe `details` on JSONL/SSE error events (including prototype-defined fields `JSON.stringify` drops), degraded non-JSON-safe throws to `{ message }`, and exported `errorEvent`. |
 | `1.0.11` | Updated the Client dependency to `1.0.11`. |
 | `1.0.10` | Updated the Client dependency to `1.0.10`. |
@@ -41,5 +43,9 @@ See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a
 - Validate the discriminated `ClientStreamRequest` union and persist interaction continuations server-side; never return trusted continuations to the browser.
 - Re-test proxy buffering, content types, cancellation, and custom serializers after transport changes.
 - When adopting resume, add shared persistence before enabling it across multiple production replicas.
+- Validate `after` with `parseResumableAfter()` and return `resumeAfterErrorResponse()` (or an equivalent 400) for custom resume routes.
+- Size in-memory closed-stream retention for the reconnection window; resumed evicted streams report `missing`.
+- Map durable payload failures to 413 and capacity to 429, and read `DurableHttpError.code`/`field` rather than matching message text.
+- Upgrade the server's Client dependency and browser clients together when `message_reset` is in use.
 
 Read the complete [Server changelog](https://github.com/anvia-hq/anvia/blob/main/packages/server/CHANGELOG.md).

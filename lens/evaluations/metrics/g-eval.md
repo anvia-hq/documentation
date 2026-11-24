@@ -43,7 +43,7 @@ const result = await runEvalSuite({
   ],
 })
 
-console.log(result.results[0]?.scores)
+console.log(result.results[0]?.scores['refund-policy-quality'])
 ```
 
 ## Read the result

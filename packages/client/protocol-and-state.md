@@ -33,13 +33,29 @@ type ClientStreamRequest =
 
 Errors are masked by default. Use `mapError` only at the trusted adapter boundary when the application intentionally exposes a safe public shape.
 
+## Retries and message reset
+
+Protocol 1.6.0 adds the validated `message_reset` event:
+
+```ts
+{ type: 'message_reset', messageId: string }
+```
+
+A server emits it before retry content when a repeated `generation_start` targets an unfinished turn. `applyClientStreamEvent()` clears that message's parts, metadata, and generation state while preserving its ID and role. Completed turns and other agent scopes are unaffected. Custom reducers must handle the event; an older client validator rejects it, so upgrade the server and frontend copies of `@anvia/client` together.
+
 ## Public error boundaries
 
 `ClientProtocolError` from `@anvia/client` identifies invalid request/event/frame/message shapes and
 framed transport contract violations. Its optional `value` may retain the offending payload.
 A generic HTTP failure instead throws `EventStreamHttpError` from `@anvia/client/transport` with
-the HTTP response and raw text body. JSON parsing and application event validation can throw other
-errors before any valid protocol event is available.
+the HTTP response and raw text body.
+
+Malformed JSON frames are a separate boundary. `readJsonlStream`, `readSseStream`, and
+`readSseFrames` skip them by default and report an `EventStreamParseError` through `onParseError`;
+`strict: true` throws instead. `createFetchEventTransport` and `createHttpClientTransport` accept
+`onParseError`, while `DurableClient` streams always parse strictly. A malformed frame that is
+skipped is not a `ClientProtocolError`, and the framed protocol validator never receives it.
+Application event validation can still throw before any valid protocol event is available.
 
 `maskedClientError()` returns `{ message: 'An unexpected error occurred.' }` for a public stream.
 `normalizeClientError(value)` returns an Error: existing Errors are returned unchanged; valid
@@ -62,3 +78,6 @@ try {
 
 For custom event protocols, validate every parsed value with `mapEvent`; see
 [generic transports](/packages/client/api-reference#generic-event-transport-reference).
+
+For durable runs, the [durable chat transport](/packages/client/durable-chat) produces these
+frames from the durable journal and uses a run ID plus sequence as its resume cursor.

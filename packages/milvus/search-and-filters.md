@@ -12,7 +12,11 @@ const results = await retrieveDocuments({
 });
 ```
 
-`filterToMilvusExpr` translates equality, numeric comparisons, and nested `and`/`or` expressions into Milvus syntax. String literals are quoted and escaped; booleans and numbers use provider literals.
+`filterToMilvusExpr` translates `eq`, `ne`, `gt`, `gte`, `lt`, and `lte` to Milvus `==`, `!=`, `>`,
+`>=`, `<`, and `<=`, and `in` to a Milvus list expression. N-ary `and`/`or` become parenthesized
+`&&` and `||` expressions. String literals are quoted and escaped; booleans, numbers, and `null` use
+provider literals. Empty `in` lists, `null` values inside `in`, invalid keys, reserved keyword
+segments, and non-finite numbers throw descriptive errors.
 
 Search requests use the collection metric chosen at connection time. Score interpretation therefore depends on Milvus and the metric. Test ranking and thresholds on representative data.
 

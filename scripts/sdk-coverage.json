@@ -1,5 +1,5 @@
 {
-  "reviewedSdkRevision": "10977b75a1518a553b7d5deb0193b788258ba093",
+  "reviewedSdkRevision": "e751560f4a02c8989928966c203ed8747c0072fb",
   "entries": [
     {
       "module": "@anvia/cli",
@@ -19,8 +19,8 @@
       "module": "@anvia/client/transport",
       "guide": "sdk/streaming/server-transport.md",
       "reference": "packages/client/api-reference.md",
-      "exportCount": 11,
-      "exportNamesHash": "c6b4eab29c177543042f7d58688e740fa50f949e235ab46f0ce14b48efe23fdb"
+      "exportCount": 15,
+      "exportNamesHash": "4e5945dda7fd9ed0a8e56987cd40dacf270e323c79b642326b13d9172a731ad2"
     },
     {
       "module": "@anvia/core",
@@ -171,10 +171,10 @@
     },
     {
       "module": "@anvia/core/vector-store",
-      "guide": "sdk/index.md",
+      "guide": "sdk/knowledges/vector-stores.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 33,
-      "exportNamesHash": "460763d5e5166bfa32947e9b55a994440a7218145facd464f5616c3d2417186a"
+      "exportCount": 38,
+      "exportNamesHash": "b77aa9f31039aa13d1672f9fc0d38d3bbd083ac28b173808c7f0ed0a0f52d175"
     },
     {
       "module": "@anvia/transformers",
@@ -334,8 +334,8 @@
       "module": "@anvia/react-ui",
       "guide": "packages/react-ui/get-started.md",
       "reference": "packages/react-ui/api-reference.md",
-      "exportCount": 76,
-      "exportNamesHash": "3777a575d59495fe95f5ae5a5282d3630aaec686e06d2e880b2e0247e86f6e93"
+      "exportCount": 77,
+      "exportNamesHash": "5f8147f67e23f5ebace8452218efd96fd011617b933ca6ba1697979c9e77035f"
     },
     {
       "module": "@anvia/react-ui/attachment",
@@ -348,8 +348,8 @@
       "module": "@anvia/react-ui/chat",
       "guide": "packages/react-ui/get-started.md",
       "reference": "packages/react-ui/api-reference.md",
-      "exportCount": 25,
-      "exportNamesHash": "ed747a165d03ce294337e4b27a32707a3a5dd88b8c4eef390fd5ea67e11e8ef6"
+      "exportCount": 26,
+      "exportNamesHash": "8aff6d0807e213630e8f76118547bff3ccfb75e802bdd20f0fe941256b661c6b"
     },
     {
       "module": "@anvia/react-ui/completion",
@@ -418,29 +418,22 @@
       "module": "@anvia/server",
       "guide": "packages/server/get-started.md",
       "reference": "packages/server/api-reference.md",
-      "exportCount": 32,
-      "exportNamesHash": "f9ad440e5ad77baf237c0d55dfc39aa3a79ff897bcb4342f935052d567754e99"
-    },
-    {
-      "module": "@anvia/browser",
-      "guide": "packages/browser/get-started.md",
-      "reference": "packages/browser/api-reference.md",
-      "exportCount": 35,
-      "exportNamesHash": "82db5c5c892c70852a7e5c7b2dc42cc751bac72e17f2f6351829ec88aeb5cc3b"
+      "exportCount": 36,
+      "exportNamesHash": "ed24b7f3c3a87433c2996deb1f7e22ada5688949221c0166a446e124bfa8b668"
     },
     {
       "module": "@anvia/sandbox",
       "guide": "packages/sandbox/get-started.md",
       "reference": "packages/sandbox/api-reference.md",
-      "exportCount": 46,
-      "exportNamesHash": "8b71600ad6c1fcd2885f09355bdb1004bf0ea75ef4d320a3c9e8c90685615825"
+      "exportCount": 83,
+      "exportNamesHash": "6c65dd3bf35488b1da6aa0c5411a60b22858d4742cb15488580694db0014dbd4"
     },
     {
       "module": "@anvia/studio",
       "guide": "packages/studio/get-started.md",
       "reference": "packages/studio/api-reference.md",
-      "exportCount": 175,
-      "exportNamesHash": "c05800bf21379cce51c0a846653dbed10e79c47c8c8809f2c121009171bab2c3"
+      "exportCount": 176,
+      "exportNamesHash": "7d611a90276eb150e76e0d4627ffa6148d69f43b0d082afe23de663fd12ae35f"
     },
     {
       "module": "@anvia/chroma",
@@ -523,8 +516,8 @@
       "module": "@anvia/durable",
       "guide": "sdk/advanced/durable-execution.md",
       "reference": "packages/durable/api-reference.md",
-      "exportCount": 82,
-      "exportNamesHash": "abd39b6f8f52e0e4c268a6ec89bb0bf3dd4074425f0aaf3f5dc48358f09d81fc"
+      "exportCount": 85,
+      "exportNamesHash": "0f948ef1794dab704e5822b0bc7690e22a21297dd46b256fe6084bf8276fe4b6"
     },
     {
       "module": "@anvia/durable/maintenance",
@@ -567,6 +560,41 @@
       "reference": "packages/durable/api-reference.md",
       "exportCount": 4,
       "exportNamesHash": "c94c93480fa448a9a9f17fdf263a53f017cd9148104607e1161fbce45f3ad509"
+    },
+    {
+      "module": "@anvia/client/durable-chat",
+      "guide": "packages/client/durable-chat.md",
+      "reference": "packages/client/api-reference.md",
+      "exportCount": 7,
+      "exportNamesHash": "96e5504e529da5be99d72d12c97e6530b6da26211e4bb52fe0cebb2c685f7f4b"
+    },
+    {
+      "module": "@anvia/react-ui/sandbox-terminal",
+      "guide": "packages/react-ui/get-started.md",
+      "reference": "packages/react-ui/api-reference.md",
+      "exportCount": 8,
+      "exportNamesHash": "f36ae913b663558dd2b41fd9b36e46e1bf96fb2f20217ff3dcb49d0bdd69c736"
+    },
+    {
+      "module": "@anvia/react-ui/sandbox-desktop",
+      "guide": "packages/react-ui/get-started.md",
+      "reference": "packages/react-ui/api-reference.md",
+      "exportCount": 11,
+      "exportNamesHash": "83fce5f0759a9396c15fb3a2236184fa9c0b4d336127ce04e9424c62ec008084"
+    },
+    {
+      "module": "@anvia/sandbox/remote",
+      "guide": "sdk/advanced/sandbox/remote.md",
+      "reference": "packages/sandbox/api-reference.md",
+      "exportCount": 43,
+      "exportNamesHash": "1e1d853b3df821146479441d1ae9654cd5d51ebb3629fb5e525f814128d2c429"
+    },
+    {
+      "module": "@anvia/sandbox/daemon",
+      "guide": "sdk/advanced/sandbox/remote.md",
+      "reference": "packages/sandbox/api-reference.md",
+      "exportCount": 9,
+      "exportNamesHash": "9e39095f679d9deeede9c13718c0749d03f2ad75e59333447bd1e8ac900e5b6a"
     }
   ],
   "features": [
@@ -751,6 +779,17 @@
       "runtimeTest": "durable compaction example preserves canonical history and omits summary temperature"
     },
     {
+      "title": "Vector filters and metrics",
+      "module": "@anvia/core/vector-store",
+      "symbols": [
+        "InMemoryVectorStore",
+        "vectorFilter"
+      ],
+      "page": "sdk/knowledges/metadata-filters.md",
+      "marker": "vector-filter-example",
+      "runtimeTest": "vector filters combine n-ary operators and metric scoring"
+    },
+    {
       "title": "Lens eval correlation",
       "module": "@anvia/lens",
       "symbols": [
@@ -758,7 +797,7 @@
       ],
       "page": "lens/evaluations/run-evaluations.md",
       "marker": "lens-eval-correlation-example",
-      "runtimeTest": "Lens examples preserve tracing, dataset, and prompt contracts"
+      "runtimeTest": "Lens evaluation example exports matching primary traces and result links"
     },
     {
       "title": "Lens dataset versions",
@@ -768,7 +807,7 @@
       ],
       "page": "lens/evaluations/datasets/versions.md",
       "marker": "lens-dataset-version-example",
-      "runtimeTest": "Lens examples preserve tracing, dataset, and prompt contracts"
+      "runtimeTest": "Lens dataset version example uses object options and preserves the published identity"
     },
     {
       "title": "Lens prompt compilation",
@@ -778,7 +817,7 @@
       ],
       "page": "packages/lens/api-reference.md",
       "marker": "lens-prompt-example",
-      "runtimeTest": "Lens examples preserve tracing, dataset, and prompt contracts"
+      "runtimeTest": "Lens prompt reference example compiles the deployed version without implicit attribution"
     }
   ],
   "utilities": [

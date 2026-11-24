@@ -51,7 +51,6 @@ changelogs for exact fixes, additions, breaking changes, and migration notes.
 - [`@anvia/langfuse`](https://github.com/anvia-hq/anvia/blob/main/packages/observability-langfuse/CHANGELOG.md)
 - [`@anvia/studio`](https://github.com/anvia-hq/anvia/blob/main/packages/tool-studio/CHANGELOG.md)
 - [`@anvia/sandbox`](https://github.com/anvia-hq/anvia/blob/main/packages/tool-sandbox/CHANGELOG.md)
-- [`@anvia/browser`](https://github.com/anvia-hq/anvia/blob/main/packages/tool-browser/CHANGELOG.md)
 
 ## Channels workspace
 

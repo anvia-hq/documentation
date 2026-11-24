@@ -53,4 +53,28 @@ Providers accept existing `useChat` or `useCompletion` results. The UI package d
 transport, own server state, run an agent, or ship CSS. Its semantic DOM contract uses ARIA,
 `data-state`, and `data-role` only.
 
+## Optional sandbox viewers
+
+The terminal and desktop viewers are separate entry points with optional peer dependencies. Install
+only the peers for the viewer you use:
+
+```sh
+# @anvia/react-ui/sandbox-terminal
+pnpm add @xterm/xterm @xterm/addon-fit
+
+# @anvia/react-ui/sandbox-desktop
+pnpm add @novnc/novnc
+```
+
+Import xterm's stylesheet once in the application:
+
+```ts
+import '@xterm/xterm/css/xterm.css'
+```
+
+Both components stay off the root export, and their viewer libraries load on demand when a viewer
+mounts. The application supplies a one-time ticket for each connection; the sandbox hub authorizes
+the session and any read-only grant. See [terminal behavior and security](/sdk/advanced/sandbox/terminals)
+and [desktop behavior and control](/sdk/advanced/sandbox/desktop).
+
 Import from the root for convenience or from subpaths such as `@anvia/react-ui/message` and `@anvia/react-ui/chat` for clearer boundaries. Continue with [components and theming](/packages/react-ui/components-and-theming) or the [API reference](/packages/react-ui/api-reference).

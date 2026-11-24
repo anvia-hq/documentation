@@ -111,15 +111,23 @@ The model selector appears in the composer when the selected agent has available
 
 For a new chat, Studio also saves the initial selection in the session metadata. Every Playground request sends the current selection explicitly, so changing the selector affects the next run in the same session.
 
-If you call Studio’s HTTP runtime yourself, send the same reference in `model`:
+If you call Studio’s HTTP runtime yourself, send a `type`-discriminated `messages` request and pass `model` as an object with `providerId` and `modelId`:
 
 ```json
 {
-  "message": "Summarize the attached incident report.",
-  "model": "anthropic:claude-opus-4-8",
+  "type": "messages",
+  "messages": [
+    {
+      "role": "user",
+      "content": [{ "type": "text", "text": "Summarize the attached incident report." }]
+    }
+  ],
+  "model": { "providerId": "anthropic", "modelId": "claude-opus-4-8" },
   "stream": true
 }
 ```
+
+A `"provider:model"` string is what Studio emits in `/config`, `/status`, and session metadata; the run route rejects it, and any `message` or `history` key is rejected as a legacy request.
 
 The runtime resolves selection in this order: request model, saved session model, agent default, then global default. If none is configured, the agent’s original completion model is used.
 

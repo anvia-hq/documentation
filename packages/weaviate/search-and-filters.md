@@ -12,7 +12,10 @@ const results = await retrieveDocuments({
 });
 ```
 
-`filterToWeaviateWhere` emits `Equal`, `GreaterThan`, `LessThan`, `And`, and `Or` structures, selecting string, integer/number, or boolean value fields from the metadata value.
+`filterToWeaviateWhere` emits `Equal`, `NotEqual`, `GreaterThan`, `GreaterThanEqual`, `LessThan`,
+`LessThanEqual`, and `ContainsAny` structures for the comparison and membership operators, with
+n-ary `And`/`Or` for combinators. An empty `in` list or a `null` value inside `in` throws a
+descriptive error.
 
 Search uses the collection's `nearVector` query with a result limit. Scores are derived from Weaviate distance, so thresholds depend on the configured metric and corpus.
 

@@ -13,7 +13,7 @@ Use it when application code should describe agent behavior without depending on
 pnpm add @anvia/core zod
 ```
 
-`zod` is a direct dependency of Core, but application code normally imports it when defining tool inputs and structured outputs.
+Core declares `zod` as a required peer, so install it alongside Core; application code imports it when defining tool inputs and structured outputs.
 
 ## Build a useful agent
 
@@ -101,8 +101,8 @@ Schemas validate model-produced arguments; they do not authorize a user or tenan
 | --- | --- |
 | Package format | ESM |
 | TypeScript | Declarations included |
-| Peer dependencies | None declared |
-| Schema library | Zod 4 |
+| Peer dependencies | `zod` required; `@valibot/to-json-schema` optional |
+| Schema library | Zod 4 required; Valibot through the optional peer |
 | Runtime boundary | Modern JavaScript runtimes; individual entry points may require runtime-specific capabilities |
 
 Core's contracts are broadly portable, but not every entry point has the same environment needs. MCP

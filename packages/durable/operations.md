@@ -55,21 +55,48 @@ period.
 | --- | --- | --- |
 | `maxPendingRuns` | 10,000 | Unfinished runs, including graph nodes and owned agents. |
 | `maxPendingTasks` | 10,000 | Unfinished custom tasks, including owned children. |
-| `maxPayloadBytes` | 1,048,576 | UTF-8 JSON size of a run's prompt, input, history, responses, and outcome; a task's input, checkpoint, signals, and successful output; an operation's input and result; and each streamed delta. |
+| `maxPayloadBytes` | 1,048,576 | UTF-8 JSON size of each persisted value: a run's prompt, trace, input, history, responses, steering, outcome, context checkpoint, and exhaustion; a task's trace, input, checkpoint, signals, and successful output; an operation's input and result; and each `model_delta` event. |
 | `maxOperations` | 10,000 | Operations per execution. |
+| `maxBodyBytes` | 65,536 | HTTP request body bytes, measured as received. This is a handler option, not a runtime limit. |
 
-Limits must be positive safe integers. Capacity checks and insertion share one transaction, so a graph or
-owned-agent creation that exceeds capacity rolls back atomically, and repeating an identical existing
-submission still succeeds at capacity. Terminal executions release capacity. Admission failures throw
-`DurableLimitError` (HTTP 429). Status and control changes remain possible after limits are lowered on
-restart, failure diagnostics use a separate 4,096-character bound, and copying an already-admitted owned
+Limits must be positive safe integers. `maxPayloadBytes` is a per-field cap on a single write, not a session
+budget. The same content is counted again wherever it is persisted: a prompt lives in `run.prompt`, again in
+`run.input`, again in the model operation request with the provider and model envelope, and later in
+`history` and `outcome`. Budget for "prompt + history + request envelope ≤ `maxPayloadBytes`"; `run.input`
+is usually the field that crosses first, and the error names it.
+
+The HTTP body limit is the binding ceiling for uploads. Base64 images and long documents must fit
+`maxBodyBytes` before the runtime sees them. The default 64 KiB body limit is far below the default payload
+limit, so a large image is rejected with HTTP 413 before payload admission is consulted. Raise
+`maxBodyBytes` to at least the largest encoded request you accept; the payload limit still applies
+afterwards.
+
+Capacity checks and insertion share one transaction, so a graph or owned-agent creation that exceeds
+capacity rolls back atomically, and repeating an identical existing submission still succeeds at capacity.
+Terminal executions release capacity. Status and control changes remain possible after limits are lowered
+on restart, failure diagnostics use a separate 4,096-character bound, and copying an already-admitted owned
 agent output survives lower quotas.
 
+Admission rejects with `DurableLimitError`, which has `code` (`'payload_too_large'` or
+`'capacity_exceeded'`) plus optional `field`, `limit`, and `actual` values. Payload messages name the field
+and byte counts. `payload_too_large` can never succeed for the same request; `capacity_exceeded` clears as
+unfinished work settles. Over HTTP, payload limits return 413 and capacity returns 429, both with
+`{ error, code, field? }`; a body over `maxBodyBytes` also returns 413 and includes its `limit`.
+`DurableHttpError` in `@anvia/client` exposes `status`, `code`, `field`, and the server message.
+
+A run that cannot start because its prompt, input, or inherited history exceeds the payload limit ends in
+terminal `failed`, not `needs_attention`: no work is pending, so there is nothing for an operator to
+unblock. `run.result()` rejects with `DurableRunError` (`status: 'failed'`) and the event stream ends.
+Retrying recomputes the inherited history from the session's latest settled run and persists it before
+execution. If it still does not fit, `retry()` rejects with the same `DurableLimitError` and the run stays
+failed; a retry never runs with a shorter history. Raise `maxPayloadBytes`, restart, and retry to continue
+the session.
+
 An oversized external effect result leaves its started intent and blocks for reconciliation instead of
-running the effect again. An oversized checkpoint blocks the task for attention: raise the limit and retry,
-or cancel. Limits do not expire data, and automatic retention and execution deadlines are not available. Do
-not delete journal rows manually; deduplication, history, cursors, and recovery depend on them. HTTP bodies
-have their own `maxBodyBytes`.
+running the effect again. An oversized custom-task checkpoint or transition blocks the task for operator
+attention: raise the limit and retry, or cancel. Limits do not expire data, and automatic retention and
+execution deadlines are not available. Do not delete journal rows manually; deduplication, history,
+cursors, and recovery depend on them.
 
 ## Backup and restore
 

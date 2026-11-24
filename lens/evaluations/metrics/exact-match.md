@@ -32,7 +32,7 @@ const result = await runEvalSuite({
   ],
 })
 
-console.log(result.results[0]?.scores)
+console.log(result.results[0]?.scores.exactMatch)
 ```
 
 ## Read the result

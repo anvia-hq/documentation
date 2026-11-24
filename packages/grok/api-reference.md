@@ -39,7 +39,7 @@ class GrokClient {
     const Controls extends CompletionModelControls = GrokControlsFor<ModelId>,
   >(options: {
     modelId: ModelId
-    api: 'responses' | 'chat'
+    api?: 'responses' | 'chat'
     contextLimits?: ModelContextLimits
     controls?: Controls
   }): GrokCompletionModelHandle<Controls>
@@ -54,7 +54,7 @@ class GrokClient {
 }
 ```
 
-All model IDs and the completion API are explicit. Omitting `controls` applies per-model reasoning defaults derived from the model ID (`GrokControlsFor`). When injecting an OpenAI SDK client, supply `http` separately because Grok media endpoints also need credentials and transport settings.
+All model IDs are explicit. `api` is optional and defaults to `'chat'` when omitted. Omitting `controls` applies per-model reasoning defaults derived from the model ID (`GrokControlsFor`). When injecting an OpenAI SDK client, supply `http` separately because Grok media endpoints also need credentials and transport settings.
 
 ## Provider tools
 
@@ -68,7 +68,7 @@ function mcp(options: GrokMcpOptions): GrokProviderTool
 const tools = { webSearch, xSearch, codeInterpreter, fileSearch, mcp }
 ```
 
-`webSearch()` validates mutually exclusive allowed/excluded domains. `xSearch()` does the same for handles and validates its date range. `fileSearch()` requires vector-store IDs. `mcp()` requires an HTTPS server URL and validates its labels, credentials, headers, and tool allow-list.
+`webSearch()` validates mutually exclusive allowed/excluded domains. `xSearch()` does the same for handles and validates its date range. `fileSearch()` requires vector-store IDs. `mcp()` requires an HTTPS server URL that is not a private or reserved host, and validates its labels, credentials, headers, and tool allow-list.
 
 ## Other exports
 

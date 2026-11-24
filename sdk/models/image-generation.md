@@ -43,7 +43,7 @@ Width and height default to `1024` and must be positive integers. Provider-speci
 
 ## 3. Read the normalized response
 
-The response exposes the first image directly and preserves every returned image.
+The response exposes a non-empty `images` tuple: `images[0]` is the primary image and every returned image is preserved.
 
 ```ts
 console.log({

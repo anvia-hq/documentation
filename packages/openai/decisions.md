@@ -28,7 +28,7 @@ export async function routeTicket(client: OpenAIClient, message: string) {
 ```
 
 Create the client with server-side credentials or inject an initialized OpenAI SDK client. The
-adapter requires OpenAI SDK 7.30.0 or newer. `GPT_6_LUNA` is the known decision-model constant;
+adapter ships with `openai@^7.45.0` as a dependency, so that is the effective floor. `GPT_6_LUNA` is the known decision-model constant;
 `OpenAIDecisionModelId` also accepts extensible string IDs. A type or constant does not guarantee
 model access for your account or a compatible endpoint.
 

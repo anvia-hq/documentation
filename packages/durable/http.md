@@ -62,11 +62,22 @@ lifecycle. SSE authorization is checked at connection time (task tree events rea
 | POST | `/tasks/:id/retry` | Resume a task needing attention. |
 | POST | `/tasks/:id/cancel` | Cancel the selected subtree. |
 
-JSON bodies default to a 64 KiB limit (`maxBodyBytes`). Errors map to 400 (validation), 403 (denied), 404,
-409 (conflict), 413 (oversized body), 415 (media type), 429 (durable limit), and 500 without internal
-diagnostics. Responses disable caching, and SSE frames use the durable event sequence as their `id`. A
-transport error closes the stream without cancelling execution. Task cancellation returns 409 without
-mutating the tree if children appeared during authorization; retry to authorize the new tree.
+JSON bodies default to a 64 KiB limit (`maxBodyBytes`). This is the binding ceiling for uploads: an
+encoded request body must fit before the runtime applies `limits.maxPayloadBytes`. The default body limit
+is far below the default payload limit, so raise `maxBodyBytes` for large images or documents.
+
+Errors map to 400 (validation), 403 (denied), 404, 409 (conflict), 413 (oversized body or payload), 415
+(media type), 429 (capacity), and 500 without internal diagnostics. Payload and capacity responses use
+`{ error, code, field? }`: `payload_too_large` is 413, `capacity_exceeded` is 429, and a body over
+`maxBodyBytes` is 413 with code `payload_too_large`, field `request.body`, and the configured `limit`.
+A run whose prompt, input, or inherited history exceeds `maxPayloadBytes` ends in terminal `failed`; it
+does not wait in `needs_attention`.
+
+Responses disable caching, and SSE frames use the durable event sequence as their `id`. The events route
+rejects an invalid `after` or `Last-Event-ID` cursor (not a nonnegative safe integer, or ahead of the stored
+cursor) with 400. A transport error closes the stream without cancelling execution. Task cancellation
+returns 409 without mutating the tree if children appeared during authorization; retry to authorize the
+new tree.
 
 Executable code is registered on the server. Clients only select registered names and versions and supply
 JSON, so allowlist the task definitions and agents each caller may use: granting submission or retry of a
@@ -109,10 +120,17 @@ for await (const event of client.stream(accepted.run.id, { after: snapshot.curso
 | Tasks | `submitTask`, `taskSnapshot`, `taskGraph`, `listTasks`, `streamTask`, `signalTask`, `resolveEffect`, `retryTask`, `cancelTask` |
 
 Requests accept an `abortSignal`; aborting a stream detaches only that subscriber. The client validates
-incoming snapshots and events, rejects wrong-run, wrong-root, and out-of-order events, and throws
-`DurableHttpError` with the HTTP status on a failed response. It never retries mutations automatically. On a
-connection failure, reconnect from a fresh snapshot or from the last event cursor your application applied.
-Durable progress events are not the token-delta chat protocol used by the standard client transport.
+incoming snapshots and events, rejects wrong-run, wrong-root, and out-of-order events, and parses SSE
+strictly. A failed response throws `DurableHttpError` with `status`, `code`, `field`, and the server
+message; empty, non-JSON, or oversized error bodies fall back to a status-based message. It never retries
+mutations automatically. On a connection failure, reconnect from a fresh snapshot or from the last event
+cursor your application applied. Durable progress events are not the token-delta chat protocol used by the
+standard client transport.
+
+For `useChat` from `@anvia/react` and the `@anvia/react-ui` chat primitives, wrap the client with
+`createDurableChatTransport({ client, agentId, sessionId })` from `@anvia/client/durable-chat`. See
+[Durable chat transport](/packages/client/durable-chat) for event mapping, resume, interaction routing, and
+the `DurableBusyError` 409 behavior.
 
 ## Steering, goals, and trace context
 

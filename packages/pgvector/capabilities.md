@@ -4,7 +4,7 @@
 - SQL upsert on deterministic physical IDs.
 - Cosine, L2, and inner-product distance operators.
 - Connection through a `pg` client, pool, or connection string.
-- Parameterized equality and numeric comparison filters.
+- Parameterized equality, membership, and numeric comparison filters, including null-safe `ne` and n-ary `and`/`or`.
 - `search` retrieval through the core `VectorStore` interface, with `retrieveDocuments` and `createVectorSearchTool` integration from `@anvia/core/vector-store`.
 - Runtime validation of the vector column dimension.
 

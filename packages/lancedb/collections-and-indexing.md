@@ -9,4 +9,4 @@ The adapter replaces rows for re-ingested document IDs — deleting matches befo
 3. Delete rows for document IDs that leave the corpus; re-upserted IDs are replaced automatically.
 4. Run compaction or optimization according to your LanceDB deployment.
 
-`dimensions` is required and validated: the constructor rejects non-positive values, and `validate()` throws when the `__anvia_vector` column's list size differs from the configured dimensions.
+`dimensions` is required and validated: the constructor rejects non-positive values, and `validate()` throws when the `__anvia_vector` column reports a list size that differs from the configured dimensions. A table whose driver exposes no schema or no numeric list size is not compared.

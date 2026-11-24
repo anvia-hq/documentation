@@ -104,6 +104,11 @@ If the operator stops the run while it is waiting:
 - a pending question becomes `cancelled` and resolves with no answers;
 - the session transcript records the cancelled state.
 
+While an interaction is pending, the Playground blocks actions that would replace the suspended
+run: composer submit, new chat, agent switch, and session load or delete. Answer or cancel the
+pending interaction first. This prevents a new prompt from clearing the pending state and orphaning
+the server-held continuation.
+
 Approval and question requests live in the Studio process. Restarting an in-memory Studio runtime does not preserve an unresolved interaction, so do not use the development Playground as a production approval queue.
 
 Return to the [Playground overview](/studio/playground) or review [Run an agent](/studio/playground/run-an-agent) for the complete streaming lifecycle.

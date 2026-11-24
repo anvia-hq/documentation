@@ -113,7 +113,7 @@ const result = await generateCompletion({
 })
 ```
 
-Document support depends on the selected completion model. Anvia validates declared capabilities before the request is sent.
+Request `documents` are serialized by the adapter as tagged text and need no document capability. User-message `file` parts are different: those carrying a URL or base64 payload require `model.capabilities.documentInput`, which Anvia validates before the request is sent.
 
 ## 5. Opt into retries
 

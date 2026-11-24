@@ -70,7 +70,9 @@ The public contracts include `GraphContextRetriever`, `GraphSearchOptions`,
 ## Exploration and writes
 
 `GraphExplorer.explore()` accepts the `overview` and `expand` option unions and returns nodes,
-relationships, and per-resource truncation flags. `GraphDocumentWriter.replaceDocuments()` accepts
+relationships, and per-resource truncation flags. The `@anvia/graph/explore` subpath exports
+`resolveGraphExploreOptions()` with its resolved option types, for applications that validate the
+same bounds without constructing a `GraphExplorer`. `GraphDocumentWriter.replaceDocuments()` accepts
 prepared records and returns `GraphWriteResult` change counts.
 
 The package also exports schema, fact, document, chunk, entity, relationship, mention, property,

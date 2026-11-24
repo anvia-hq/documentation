@@ -12,7 +12,9 @@ const results = await retrieveDocuments({
 });
 ```
 
-The adapter runs vector search first and applies the filter afterwards with core's `matchesVectorFilter`, matching `eq`, `gt`, `lt`, `and`, and `or` against each candidate's metadata. When a filter eliminates candidates, the store widens its candidate limit until `topK` results survive, the table runs out of rows, or `minScore` excludes the remainder.
+The adapter has no server-side filter translator. It runs vector search first and applies the filter afterwards with core's `matchesVectorFilter`, which evaluates `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, and n-ary `and`/`or` against each candidate's metadata. An empty `in` list matches nothing rather than throwing because evaluation is local.
+
+When a filter eliminates candidates, the store widens its candidate limit until `topK` results survive, the table runs out of rows, or `minScore` excludes the remainder. The vector query itself is unfiltered, so filtering still happens after the database has selected nearest neighbors.
 
 Filters match against the metadata stored at ingestion, so give filtered documents metadata up front. Retrieval filters do not replace authorization.
 

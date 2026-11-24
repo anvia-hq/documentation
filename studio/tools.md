@@ -67,7 +67,7 @@ When several agents are registered, use the agent selector at the top of the vie
 - **mcp** counts definitions with MCP server provenance;
 - **approvals** counts tools that declare an approval policy.
 
-Definitions with the same source and name are de-duplicated. Studio lists static definitions before dynamic definitions and sorts names within each group.
+A dynamic definition is hidden when a static tool already has the same name; otherwise definitions are de-duplicated per source and name. Studio lists static definitions before dynamic definitions and sorts names within each group.
 
 ## Inspection versus execution
 

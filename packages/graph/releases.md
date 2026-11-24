@@ -1,15 +1,16 @@
 # Releases
 
-The reviewed source release is `@anvia/graph` **1.1.5**.
+The reviewed source release is `@anvia/graph` **1.1.6**.
 
-## Changes through 1.1.5
+## Changes through 1.1.6
 
-Reviewed `1.1.4` → `1.1.5` against SDK source on 2026-10-15. Refreshed package READMEs with current overviews, quickstarts, and links to the detailed guides. Review the source changelog for any dependency changes included in your upgrade.
+Reviewed `1.1.5` → `1.1.6` against SDK source on 2026-11-04. Updated upstream runtime dependencies and raised the `zod` peer range to `^4.6.7`.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/graph/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/graph/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.1.6` | Updated upstream runtime and schema dependencies; the `zod` peer range is now `^4.6.7`. |
 | `1.1.4` | Updated upstream runtime and schema dependencies across the workspace. |
 | `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
 | `1.1.2` | Moved zod to peerDependencies (`^4.4.0`), plus dependency updates. |

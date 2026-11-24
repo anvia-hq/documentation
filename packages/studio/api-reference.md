@@ -19,7 +19,11 @@ class Studio implements AnviaStudio {
 ```
 
 `start()` starts a server and returns immediately. `serve()` resolves after active runs drain and
-shutdown completes. `shutdown()` exposes the same asynchronous draining for an application-owned
+shutdown completes. `allowedHosts` lists additional client-facing hostnames that may appear in the
+`Host` or `Origin` header; ports are ignored. Loopback hostnames are always accepted, and an
+explicit non-wildcard `hostname` is trusted automatically. Binding to `0.0.0.0` or `::` still
+requires every public hostname to be listed. Requests with a foreign `Host` or `Origin` receive
+`403` with `error.code: "forbidden"`. `shutdown()` exposes the same asynchronous draining for an application-owned
 lifecycle. `close()` is synchronous, aborts active work, and does not wait for observers. `fetch()`
 makes the same application usable in runtimes or servers that accept a Fetch handler.
 
@@ -27,6 +31,7 @@ makes the same application usable in runtimes or servers that accept a Fetch han
 type StudioServeOptions = {
   port?: number
   hostname?: string
+  allowedHosts?: readonly string[]
   log?: boolean
   handleSignals?: boolean
   shutdownTimeoutMs?: number
@@ -41,7 +46,7 @@ type StudioServeLifecycleOptions = Omit<StudioServeOptions, 'handleSignals'> & {
 ## Targets and configuration
 
 ```ts
-type StudioTarget = Agent | Pipeline<any, any>
+type StudioTarget = Agent | AgentTeam<unknown> | Pipeline<any, any>
 
 type StudioOptions = {
   evals?: StudioEvalSuite<any, any, any>[]
@@ -144,7 +149,7 @@ Trace records use `StudioTrace`, `StudioTraceSummary`, `StudioTraceObservation`,
 
 ## Requests, events, and errors
 
-`AgentRunRequest` accepts a normalized `messages` array plus optional session ID, streaming, max-turn, tool-concurrency, model, metadata, and trace controls. `AgentRunResponse` aliases Core `AgentResponse`.
+`AgentRunRequest` is a `type`-discriminated union: `{ type: 'messages', messages, ... }` or `{ type: 'interaction_response', ... }`, with optional streaming, model, metadata, trace, and control fields. `AgentRunResponse` is core's `AgentOutcome` minus the interaction continuation: interaction outcomes are stripped of `continuation` and `messages`.
 
 `AgentRunStreamEvent` combines core agent events with Studio approval, question, session-log, pipeline-log, and pipeline-final events.
 
@@ -156,7 +161,7 @@ Registered `AgentTeam` targets gain live run routes. Team IDs occupy a separate 
 const studio = new Studio([agent, team])
 
 // Config exposure
-GET /teams                    // -> StudioTeamConfig[]
+GET /teams                    // -> { teams: StudioTeamConfig[] }
 GET /teams/:teamId            // -> StudioTeamConfig
 
 // Run lifecycle (JSONL event stream)
@@ -172,8 +177,10 @@ POST /teams/:teamId/runs/:runId/interactions/:interactionId       // AgentIntera
 type StudioErrorCode =
   | 'bad_request'
   | 'conflict'
+  | 'forbidden'
   | 'not_found'
   | 'payload_too_large'
+  | 'service_unavailable'
   | 'unsupported_capability'
   | 'internal_error'
 ```

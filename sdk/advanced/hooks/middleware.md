@@ -28,7 +28,7 @@ const hideInternalErrors = createMiddleware({
 })
 ```
 
-Returning `undefined` keeps the current value. Tool output middleware may return replacement text or an object containing replacement text and structured result content.
+Returning `undefined` keeps the current value. Tool output middleware may return replacement text, an object whose `result` replaces the text, or an object whose `structuredResult` replaces the structured content. The two object fields are mutually exclusive in one result.
 
 Middleware also supports `onCompletionRequest`, `onCompletionResponse`, and `onToolInput`. Preserve valid request and response shapes when replacing them.
 

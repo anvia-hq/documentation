@@ -5,7 +5,7 @@
 - `search` alongside `ensure`, `validate`, and `upsert` from the core `VectorStore` contract; agent tool integration via core's `createVectorSearchTool()`.
 - Multiple embeddings per document with logical-result collapsing.
 - Scalar metadata stored alongside reserved Anvia fields.
-- Translation of `eq`, `gt`, `lt`, `and`, and `or` filters.
+- Translation of `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, and n-ary `and`/`or` filters.
 
 `upsert()` deletes rows for each supplied document ID before inserting, so repeated ingestion replaces documents instead of duplicating them.
 

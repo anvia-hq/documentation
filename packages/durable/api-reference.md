@@ -41,6 +41,7 @@ class DurableRuntime {
   run(id: string): DurableRunRecord
   operationRequest(id: string, key: string): CompletionRequest
   steer(id: string, input: AgentSteerInput, options?: DurableSteerOptions): AgentSteerReceipt
+  compatibility(): readonly DurableAgentCompatibility[]
   submitGoal(definition: DefinedGoal, input: GoalInput & {
     sessionId: string; requestId: string; trace?: DurableTraceOptions
   }): Promise<DurableTaskHandle<GoalResult>>
@@ -91,6 +92,9 @@ type DurableRuntimeOptions = {
   store: DurableStore
   limits?: Partial<DurableLimits>
   onFatalError?: (error: unknown) => void
+  onCompatibility?: (
+    report: readonly DurableAgentCompatibility[],
+  ) => void | Promise<void>
   agents?: readonly DurableAgentRegistration[]
   tasks?: readonly { readonly registration: RegisteredTask }[]
   maxConcurrentTasks?: number
@@ -102,6 +106,12 @@ type DurableRuntimeOptions = {
 `cancel`, `graphSnapshot`, `graphEvents`, `cancelGraph`) that the handles delegate to; prefer the handles.
 `runScope()` returns lightweight owner metadata (`runId`, `agentId`, `sessionId`, and optional `graphId`,
 `taskId`, `rootTaskId`, `taskName`) for trusted authorization code.
+
+`compatibility()` returns a detached, frozen report per registration. Each
+`DurableAgentCompatibility` has `agentId`, `version`, `tools`, `streaming`, `compaction`, `modelRetry`,
+`frozen` (`DurableFrozenAgentOption[]`), and `unavailable` (`DurableUnavailableRunSetting[]`).
+`onCompatibility` receives the same report after `open()` and each successful `registerAgents()`; a throw
+or rejected promise from the callback is ignored.
 
 ## DurableRun
 
@@ -123,7 +133,14 @@ class DurableRun {
 `stream()` reads committed events after `after` (default 0), polls while idle, and finishes when the run is
 `completed`, `failed`, or `cancelled`. It stays open during approvals and recovery blocks and throws a
 `TypeError` if the cursor is ahead of the store. `result()` throws `DurableRunError` for a failed or
-cancelled run; it does not approve interactions.
+cancelled run; it does not approve interactions. A run that fails payload admission is terminal `failed`,
+so the stream ends and `result()` rejects.
+
+`retry()` is accepted only for `failed` or `needs_attention` runs, and only while the session has not
+advanced. For a run whose admission rolled back, it recomputes inherited history from the session's latest
+settled run and persists it before execution. If that history still exceeds `maxPayloadBytes`, `retry()`
+rejects with the same `DurableLimitError` and the run stays failed; it never executes with truncated
+history.
 
 ## Submission and record types
 
@@ -146,6 +163,33 @@ type DurableAgentRegistration = {
   compaction?: DurableCompactionOptions
 }
 
+type DurableAgentCompatibility = {
+  agentId: string
+  version: string
+  tools: readonly string[]
+  streaming: boolean
+  compaction: boolean
+  modelRetry: DurableModelRetry | undefined
+  frozen: readonly DurableFrozenAgentOption[]
+  unavailable: readonly DurableUnavailableRunSetting[]
+}
+
+type DurableFrozenAgentOption =
+  | 'maxTurns' | 'controls' | 'toolChoice' | 'temperature'
+  | 'maxTokens' | 'providerOptions' | 'outputSchema'
+
+type DurableUnavailableRunSetting =
+  | 'retries' | 'maxTurns' | 'controls' | 'lifecycle' | 'guardrails'
+  | 'middlewares' | 'toolConcurrency' | 'session'
+```
+
+`skills` are supported because they flatten into static instructions and tools. Agent-level `retries` is
+rejected when it would retry (`retries: false`, `retries: 0`, and `retries: { maxAttempts: 1 }` are
+accepted); use the registration's `modelRetry`. Unsupported `memory`, `lifecycle`, `middlewares`,
+`guardrails`, `context`, `mcpServers`, provider tools, and dynamic tool indexes throw a `TypeError` naming
+the groups the agent sets.
+
+```ts
 type DurableRunStatus =
   | 'queued' | 'retry_wait' | 'pending' | 'running' | 'waiting'
   | 'needs_attention' | 'completed' | 'failed' | 'cancelled'
@@ -280,7 +324,7 @@ Task statuses are `pending`, `running`, `waiting`, `completing`, `cancelling`, `
 | `DurableNotFoundError` | Unknown run, graph, or task. |
 | `DurableConflictError` | Conflicting submission, duplicate registration, or unregistering an agent that is still needed. |
 | `DurableStorageError` | Fatal journal failure. The runtime stops accepting work. |
-| `DurableLimitError` | An admission, payload, or operation limit was exceeded. |
+| `DurableLimitError` | An admission, payload, or operation limit was exceeded. Has `code` (`'payload_too_large'` or `'capacity_exceeded'`) and optional `field`, `limit`, and `actual`. Payload limits return HTTP 413; capacity returns 429. |
 
 ## Storage and maintenance
 
@@ -302,9 +346,13 @@ type DurableBackupInfo = { createdAt: string; schemaVersion: number }
 ```ts
 import { createDurableHandler, type DurableAuthorization } from '@anvia/server/durable'
 import { DurableClient, DurableHttpError } from '@anvia/client/durable'
+import { createDurableChatTransport } from '@anvia/client/durable-chat'
 ```
 
-See [HTTP server and client](/packages/durable/http) for options, routes, and methods.
+`DurableHttpError` exposes `status`, `code`, `field`, and the server message. `createDurableChatTransport`
+adapts the HTTP client to `useChat` from `@anvia/react`. See [HTTP server and client](/packages/durable/http),
+[Durable chat transport](/packages/client/durable-chat), and the payload and capacity error mapping in
+[Operations](/packages/durable/operations#admission-and-payload-limits).
 
 ## Goals and continuing agent children
 

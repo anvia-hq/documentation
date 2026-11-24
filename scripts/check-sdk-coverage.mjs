@@ -44,8 +44,9 @@ for (const directory of await readdir(join(sdkRoot, 'packages'))) {
     if (subpath.startsWith('./internal/')) continue
     const types = exported?.types
     if (typeof types !== 'string') throw new Error(`No typed source mapping for ${manifest.name}${subpath}`)
-    const source = resolve(packageRoot, types.replace(/^\.\/dist\//, './src/').replace(/\.d\.ts$/, '.ts'))
-    if (!existsSync(source)) throw new Error(`Missing source entry: ${source}`)
+    const sourceBase = resolve(packageRoot, types.replace(/^\.\/dist\//, './src/').replace(/\.d\.ts$/, ''))
+    const source = [`${sourceBase}.ts`, join(sourceBase, 'index.ts')].find(existsSync)
+    if (!source) throw new Error(`Missing source entry: ${sourceBase}.ts or ${sourceBase}/index.ts`)
     entries.set(subpath === '.' ? manifest.name : manifest.name + subpath.slice(1), source)
   }
 }
@@ -95,7 +96,10 @@ for (const feature of inventory.features) {
   if (!codeBlocks(page).some(block => block.flags.includes('anvia-check') && block.flags.split(/\s+/).includes(feature.marker))) {
     failures.push(`${feature.title}: missing complete checked example ${feature.marker}`)
   }
-  const tests = await readFile(join(docsRoot, 'scripts/check-sdk-runtime.mjs'), 'utf8')
+  const tests = [
+    await readFile(join(docsRoot, 'scripts', 'check-sdk-runtime.mjs'), 'utf8'),
+    await readFile(join(docsRoot, 'scripts', 'lens-runtime-contracts.mjs'), 'utf8'),
+  ].join('\n')
   if (!tests.includes(`test('${feature.runtimeTest}'`)) failures.push(`${feature.title}: missing named runtime test`)
 }
 for (const decision of inventory.utilities) {

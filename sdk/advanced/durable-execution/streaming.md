@@ -66,9 +66,17 @@ for await (const event of run.stream()) {
 Persisting each delta adds SQLite writes and retained event data, and `limits.maxPayloadBytes` applies to
 each delta. These events are not the token-delta chat protocol used by the standard client transport.
 
+A run that cannot admit its prompt, input, or inherited history because of `maxPayloadBytes` ends in
+terminal `failed`. Its event stream ends instead of staying open for operator action; raise the limit,
+restart, and retry the run.
+
 ## 4. Stream over HTTP
 
 `@anvia/server/durable` serves runs as SSE and `@anvia/client/durable` reconnects with validated cursors. See
 [HTTP server and client](/packages/durable/http).
+
+To feed the same run into `useChat` from `@anvia/react`, use
+[`createDurableChatTransport`](/packages/client/durable-chat). It maps these journal events to client frames
+and uses the durable run ID and sequence as the resume cursor.
 
 Next: [tools, approvals, and recovery](/sdk/advanced/durable-execution/recovery).

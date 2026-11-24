@@ -375,13 +375,13 @@ export default defineConfig({
                 { text: 'Command execution', link: '/sdk/advanced/sandbox/commands' },
                 { text: 'Processes and previews', link: '/sdk/advanced/sandbox/processes' },
                 { text: 'Sessions and cleanup', link: '/sdk/advanced/sandbox/sessions' },
+                { text: 'Remote sandboxes', link: '/sdk/advanced/sandbox/remote' },
+                { text: 'Remote terminals', link: '/sdk/advanced/sandbox/terminals' },
+                { text: 'Remote tunnels', link: '/sdk/advanced/sandbox/tunnels' },
+                { text: 'Sandbox desktop', link: '/sdk/advanced/sandbox/desktop' },
                 { text: 'Limits and security', link: '/sdk/advanced/sandbox/security' },
                 { text: 'Production checklist', link: '/sdk/advanced/sandbox/checklist' }
               ]
-            },
-            {
-              text: 'Visible browser agents',
-              link: '/sdk/advanced/browser'
             }
           ]
         },
@@ -657,7 +657,6 @@ export default defineConfig({
             },
             { text: 'Memory', link: '/studio/memory' },
             { text: 'Sandboxes', link: '/studio/sandboxes' },
-            { text: 'Browser desktop', link: '/studio/browser' },
             { text: 'Team runs', link: '/studio/team-runs' },
             { text: 'Runtime status', link: '/studio/runtime-status' }
           ]
@@ -901,6 +900,7 @@ export default defineConfig({
                 { text: 'Overview', link: '/packages/client' },
                 { text: 'Get started', link: '/packages/client/get-started' },
                 { text: 'Protocol and state', link: '/packages/client/protocol-and-state' },
+                { text: 'Durable chat', link: '/packages/client/durable-chat' },
                 { text: 'API', link: '/packages/client/api-reference' },
                 { text: 'Releases', link: '/packages/client/releases' }
               ]
@@ -1420,18 +1420,6 @@ export default defineConfig({
                 { text: 'Security', link: '/packages/sandbox/security' },
                 { text: 'API', link: '/packages/sandbox/api-reference' },
                 { text: 'Releases', link: '/packages/sandbox/releases' }
-              ]
-            },
-            {
-              text: '@anvia/browser',
-              collapsed: true,
-              items: [
-                { text: 'Overview', link: '/packages/browser' },
-                { text: 'Get started', link: '/packages/browser/get-started' },
-                { text: 'Capabilities', link: '/packages/browser/capabilities' },
-                { text: 'Security', link: '/packages/browser/security' },
-                { text: 'API', link: '/packages/browser/api-reference' },
-                { text: 'Releases', link: '/packages/browser/releases' }
               ]
             }
           ]

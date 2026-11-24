@@ -90,7 +90,7 @@ Error records are operational diagnostics. `load()` must not mix them into norma
 Expose an optional `inspector` with:
 
 - `listConversations({ limit, userId? })` returning conversation summaries; and
-- `getConversation(ref)` returning one summary plus ordered message records.
+- `getConversation({ ref })` returning one summary plus ordered message records.
 
 The `ref` value is an opaque store-owned identifier used to retrieve that exact conversation. This capability lets Studio and internal tooling inspect memory without teaching core about the database schema.
 

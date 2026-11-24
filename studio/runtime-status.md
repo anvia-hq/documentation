@@ -75,6 +75,7 @@ Capabilities reflect current registration and adapter availability:
 | `memory` | A session store exists or at least one agent has memory configured. |
 | `traces` | A trace store is resolved. |
 | `pipelines` | At least one pipeline is registered. |
+| `graphs` | At least one graph explorer is registered through `StudioOptions.graphs`. |
 | `evals` | At least one evaluation suite is registered. |
 | `tools` | An agent has static or dynamic tools. |
 | `mcps` | An agent has a tool carrying MCP server provenance. |

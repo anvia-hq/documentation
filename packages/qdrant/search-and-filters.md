@@ -24,7 +24,11 @@ const hybridResults = await retrieveDocuments({
 })
 ```
 
-`filterToQdrantFilter()` translates `eq`, `gt`, `lt`, `and`, and `or` into native Qdrant filters for direct client calls.
+`filterToQdrantFilter()` translates `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `and`, and `or` into
+native Qdrant conditions for direct client calls. Equality uses `must` match, `ne` uses `must_not`,
+ranges use `range`, and n-ary `and`/`or` use `must`/`should`. `in` requires a non-empty list whose
+values are all strings or all integers; booleans, floats, `null`, and mixed types throw a descriptive
+error.
 
 For raw vector queries, call `store.search({ vector, topK, minScore, filter })`. A hybrid store also exposes `searchHybrid({ vector, sparseVector, fusion, topK, minScore, filter, providerOptions })`; Qdrant's `providerOptions.prefetchLimit` controls candidates per branch.
 

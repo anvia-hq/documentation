@@ -39,6 +39,6 @@ await store.upsert({ documents, providerOptions })
 const results = await store.search({ vector, topK, minScore, filter, providerOptions, abortSignal })
 ```
 
-`filterToPineconeFilter(filter)` converts an Anvia `VectorFilter` for direct Pinecone queries.
+`filterToPineconeFilter(filter)` converts an Anvia `VectorFilter` for direct Pinecone queries. It maps every comparison operator plus `in` to native `$` operators and n-ary `and`/`or` to `$and`/`$or`; empty `in` lists throw.
 
 Return to the [package guide](/packages/pinecone).

@@ -548,18 +548,27 @@ test('generic stream example validates SSE and handles JSONL, HTTP and parsing f
   assert.ok(example)
   await runExample(example.code, '', String.raw`
     assert.deepEqual(received, [{ type: 'progress', completed: 1 }])
-    async function collect(body, status = 200) {
+    async function collect(body, status = 200, options = {}) {
       const client = createFetchEventTransport({ endpoint: 'https://example.invalid',
-        fetch: async () => new Response(body, { status }), mapEvent: event => eventSchema.parse(event) })
+        fetch: async () => new Response(body, { status }), mapEvent: event => eventSchema.parse(event), ...options })
       const values = []
       for await (const value of client.send({ request: {} })) values.push(value)
       return values
     }
     assert.deepEqual(await collect('{"type":"progress","completed":2}\n'), [{ type: 'progress', completed: 2 }])
-    await assert.rejects(collect('not-json'), SyntaxError)
+    assert.deepEqual(await collect('not-json'), [])
+    const parseErrors = []
+    assert.deepEqual(await collect('not-json', 200, { onParseError: error => parseErrors.push(error) }), [])
+    assert.equal(parseErrors.length, 1)
+    assert.equal(parseErrors[0].name, 'EventStreamParseError')
+    assert.equal(parseErrors[0].format, 'jsonl')
     await assert.rejects(collect('{"type":"progress","completed":"bad"}'))
     await assert.rejects(collect('private error', 503), error => error instanceof EventStreamHttpError && error.body === 'private error')
-    const { readJsonlStream, createDirectEventTransport } = await import(${JSON.stringify(await sourceEntry('@anvia/client/transport'))})
+    const { readJsonlStream, createDirectEventTransport, EventStreamParseError } = await import(${JSON.stringify(await sourceEntry('@anvia/client/transport'))})
+    const invalid = new ReadableStream({ start(c) { c.enqueue(new TextEncoder().encode('not-json\n')) } })
+    await assert.rejects(async () => {
+      for await (const value of readJsonlStream(invalid, { strict: true })) void value
+    }, error => error instanceof EventStreamParseError && error.format === 'jsonl')
     let cancelled = false
     const body = new ReadableStream({ start(c) { c.enqueue(new TextEncoder().encode('1\n2\n')) }, cancel() { cancelled = true } })
     for await (const value of readJsonlStream(body)) { assert.equal(value, 1); break }
@@ -931,6 +940,15 @@ test('durable compaction example preserves canonical history and omits summary t
       assert.equal(requests[1].temperature, undefined)
       assert.ok(runtime.events(second.id, 0).some(event => event.type === 'compaction_completed'))
     } finally { await runtime.close() }
+  `)
+})
+
+test('vector filters combine n-ary operators and metric scoring', async () => {
+  const example = (await blocks('sdk/knowledges/metadata-filters.md')).find(block => block.flags.includes('vector-filter-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    assert.deepEqual(results.map(({ id }) => id), ['invoice', 'accounts'])
+    assert.ok(results[0].score >= results[1].score)
   `)
 })
 

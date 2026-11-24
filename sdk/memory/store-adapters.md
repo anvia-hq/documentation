@@ -19,6 +19,8 @@ npx prisma migrate dev --name add_anvia_memory
 
 The init command is a dry run unless `--write` is supplied. By default it creates `prisma/models/anvia-memory.prisma`; use the explicit `--append-to-schema` flag only after reviewing the generated models.
 
+Prisma 8 uses a contract layout instead. `init --prisma-version 8` rejects `--schema` and `--append-to-schema` and points you at `--contract <path>` with `--append-to-contract`, and runtime clients come from `@anvia/memory-prisma/v8`. See [Prisma schema and migrations](/packages/memory-prisma/schema-and-migrations) for the contract, directive, and `contractFromJson` steps.
+
 ```ts
 import { PrismaMemoryStore } from '@anvia/memory-prisma'
 

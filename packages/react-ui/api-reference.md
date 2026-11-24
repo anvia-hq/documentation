@@ -14,7 +14,7 @@ import {
 } from '@anvia/react-ui'
 ```
 
-The root exports the principal components, providers, hooks, and shared types from every family.
+The root exports the principal components, providers, hooks, and shared types. The sandbox viewers are the exception: `SandboxTerminal` and `SandboxDesktop` are available only from their own subpaths, so applications that never render a viewer do not need xterm or noVNC.
 
 ### Providers
 
@@ -94,7 +94,7 @@ Renders completion context usage. A render-function child receives the resolved 
 | Streaming | `StreamMarkdown`, `StreamMarkdownProps` |
 | ThreadPrimitive list | `ThreadListPrimitive`, `ThreadListItemPrimitive`, `ThreadListProvider`, `useThreadList`, `useThreadListItem`, `ThreadListController`, `ThreadListItemContextValue`, `ThreadListProviderProps`, `ThreadListRecord` |
 | Shared context types | `ApprovalContextValue`, `AttachmentContextValue`, `ChatController`, `ChatProviderProps`, `CompletionController`, `CompletionInputContextValue`, `CompletionProviderProps`, `ComposerContextValue`, `ImageContextValue`, `MessageContextValue`, `MessagePartContextValue`, `QuestionContextValue`, `QuestionPromptContextValue`, `SelectionToolbarContextValue`, `ThreadContextValue` |
-| ComposerPrimitive types | `ComposerAttachmentInput`, `ComposerAttachmentsUpdate`, `ComposerEntitiesUpdate`, `ComposerEntity`, `ComposerEntityData`, `ComposerMessageMetadata`, `ComposerQuote`, `ComposerTriggerDefinition`, `ComposerTriggerItem`, `ComposerTriggerItems`, `ComposerTriggerItemsArgs`, `ComposerTriggerState`, `ComposerTriggerStateUpdate` |
+| ComposerPrimitive types | `ComposerAttachmentInput`, `ComposerAttachmentsUpdate`, `ComposerEntitiesUpdate`, `ComposerEntity`, `ComposerEntityData`, `ComposerInputEntity`, `ComposerMessageMetadata`, `ComposerQuote`, `ComposerTriggerDefinition`, `ComposerTriggerItem`, `ComposerTriggerItems`, `ComposerTriggerItemsArgs`, `ComposerTriggerState`, `ComposerTriggerStateUpdate` |
 | Primitive types | `PrimitiveProps`, `PrimitiveRef` |
 
 ## `@anvia/react-ui/chat`
@@ -117,7 +117,7 @@ import {
 | Part | Role |
 | --- | --- |
 | `ComposerPrimitive.Root` | Form, controlled/uncontrolled input state, attachments, entities, quote, and submission |
-| `ComposerPrimitive.Input` | Tiptap-backed rich input |
+| `ComposerPrimitive.Input` | Tiptap-backed rich input; accepts `renderEntity` for mention-token display |
 | `ComposerPrimitive.TextareaInput` | Native textarea alternative |
 | `ComposerPrimitive.Attachments` | Renders the attachment collection |
 | `ComposerPrimitive.AddAttachment` | Opens an attachment input |
@@ -166,13 +166,26 @@ type ComposerSubmitMessage<Data extends ClientDataMap = ClientDataMap> = (
 ) => Promise<void> | void
 ```
 
+`ComposerPrimitive.Input` also accepts an editor-only renderer for mention tokens:
+
+```ts
+type ComposerInputEntity = Omit<ComposerEntity, 'range'>
+
+// ComposerPrimitive.Input prop
+renderEntity?: (entity: ComposerInputEntity) => ReactNode
+```
+
+`ComposerInputEntity` carries `id`, `triggerId`, `trigger`, `label`, `text`, and optional `data`; `range` is omitted because it is meaningful only in the saved message. `renderEntity` changes how the token displays inside the editor, for example an avatar or display name from `entity.data`. It does not change the saved input text or submitted entities. Return `null` or `undefined` to fall back to `entity.text`.
+
+Keep the function a pure function of `entity`: a token re-renders only when its Tiptap node changes, not when state captured by the function's closure changes. `ComposerPrimitive.TextareaInput` does not accept `renderEntity`. `ComposerInputEntity` is exported from both `@anvia/react-ui/chat` and the root entry point.
+
 ### `ThreadPrimitive`
 
 `ThreadPrimitive` exposes `Root`, `Viewport`, `ViewportFooter`, `Messages`, `Empty`, `Status`, `Loading`, `Error`, `Suggestions`, `Suggestion`, and `ScrollToBottom`. The parts consume the current chat controller and thread context; ordinary DOM props and refs are forwarded.
 
 ### Other exports
 
-The chat subpath also exports `ChatController`, `ChatProviderProps`, `ComposerAttachmentInput`, `ComposerAttachmentsUpdate`, `ComposerContextValue`, `ComposerEntitiesUpdate`, `ComposerEntity`, `ComposerEntityData`, `ComposerMessageMetadata`, `ComposerQuote`, `ComposerTriggerDefinition`, `ComposerTriggerItem`, `ComposerTriggerItems`, `ComposerTriggerItemsArgs`, `ComposerTriggerState`, `ComposerTriggerStateUpdate`, and `ThreadContextValue`.
+The chat subpath also exports `ChatController`, `ChatProviderProps`, `ComposerAttachmentInput`, `ComposerAttachmentsUpdate`, `ComposerContextValue`, `ComposerEntitiesUpdate`, `ComposerEntity`, `ComposerEntityData`, `ComposerInputEntity`, `ComposerMessageMetadata`, `ComposerQuote`, `ComposerTriggerDefinition`, `ComposerTriggerItem`, `ComposerTriggerItems`, `ComposerTriggerItemsArgs`, `ComposerTriggerState`, `ComposerTriggerStateUpdate`, and `ThreadContextValue`.
 
 ## `@anvia/react-ui/completion`
 
@@ -339,6 +352,162 @@ These primitives compose the controller returned by `useGraphExplorer()` in `@an
 `GraphExplorerProvider` accepts `{ controller, children? }`. `useGraphExplorerContext()` returns the `GraphExplorerController` and throws outside the provider; `useGraphExplorerNode()` returns the `{ node, selected, matched }` item context.
 
 The entry point also exports the `GraphExplorerController`, `GraphExplorerExpandNodeOptions`, `GraphExplorerNodeContextValue`, `GraphExplorerProviderProps`, `GraphExplorerStatus`, and `GraphExplorerNodeRootProps` types.
+
+## `@anvia/react-ui/sandbox-terminal`
+
+```ts
+import { SandboxTerminal } from '@anvia/react-ui/sandbox-terminal'
+```
+
+`SandboxTerminal` draws a remote sandbox session's terminal with xterm.js and speaks the terminal relay of `RemoteSandboxHub` (`hub.handleTerminalUpgrade`). It is not exported from the root entry point. xterm is loaded on demand, and `@xterm/xterm` (>=5.5.0) and `@xterm/addon-fit` (>=0.10.0) are optional peer dependencies, so an application that never renders a terminal never needs them.
+
+```ts
+import type { ITerminalOptions } from '@xterm/xterm'
+
+type SandboxTerminalProps = Omit<PrimitiveProps<'div'>, 'children' | 'onError'> & {
+  url: string
+  sessionName?: string
+  ticket?: string | (() => string | Promise<string>)
+  readOnly?: boolean
+  reconnect?: SandboxTerminalReconnectOptions
+  terminalOptions?: ITerminalOptions
+  onStatusChange?: (status: SandboxTerminalStatus) => void
+  renderStatus?: (status: SandboxTerminalStatus, retry: () => void) => ReactNode
+}
+
+interface SandboxTerminalHandle {
+  focus(): void
+  reconnect(): void
+}
+
+type SandboxTerminalReconnectOptions = {
+  initialDelayMs?: number
+  maxDelayMs?: number
+  maxAttempts?: number
+}
+
+type SandboxTerminalState = 'loading' | 'connecting' | 'open' | 'reconnecting' | 'ended' | 'failed'
+
+type SandboxTerminalStatus = {
+  state: SandboxTerminalState
+  attempt?: number
+  retryInMs?: number
+  exitCode?: number
+  message?: string
+}
+```
+
+| Prop | Purpose |
+| --- | --- |
+| `url` | The hub's terminal endpoint: `ws:`/`wss:`, `http:`/`https:`, or a path relative to the page. |
+| `sessionName` | Sent as `?session=` so `authorizeTerminal` can choose the session. It is a hint; the server decides which session a ticket grants. |
+| `ticket` | A one-time ticket, or a function returning one. It travels as the `anvia.ticket.<ticket>` WebSocket subprotocol, not in the URL, and must use only URL-safe characters. Pass a function: tickets are single use, so every reconnect needs a fresh one. |
+| `readOnly` | Stops this viewer sending input and resize messages. xterm is created with stdin disabled and cursor blinking off unless `terminalOptions` overrides those settings, and the relay enforces any read-only grant it issued as well. |
+| `reconnect` | Backoff options: `initialDelayMs` (default 500), `maxDelayMs` (default 15,000), and `maxAttempts` (default 10). |
+| `terminalOptions` | xterm options such as `fontSize` or `theme`, applied when the terminal is created. The component's defaults are a 5,000-line scrollback, cursor blinking unless `readOnly`, and stdin disabled when `readOnly` is true. |
+| `onStatusChange` | Called with every connection state change, starting with `loading`. |
+| `renderStatus` | Replaces the default status line. Receives the current status and a retry callback; return `null` to show nothing. |
+
+The component also accepts ordinary `div` props except `children` and `onError`, including `className`, `style`, and `data-*`. It fills its parent, so give the parent a height. A `ResizeObserver` refits the terminal and sends the new size to the sandbox. Changing `url`, `sessionName`, or `readOnly` tears down the terminal and creates a new connection; the other props are read when needed.
+
+A connection is `loading`, `connecting`, `open`, `reconnecting`, `ended`, or `failed`. `ended` means the shell exited and is not retried. `failed` means a fatal error or that reconnect attempts ran out. After a reconnect the screen is cleared before the session redraws, and focus returns to the terminal unless it is read-only. The root element carries the state as `data-state` and `data-readonly` while the viewer is read-only. The default status line is a `role="status"` element with `data-relay-status`; after a failure it offers a Retry button. A `ref` exposes `focus()` and `reconnect()`; `reconnect()` retries only after the viewer gave up.
+
+Import xterm's stylesheet once in the application:
+
+```ts
+import '@xterm/xterm/css/xterm.css'
+```
+
+The subpath also exports `terminalSubprotocol` (`"anvia.terminal.v1"`), `ticketSubprotocolPrefix` (`"anvia.ticket."`), and the `SandboxTerminalHandle`, `SandboxTerminalProps`, `SandboxTerminalReconnectOptions`, `SandboxTerminalState`, and `SandboxTerminalStatus` types.
+
+### Authorization boundary
+
+The component does not choose who may see a session and does not mint or validate tickets. The application's backend mints the ticket, and the hub calls the application's `authorizeTerminal` callback, which redeems it and returns the sandbox, `sessionName`, and optional `readOnly` grant. That server-side grant is authoritative: the relay drops input and resize messages from a read-only viewer. Setting `readOnly` on the component is a UI and client-side guard, not an access-control decision. See [terminal behavior and security](/sdk/advanced/sandbox/terminals).
+
+## `@anvia/react-ui/sandbox-desktop`
+
+```ts
+import { SandboxDesktop } from '@anvia/react-ui/sandbox-desktop'
+```
+
+`SandboxDesktop` shows a remote sandbox's desktop with noVNC and lets a person take control from the agent. It speaks the desktop relay of `RemoteSandboxHub` (`hub.handleDesktopUpgrade`). It is not exported from the root entry point, and `@novnc/novnc` (>=1.5.0) is an optional peer dependency loaded on demand.
+
+```ts
+type SandboxDesktopProps = Omit<PrimitiveProps<'div'>, 'children' | 'onError'> & {
+  url: string
+  ticket?: string | (() => string | Promise<string>)
+  readOnly?: boolean
+  scaleToFit?: boolean
+  qualityLevel?: number
+  compressionLevel?: number
+  reconnect?: SandboxDesktopReconnectOptions
+  onStatusChange?: (status: SandboxDesktopStatus) => void
+  onControlChange?: (control: SandboxDesktopControl) => void
+  renderStatus?: (status: SandboxDesktopStatus, retry: () => void) => ReactNode
+  renderControls?: (state: SandboxDesktopControlsState) => ReactNode
+}
+
+interface SandboxDesktopHandle {
+  focus(): void
+  reconnect(): void
+  takeOver(): void
+  release(): void
+}
+
+interface SandboxDesktopControl {
+  held: boolean
+  holder?: string
+  expiresAt?: string
+  you: boolean
+  readOnly: boolean
+}
+
+interface SandboxDesktopNotice {
+  code: string
+  message: string
+}
+
+interface SandboxDesktopControlsState {
+  status: SandboxDesktopStatus
+  control: SandboxDesktopControl | undefined
+  readOnly: boolean
+  notice: SandboxDesktopNotice | undefined
+  takeOver(): void
+  release(): void
+}
+```
+
+`SandboxDesktopReconnectOptions`, `SandboxDesktopState`, and `SandboxDesktopStatus` alias the shared relay option, state, and status types shown for the terminal. In `SandboxDesktopControlsState`, `readOnly` combines the prop and the relay's read-only grant; it does not mean another viewer holds control.
+
+| Prop | Purpose |
+| --- | --- |
+| `url` | The hub's desktop endpoint: `ws:`/`wss:`, `http:`/`https:`, or a path relative to the page. |
+| `ticket` | A one-time ticket, or a function returning one, sent as the `anvia.ticket.<ticket>` subprotocol. Pass a function so each reconnect gets a fresh one. The desktop viewer has no `sessionName` prop; the ticket and `authorizeDesktop` select the sandbox. |
+| `readOnly` | Asks this viewer to watch only. The relay also removes a read-only viewer's key, pointer, clipboard, and resize messages. |
+| `scaleToFit` | Scales the desktop to the element. Default `true`; `false` shows it at its own size. A viewer never resizes the session; use the hub's desktop API for that. |
+| `qualityLevel` | JPEG quality requested from the server, 0 (smallest, blockiest) to 9 (best, most data). Default 6. Values are rounded and clamped, and non-finite values fall back to the default. Changes apply to the live connection. |
+| `compressionLevel` | Server compression effort, 0 (fastest, most data) to 9 (slowest, least data). Default 2. Values are rounded and clamped, and non-finite values fall back to the default. Changes apply to the live connection. |
+| `reconnect` | Backoff options with the same defaults as the terminal: 500 ms, 15 s, and 10 attempts. |
+| `onStatusChange` | Called with every connection state change, starting with `loading`. |
+| `onControlChange` | Called whenever the relay reports who has control. |
+| `renderStatus` | Replaces the default status line. Receives the current status and a retry callback; return `null` to show nothing. |
+| `renderControls` | Replaces the default take-over bar. Receives `{ status, control, readOnly, notice, takeOver, release }`; return `null` to show nothing. |
+
+The component also accepts ordinary `div` props except `children` and `onError`. It fills its parent, so give the parent a height. Changing `url` reconnects; `readOnly`, `scaleToFit`, `qualityLevel`, and `compressionLevel` update the live viewer. Each accepted attachment gets a new noVNC client, and each reconnect uses a fresh ticket.
+
+### Status and control
+
+The desktop uses the shared relay states: `loading`, `connecting`, `open`, `reconnecting`, and `failed`. A relay that cannot set the viewer up closes with a reason such as `unsupported: ...`; that stops the viewer when retrying cannot help, while `sandbox_unavailable` and `timeout` are retried. The root element carries the state as `data-state`. The default status line is a `role="status"` element with `data-relay-status` and offers a Retry button after a failure.
+
+Until the relay says who has control, the viewer is view-only. `control` is undefined and the default bar is hidden. After the relay reports state, the bar shows "The agent has control", "`<holder>` has control", "You have control", or "View only". "Take over" asks the relay for control, which pauses the agent's inputs (`desktop_locked`) until "Release" or until the hold lease is released. While someone else holds control there is no take-over button, and this viewer sends no input. A refused request, such as taking over while someone else holds control, appears as `notice` until the next control update. Closing the tab releases the hold. `onControlChange` receives `SandboxDesktopControl`. The component forgets the current control state while the link is down.
+
+The root also exposes `data-readonly` whenever this viewer is view-only, which includes the `readOnly` prop, a read-only ticket grant, and any time this viewer does not hold control. `data-control` is `you`, `other`, or `none`. A `ref` exposes `focus()`, `reconnect()`, `takeOver()`, and `release()`; `reconnect()` retries only after the viewer gave up.
+
+### Authorization boundary
+
+The component does not authorize desktop access or control. The application's backend mints the ticket, and the hub calls the application's `authorizeDesktop` callback, which redeems it and returns the sandbox, optional `readOnly` grant, and holder identity. The relay is authoritative: it filters keyboard, pointer, clipboard, and resize input from read-only viewers and from viewers that are not the current holder. The component also keeps noVNC view-only until this viewer holds control, so its input never mixes with the agent's. A `readOnly` prop is a local UI and client-side guard; a read-only grant in the ticket wins even when the prop is absent. The component's take-over action only asks the relay; it cannot grant control itself. See [desktop behavior and control](/sdk/advanced/sandbox/desktop).
+
+The subpath also exports `desktopSubprotocol` (`"anvia.desktop.v1"`), `ticketSubprotocolPrefix` (`"anvia.ticket."`), and the `SandboxDesktopControl`, `SandboxDesktopControlsState`, `SandboxDesktopHandle`, `SandboxDesktopNotice`, `SandboxDesktopProps`, `SandboxDesktopReconnectOptions`, `SandboxDesktopState`, and `SandboxDesktopStatus` types.
 
 ## `@anvia/react-ui/stream`
 

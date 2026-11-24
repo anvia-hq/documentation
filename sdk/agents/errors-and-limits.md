@@ -87,7 +87,7 @@ not execute the protected action outside the runtime as a shortcut.
 
 ## 4. Retry transient model failures
 
-Agents own their default retry policy. A run with no `retries` value inherits the constructor setting; `false` disables it for that run; an object replaces it. Direct completions remain opt-in.
+Agents have no implicit retry policy, exactly like direct completions: retries are off unless `retries` is set on the constructor or on the run. A run with no `retries` value inherits the constructor setting; `false` disables it for that run; an object replaces it.
 
 ```ts
 const supportAgent = new Agent({
@@ -104,7 +104,7 @@ await supportAgent.generate({ prompt: input.message })
 await supportAgent.generate({ prompt: input.message, retries: false })
 ```
 
-Retries apply to the failed model invocation in its current turn. They do not restart the run or replay completed tools. The default policy covers common connection failures, rate limits, timeouts, conflicts, and server errors. `maxAttempts` is the total number of model attempts for that completion, including the initial attempt.
+Retries apply to the failed model invocation in its current turn. They do not restart the run or replay completed tools. When retries are enabled, the default policy covers common connection failures, rate limits, timeouts, conflicts, and server errors. `maxAttempts` is the total number of model attempts for that completion, including the initial attempt.
 
 For streaming, Anvia retries only before provider progress has been exposed. Once output or another provider event has been observed, retrying could duplicate client-visible data, so the failure ends the stream.
 

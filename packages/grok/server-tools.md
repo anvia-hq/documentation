@@ -42,7 +42,15 @@ const remote = grokTools.mcp({
 })
 ```
 
-The URL must be HTTPS and must not point to a private, loopback, link-local, or other reserved host; `mcp()` throws a `TypeError` for those. Labels, authorization, header names, and header values must be non-empty. Credentials are sent to xAI so it can call the remote server; Anvia omits sensitive authorization and headers from its request trace summary.
+The URL must be HTTPS and must not target a private or reserved host. The guard rejects loopback,
+link-local (including cloud metadata addresses), private, carrier-grade NAT, multicast, and other
+non-global IPv4 and IPv6 literals, including normalized spellings such as `127.1` and
+`[::ffff:127.0.0.1]`; `localhost` and `.localhost` names are rejected too. It checks the literal
+hostname and does not resolve DNS, so keep network egress controls in place for public names.
+
+Labels, authorization, header names, and header values must be non-empty. Credentials are sent to
+xAI so it can call the remote server; Anvia omits sensitive authorization and headers from its
+request trace summary.
 
 ## Operational controls
 

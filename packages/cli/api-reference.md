@@ -6,13 +6,13 @@ the bundled shadcn CLI. Exceptions propagate to programmatic callers.
 
 ## Commands
 
-Use `anvia` as shorthand for `pnpm dlx @anvia/cli` or an installed `@anvia/cli` binary. This reference describes CLI `1.5.0`.
+Use `anvia` as shorthand for `pnpm dlx @anvia/cli` or an installed `@anvia/cli` binary. This reference describes CLI `1.5.4`.
 
 ```text
 anvia ui init [next|vite] [--cwd <path>] [--force]
 anvia ui add <chat|thread|message|composer|attachment|markdown|tool-fallback>
   [--cwd <path>] [--overwrite]
-anvia ui update [items...] [--cwd <path>] [--apply]
+anvia ui update [items...] [--cwd <path>] [--apply] [--overwrite]
 anvia skills init [--claude] [--codex] [--cursor] [--agents]
   [--dir <path>] [--force] [--cwd <path>]
 anvia skills update [--claude] [--codex] [--cursor] [--agents]
@@ -35,7 +35,7 @@ anvia skills list
 | `--dir <path>` | `skills init/update` | `skills`; canonical directory within the project |
 | `--apply` | `ui update`, `skills update` | False; explicitly write previewed changes |
 | `--force` | `ui init`, `skills init` | False; replace shadcn configuration or differing skill files/rules |
-| `--overwrite` | `ui add` | False; allow component file replacement during installation |
+| `--overwrite` | `ui add`, `ui update` | False; allow component file replacement during installation. On `ui update` it is an alias for `--apply`. |
 | `--claude` | `skills init/update` | Add the `.claude/skills/` copy |
 | `--cursor` | `skills init/update` | Add `.cursor/rules/` pointers |
 | `--agents`, `--codex` | `skills init/update` | Maintain the Anvia section in `AGENTS.md`; both select the same integration |

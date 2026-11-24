@@ -15,7 +15,7 @@ deterministic code; use evals for behavior whose wording or reasoning varies.
 ## Architecture
 
 ```text
-versioned cases -> agentEvalTarget(agent) -> outputs/traces
+versioned cases -> agentEvalTarget({ agent, request }) -> outputs/traces
                -> deterministic metrics + judge metrics -> suite result/reporters
 ```
 

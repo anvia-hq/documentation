@@ -34,7 +34,7 @@ const result = await runEvalSuite({
   ],
 })
 
-console.log(result.results[0]?.scores)
+console.log(result.results[0]?.scores.semanticSimilarity)
 ```
 
 ## Read the result

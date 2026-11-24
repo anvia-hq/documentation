@@ -67,7 +67,9 @@ A prompt instruction is not an authorization boundary. Documents the model must 
 
 Apply the same access scope to every path into the index. If the store is also exposed as a model tool with `createVectorSearchTool()`, pass an equivalent trusted `filter` in that tool's options.
 
-`vectorFilter.and()` and `vectorFilter.or()` each combine two filters, so nest them for additional conditions. Equality, greater-than, and less-than expressions are available; test the exact value types and operations against the chosen vector-store adapter.
+`vectorFilter` provides `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, and variadic `and()`/`or()`, so
+pass every condition to one combinator instead of nesting two-filter calls. Test the exact value
+types and operations against the chosen vector-store adapter; see [metadata filters](/sdk/knowledges/metadata-filters).
 
 ## 4. Test the boundary directly
 

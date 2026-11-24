@@ -5,23 +5,26 @@ only validate APIs present in examples; they cannot reveal an exported API that 
 
 ## Source and inventory
 
-`scripts/sdk-coverage.json` records 81 public entrypoints across 38 public SDK packages at reviewed
-source revision `10977b75a1518a553b7d5deb0193b788258ba093`. Each entry links its owning guide and
+`scripts/sdk-coverage.json` records 85 public entrypoints across 37 public SDK packages at reviewed
+source revision `e751560f4a02c8989928966c203ed8747c0072fb`. Each entry links its owning guide and
 reference, with an export-name count and SHA-256 snapshot. The checker resolves TypeScript exports
-from source, including re-exports and types; private packages and `@anvia/core/internal/*` are
-excluded. A new/removed entrypoint or changed exported name set requires editorial review.
+from source, including re-exports and types; `@anvia/core/internal/*` is excluded, as would be any
+package marked private. A new/removed entrypoint or changed exported name set requires editorial
+review.
 
 The map is entrypoint-level coverage, not a claim that every exported type or behavior has a
 complete explanation. Name hashes do not detect changed signatures, defaults, or implementation
 behavior under the same names. Review those changes against the source, checked examples, and
 runtime tests. Types and aliases can belong to an existing feature/reference without a separate
-tutorial. The `features` entries tie selected APIs to complete examples and named offline tests;
-`utilities` records reference coverage or a reason for excluding a dedicated tutorial.
+tutorial. The `features` entries tie selected APIs to complete examples and named offline tests, and
+one named test may cover more than one feature; `utilities` records reference coverage or a reason
+for excluding a dedicated tutorial.
 
-The 2026-10-16 release-baseline refresh updates source versions and export-name snapshots only.
-Pipeline decision and routing documentation remains tracked in
-[documentation PR #10](https://github.com/anvia-hq/documentation/pull/10); refreshing the snapshot
-does not establish feature coverage for those additions.
+The 2026-11-04 review covers the sandbox remote runtime, terminals, tunnels, and desktop;
+`@anvia/client/durable-chat`; the React UI sandbox viewers; richer vector filters and metrics;
+durable agent compatibility and payload admission; and the retirement of `@anvia/browser`. It
+refreshes export-name snapshots and adds the new entrypoints, but a hash only records names. The
+guides and checked examples establish behavior coverage.
 
 ## Run the checks
 
@@ -35,6 +38,7 @@ generated Core files until this build runs. Both CI validation jobs perform this
 Run the following commands from the documentation repository:
 
 ```sh
+node scripts/audit-rc-api.mjs --sdk --source
 node scripts/check-sdk-coverage.mjs
 node --test scripts/test-sdk-coverage.mjs
 node scripts/typecheck-rc-snippets.mjs --source
@@ -42,15 +46,21 @@ node scripts/check-sdk-runtime.mjs
 pnpm docs:build
 ```
 
+`audit-rc-api.mjs` also accepts `--cli --source` for the CLI pages. Its unscoped form now skips the
+Channels packages listed in the inventory's `externalPackages`.
+
 The coverage checker audits static Anvia imports in TypeScript/JavaScript fences under `sdk/`,
 `packages/`, `examples/`, `channels/`, `lens/`, `studio/`, and `faqs/`. SDK-owned packages must resolve
 to public entrypoints and exported named/default bindings. Known Channels packages are reported as
 out of scope because they need the sibling Channels implementation; unknown package names still
-fail. This is not an independent Channels API audit.
+fail. Directories outside that list — `guide/`, `use-cases/`, `references/`, and the root pages — are
+covered only by the broader snippet typecheck. This is not an independent Channels API audit.
 
 The broader snippet checker scans repository Markdown and public LLM text files. Complete
 `anvia-check` fences enable all TypeScript diagnostics; ordinary fragments receive selected API
-shape diagnostics and may rely on application variables. Only complete marked examples establish
+shape diagnostics and may rely on application variables. An unmarked fragment is collected only
+when its text contains an `@anvia/` specifier, so an SDK-shaped fragment without an import line is
+not checked. Only complete marked examples establish
 standalone type correctness. The SDK source directory is excluded even when CI nests its checkout inside the docs repository.
 Other local untracked Markdown may affect scan counts. Neither checker
 validates shell commands, dynamic imports, provider availability, or deployment health.
@@ -96,6 +106,8 @@ the full reviewed SDK revision from the inventory and runs these gates. The depl
 | Provider output | [Catch and retry boundary](/sdk/structured-output/validation-errors#_4-handle-invalid-provider-output) | Retry kinds and streaming progress; adapter/tool errors tested separately. |
 | Memory keys | [Custom-store factory](/sdk/memory/custom-stores#_6-reuse-the-official-scope-key-helper) | Scope separation and consistent keys across operations. |
 | Embedding helpers | [Distance reference](/packages/core/api-reference#embedding-distances) | Zero vectors and dimension mismatches. |
+| Vector filters and metrics | [Metadata filters](/sdk/knowledges/metadata-filters) | N-ary operators, `ne`/`in`/`gte`/`lte`, euclidean scoring, and filtered search. |
+| Pipeline routing | [Branch selection](/sdk/pipelines/decisions-and-routing) | Only the chosen branch runs and the decision entry is retained in the output. |
 | Graph helpers | [Schema adapter reference](/packages/graph/api-reference#schema-adapter-helpers) | Invalid property values and reserved names. |
 
 ## Integration utility decisions

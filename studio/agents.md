@@ -44,7 +44,6 @@ Studio asks the running server for a summary of each registered agent. The summa
 | MCP | The subset of registered tools carrying MCP server provenance. |
 | Context | Static context plus dynamic context registrations. |
 | Observers | Observers attached to the agent. |
-| Prompts | Quick prompts configured for this agent in Studio. |
 | Memory | Whether the agent has a memory implementation. |
 | Lifecycle | Whether the agent has lifecycle callbacks. |
 | Schema | Whether the agent requires structured output. |

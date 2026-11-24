@@ -17,7 +17,7 @@ export const model = client.completionModel({
 })
 ```
 
-OpenAI requires `api: 'responses' | 'chat'` when creating a completion model. A compatible `baseUrl` does not select the adapter.
+OpenAI accepts `api: 'responses' | 'chat'` when creating a completion model; it defaults to `'chat'` when omitted. A compatible `baseUrl` does not select the adapter.
 
 ## 2. Send one completion
 

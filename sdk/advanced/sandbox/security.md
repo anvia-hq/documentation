@@ -55,4 +55,20 @@ In allow mode, shell interpreters (`sh`, `bash`, `zsh`, and similar) are blocked
 
 Commands can inspect workspace files and process environment. Sandbox `env` values are passed to Docker as `--env KEY=VALUE` arguments; if a Docker command fails, the resulting `DockerSandboxError` message shows the variable name but replaces the value with `<redacted>` (for example `--env OPENAI_API_KEY=<redacted>`), so those messages are safer to log. That covers error text only, and does not make environment values safe to expose to the commands themselves. Do not seed credentials, unrestricted customer data, hidden prompts, or infrastructure configuration unless the task explicitly requires them. Avoid logging command input, output, or file contents by default.
 
+## Remote sandbox boundary
+
+The [remote runtime](/sdk/advanced/sandbox/remote) moves execution behind a daemon that dials out to a `RemoteSandboxHub`. The hub authorizes daemon tokens and routes calls; it does not provide isolation. The daemon runs on the sandbox host with the privileges of its own user, and anything it starts — commands, processes, terminals, and the desktop — inherits those privileges.
+
+`authorize(token)` must resolve a daemon token to exactly one sandbox and return `null` for anything else. The hub does not issue or rotate tokens; application code owns that lifecycle. Use `wss://` for the control URL, keep the daemon's state directory outside the workspace, and treat the token as a secret even though the daemon removes `ANVIA_SANDBOX_TOKEN` and `ANVIA_CONTROL_URL` from the environment of commands it runs.
+
+Browser relays have their own authorization. Terminals, tunnels, and desktops read a short-lived ticket from the request, and the hub checks the browser `Origin` before the authorizer runs. Set `allowedOrigins` when a proxy rewrites the Host header. A refused ticket returns 401 and a route without an authorizer returns 404; a foreign Origin returns 403. Read-only desktop viewers are enforced by the relay, which filters input on the server rather than relying on browser UI.
+
+## Desktop boundary
+
+A [remote desktop](/sdk/advanced/sandbox/desktop) is a virtual display inside the sandbox. Its VNC server listens on loopback with no password and is reachable through a tunnel, and the daemon always allows its VNC port through. Any code that can run inside the sandbox can also connect to that port directly, so the desktop does not isolate sandbox code from anything the sandbox can already reach.
+
+The takeover lock is a coordination boundary, not authorization. While a person holds control, `act()` calls fail with `desktop_locked`, and the relay drops input from read-only viewers and from viewers who are not the holder. But `takeover()` itself trusts the holder string it is given; authorize who may take over in application code. `release({ force: true })` and a bare `release()` are operator overrides, not something to expose to the agent.
+
+Image contents are part of the boundary. Install only the graphical programs the workflow needs, pin and scan the image, and prefer Xvnc to the Xvfb fallback unless the image already uses the pair. The reference image's `anvia-chromium` launcher runs Chromium with `--no-sandbox` because Docker's default seccomp profile blocks user namespaces; set `ANVIA_CHROMIUM_SANDBOX=1` and allow user namespaces if Chromium's own sandbox matters more than that compatibility. Clipboard sync is best-effort and there is no audio support. Do not place secrets on the desktop clipboard or assume desktop state survives a restart.
+
 For public arbitrary-code execution or strong multi-tenant isolation, add infrastructure controls such as dedicated workers, rootless containers, restrictive seccomp/AppArmor profiles, microVMs, egress policy, image scanning, and host patching.

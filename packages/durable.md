@@ -20,12 +20,12 @@ pnpm add @anvia/durable @anvia/core zod
 
 Add a provider package such as `@anvia/openai` for the model. SQLite storage uses Node's built-in
 `node:sqlite`, so the package requires **Node.js 22.16 or newer**. Use the accompanying `@anvia/core`
-release: the durable package requires core's agent execution protocol version 4 and rejects older core
-versions when it is imported. `zod` is a peer dependency.
+release: the durable package requires core's agent execution protocol version 4 and rejects an
+incompatible core release when agents are registered. `zod` is a peer dependency.
 
 To expose durable runs over HTTP, add `@anvia/server` (`@anvia/server/durable`) and `@anvia/client`
 (`@anvia/client/durable`). Use mutually compatible releases: the reviewed Client and Server manifests accept Durable through
-0.12. Steering requires Durable 0.8+, HTTP task agent binding requires 0.6+, and tracing requires
+0.13. Steering requires Durable 0.8+, HTTP task agent binding requires 0.6+, and tracing requires
 0.11+ (0.12+ for an observability session override).
 
 ## What it provides

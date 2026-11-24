@@ -4,7 +4,7 @@
 - RediSearch HNSW indexes with FLOAT32 vectors.
 - Cosine, L2, and inner-product distance configuration.
 - Deterministic hash keys for repeatable writes.
-- Equality, numeric range, `and`, and `or` filter translation.
+- Equality, inequality, membership, numeric range, and n-ary `and`/`or` filter translation.
 - `search` plus `createVectorSearchTool()` tool integration from `@anvia/core/vector-store`.
 - Logical result collapsing for multi-embedding documents.
 

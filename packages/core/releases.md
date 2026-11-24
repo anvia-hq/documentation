@@ -1,16 +1,22 @@
 # Releases
 
-The reviewed source release is `@anvia/core` **1.15.0**. The source changelog is authoritative; the
+The reviewed source release is `@anvia/core` **1.17.3**. The source changelog is authoritative; the
 entries below summarize recent v1 changes and preserve notable v0 compatibility milestones.
 
-## Changes through 1.14.1
+## Changes through 1.17.3
 
-Reviewed `1.9.0` → `1.14.1` against SDK source on 2026-10-15. Added OpenAI Decisions and typed refusal errors (1.10), active-loop compaction and broader credential redaction (1.11), summary temperature omission (1.11.1), question-tool defaults and input limits (1.12), durable steering protocol 4 (1.13), observer failure reporting (1.14), and replay-aware durable tracing (1.14.1). See [Decisions](/sdk/decisions), [compaction](/sdk/memory/compaction), and [observability](/sdk/observability).
+Reviewed `1.9.0` → `1.17.3` against SDK source on 2026-11-04. Added OpenAI Decisions and typed refusal errors (1.10), active-loop compaction and broader credential redaction (1.11), summary temperature omission (1.11.1), question-tool defaults and input limits (1.12), durable steering protocol 4 (1.13), observer failure reporting (1.14), replay-aware durable tracing (1.14.1), Pipeline decision and route stages (1.15), richer vector metrics and filters (1.16), model-listing metadata (1.17.0 and 1.17.1), and bounded media estimates plus optional compaction temperature (1.17.3). See [Decisions](/sdk/decisions), [compaction](/sdk/memory/compaction), [observability](/sdk/observability), and [Pipeline decisions and routing](/sdk/pipelines/decisions-and-routing).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/core/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/core/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.17.3` | Bounded inline image and file base64 at about 2,000 tokens per payload in `estimateMemoryTokens()`, so one attachment no longer triggers premature compaction. `createSummaryMemoryCompactor()` sends no `temperature` unless set; use `temperature: 0` for deterministic summaries. Summary-request failures now include the provider message in the error, while accumulated usage remains available on `usage`. See [compaction](/sdk/memory/compaction). |
+| `1.17.2` | Updated upstream runtime dependencies, including Anthropic 1.x and Mistral 3.x SDKs, raised the `zod` peer floor to `^4.6.7`, and adapted `@anvia/jev` to TypeSafe SDK 0.7. |
+| `1.17.1` | Durable sessions continue from started failed or cancelled runs and carry settled progress into the next run's history. OpenAI model listings preserve advertised `pricing` metadata, and in-memory vector `inspect` rejects invalid cursors with `RangeError`. See [`@anvia/durable`](/packages/durable). |
+| `1.17.0` | Model listings expose provider-advertised `supportedParameters` and provider-specific `reasoning` metadata. The single-consumer `AgentStream` final-promise contract was clarified. See [model listing](/sdk/providers/openai/model-listing). |
+| `1.16.0` | `InMemoryVectorStore` gained a `metric` option (`cosine` by default, plus `euclidean` and `dotProduct`), and `VectorFilter` gained `ne`, `in`, `gte`, and `lte` with variadic `and`/`or`, translated natively where a backend supports them and rejected with a descriptive error otherwise. Empty or whitespace-only tool-call arguments are treated as `{}`. |
+| `1.15.0` | Added Pipeline `.decide()` and `.route()` stages for typed decisions, and graph branch nodes report `branchOf` (`parallel` or `route`). See [Pipeline decisions and routing](/sdk/pipelines/decisions-and-routing). |
 | `1.9.0` | Added provider-neutral typed decisions through `@anvia/core/decision` (also exported from the Core root): choice, multi-label, rubric score, and boolean-probability questions, validated execution, and ordered batches with retries and cancellation. See [Typed decisions](/sdk/decisions). |
 | `1.8.0` | Added opt-in durable agent streaming with persisted generation deltas, unique model-attempt identities, and validated streamed response checkpoints; durable execution protocol moved to version 2. See [`@anvia/durable`](/packages/durable). |
 | `1.7.0` | Added the execution boundaries and stable tool operation IDs that back experimental durable agent execution, preserving direct agent behavior. |

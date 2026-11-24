@@ -3,7 +3,7 @@
 - Dense vector upsert using deterministic physical IDs.
 - Namespace-scoped ingestion and retrieval.
 - Cosine, Euclidean, or dot-product metric configuration.
-- Equality, range, `and`, and `or` metadata filters.
+- Equality, inequality, membership, range, and n-ary `and`/`or` metadata filters.
 - Multiple embeddings collapsed into one logical document result.
 - `search` retrieval through the core `VectorStore` interface, with `retrieveDocuments` and `createVectorSearchTool` integration from `@anvia/core/vector-store`.
 

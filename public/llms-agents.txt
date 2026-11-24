@@ -117,7 +117,10 @@ headers, redirects, tool exposure, and lifecycle in server-owned configuration.
 - Load skills from trusted roots and validate their manifests and referenced assets.
 - Expose specialist agents as narrow tools when delegation is clearer than one large agent.
 - Use `@anvia/sandbox` for isolated execution, while still enforcing command, network, resource,
-  secret, and cleanup policy.
+  secret, and cleanup policy. `DockerSandboxClient` runs locally; `RemoteSandboxHub` with
+  `anvia-sandbox-daemon` runs workloads elsewhere and adds terminals, loopback tunnels, and a
+  desktop. The retired `@anvia/browser` semantic tools have no direct replacement; use
+  `createDesktopTools()` against a sandbox desktop.
 
 ## Streaming and production boundaries
 
@@ -150,4 +153,6 @@ token use, and latency.
 - Streaming: https://docs.anvia.dev/sdk/streaming
 - Memory compaction: https://docs.anvia.dev/sdk/memory/compaction
 - Sandbox: https://docs.anvia.dev/sdk/advanced/sandbox
+- Remote sandboxes: https://docs.anvia.dev/sdk/advanced/sandbox/remote
+- Sandbox desktop: https://docs.anvia.dev/sdk/advanced/sandbox/desktop
 - Full-stack applications: https://docs.anvia.dev/llms-apps.txt

@@ -41,9 +41,31 @@ Its default brute-force strategy checks every stored document. Pass an LSH `inde
 constructor to narrow the candidate set before scoring once the index outgrows it:
 `index: { type: 'lsh', numTables, numHyperplanes, seed? }`.
 
-Stores may also implement `inspect()`, which pages stored documents with `limit` plus optional
-`cursor` and `filter` — useful for debugging and rebuilds. The in-memory store and the Qdrant
-adapter implement it.
+Scores use cosine similarity by default. Set `metric` to `'cosine'`, `'euclidean'`, or
+`'dotProduct'`:
+
+```ts
+const store = new InMemoryVectorStore<TextDocument>({ metric: 'euclidean' })
+```
+
+Every metric keeps the higher-is-better contract. `cosine` returns cosine similarity, `dotProduct`
+returns the raw inner product, and `euclidean` returns the negated Euclidean distance. A euclidean
+score of `0` is an exact match, so `minScore` is a negative distance threshold: `minScore: -0.5`
+keeps matches at distance `0.5` or less. With an `{ type: 'lsh' }` index, non-cosine metrics are
+approximate because LSH buckets are angle-based; brute force, the default, is exact.
+
+Stores may also implement `inspect()`, which pages stored documents with a positive safe-integer
+`limit` plus optional `cursor` and `filter` — useful for debugging and rebuilds. The in-memory store
+and the Qdrant adapter implement it. In-memory pages include `totalCount` and set `nextCursor` while
+more rows remain. Pass that cursor back unchanged. An in-memory cursor is a canonical non-negative
+safe-integer decimal offset: signs, fractions, exponents, whitespace, leading zeroes, and values
+outside the safe-integer range throw a `VectorInspectCursorError` instead of silently replaying a
+page. An omitted cursor starts at `0`.
+
+`VectorInspectCursorError` extends `RangeError`. Use `VectorInspectCursorError.isCursorError(error)`
+to identify an invalid cursor without matching its message; `parseVectorInspectCursor()` exposes the
+same parser. Qdrant uses its own opaque cursor format, so treat every adapter's cursor as an opaque
+value rather than parsing or constructing it.
 
 The in-memory store accepts only a canonical nonnegative safe integer string as `cursor`. Signs, fractions, exponents, whitespace, and leading zeroes are rejected. Invalid cursors throw a `RangeError` subclass. Check for them with `VectorInspectCursorError.isCursorError(error)`, which is exported from `@anvia/core/vector-store`. Pass each returned `nextCursor` back unchanged.
 
