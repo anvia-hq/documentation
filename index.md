@@ -1,145 +1,57 @@
-# Build your first Anvia agent
+# Introduction
 
-Anvia is a TypeScript runtime for adding AI agents to an application without handing over the rest of its architecture. You create the provider model and define the agent's behavior; Anvia runs the model and tool loop.
-
-## Anvia CLI
-
-Use the CLI to install Anvia knowledge for your coding agent or editable React chat components
-for your application.
-
-- [Get started](/packages/cli/get-started): Set up the CLI and choose skills or component installation.
-- [Agent Skills](/packages/cli/agent-skills): Install skills for Claude Code, Cursor, or AGENTS.md/Codex.
-- [Editable components](/packages/cli/components): Install Tailwind chat components and connect them to your application.
-
-The tutorial below builds a small support agent with the stable v1 API. Add each snippet to the same TypeScript file in order.
-
-## 1. Install the runtime and a provider
-
-`@anvia/core` contains the provider-neutral agent runtime. `@anvia/openai` adapts OpenAI and OpenAI-compatible models to that runtime. Install both from the stable release line.
-
-```bash
-pnpm add @anvia/core @anvia/openai
-```
-
-Keep credentials in your application's configuration. Anvia clients receive credentials explicitly and do not read environment variables on their own.
-
-```bash
-export OPENAI_API_KEY=...
-```
-
-## 2. Create a provider model
-
-The provider client handles the provider-specific API. Calling `completionModel()` creates the model object that the rest of Anvia depends on.
-
-```ts
-import { OpenAIClient } from '@anvia/openai'
-
-const apiKey = process.env.OPENAI_API_KEY
-
-if (!apiKey) {
-  throw new Error('OPENAI_API_KEY is required')
-}
-
-const client = new OpenAIClient({ apiKey })
-const model = client.completionModel({
-    modelId: 'gpt-5.6-sol',
-    api: "responses"
-})
-```
-
-This separation is what keeps the agent provider-neutral. To change providers later, create a different model and leave the agent behavior unchanged.
-
-## 3. Define the agent
-
-An agent combines a model with reusable behavior. Its ID is useful for tracing and memory, while its instructions and turn limit define how it should handle a run.
+Anvia is a TypeScript runtime and product suite for building, debugging, and operating AI agents
+inside your own application. You create the provider model and define the agent's behavior; Anvia
+runs the model and tool loop, while your application keeps authentication, data, persistence, and
+deployment.
 
 ```ts
 import { Agent } from '@anvia/core'
+import { OpenAIClient } from '@anvia/openai'
 
-const supportAgent = new Agent({
+const client = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! })
+const model = client.completionModel({ modelId: 'gpt-5.6-sol', api: 'responses' })
+
+const agent = new Agent({
   id: 'support',
   model,
   instructions: 'Answer support questions clearly. Ask for missing details.',
-  maxTurns: 4,
-})
-```
-
-The dependencies remain visible at construction time. Tools, memory, context, guardrails, and observers can be added to the same options object as the application grows.
-
-## 4. Generate an answer
-
-`generate()` starts the agent loop and resolves to a response, interaction, or guardrail block.
-Checking `type` keeps that boundary explicit, even though this first agent has no tools yet.
-
-```ts
-const response = await supportAgent.generate({
-    prompt: 'A customer cannot reset their password. What should I check first?'
 })
 
-if (response.type === 'interaction') throw new Error(`Interaction required: ${response.interaction.type}`)
-if (response.type === 'blocked') throw new Error(`Blocked at ${response.stage}: ${response.reason}`)
-
-console.log(response.output)
+const response = await agent.generate({ prompt: 'How do I reset my password?' })
+if (response.type === 'response') console.log(response.output)
 ```
 
-The response outcome includes the final output, normalized messages, token usage, and run metadata.
-Your application decides how that result is stored or presented to a user.
+## Start here
 
-## Stream the same agent
+- [Add Anvia to your coding agent](/guide/coding-agents): Install Agent Skills for Claude Code, Cursor, or Codex.
+- [Quickstart](/guide/getting-started): Install a provider, verify a completion, and run your first agent.
+- [What is an agent runtime?](/guide/introduction): See what Anvia owns and what stays in your application.
 
-Use `stream()` when a CLI or interface should update while the model is responding. It emits normalized events, so application code does not need to translate each provider's streaming format.
+## Products
 
-```ts
-for await (const event of supportAgent.stream({
-    prompt: 'Draft a short support reply.'
-})) {
-  if (event.type === 'text_delta') {
-    process.stdout.write(event.delta)
-  }
+| Product | What it does |
+| --- | --- |
+| [Anvia SDK](/sdk/) | Provider-neutral models, agents, tools, memory, retrieval, pipelines, durable execution, and streaming. |
+| [Channels](/channels/) | Connect agents to Discord, Slack, and Telegram, including proactive delivery. |
+| [Studio](/studio/) | A local browser runtime for running agents and inspecting sessions, traces, tools, and memory while you develop. |
+| [Lens](/lens/) | Production tracing, evaluations, datasets, alerts, and cost for the systems you ship. |
+| [CLI](/packages/cli) | Install coding-agent skills and editable React chat components. |
 
-  if (event.type === 'response' || event.type === 'interaction' || event.type === 'blocked') {
-    process.stdout.write('\n')
-    console.log(event.usage)
-  }
-}
-```
+## Features
 
-## What changed from v0
+- [Agent Runtime](/features/agent-runtime): Reusable agents with bounded model and tool turns.
+- [Agent API and Interfaces](/features/agent-api): Serve agents over HTTP and render them in React.
+- [Tools and MCP](/features/tools-and-mcp): Typed application actions, tool search, and MCP servers.
+- [Knowledge and RAG](/features/knowledge-and-rag): Embeddings, vector stores, and GraphRAG.
+- [Memory](/features/memory): Durable session history in your own database.
+- [Multi-agent Teams](/features/multi-agent): Coordinate specialist agents.
+- [Durable Execution](/features/durable-execution): Runs that survive restarts and resume after approvals.
+- [Security and Auth](/features/security): Keep authorization, secrets, and limits on the server.
+- [Observability](/features/observability) and [Evaluations](/features/evaluations): Trace, score, and compare releases.
 
-The v0 API builds agents through `AgentBuilder` and sends work through `prompt().send()`. In v1, construction uses one explicit options object and execution happens directly on the agent.
+## What's new
 
-In v0, the builder accumulates configuration before creating the agent:
-
-```ts
-const supportAgent = new AgentBuilder('support', model)
-  .instructions('Answer support questions clearly.')
-  .defaultMaxTurns(4)
-  .build()
-
-const response = await supportAgent.prompt(input).send()
-```
-
-In v1, the constructor receives that configuration directly and `generate()` starts the run:
-
-```ts
-const supportAgent = new Agent({
-  id: 'support',
-  model,
-  instructions: 'Answer support questions clearly.',
-  maxTurns: 4,
-})
-
-const response = await supportAgent.generate({
-    prompt: input
-})
-```
-
-The runtime boundary stays the same: Anvia owns the model and tool loop, while the application owns credentials, authentication, permissions, data access, persistence, deployment, and user-facing responses.
-
-## Continue building
-
-- Follow [Getting started](/guide/getting-started) for direct completions and a deeper walkthrough.
-- Learn how agents, tools, context, memory, and events fit together in [Core concepts](/guide/core-concepts).
-- Add application-owned actions in [Tools](/sdk/tools).
-- Connect an agent to a server or interface in [Build applications](/use-cases/build-applications).
-- Review production boundaries in [Production operations](/use-cases/production).
+Anvia packages release independently. Read the [changelog](/packages/changelog) for recent
+additions, and [Compatibility and versioning](/packages/compatibility-and-versioning) for supported
+versions and the [v0 to v1 migration boundary](/packages/compatibility-and-versioning#v0-to-v1-migration-boundary).

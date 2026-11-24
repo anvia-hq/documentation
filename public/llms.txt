@@ -29,11 +29,27 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 
 ## Start Here
 
-- [Welcome to Anvia](https://docs.anvia.dev/): Product boundary, documentation paths, and what applications can build.
-- [Introduction](https://docs.anvia.dev/guide/introduction): Anvia's role in an application and the responsibilities it intentionally leaves to the host application.
+- [Introduction](https://docs.anvia.dev/): What Anvia is, the products, and where to start.
+- [What is an agent runtime?](https://docs.anvia.dev/guide/introduction): Anvia's role in an application, the responsibilities it leaves to the host application, and the package map.
+- [Add Anvia to your coding agent](https://docs.anvia.dev/guide/coding-agents): Install CLI Agent Skills for Claude Code, Cursor, or AGENTS.md/Codex, and use these LLM text guides.
 - [Quickstart](https://docs.anvia.dev/guide/getting-started): Install the smallest runtime stack and run a first agent.
 - [Core concepts](https://docs.anvia.dev/guide/core-concepts): Models, agents, tools, memory, knowledge, pipelines, streaming, and runtime events.
 - [Configuration](https://docs.anvia.dev/guide/configuration): Environment and runtime configuration guidance.
+
+## Features
+
+- [Agent Runtime](https://docs.anvia.dev/features/agent-runtime): Agent construction, generate and stream, run outcomes, limits, and per-run overrides.
+- [Agent API and interfaces](https://docs.anvia.dev/features/agent-api): Serve an agent from an HTTP route and render it in React.
+- [Tools and MCP](https://docs.anvia.dev/features/tools-and-mcp): Typed tools, approvals, tool indexes and search, MCP servers, and skills.
+- [Knowledge and RAG](https://docs.anvia.dev/features/knowledge-and-rag): Context documents, embeddings, vector stores, retrieval, and GraphRAG.
+- [Memory](https://docs.anvia.dev/features/memory): Memory stores, session scope, save policies, and compaction.
+- [Multi-agent teams](https://docs.anvia.dev/features/multi-agent): Coordinating specialist agents and when to use pipelines instead.
+- [Durable execution](https://docs.anvia.dev/features/durable-execution): Runs that survive restarts, recorded steps, and durable stores.
+- [Channels](https://docs.anvia.dev/features/channels): Connecting agents to messaging platforms.
+- [Security and auth](https://docs.anvia.dev/features/security): Authenticate, authorize, bound, and observe Anvia-based systems for real users.
+- [Observability](https://docs.anvia.dev/features/observability): Runtime logging, traces, scores, and Lens.
+- [Evaluations](https://docs.anvia.dev/features/evaluations): Offline suites, scoring, datasets, and release gates.
+- [Studio](https://docs.anvia.dev/features/studio): Local inspection of agents, sessions, traces, tools, and memory.
 
 ## SDK
 
@@ -92,9 +108,6 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Lens MCP access](https://docs.anvia.dev/lens/workspace/mcp-access): Workspace-wide read-only assistant diagnostics and payload permission.
 - [Lens System Health](https://docs.anvia.dev/lens/self-hosting/system-health): Host capacity, ingestion, dependencies, workers, and queues.
 - [Channels](https://docs.anvia.dev/channels/): Discord, Slack, and Telegram adapters that connect platforms to agents and support proactive delivery.
-- [Build applications](https://docs.anvia.dev/use-cases/build-applications): Connect Anvia runtime behavior to an application.
-- [Observe systems](https://docs.anvia.dev/use-cases/observe-systems): Add runtime observability.
-- [Production operations](https://docs.anvia.dev/use-cases/production): Prepare Anvia-based systems for real users.
 
 ## Packages
 

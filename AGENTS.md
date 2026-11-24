@@ -112,7 +112,7 @@ workspace. VitePress excludes that workspace's files through `srcExclude`.
 
 ## Documentation Map
 
-- `guide/`: introduction, getting started, core concepts, and configuration.
+- `guide/`: introduction, coding-agent setup, getting started, core concepts, and configuration.
 - `sdk/`: models, agents, tools, memory, knowledge, pipelines, streaming,
   providers, evaluations, and advanced runtime guides.
 - `channels/`: platform adapters, agent bridges, delivery, and channel releases.
@@ -121,7 +121,7 @@ workspace. VitePress excludes that workspace's files through `srcExclude`.
 - `lens/`: observability, evaluations, datasets, administration, and self-hosting.
 - `packages/`: package catalog, compatibility, public API references, and releases.
 - `faqs/`: architecture, product boundaries, capability choices, and comparisons.
-- `use-cases/`: application building, observability, and production guidance.
+- `features/`: Home feature overviews, plus the agent API, observability, and security guides.
 - `references/`: reference entry point linking to package API documentation.
 - `.vitepress/config.ts`: site configuration, navigation, sidebars, and base path.
 - `.vitepress/theme/`: shared Vue components, styles, and code theme.
