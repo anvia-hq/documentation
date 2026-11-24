@@ -37,6 +37,6 @@ Agent streams are semantic events, not raw provider chunks. Core combines provid
 
 ## Public entry points
 
-The root entry point favors common application authoring. Capability subpaths expose larger contracts without forcing every advanced symbol into the root. `@anvia/core/internal/agent` is exported for Anvia integration packages; normal application code should prefer `@anvia/core/agent`.
+The root entry point favors common application authoring. Capability subpaths expose larger contracts without forcing every advanced symbol into the root. `@anvia/core/internal/agent` and `@anvia/core/internal/provider` are exported for Anvia integration packages; normal application code should prefer `@anvia/core/agent` or the provider packages.
 
 See [configuration](/packages/core/configuration), [runtime lifecycle](/packages/core/runtime-lifecycle), and [the API reference](/packages/core/api-reference).

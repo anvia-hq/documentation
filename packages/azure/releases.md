@@ -4,7 +4,7 @@ Reviewed source release: `0.1.12`. `@anvia/azure` is a new package, so its relea
 
 ## Changes in 0.1.12
 
-Reviewed `0.1.11` → `0.1.12` against SDK source on 2026-11-23. Followed the `@anvia/openai` 1.4.1 provider refactor and rejects non-object provider responses.
+Reviewed `0.1.11` → `0.1.12` against SDK source on 2026-11-23. Followed the `@anvia/openai` 1.4.1 provider refactor and guards against non-object provider responses.
 
 ## Changes in 0.1.11
 
@@ -30,7 +30,7 @@ See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14c
 
 | Version | Type | Summary |
 | --- | --- | --- |
-| `0.1.12` | Patch | Followed the `@anvia/openai` 1.4.1 provider refactor and rejects non-object provider responses. |
+| `0.1.12` | Patch | Followed the `@anvia/openai` 1.4.1 provider refactor and guards against non-object provider responses. |
 | `0.1.3` | Patch | Require HTTPS for non-loopback `endpoint` and `baseUrl` values; retain HTTP support for loopback development hosts. |
 | `0.1.0` | Minor | Added `AzureOpenAIClient` for Azure OpenAI and Foundry v1 endpoints with API-key or Microsoft Entra token authentication, injected SDK clients, and Azure provider identities. Moved Azure Responses function-name recovery and the opt-in Azure integration test into the package, and added explicit message types to Azure Responses requests for Foundry project endpoints. Built on `@anvia/openai` `1.2.0`. |
 

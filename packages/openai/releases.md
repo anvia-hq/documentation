@@ -4,7 +4,7 @@ Reviewed source release: `1.4.1`. The entries below summarize the 1.x line and p
 
 ## Changes in 1.4.1
 
-Reviewed `1.4.0` → `1.4.1` against SDK source on 2026-11-23. Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and rejects non-object provider responses in the embedding, image, and transcription adapters.
+Reviewed `1.4.0` → `1.4.1` against SDK source on 2026-11-23. Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and guards against non-object provider responses in the embedding, image, and transcription adapters.
 
 ## Changes in 1.4.0
 
@@ -22,7 +22,7 @@ See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14c
 
 | Version | Type | Summary |
 | --- | --- | --- |
-| `1.4.1` | Patch | Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and rejects non-object provider responses in the embedding, image, and transcription adapters. |
+| `1.4.1` | Patch | Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and guards against non-object provider responses in the embedding, image, and transcription adapters. |
 | `1.3.7` | Patch | Fixed continuation after a provider switch by replaying only provider-valid history; omitted foreign reasoning, thought signatures, and tool-call IDs where the target provider rejects them. |
 | `1.3.5` | Patch | Preserved advertised `pricing` metadata in model listings and carried settled durable history across started failed or cancelled runs. |
 | `1.3.4` | Patch | Exposed advertised `supportedParameters` and provider-specific `reasoning` metadata in model listings. |

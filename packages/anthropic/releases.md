@@ -4,7 +4,7 @@ Reviewed source release: `1.4.1`. The entries below summarize the 1.0 line and p
 
 ## Changes in 1.4.1
 
-Reviewed `1.4.0` → `1.4.1` against SDK source on 2026-11-23. Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and rejects non-object provider responses in the embedding, image, and transcription adapters.
+Reviewed `1.4.0` → `1.4.1` against SDK source on 2026-11-23. Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and guards against non-object provider responses in the embedding, image, and transcription adapters.
 
 ## Changes in 1.4.0
 
@@ -20,7 +20,7 @@ See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14c
 
 | Version | Type | Summary |
 | --- | --- | --- |
-| `1.4.1` | Patch | Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and rejects non-object provider responses in the embedding, image, and transcription adapters. |
+| `1.4.1` | Patch | Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and guards against non-object provider responses in the embedding, image, and transcription adapters. |
 | `1.1.4` | Patch | Updated upstream runtime and schema dependencies across the workspace. |
 | `1.1.3` | Patch | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
 | `1.1.2` | Patch | Updated the Core dependency to `1.1.2`. |
