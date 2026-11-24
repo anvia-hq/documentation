@@ -9,7 +9,7 @@ Prompt retrieval/compilation is already included in this reviewed source baselin
 
 Reviewed `1.2.0` → `1.2.3` against SDK source on 2026-10-15. Refreshed package guidance and aligned OpenTelemetry dependencies. Parentless durable roots now finish correctly in Lens, and `LensClient` installs `createAnviaIdGenerator()` automatically. See [Durable tracing](/packages/durable/tracing).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/observability-lens/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/observability-lens/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Notable history
 
