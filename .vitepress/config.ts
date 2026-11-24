@@ -197,7 +197,16 @@ export default defineConfig({
               ]
             },
             { text: 'Guardrails', link: '/sdk/guardrails' },
-            { text: 'Evaluations', link: '/sdk/evaluations' },
+            {
+              text: 'Evaluations',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/sdk/evaluations' },
+                { text: 'Results', link: '/sdk/evaluations/results' },
+                { text: 'Trials and caching', link: '/sdk/evaluations/trials-and-caching' },
+                { text: 'CLI and baselines', link: '/sdk/evaluations/cli-and-baselines' }
+              ]
+            },
             { text: 'Observability', link: '/sdk/observability' },
             {
               text: 'Streaming',
@@ -773,7 +782,10 @@ export default defineConfig({
                     { text: 'Does not match', link: '/lens/evaluations/metrics/does-not-match' },
                     { text: 'Max length', link: '/lens/evaluations/metrics/max-length' },
                     { text: 'Required fields', link: '/lens/evaluations/metrics/required-fields' },
-                    { text: 'JSON correctness', link: '/lens/evaluations/metrics/json-correctness' }
+                    { text: 'JSON correctness', link: '/lens/evaluations/metrics/json-correctness' },
+                    { text: 'Schema match', link: '/lens/evaluations/metrics/schema-match' },
+                    { text: 'Not blank', link: '/lens/evaluations/metrics/not-blank' },
+                    { text: 'Predicate', link: '/lens/evaluations/metrics/predicate' }
                   ]
                 },
                 {
@@ -806,6 +818,13 @@ export default defineConfig({
                     { text: 'Knowledge retention', link: '/lens/evaluations/metrics/knowledge-retention' }
                   ]
                 },
+                {
+                  text: 'Agent trajectories',
+                  collapsed: true,
+                  items: [
+                    { text: 'Tool and budget metrics', link: '/lens/evaluations/metrics/agent-metrics' }
+                  ]
+                }
               ]
             },
             { text: 'Run evaluations', link: '/lens/evaluations/run-evaluations' },

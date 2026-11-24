@@ -32,6 +32,9 @@ Read [Tips](/lens/evaluations/metrics/tips) for how to choose a focused set of m
 | [maxLength](/lens/evaluations/metrics/max-length) | Checks whether output text stays within a character limit. |
 | [requiredFields](/lens/evaluations/metrics/required-fields) | Checks whether an object contains all required top-level fields. |
 | [jsonCorrectness](/lens/evaluations/metrics/json-correctness) | Checks whether output text is valid JSON and satisfies a Zod schema. |
+| [notBlank](/lens/evaluations/metrics/not-blank) | Checks whether the answer contains anything other than whitespace. |
+| [schemaMatch](/lens/evaluations/metrics/schema-match) | Checks whether the output satisfies a Zod schema. |
+| [predicate](/lens/evaluations/metrics/predicate) | Runs an application-owned rule with a comment on failure. |
 
 ## Meaning and custom judgments
 
@@ -53,11 +56,36 @@ Read [Tips](/lens/evaluations/metrics/tips) for how to choose a focused set of m
 | [abstention](/lens/evaluations/metrics/abstention) | Checks whether the assistant appropriately answers or declines to answer. |
 | [summarization](/lens/evaluations/metrics/summarization) | Checks whether a summary preserves important source facts and stays grounded. |
 
+## Agent trajectories
+
+| Metric | What it checks |
+| --- | --- |
+| [toolCalled](/lens/evaluations/metrics/agent-metrics) | Checks that the agent called a tool within a call budget. |
+| [toolNotCalled](/lens/evaluations/metrics/agent-metrics) | Checks that the agent never called a tool. |
+| [toolCallOrder](/lens/evaluations/metrics/agent-metrics) | Checks that the agent called tools in a required order. |
+| [maxTurns](/lens/evaluations/metrics/agent-metrics) | Checks that the run stayed within a turn budget. |
+| [maxTokens](/lens/evaluations/metrics/agent-metrics) | Checks that the run stayed within a token budget. |
+| [maxDurationMs](/lens/evaluations/metrics/agent-metrics) | Checks that the run stayed within a duration budget. |
+
 ## Conversations
 
 | Metric | What it checks |
 | --- | --- |
 | [turnRelevancy](/lens/evaluations/metrics/turn-relevancy) | Checks whether assistant replies stay relevant across a conversation. |
 | [knowledgeRetention](/lens/evaluations/metrics/knowledge-retention) | Checks whether the assistant preserves information the user supplied earlier. |
+
+## Call forms
+
+Every metric accepts a positional value, an options object, or nothing at all. Called with no expectation, a text metric falls back to `case.expected`, and the case type then requires that field:
+
+```ts
+metrics: [
+  contains(),                    // reads case.expected
+  contains('30 days'),           // positional
+  contains({ expected: /30 days/, caseSensitive: false }),
+]
+```
+
+Only `exactMatch` accepts `trim`; `caseSensitive` applies to string expectations, while a `RegExp` keeps its own flags. Share one judge model and its defaults with `createJudgeMetrics({ model, includeReason: 'on-fail' })`, which returns the same judge metrics with `model` optional per metric.
 
 Continue with [What to evaluate](/lens/evaluations/what-to-evaluate) to design cases or [Run evaluations](/lens/evaluations/run-evaluations) to execute a suite.

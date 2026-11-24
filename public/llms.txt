@@ -54,6 +54,10 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Pipeline runs and observability](https://docs.anvia.dev/sdk/pipelines/runs-and-errors): Named run and stage tracing, Agent trace nesting, operational events, and failure policy.
 - [Streaming](https://docs.anvia.dev/sdk/streaming): Completion and agent streams, event types, transports, cancellation, and resumption.
 - [Providers](https://docs.anvia.dev/sdk/providers): Provider adapters, supported capabilities, and provider selection.
+- [Evaluations](https://docs.anvia.dev/sdk/evaluations): Offline suites, agent targets, metrics, and regression gates.
+- [Evaluation results](https://docs.anvia.dev/sdk/evaluations/results): Suite totals, `passed`, metric summaries, and per-case records.
+- [Trials and caching](https://docs.anvia.dev/sdk/evaluations/trials-and-caching): Repeated sampling, tag filters, and target caches.
+- [Evaluation CLI and baselines](https://docs.anvia.dev/sdk/evaluations/cli-and-baselines): CLI flags, exit codes, stored baselines, and target comparison.
 
 ## Advanced SDK Topics
 

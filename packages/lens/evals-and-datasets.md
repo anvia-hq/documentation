@@ -44,4 +44,13 @@ const dataset = await datasets.getDataset<string, string>({
 
 The client reads published immutable versions and follows at most 100 pages. Default `pageSize: 50` supports 5,000 items; `pageSize: 100` supports 10,000. Larger populations throw `LensDatasetError` with `code: 'pagination_limit'`; partition larger datasets rather than expecting a partial return. Omitting `version` selects the latest published version. Pin a version in CI so repeated runs evaluate the same cases.
 
+Each item exposes `{ id, input, expected?, context?, retrievalContext?, tags?, metadata? }`. `tags` arrives as a string array and `metadata` as a JSON object, so `dataset.items` passes straight into `runEvalSuite` and a tag filter can select managed cases:
+
+```ts
+const cases = dataset.items
+await runEvalSuite({ ...suite, cases, tags: ['smoke'] })
+```
+
+A response whose `tags` is not a string array or whose `metadata` is not a JSON object is rejected as `invalid_response` rather than coerced. `LensDatasetError.code` is `network_error`, `invalid_response`, `pagination_limit`, or the API's own error code, with a `request_failed` fallback; `status` is absent for transport and parse failures.
+
 The public client is read-only: dataset drafting, publishing, archiving, comparison, and quality-gate configuration live in Lens.

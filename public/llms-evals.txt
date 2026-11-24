@@ -108,6 +108,47 @@ const result = await runEvalSuite({
 console.log(result.metrics)
 ```
 
+## Repeat, cache, and gate
+
+`agentEvalTarget(agent)` adapts a string-prompt agent directly; the options form is required only
+when a case input is not a string. `trials` repeats a case and `minPassRate` decides how many
+samples must pass, `tags` selects cases, and `targetCache` or `cachedEvalTarget` reuses target
+outputs. `result.passed` is the gate; `result.metricSummaries` reports per-metric `passRate`.
+
+```ts
+import {
+  assertEvalPassed, cachedEvalTarget, compareEvalResults, createMemoryEvalCache,
+  loadEvalResult, runEvalCli, runEvalSuite, saveEvalResult,
+} from '@anvia/core/evals'
+
+const target = cachedEvalTarget(myTarget, createMemoryEvalCache())
+const run = await runEvalSuite({ ...suite, target, trials: { count: 3, minPassRate: 2 / 3 }, tags: ['smoke'] })
+assertEvalPassed(run)
+
+await saveEvalResult('evals/baseline.json', run)
+const baseline = await loadEvalResult('evals/baseline.json')
+const comparison = compareEvalResults(baseline, run, { scoreTolerance: 0.02 })
+
+await runEvalCli({
+  ...suite,
+  argv: true,
+  exitCode: true,
+  baselinePath: 'evals/baseline.json',
+  savePath: 'evals/baseline.json',
+})
+
+console.log(comparison.hasRegressions)
+```
+
+Flags are read only with `argv: true` (or an explicit array). `evalExitCode` returns `2` for a
+required invalid judgment, `1` for a required failure, and `0` otherwise; `exitCode: true` raises
+`process.exitCode` and never lowers it. Without a `scoreTolerance`, same-outcome score drift is
+`unchanged`, and optional-metric regressions do not gate unless `includeOptionalMetrics` is set.
+
+Agent trajectories have their own metrics: `toolCalled`, `toolNotCalled`, `toolCallOrder`,
+`maxTurns`, `maxTokens`, and `maxDurationMs`. `createJudgeMetrics({ model })` shares one judge
+model across the judge metrics.
+
 Start with deterministic checks. Add semantic similarity, judge, score, RAG, or conversation metrics
 only when each one represents a named product requirement. Judge metrics add cost and variance.
 
