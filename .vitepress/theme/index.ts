@@ -1,4 +1,4 @@
-import DefaultTheme from 'vitepress/theme'
+import DefaultTheme from 'vitepress/theme-without-fonts'
 import { h } from 'vue'
 import ImageDialog from './ImageDialog.vue'
 import './style.css'

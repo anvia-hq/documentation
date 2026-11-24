@@ -1,4 +1,9 @@
-const palette = {
+type Palette = Record<
+  'background' | 'foreground' | 'comment' | 'keyword' | 'type' | 'function' | 'string' | 'number' | 'literal',
+  string
+>
+
+const darkPalette: Palette = {
   background: '#101010',
   foreground: '#b7c0ca',
   comment: '#56606a',
@@ -8,11 +13,24 @@ const palette = {
   string: '#9fbd73',
   number: '#bd93d8',
   literal: '#df7d68',
-} as const
+}
 
-export const landingCodeTheme = {
-  name: 'anvia-landing-code',
-  type: 'dark' as const,
+// Mirrors the light syntax tokens in style.css.
+const lightPalette: Palette = {
+  background: '#fbfcfa',
+  foreground: '#48504c',
+  comment: '#788079',
+  keyword: '#9c2c62',
+  type: '#087d78',
+  function: '#255fa6',
+  string: '#257044',
+  number: '#955810',
+  literal: '#7144a5',
+}
+
+const createCodeTheme = (name: string, type: 'light' | 'dark', palette: Palette) => ({
+  name,
+  type,
   fg: palette.foreground,
   bg: palette.background,
   colors: {
@@ -127,4 +145,7 @@ export const landingCodeTheme = {
       settings: { foreground: palette.literal },
     },
   ],
-}
+})
+
+export const landingCodeTheme = createCodeTheme('anvia-landing-code', 'dark', darkPalette)
+export const landingCodeLightTheme = createCodeTheme('anvia-landing-code-light', 'light', lightPalette)
