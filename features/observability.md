@@ -1,10 +1,11 @@
-# Observe systems
+# Observability
 
 Anvia runtime events provide one consistent observation surface across providers, direct model calls, agent turns, and tools.
 
 ## Log the lifecycle
 
 ```ts
+import { Agent } from '@anvia/core'
 import { createConsoleLogger, createLoggerObserver } from '@anvia/logger'
 
 const logger = createConsoleLogger({

@@ -8,10 +8,6 @@ function normalizeBase(base: string) {
   return `/${base.replace(/^\/+|\/+$/g, '')}${base === '/' ? '' : '/'}`
 }
 
-function withDocsBase(path: string) {
-  return `${docsBase}${path.replace(/^\/+/, '')}`
-}
-
 export default defineConfig({
   // Dark by default; the header toggle stores the reader's choice.
   appearance: 'dark',
@@ -1549,41 +1545,41 @@ export default defineConfig({
       '/': [
         {
           text: 'Welcome',
-          items: [{ text: 'Welcome to Anvia', link: '/' }]
+          items: [
+            { text: 'Introduction', link: '/' },
+            { text: 'What is an agent runtime?', link: '/guide/introduction' }
+          ]
         },
         {
           text: 'Get Started',
           items: [
-            { text: 'Introduction', link: '/guide/introduction' },
-            { text: 'Quickstart', link: '/guide/getting-started' },
-            { text: 'Core concepts', link: '/guide/core-concepts' },
-            { text: 'Configuration', link: '/guide/configuration' }
+            { text: 'Add Anvia to your coding agent', link: '/guide/coding-agents' },
+            {
+              text: 'Build your first agent',
+              collapsed: true,
+              items: [
+                { text: 'Quickstart', link: '/guide/getting-started' },
+                { text: 'Core concepts', link: '/guide/core-concepts' },
+                { text: 'Configuration', link: '/guide/configuration' }
+              ]
+            }
           ]
         },
         {
-          text: 'Products',
+          text: 'Features',
           items: [
-            { text: 'Anvia SDK', link: '/sdk/' },
-            { text: 'Anvia Studio', link: '/studio/' },
-            { text: 'Lens Observability', link: '/lens/' }
-          ]
-        },
-        {
-          text: 'Use Cases',
-          items: [
-            { text: 'Build applications', link: '/use-cases/build-applications' },
-            { text: 'Observe systems', link: '/use-cases/observe-systems' },
-            { text: 'Production operations', link: '/use-cases/production' }
-          ]
-        },
-        {
-          text: 'For agents',
-          items: [
-            { text: 'LLMs.txt', link: withDocsBase('/llms.txt') },
-            { text: 'Agents, tools, and MCP', link: withDocsBase('/llms-agents.txt') },
-            { text: 'Full-stack applications', link: withDocsBase('/llms-apps.txt') },
-            { text: 'Evaluations and observability', link: withDocsBase('/llms-evals.txt') },
-            { text: 'RAG and retrieval', link: withDocsBase('/llms-rag.txt') }
+            { text: 'Agent Runtime', link: '/features/agent-runtime' },
+            { text: 'Agent API and Interfaces', link: '/features/agent-api' },
+            { text: 'Tools and MCP', link: '/features/tools-and-mcp' },
+            { text: 'Knowledge and RAG', link: '/features/knowledge-and-rag' },
+            { text: 'Memory', link: '/features/memory' },
+            { text: 'Multi-agent Teams', link: '/features/multi-agent' },
+            { text: 'Durable Execution', link: '/features/durable-execution' },
+            { text: 'Channels', link: '/features/channels' },
+            { text: 'Security and Auth', link: '/features/security' },
+            { text: 'Observability', link: '/features/observability' },
+            { text: 'Evaluations', link: '/features/evaluations' },
+            { text: 'Studio', link: '/features/studio' }
           ]
         }
       ],

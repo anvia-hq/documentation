@@ -1,4 +1,4 @@
-# Production operations
+# Security and auth
 
 A production Anvia service keeps the runtime boundary explicit: the server authenticates users, constructs trusted dependencies, runs bounded agents, and emits only the events a client is allowed to receive.
 
@@ -7,6 +7,8 @@ A production Anvia service keeps the runtime boundary explicit: the server authe
 Anvia clients receive credentials explicitly. Validate them once during server startup rather than discovering a missing secret during a user request.
 
 ```ts
+import { OpenAIClient } from '@anvia/openai'
+
 const apiKey = process.env.OPENAI_API_KEY
 
 if (!apiKey) {
@@ -15,7 +17,8 @@ if (!apiKey) {
 
 const client = new OpenAIClient({ apiKey })
 const model = client.completionModel({
-    modelId: 'gpt-5.6-sol'
+    modelId: 'gpt-5.6-sol',
+    api: 'responses'
 })
 ```
 
@@ -24,6 +27,8 @@ Keep provider keys, database credentials, and observability secrets in the serve
 ## Authenticate before agent execution
 
 Authentication belongs at the request boundary. Tool handlers must also enforce authorization because schema validation only proves that arguments have the expected shape.
+
+`authenticate()` and `runSupportAgent()` below stand for your application's own authentication and request handling.
 
 ```ts
 export async function POST(request: Request) {
@@ -45,13 +50,16 @@ Do not treat a session ID, user ID, tenant ID, or model-selected tool argument a
 Create tool handlers around authenticated application services. The closure keeps trusted identity out of model-controlled arguments.
 
 ```ts
+import { Agent, createTool } from '@anvia/core'
+import { z } from 'zod'
+
 function createOrderTools(userId: string) {
   return [
     createTool({
       name: 'lookup_order',
       description: 'Look up an order the current user may access.',
       inputSchema: z.object({ orderId: z.string() }),
-      execute: async ({ orderId }) => {
+      handler: async ({ orderId }) => {
         return orders.findAuthorized({ orderId, userId })
       },
     }),
@@ -65,7 +73,7 @@ const agent = new Agent({
 })
 ```
 
-Use approval requirements for consequential side effects, but keep product authorization inside the handler even after a user approves the action.
+`orders` is an application service and `user` comes from the authenticated request. Use approval requirements for consequential side effects, but keep product authorization inside the handler even after a user approves the action.
 
 ## Bound every run
 
@@ -114,6 +122,9 @@ Verify that the authenticated user can access `threadId` before creating the ses
 Return normalized runtime events with `@anvia/server`. JSONL is the default for Anvia clients; SSE supports clients that require `text/event-stream`.
 
 ```ts
+import { agentToClientStream } from '@anvia/client'
+import { createClientStreamResponse } from '@anvia/server'
+
 const events = agent.stream({ messages })
 return createClientStreamResponse({
   events: agentToClientStream({ events }),
@@ -140,7 +151,7 @@ Only retain message content when a documented product or compliance policy requi
 
 ## Always clean up sandboxes
 
-Destroy sandbox handles even when model execution or a tool fails.
+Destroy sandbox handles even when model execution or a tool fails. `sandboxClient` is a sandbox client such as `DockerSandboxClient` from `@anvia/sandbox`, and `runWithSandbox()` is your application's work; see [Sandbox](/sdk/advanced/sandbox) for setup.
 
 ```ts
 const sandbox = await sandboxClient.createSandbox({
@@ -161,7 +172,7 @@ Start with explicit command allowlists, timeouts, output limits, file-size limit
 
 ## Production checklist
 
-- Keep all Anvia packages on the same release channel.
+- Install package versions whose declared dependency and peer-dependency ranges are compatible.
 - Validate secrets during startup and keep them server-only.
 - Authenticate requests before constructing sessions or request-scoped agents.
 - Authorize every private read and side effect inside tool execution.

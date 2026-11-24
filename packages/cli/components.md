@@ -74,7 +74,7 @@ export function SupportChat() {
 
 Adjust the relative import when your component alias uses a different directory. The generated
 chat uses the controller in `ChatProvider`; installing files does not construct an agent or
-implement `/api/chat`. Follow [Build applications](/use-cases/build-applications) for a server
+implement `/api/chat`. Follow [Agent API and interfaces](/features/agent-api) for a server
 route that returns the matching client protocol. Keep provider credentials on the server.
 
 The layout uses `h-full` and scrolling regions, so give its parent a height. Ensure Tailwind

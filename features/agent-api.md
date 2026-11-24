@@ -1,6 +1,6 @@
-# Build applications
+# Agent API and interfaces
 
-Anvia applications keep provider credentials and agent execution on the server, then send normalized runtime events to the client. The client owns interaction state; the server remains the trusted runtime boundary.
+Serve an agent from your own HTTP route and render it in React. Anvia applications keep provider credentials and agent execution on the server, then send normalized runtime events to the client. The client owns interaction state; the server remains the trusted runtime boundary.
 
 ## 1. Install the application packages
 
@@ -123,21 +123,28 @@ The hook also exposes `stop()`, `regenerate()`, `reset()`, stream events, contex
 
 ## 5. Understand the wire boundary
 
-The default request shape is intentionally small:
+`parseClientStreamRequest()` validates the request body and returns one of two request kinds:
 
 ```ts
 type ClientStreamRequest = {
+  type: 'messages'
   messages: readonly Message[]
   metadata?: JsonObject
-  resume?: {
-    streamId: string
-    after: number
-  }
+  resume?: { streamId: string; after: number }
+} | {
+  type: 'interaction_response'
+  interactionId: string
+  response: AgentInteractionResponse
+  metadata?: JsonObject
+  resume?: { streamId: string; after: number }
 }
 ```
 
-Read `body.messages` at the server boundary rather than assuming a single `{ message }` string. Use `metadata` only for non-sensitive request context, and validate any values before trusting them.
+Branch on `body.type` at the server boundary rather than assuming a single `{ message }` string.
+An `interaction_response` answers an approval or question from an earlier run; reject it, as the
+route above does, until your server stores and resumes interaction continuations. Use `metadata`
+only for non-sensitive request context, and validate any values before trusting them.
 
 ## Next
 
-Add narrow application actions with [Tools](/sdk/tools), then review [Production operations](/use-cases/production) before exposing the runtime to real users.
+Add narrow application actions with [Tools](/sdk/tools), then review [Security and auth](/features/security) before exposing the runtime to real users.

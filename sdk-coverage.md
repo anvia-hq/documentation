@@ -55,7 +55,7 @@ The coverage checker audits static Anvia imports in TypeScript/JavaScript fences
 `packages/`, `examples/`, `channels/`, `lens/`, `studio/`, and `faqs/`. SDK-owned packages must resolve
 to public entrypoints and exported named/default bindings. Known Channels packages are reported as
 out of scope because they need the sibling Channels implementation; unknown package names still
-fail. Directories outside that list — `guide/`, `use-cases/`, `references/`, and the root pages — are
+fail. Directories outside that list — `guide/`, `features/`, `references/`, and the root pages — are
 covered only by the broader snippet typecheck. This is not an independent Channels API audit.
 
 The broader snippet checker scans repository Markdown and public LLM text files. Complete

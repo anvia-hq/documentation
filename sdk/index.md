@@ -115,6 +115,6 @@ Provider clients receive configuration explicitly. They do not load environment 
 2. [Your first agent](/sdk/your-first-agent) adds reusable instructions and bounded execution.
 3. [Tools](/sdk/tools) connects the model to application-owned reads and actions.
 4. [Memory](/sdk/memory) adds durable conversation identity.
-5. [Build applications](/use-cases/build-applications) exposes runtime events from a server.
+5. [Agent API and interfaces](/features/agent-api) exposes runtime events from a server.
 
 For a complete package map, continue to the [Package catalog](/packages/catalog).
