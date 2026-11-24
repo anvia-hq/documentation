@@ -1,5 +1,5 @@
 {
-  "reviewedSdkRevision": "aa39d29b6db6e6672750a0d9a71285b6230a730a",
+  "reviewedSdkRevision": "7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488",
   "entries": [
     {
       "module": "@anvia/cli",
@@ -68,8 +68,8 @@
       "module": "@anvia/core/evals",
       "guide": "sdk/evaluations.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 134,
-      "exportNamesHash": "fc3724473ec44fe5e1d25fba85025f41d294c1c5c9e3d7ddb57f7c1b3ca3fa32"
+      "exportCount": 186,
+      "exportNamesHash": "32d157f60a2bee75c913f5f0a3daa36eb33f618263933901fd829cb3e83c0fdc"
     },
     {
       "module": "@anvia/core/documents",
@@ -313,8 +313,8 @@
       "module": "@anvia/openai",
       "guide": "packages/openai/get-started.md",
       "reference": "packages/openai/api-reference.md",
-      "exportCount": 44,
-      "exportNamesHash": "0253a9e1c1d880b646ddbe9cf8fdaf6c4bbefb9c4f55f5d5948d5a0fb1f84fb3"
+      "exportCount": 45,
+      "exportNamesHash": "ae8ba857be1de33f1db9bf980bd37d9e9489b2ee918c73edc67f0639c00dfa92"
     },
     {
       "module": "@anvia/react",
@@ -495,8 +495,8 @@
       "module": "@anvia/azure",
       "guide": "sdk/providers/azure/setup.md",
       "reference": "packages/azure/api-reference.md",
-      "exportCount": 12,
-      "exportNamesHash": "b1d846fa490d32750aafe9ddf9036de9952824491ec4ea2a6ab77dec06475135"
+      "exportCount": 14,
+      "exportNamesHash": "f0040995a585bcdd2bca11d83e0ccb938f9f715c6047b7ab4d4e09ba36aa736a"
     },
     {
       "module": "@anvia/client/durable",
