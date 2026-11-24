@@ -6,7 +6,8 @@ Anvia places provider-neutral contracts around common capabilities, but it canno
 
 - Agents depend on completion-model contracts rather than a provider client.
 - Messages, tool calls, usage, and streaming events use normalized shapes.
-- Embedding, media, memory, vector, and observer contracts have replaceable adapters.
+- Embedding, media, memory, vector, graph, and observer contracts have replaceable adapters.
+- Durable execution stores can use SQLite, Postgres, Drizzle, or Prisma.
 - Application tools remain ordinary TypeScript functions.
 - Pipelines remain callable application code.
 - Observability can target Lens, Langfuse, or an OpenTelemetry pipeline through the corresponding integration.

@@ -10,4 +10,6 @@ Lens is operational telemetry, not application state. It does not replace conver
 
 Unlike Studio's local, process-oriented history, Lens is designed for retained team workflows across development, staging, and production. Self-hosting also makes the operator responsible for HTTPS, secrets, storage, backups, upgrades, retention, and incident response.
 
-Start with [Lens](/lens/), [core concepts](/lens/core-concepts), [connect Anvia](/lens/connect/anvia), and [evaluations](/lens/evaluations). The native adapter is documented under [`@anvia/lens`](/packages/lens).
+Evaluation suites themselves run in `@anvia/core/evals` without Lens; see [Can I run evaluations without Lens?](/faqs/studio-and-lens/evaluations-without-lens).
+
+Start with [Observability](/features/observability), [Lens](/lens/), [core concepts](/lens/core-concepts), [connect Anvia](/lens/connect/anvia), and [evaluations](/lens/evaluations). The native adapter is documented under [`@anvia/lens`](/packages/lens).

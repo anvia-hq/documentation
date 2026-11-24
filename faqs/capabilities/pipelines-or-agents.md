@@ -8,16 +8,19 @@ Use an agent for an adaptive model-and-tool loop. Use a pipeline when the applic
 | Normalize input, load data, classify, then format output | [Pipeline](/sdk/pipelines) |
 | One model call | [Completion](/sdk/completions) |
 | A fixed sequence that includes model reasoning | Pipeline with an agent or extractor stage |
+| A typed judgment chooses which branch runs | Pipeline `.decide()` and `.route()` stages |
 
 ## Can a pipeline contain an agent?
 
 Yes. Keep normalization, authorization, database work, branching, and response shaping in ordinary TypeScript steps. Use an agent stage only where adaptive reasoning or a tool loop adds value, and use an extractor when existing content must become validated fields.
 
-See [Agents and extractors](/sdk/pipelines/agents-and-extractors).
+See [Agents and extractors](/sdk/pipelines/agents-and-extractors) and [Decisions and routing](/sdk/pipelines/decisions-and-routing).
 
 ## Is a pipeline a job queue?
 
 No. A pipeline describes and runs the workflow. Long-running or retryable production work still needs worker infrastructure, durable job state, idempotency, and deployment-specific recovery. Read [Production workers](/sdk/pipelines/production-workers).
+
+`@anvia/durable` can recover agent runs and task graphs after a restart, but it does not recover pipelines. See [durable execution, pipelines, or a job queue](/faqs/production/durable-execution).
 
 ## When is neither necessary?
 

@@ -12,6 +12,8 @@ Also test the negative paths: denied tools, approval-required continuations, rej
 
 Create stable cases for important product behaviors, known failures, tool selection, structured output, retrieval quality, policy boundaries, and regressions discovered in production. Record useful evidence and expected outcomes without pretending one small suite proves general safety.
 
+Run suites with `@anvia/core/evals`; Lens is not required. Core provides agent targets, deterministic and model-scored metrics, trajectory metrics such as `toolCalled` and `maxTurns`, repeated trials with pass@k, a CI runner, and baseline comparison. See [Can I run evaluations without Lens?](/faqs/studio-and-lens/evaluations-without-lens).
+
 ## Live-provider checks
 
 Run a credential-gated suite against the exact provider, endpoint, model ID, account, region, and parameters used in production. Test capabilities the application depends on, such as streaming tool arguments or schema adherence.
@@ -20,4 +22,4 @@ Run a credential-gated suite against the exact provider, endpoint, model ID, acc
 
 Compare results across candidate releases, set a small number of owned quality gates, and retain the underlying cases so a failure can be investigated. Keep deterministic security and authorization tests outside model-scored evaluations. A metric threshold should support a human release policy, not replace it.
 
-See [Lens evaluations](/lens/evaluations), [what to evaluate](/lens/evaluations/what-to-evaluate), [quality gates](/lens/evaluations/quality-gates), and the [provider capability matrix](/sdk/providers/capability-matrix). Use [compatible-endpoint testing](/sdk/providers/compatible/testing) when a custom OpenAI- or Anthropic-shaped endpoint is in scope.
+See [Evaluations](/features/evaluations), the [SDK evaluation guide](/sdk/evaluations), [Lens evaluations](/lens/evaluations), [what to evaluate](/lens/evaluations/what-to-evaluate), [quality gates](/lens/evaluations/quality-gates), and the [provider capability matrix](/sdk/providers/capability-matrix). Use [compatible-endpoint testing](/sdk/providers/compatible/testing) when a custom OpenAI- or Anthropic-shaped endpoint is in scope.

@@ -9,6 +9,7 @@ Choose based on the workflow before the object is produced.
 | Existing content must be converted into fields | [`extract()`](/sdk/structured-output/extractors) |
 | A tool returns typed data to the model | Tool `outputSchema` |
 | Typed data is one stage in a larger workflow | [Pipeline](/sdk/pipelines) |
+| A label, score, or probability to branch on | [Typed decision](/faqs/capabilities/decisions-or-structured-output) |
 
 ## Does a schema guarantee valid model output?
 
@@ -26,6 +27,8 @@ const result = await generateCompletion({
 
 console.log(result.output.priority)
 ```
+
+`model` is a completion model created by your provider package, such as `client.completionModel(...)`.
 
 ## Should I parse `result.text` myself after validation fails?
 

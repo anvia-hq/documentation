@@ -11,7 +11,10 @@ Platform independence means Anvia is not tied to one web framework or hosting ve
 - React UI targets React DOM and browser interactions.
 - Resumable streams need shared durable storage in multi-worker deployments.
 - Long-running pipelines may need application-owned queues and workers.
+- Some packages declare a minimum Node.js version, from 20 for `@anvia/mcp` to 24 for `@anvia/lens` and Channels. Bun 1.3.14 is tested for a subset of packages, and edge runtimes are not claimed. See [Which runtimes are supported?](/faqs/production/runtime-support).
 
 Keep provider credentials and model execution on a trusted server boundary. A browser client should call an authenticated application route rather than receive provider API keys.
 
 Review the [provider model boundary](/sdk/providers/model-boundary), [provider capability matrix](/sdk/providers/capability-matrix), [package compatibility and versioning](/packages/compatibility-and-versioning), and [`@anvia/server` runtime compatibility](/packages/server#runtime-compatibility) before choosing a target platform.
+
+Reviewed against Anvia SDK `7aa42c0a` on 2026-11-24.

@@ -10,6 +10,7 @@ Use multiple agents when a child creates a real boundary: different instructions
 | The same specialists must run in a known order | [Pipeline](/sdk/pipelines) |
 | Independent specialists can run together | Pipeline parallel branches or application orchestration |
 | Membership is dynamic: spawn on demand, message, recurse | [Agent teams](/sdk/advanced/multi-agent/agent-teams) |
+| Dependent agent tasks must survive a restart | Durable [task graphs](/sdk/advanced/durable-execution/graphs) (experimental) |
 
 The model should choose a child only when adaptive routing is useful. If every request must call the same agents, deterministic composition is easier to test and operate.
 
@@ -23,4 +24,4 @@ No. Build each child with only its allowed tools and context. Authorization belo
 
 ## How should I decide?
 
-Start with [When not to use multiple agents](/sdk/advanced/multi-agent/when-not-to-use), then review [Coordination](/sdk/advanced/multi-agent/coordination) and [Failures](/sdk/advanced/multi-agent/failures). Measure whether the specialist improves results enough to justify its operational cost.
+Start with [Multi-agent](/features/multi-agent) and [When not to use multiple agents](/sdk/advanced/multi-agent/when-not-to-use), then review [Coordination](/sdk/advanced/multi-agent/coordination) and [Failures](/sdk/advanced/multi-agent/failures). Measure whether the specialist improves results enough to justify its operational cost. Studio can run registered teams locally; see [Team runs](/studio/team-runs).

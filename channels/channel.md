@@ -2,7 +2,7 @@
 
 `@anvia/channel` is the platform-neutral foundation for channels: it defines addresses, normalized events, portable messages, splitting, runtime validation, and the `Channel` interface every adapter implements, with no dependency on `@anvia/core` or a platform SDK.
 
-The package is currently a private workspace package in the channels monorepo; `@anvia/channel` is its intended npm name.
+Install it from npm with `pnpm add @anvia/channel`. It requires Node.js 24 or later.
 
 ## Pick the right utility
 

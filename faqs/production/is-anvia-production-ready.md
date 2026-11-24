@@ -7,11 +7,22 @@ The runtime can bound agent turns, validate tool arguments, stream structured ev
 ## What Anvia provides
 
 - Explicit model, tool, memory, pipeline, streaming, and observer contracts.
-- Agent turn and tool-concurrency controls, plus explicit streaming cancellation boundaries.
-- Provider, storage, vector, UI, and observability adapters.
+- Agent turn and tool-concurrency controls, per-run abort signals, and explicit streaming cancellation boundaries.
+- Provider, storage, vector, graph, UI, and observability adapters.
 - Studio for local inspection.
-- Lens or OpenTelemetry integrations for retained operational telemetry.
-- Evaluation primitives for testing behavior before and after release.
+- Lens, Langfuse, or OpenTelemetry integrations for retained operational telemetry.
+- Evaluation suites in `@anvia/core/evals` for testing behavior before and after release.
+- Experimental durable execution for agent runs that must survive a restart.
+
+## Which packages are stable?
+
+Core is a stable v1 package (`1.22.0`), and most adapters are stable 1.x releases. Packages version independently, and the SDK release policy currently prohibits major releases. Some packages are not yet stable:
+
+- `@anvia/durable` (`0.18.0`) is experimental; its database records may change between releases.
+- `@anvia/azure` (`0.1.12`) and `@anvia/jev` (`0.3.1`) are pre-1.0.
+- The Channels packages (`0.3`–`0.5`) are pre-1.0.
+
+Pin exact versions and review release notes before upgrading pre-1.0 packages. See [compatibility and versioning](/packages/compatibility-and-versioning).
 
 ## What the application owns
 
@@ -36,4 +47,6 @@ Before shipping, confirm that the system can answer:
 5. Which data is stored or exported, and for how long?
 6. How are behavior regressions detected before and after deployment?
 
-Continue with [agent errors and limits](/sdk/agents/errors-and-limits), [tool security](/sdk/tools/security), [provider selection](/sdk/providers/choose-a-provider), and [testing agent behavior](/faqs/production/testing-agent-behavior).
+Continue with [agent errors and limits](/sdk/agents/errors-and-limits), [tool security](/sdk/tools/security), [provider selection](/sdk/providers/choose-a-provider), [Security](/features/security), [runtime support](/faqs/production/runtime-support), and [testing agent behavior](/faqs/production/testing-agent-behavior).
+
+Reviewed against Anvia SDK `7aa42c0a` on 2026-11-24.

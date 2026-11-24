@@ -12,6 +12,7 @@ Anvia is provider-neutral, but support is not universal. A provider package expo
 | Speech or audio creation | [Audio generation](/sdk/models/speech-generation) |
 | Audio-to-text | [Transcription](/sdk/models/transcription) |
 | Document or image text extraction | [OCR](/sdk/models/ocr) |
+| Labels, scores, or probabilities | [Decision model](/sdk/decisions) |
 
 A completion provider does not automatically provide embeddings, transcription, or media generation. These are separate Core interfaces and provider factories.
 
@@ -25,6 +26,6 @@ Use the [provider capability matrix](/sdk/providers/capability-matrix) to shortl
 
 Core workflows can depend on provider-neutral interfaces, so switching is usually localized to model construction. Provider-specific options, response details, and capability differences still need review.
 
-Start with [Choose a provider](/sdk/providers/choose-a-provider). Package setup is available for [OpenAI](/packages/openai), [Anthropic](/packages/anthropic), [Gemini](/packages/gemini), [Mistral](/packages/mistral), [Grok](/packages/grok), and [Azure OpenAI](/packages/azure). [Jev](/packages/jev) provides typed decision models.
+Start with [Choose a provider](/sdk/providers/choose-a-provider). Package setup is available for [OpenAI](/packages/openai), [Anthropic](/packages/anthropic), [Gemini](/packages/gemini), [Mistral](/packages/mistral), [Grok](/packages/grok), and [Azure OpenAI](/packages/azure). [Jev](/packages/jev) provides typed decision models, and OpenAI also provides one. Azure and Jev are pre-1.0; see [Can I use Azure OpenAI or Azure AI Foundry?](/faqs/capabilities/azure-openai).
 
 Keep provider credentials on the server and treat model capability declarations as configuration checks, not live network probes.
