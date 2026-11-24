@@ -11,7 +11,7 @@ Reviewed `1.5.2` → `1.5.6` against SDK source on 2026-11-23. Adds richer vecto
 
 Reviewed `1.5.0` → `1.5.1` against SDK source on 2026-10-15. Bundled the durable-goals skill guidance for persisted handoffs, verified completion, budgets, and resumable sessions. UI installation and skills installation remain separate workflows.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/cli/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/cli/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

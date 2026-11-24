@@ -1,6 +1,10 @@
 # Releases
 
-Reviewed source release: `1.4.0`. The entries below summarize the 1.x line and preserve notable v0 history.
+Reviewed source release: `1.4.1`. The entries below summarize the 1.x line and preserve notable v0 history.
+
+## Changes in 1.4.1
+
+Reviewed `1.4.0` → `1.4.1` against SDK source on 2026-11-23. Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and rejects non-object provider responses in the embedding, image, and transcription adapters.
 
 ## Changes in 1.4.0
 
@@ -12,12 +16,13 @@ Reviewed `1.3.1` → `1.3.7` against SDK source on 2026-11-04. Accepted repeated
 
 Reviewed `1.2.0` → `1.3.0` against SDK source on 2026-10-15. Added `OpenAIClient.decisionModel()`, `GPT_6_LUNA`, decision model types, native choice/score/check mappings, composed multi-label checks, and typed refusal handling. Requires OpenAI SDK 7.30.0 or newer. See [OpenAI decisions](/packages/openai/decisions).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/provider-openai/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/provider-openai/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 
 | Version | Type | Summary |
 | --- | --- | --- |
+| `1.4.1` | Patch | Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and rejects non-object provider responses in the embedding, image, and transcription adapters. |
 | `1.3.7` | Patch | Fixed continuation after a provider switch by replaying only provider-valid history; omitted foreign reasoning, thought signatures, and tool-call IDs where the target provider rejects them. |
 | `1.3.5` | Patch | Preserved advertised `pricing` metadata in model listings and carried settled durable history across started failed or cancelled runs. |
 | `1.3.4` | Patch | Exposed advertised `supportedParameters` and provider-specific `reasoning` metadata in model listings. |

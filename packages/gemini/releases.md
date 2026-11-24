@@ -1,6 +1,10 @@
 # Releases
 
-Reviewed source release: `1.2.0`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Reviewed source release: `1.2.1`. The entries below summarize the 1.0 line and preserve notable v0 history.
+
+## Changes in 1.2.1
+
+Reviewed `1.2.0` → `1.2.1` against SDK source on 2026-11-23. Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and rejects non-object provider responses in the embedding, image, and transcription adapters.
 
 ## Changes in 1.2.0
 
@@ -10,12 +14,13 @@ Reviewed `1.1.8` → `1.2.0` against SDK source on 2026-11-23. Aligns model IDs,
 
 Reviewed `1.1.4` → `1.1.7` against SDK source on 2026-10-15. Refreshed package guidance and updated upstream Google GenAI dependencies. Review the source changelog for the dependency versions crossed by your upgrade.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/provider-gemini/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/provider-gemini/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 
 | Version | Type | Summary |
 | --- | --- | --- |
+| `1.2.1` | Patch | Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and rejects non-object provider responses in the embedding, image, and transcription adapters. |
 | `1.1.4` | Patch | Updated upstream runtime and schema dependencies across the workspace. |
 | `1.1.3` | Patch | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
 | `1.1.2` | Patch | Updated the Core dependency to `1.1.2`. |

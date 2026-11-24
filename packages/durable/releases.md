@@ -11,7 +11,7 @@ Reviewed `0.13.0` → `0.18.0` against SDK source on 2026-11-23. Adds Postgres/D
 
 Reviewed `0.3.0` → `0.13.0` against SDK source on 2026-11-04. Added registration compaction (0.4), verified multi-session goals (0.5), per-submission goal agents (0.6), shared histories and bounded inspection (0.7), queued steering and SQLite schema 9 (0.8), goal controls (0.9), continuing rounds (0.10), stable run traces (0.11), and application-selected observability sessions (0.12). Version 0.13 makes agent compatibility explicit and settles over-limit admissions as terminal failures. See [Goals](/packages/durable/goals), [Compaction](/packages/durable/compaction), [Steering](/packages/durable/steering), [Tracing](/packages/durable/tracing), and [Operations](/packages/durable/operations). Upgrade Core and Durable together for execution protocol 4; snapshots can contain linked history references, and database downgrades are unsupported.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/durable/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/durable/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

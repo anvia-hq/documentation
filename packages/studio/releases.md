@@ -11,7 +11,7 @@ Reviewed `1.3.24` → `1.5.1` against SDK source on 2026-11-23. Bounds JSON requ
 
 Reviewed `1.3.14` → `1.3.24` against SDK source on 2026-11-04. Added Host/Origin validation with `allowedHosts` (1.3.19), remote sandbox desktop views and asynchronous view control (1.3.22), the suspended-run guard in Playground (1.3.21), and provider-switch filtering for remembered model controls (1.3.24). Dependency releases also align Client, Server, React, React UI, and Graph.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/tool-studio/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/tool-studio/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

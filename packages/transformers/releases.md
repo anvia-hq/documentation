@@ -10,7 +10,7 @@ Reviewed `1.1.6` → `1.1.7` against SDK source on 2026-11-23. Refreshes runtime
 
 Reviewed `1.1.3` → `1.1.5` against SDK source on 2026-10-15. Refreshed package guidance and updated Transformers.js dependencies. Review model and runtime compatibility when upgrading the local embedding stack.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/embedding-transformers/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/embedding-transformers/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Notable changes
 

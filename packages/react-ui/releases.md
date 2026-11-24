@@ -11,7 +11,7 @@ Reviewed `1.3.0` → `1.3.3` against SDK source on 2026-11-23. Rejects active UR
 
 Reviewed `1.1.8` → `1.3.0` against SDK source on 2026-11-04. Added optional sandbox viewers on their own subpaths and an editor-only entity renderer for the rich composer. The package remains headless; application styling and CLI-installed source remain application-owned.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/react-ui/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/react-ui/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

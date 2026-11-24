@@ -10,7 +10,7 @@ Reviewed `1.2.1` → `1.3.0` against SDK source on 2026-11-23. Adds `fileMode` f
 
 Reviewed `1.1.6` → `1.2.0` against SDK source on 2026-10-15. Omitted serialized observer error stacks by default, including nested causes. Added `includeErrorStack` for explicit debugging capture, with expanded Core credential redaction. See [Data and privacy](/packages/logger/data-and-privacy#error-stacks).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/logger/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/logger/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Notable history
 

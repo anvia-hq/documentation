@@ -1,6 +1,10 @@
 # Releases
 
-Reviewed source release: `1.2.0`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Reviewed source release: `1.2.1`. The entries below summarize the 1.0 line and preserve notable v0 history.
+
+## Changes in 1.2.1
+
+Reviewed `1.2.0` → `1.2.1` against SDK source on 2026-11-23. Extracted model listing and unified controls, and now shares provider helpers through `@anvia/core/internal/provider`; depends on `@anvia/openai` 1.4.1.
 
 ## Changes in 1.2.0
 
@@ -10,12 +14,13 @@ Reviewed `1.1.11` → `1.2.0` against SDK source on 2026-11-23. Aligns model IDs
 
 Reviewed `1.1.9` → `1.1.10` against SDK source on 2026-10-15. Aligned the OpenAI dependency with its Decisions-capable release. Grok retains its documented completion API; use the OpenAI package for OpenAI Decisions.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/provider-grok/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/provider-grok/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 
 | Version | Type | Summary |
 | --- | --- | --- |
+| `1.2.1` | Patch | Extracted model listing and unified controls, and now shares provider helpers through `@anvia/core/internal/provider`; depends on `@anvia/openai` 1.4.1. |
 | `1.1.9` | Patch | Updated to OpenAI adapter `1.2.0`, which adds the `@anvia/openai/adapters` export. |
 | `1.1.8` | Patch | Refreshed package README and usage guides. |
 | `1.1.7` | Patch | Updated the OpenAI SDK to `^7.23.0`. |
