@@ -59,6 +59,7 @@ npx prisma migrate dev --name add_anvia_memory
 ```
 
 ```ts
+import { Agent } from '@anvia/core'
 import { PrismaMemoryStore } from '@anvia/memory-prisma'
 import { prisma } from './db'
 
@@ -81,6 +82,9 @@ const agent = new Agent({
 `@anvia/server` emits JSONL by default. Use SSE only when the client requires `text/event-stream` compatibility:
 
 ```ts
+import { agentToClientStream } from '@anvia/client'
+import { createClientStreamResponse } from '@anvia/server'
+
 const events = agent.stream({
     messages
 })

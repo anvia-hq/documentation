@@ -85,6 +85,8 @@ Pass the tool through the agent options. During a run, Anvia sends its definitio
 
 A memory store loads and appends normalized messages. The agent supplies the policy; a session supplies the durable identity.
 
+`memoryStore` is any memory store, such as `InMemoryMemoryStore` from `@anvia/core` or a database-backed store package.
+
 ```ts
 const memoryAgent = new Agent({
     id: 'support',
@@ -126,7 +128,7 @@ Use retrieval indexes for large or frequently changing knowledge collections so 
 ## Streams are the application boundary
 
 Agent streams expose structured events such as `turn_start`, `text_delta`, `reasoning_delta`,
-`tool_call`, `tool_result`, `turn_end`, `memory_compaction`, direct terminal outcomes, and `error`.
+`tool_selection`, `tool_call`, `tool_result`, `turn_end`, `memory_compaction`, direct terminal outcomes, and `error`.
 
 ```ts
 for await (const event of agent.stream({
