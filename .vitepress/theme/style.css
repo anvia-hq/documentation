@@ -1,6 +1,6 @@
 :root {
   color-scheme: light;
-  --vp-font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --vp-font-family-base: 'Inter Tight', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --vp-font-family-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
   --vp-sidebar-width: 304px;
   --vp-nav-height: 64px;
@@ -12,12 +12,12 @@
   --scrollbar-thumb-hover: color-mix(in srgb, var(--vp-c-text-2) 65%, transparent);
 
   /* Brand — from anvia-web */
-  --accent: #62e989;
-  --accent-hover: #55da7c;
-  --accent-text: #197a37;
-  --accent-ink: #0a2c14;
-  --accent-pale: #e2fae9;
-  --accent-border: #b8eac7;
+  --accent: #2fd39f;
+  --accent-hover: #24c08f;
+  --accent-text: #0b7a5a;
+  --accent-ink: #06291e;
+  --accent-pale: #dcf8ee;
+  --accent-border: #b0e9d5;
   --docs-accent: var(--accent-text);
 
   /* Type */
@@ -33,7 +33,7 @@
   --surface: #ffffff;
   --surface-subtle: #f7f9f6;
   --surface-hover: #f1f3f1;
-  --surface-tint: #f4faf5;
+  --surface-tint: #f2faf7;
   --surface-overlay: rgba(252, 252, 251, .94);
   --surface-overlay-strong: rgba(252, 252, 251, .96);
   --surface-ring: rgba(250, 251, 249, .8);
@@ -44,7 +44,7 @@
   --strong-line: #d4d8d4;
   --shadow: #d9ddda;
   --shadow-soft: #e8ebe7;
-  --shadow-accent: #bedcc6;
+  --shadow-accent: #bcdccf;
   --shadow-strong: #111111;
 
   /* Code and media */
@@ -114,19 +114,19 @@
 
 .dark {
   color-scheme: dark;
-  --ops-bg: #0b0b0d;
-  --ops-sheet: #111113;
-  --ops-card: #18181b;
+  --ops-bg: #050505;
+  --ops-sheet: #0a0a0a;
+  --ops-card: #111111;
   --ops-ink: #ededed;
   --ops-muted: #9a9aa0;
   --ops-dim: #5c5c63;
-  --ops-line: #26262a;
+  --ops-line: #222222;
   --ops-hair: var(--ops-line);
   --ops-accent: #c4c4c4;
   --ops-accent-deep: #e0e0e0;
   --ops-accent-ink: #080808;
   --ops-glow: transparent;
-  --docs-accent: #62e989;
+  --docs-accent: #2fd39f;
   --ops-invert: #c4c4c4;
   --ops-invert-text: #080808;
   --ops-code-text: #b7c0ca;
@@ -146,10 +146,10 @@
   --paper: var(--ops-sheet);
   --surface: var(--ops-card);
   --surface-subtle: var(--ops-card);
-  --surface-hover: #1e1e22;
+  --surface-hover: #1a1a1a;
   --surface-tint: var(--ops-card);
-  --surface-overlay: rgba(17, 17, 19, .94);
-  --surface-overlay-strong: rgba(17, 17, 19, .96);
+  --surface-overlay: rgba(10, 10, 10, .94);
+  --surface-overlay-strong: rgba(10, 10, 10, .96);
   --surface-ring: rgba(0, 0, 0, .84);
   --line: var(--ops-line);
   --soft-line: var(--ops-line);
@@ -159,8 +159,8 @@
   --shadow-accent: #262828;
   --shadow-strong: #000000;
   --code-surface: var(--ops-card);
-  --code-border: #2a2a2f;
-  --code-hover: #1e1e22;
+  --code-border: #222222;
+  --code-hover: #1a1a1a;
   --code-text: var(--ops-code-text);
   --code-gutter: var(--ops-dim);
   --inline-code: var(--ops-card);

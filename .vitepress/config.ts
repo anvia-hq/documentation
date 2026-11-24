@@ -31,7 +31,10 @@ export default defineConfig({
       'link',
       { rel: 'icon', type: 'image/svg+xml', href: `${docsBase}favicon-dark.svg`, media: '(prefers-color-scheme: dark)' }
     ],
-    ['meta', { name: 'theme-color', content: '#111113' }]
+    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
+    ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
+    ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap' }],
+    ['meta', { name: 'theme-color', content: '#0a0a0a' }]
   ],
   // Clears the two-row fixed header when jumping to an anchor.
   scrollOffset: 136,

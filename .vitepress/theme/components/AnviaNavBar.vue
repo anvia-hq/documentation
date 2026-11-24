@@ -61,12 +61,10 @@ const githubLink = computed(
         <a class="action-link" :href="withBase('/packages/changelog')">Changelog</a>
         <a
           v-if="githubLink"
-          class="action-link icon-link"
+          class="action-link"
           :href="githubLink"
           target="_blank"
           rel="noreferrer"
-          aria-label="Anvia on GitHub"
-          title="GitHub"
         >
           <svg class="github-icon" viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -74,9 +72,11 @@ const githubLink = computed(
               d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6 0-3.2 0 0 1-.3 3.4 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.3 1.9 1.3 3.1 0 4.7-2.8 5.7-5.5 6 .5.4.9 1.1.9 2.3v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"
             />
           </svg>
+          GitHub
         </a>
         <a class="cta" :href="withBase('/guide/getting-started')">
           Get started
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
         </a>
         <button
           type="button"
@@ -249,6 +249,7 @@ const githubLink = computed(
 
 .action-link {
   align-items: center;
+  gap: 8px;
   padding: 6px 10px;
   border-radius: 8px;
   color: var(--vp-c-text-2);
@@ -261,13 +262,6 @@ const githubLink = computed(
   color: var(--vp-c-text-1);
 }
 
-.icon-link {
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-}
-
 .github-icon {
   width: 18px;
   height: 18px;
@@ -275,20 +269,29 @@ const githubLink = computed(
 
 .cta {
   align-items: center;
-  margin-left: 6px;
-  padding: 7px 14px;
-  border: 1px solid var(--strong-line);
+  gap: 6px;
+  margin-left: 8px;
+  padding: 5px 10px 5px 12px;
   border-radius: 8px;
-  background-color: var(--surface);
-  color: var(--vp-c-text-1);
+  background-color: var(--vp-c-text-1);
+  color: var(--vp-c-bg);
   font-size: 14px;
   font-weight: 500;
-  transition: border-color 0.2s, background-color 0.2s;
+  transition: opacity 0.2s;
 }
 
 .cta:hover {
-  border-color: var(--vp-c-text-3);
-  background-color: var(--surface-hover);
+  opacity: 0.88;
+}
+
+.cta svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .tab {
