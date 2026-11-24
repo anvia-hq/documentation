@@ -1,5 +1,6 @@
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitepress'
-import { landingCodeTheme } from './theme/landing-code-theme'
+import { landingCodeLightTheme, landingCodeTheme } from './theme/landing-code-theme'
 
 const docsBase = normalizeBase(process.env.DOCS_BASE ?? '/')
 
@@ -12,7 +13,8 @@ function withDocsBase(path: string) {
 }
 
 export default defineConfig({
-  appearance: 'force-dark',
+  // Dark by default; the header toggle stores the reader's choice.
+  appearance: 'dark',
   base: docsBase,
   outDir: '.vitepress/dist',
   // The golden-path example is a runnable project with its own README and
@@ -31,13 +33,31 @@ export default defineConfig({
     ],
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
-    ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap' }],
-    ['meta', { name: 'theme-color', content: '#080808' }]
+    ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap' }],
+    ['meta', { name: 'theme-color', content: '#0a0a0a' }]
   ],
+  // Clears the two-row fixed header when jumping to an anchor.
+  scrollOffset: 136,
   markdown: {
-    theme: landingCodeTheme
+    theme: { light: landingCodeLightTheme, dark: landingCodeTheme }
+  },
+  vite: {
+    resolve: {
+      // Swap VitePress internals for the custom header and outline.
+      alias: [
+        {
+          find: /^.*\/VPNavBar\.vue$/,
+          replacement: fileURLToPath(new URL('./theme/components/AnviaNavBar.vue', import.meta.url))
+        },
+        {
+          find: /^.*\/VPDocAsideOutline\.vue$/,
+          replacement: fileURLToPath(new URL('./theme/components/AnviaOutline.vue', import.meta.url))
+        }
+      ]
+    }
   },
   themeConfig: {
+    outline: [2, 3],
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Anvia SDK', link: '/sdk/' },
