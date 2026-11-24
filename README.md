@@ -27,7 +27,7 @@ This repository contains the VitePress site for Anvia. It explains how to build 
 
 ## Requirements
 
-- Node.js 24 (24.12.0 or newer within the 24.x release line).
+- Node.js 26 (26.13.0 or newer within the 26.x release line).
 - pnpm 11 or newer.
 
 Local development and CI use the Node.js release line in `.nvmrc`. If you use nvm,
