@@ -903,7 +903,7 @@ test('durable steering example deduplicates receipts and applies queued input', 
       await run.result({ abortSignal: AbortSignal.timeout(5000) })
       assert.equal((await run.status()).status, 'completed')
       assert.equal(calls, 2)
-      const applied = runtime.events(run.id, 0).filter(event => event.type === 'steering_applied')
+      const applied = (await runtime.events(run.id, 0)).filter(event => event.type === 'steering_applied')
       assert.equal(applied.length, 1)
       assert.equal(applied[0].data.id, 'note-1')
     } finally { release(); await runtime.close() }
@@ -938,17 +938,8 @@ test('durable compaction example preserves canonical history and omits summary t
       assert.ok(snapshot.run.contextCheckpoint.compactedMessageCount > 0)
       assert.equal(requests.length, 3)
       assert.equal(requests[1].temperature, undefined)
-      assert.ok(runtime.events(second.id, 0).some(event => event.type === 'compaction_completed'))
+      assert.ok((await runtime.events(second.id, 0)).some(event => event.type === 'compaction_completed'))
     } finally { await runtime.close() }
-  `)
-})
-
-test('vector filters combine n-ary operators and metric scoring', async () => {
-  const example = (await blocks('sdk/knowledges/metadata-filters.md')).find(block => block.flags.includes('vector-filter-example'))
-  assert.ok(example)
-  await runExample(example.code, '', `
-    assert.deepEqual(results.map(({ id }) => id), ['invoice', 'accounts'])
-    assert.ok(results[0].score >= results[1].score)
   `)
 })
 
@@ -960,4 +951,63 @@ test('Lens examples preserve tracing, dataset, and prompt contracts', async (t) 
     transpile: code => ts.transpileModule(code, {
       compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
     }).outputText })
+})
+
+test('context breakdown example scales segments to the reported input total', async () => {
+  const example = (await blocks('sdk/agents/context.md')).find(block => block.flags.includes('context-breakdown-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    assert.deepEqual(breakdown.segments.map(segment => segment.id), ['instructions', 'messages', 'documents'])
+    assert.ok(breakdown.estimatedTokens > 0)
+    assert.equal(exact.estimatedTokens, 1234)
+    assert.equal(exact.reportedInputTokens, 1234)
+    assert.equal(exact.segments.reduce((total, segment) => total + segment.tokens, 0), 1234)
+  `)
+})
+
+test('domain search example returns matching entries and a bounded default topK', async () => {
+  const example = (await blocks('sdk/advanced/dynamic-tools/domain-search.md')).find(block => block.flags.includes('domain-search-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    assert.equal(runbookSearch.topK, 5)
+    const hits = await runbookSearch.search({ query: 'deployment checklist' })
+    assert.ok(hits.length > 0)
+    assert.equal(hits[0].id, 'deploy-checklist')
+    assert.ok(hits[0].score > 0)
+  `)
+})
+
+test('versioned memory example commits once and reports duplicates and conflicts', async () => {
+  const example = (await blocks('sdk/memory/versioned-writes.md')).find(block => block.flags.includes('memory-versioned-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    assert.equal(result.status, 'committed')
+    const duplicate = await store.append({
+      scope, runId: 'run-1', turn: 0,
+      messages: [{ role: 'user', content: 'My order has not arrived.' }],
+      idempotencyKey: 'run-1:0',
+    })
+    assert.equal(duplicate.status, 'duplicate')
+    const conflict = await store.append({
+      scope, runId: 'run-2', turn: 0,
+      messages: [{ role: 'user', content: 'Different content.' }],
+      idempotencyKey: 'run-1:0',
+    })
+    assert.equal(conflict.status, 'conflict')
+    const stale = await store.append({
+      scope, runId: 'run-3', turn: 0,
+      messages: [{ role: 'user', content: 'Stale write.' }],
+      expectedVersion: current.version,
+    })
+    assert.equal(stale.status, 'conflict')
+  `)
+})
+
+test('vector filters combine n-ary operators and metric scoring', async () => {
+  const example = (await blocks('sdk/knowledges/metadata-filters.md')).find(block => block.flags.includes('vector-filter-example'))
+  assert.ok(example)
+  await runExample(example.code, '', `
+    assert.deepEqual(results.map(({ id }) => id), ['invoice', 'accounts'])
+    assert.ok(results[0].score >= results[1].score)
+  `)
 })

@@ -56,14 +56,24 @@ type StudioOptions = {
   models?: StudioModelConfig
   sandboxes?: readonly StudioSandboxRegistration[]
   graphs?: readonly StudioGraphRegistration[]
+  maxBodyBytes?: number // default 10 MiB
 }
 ```
+
+`maxBodyBytes` is the largest JSON request body Studio accepts. It defaults to **10 MiB**, which leaves room for
+full transcripts and inline images; raise it when an application sends larger prompts or attachments. The value
+must be a positive safe integer. A larger body is rejected with HTTP `413` and error code `payload_too_large`,
+before the request reaches a target. `StudioServeOptions` accepts the same option and applies it when Studio
+starts, so a constructor value and a `serve()` value use the same ceiling; the serving option wins.
 
 `StudioUiOptions` configures `path`, `rootRoutes`, `title`, `redirectRoot`, `clientScript`, and `protectShell`. `StudioStores` independently selects session, trace, pipeline-log, and pipeline-run stores; session and pipeline stores may be disabled with `false` where the type permits it.
 
 The target configuration types are `StudioAgent`, `StudioAgentConfig`, `StudioAgentRuntimeSummary`,
 `StudioPipeline`, `StudioPipelineConfig`, `StudioPipelineDetail`, `StudioGraphRegistration`,
 `StudioGraphConfig`, and `StudioConfig`.
+
+Retrieval evidence may include `StudioKnowledgeEvidenceMatch` entries (`toolName` and `score`) when a dynamic tool
+index selected definitions for a generation. A score ranks a match; it is not execution evidence.
 
 ## Models
 

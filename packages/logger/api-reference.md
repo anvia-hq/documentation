@@ -29,7 +29,10 @@ type PinoLoggerOptions = LoggerOptions & {
 }
 ```
 
-`sync`, `mkdir`, and `append` apply only with `filePath`; each defaults to `true`. Combining
+`sync`, `mkdir`, `append`, and `fileMode` apply only with `filePath`; the first three default to `true`.
+`fileMode` accepts permission bits from `0` to `0o777` and defaults to the process umask. It affects files the
+logger creates, not existing files, so it does not chmod an existing path. Use `fileMode: 0o600` for logs that
+stay on the host. Combining
 `filePath`, `destination`, and `pinoOptions.transport` throws instead of silently dropping an output
 target.
 

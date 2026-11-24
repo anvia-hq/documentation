@@ -169,7 +169,7 @@ For another base image, install the same packages: `tigervnc-standalone-server x
 `create-image --name desk --feature desktop` generates an image for you:
 
 ```sh
-pnpm dlx @anvia/sandbox create-image --name desk --feature desktop --apt chromium
+pnpm dlx --package=@anvia/sandbox anvia-sandbox create-image --name desk --feature desktop --apt chromium
 docker run --rm anvia-sandbox-desk:latest \
   /opt/anvia-daemon/node_modules/.bin/anvia-sandbox-daemon --check --require=desktop
 docker run --rm -e ANVIA_CONTROL_URL=wss://hub.example.com/daemon \

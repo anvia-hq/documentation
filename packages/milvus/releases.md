@@ -1,6 +1,6 @@
 # Releases
 
-Reviewed source release: `1.2.0`. The entries below preserve notable v0 history.
+Reviewed source release: `1.2.2`. The entries below preserve notable v0 history.
 
 Reviewed `1.1.5` → `1.2.0` against SDK source on 2026-11-04. Added native `ne`, `in`, `gte`, and `lte` filters and n-ary `and`/`or`; empty or null `in` lists, invalid keys, and non-finite numbers are rejected. See [search and filters](/packages/milvus/search-and-filters).
 
@@ -20,6 +20,10 @@ Notable releases include:
 - `0.3.0` introduced the Milvus adapter with filter translation, multi-embedding support, and `asTool()`.
 
 See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-milvus/CHANGELOG.md).
+
+## Changes in 1.2.2
+
+Reviewed `1.2.0` → `1.2.2` against SDK source on 2026-11-23. Rejects metadata keys that collide with reserved `id` and `vector` fields; refreshes dependencies.
 
 ## Changes through 1.1.5
 

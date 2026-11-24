@@ -1,6 +1,10 @@
 # Releases
 
-Reviewed source release: `1.3.7`. The entries below summarize the 1.x line and preserve notable v0 history.
+Reviewed source release: `1.4.0`. The entries below summarize the 1.x line and preserve notable v0 history.
+
+## Changes in 1.4.0
+
+Reviewed `1.3.7` → `1.4.0` against SDK source on 2026-11-23. Aligns model IDs, context limits, and reasoning controls with the current OpenAI line, and refreshes dependencies.
 
 ## Changes through 1.3.7
 

@@ -1,6 +1,6 @@
 # Releases
 
-Reviewed source release: `1.3.0`. The entries below preserve notable v0 history.
+Reviewed source release: `1.4.1`. The entries below preserve notable v0 history.
 
 Notable package releases include:
 
@@ -19,8 +19,12 @@ Notable package releases include:
 
 Release entries are generated through Changesets. Consult the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/memory-prisma/CHANGELOG.md) before migrating schema or changing peer versions.
 
-## Changes through 1.3.0
+## Changes in 1.4.1
 
-Reviewed `1.2.2` → `1.3.0` against SDK source on 2026-11-04. The Prisma 8 target moved to `@prisma/orm-postgres` `8.0.0-rc.20` with the `prisma` `8.0.0-rc.27` CLI. Generated contracts use `@onCreate(cuid(2))` for new IDs, `init --prisma-version 8` starts a contract with the `// use prisma-8` directive the CLI requires and warns instead of editing a contract that lacks it, and runtime clients are built with `contract: contractFromJson<Contract>(contractJson)` from `@prisma/orm-postgres/static`.
+Reviewed `1.3.0` → `1.4.1` against SDK source on 2026-11-23. Implements the versioned, idempotent memory contract with the `AgentMemoryWrite` model, and rejects non-positive list limits.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/memory-prisma/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+## Changes through 1.2.2
+
+Reviewed `1.2.1` → `1.2.2` against SDK source on 2026-10-15. Refreshed package READMEs with current overviews, quickstarts, and links to the detailed guides. Review the source changelog for any dependency changes included in your upgrade.
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/memory-prisma/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.

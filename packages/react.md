@@ -68,6 +68,7 @@ The adapter maps durable journal events to the same v3 frames, routes interactio
 ## Key features
 
 - `useChat`: messages, events, send/regenerate/stop/reset, suggestions, usage, stream resume, and pending agent interactions.
+- `useDurableChat`: `useChat` over a durable transport, plus the durable run ID, status, and steering, cancel, retry, and reconciliation controls. See [Durable chat hook](/packages/react/durable-chat).
 - `useCompletion`: prompt and accumulated completion state over a required client transport.
 - `useGraphExplorer` from `@anvia/react/graph-explorer`: graph exploration state over an application-provided `explore` callback, including nodes, relationships, selection, query matching, expansion, and refresh.
 - `useSmoothStreamText` and `useSmoothStreamItems`: display-only pacing for streamed text.

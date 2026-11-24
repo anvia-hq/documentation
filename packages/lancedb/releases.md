@@ -1,6 +1,6 @@
 # Releases
 
-Reviewed source release: `1.1.6`. The entries below preserve notable v0 history.
+Reviewed source release: `1.1.7`. The entries below preserve notable v0 history.
 
 Reviewed against SDK source on 2026-11-04. LanceDB continues to apply the Core filter matcher after retrieval; the richer operators need no adapter release because they run in the shared matcher. See [search and filters](/packages/lancedb/search-and-filters).
 
@@ -17,6 +17,10 @@ Notable releases in the source changelog include:
 - `0.2.0` introduced the embedded LanceDB adapter with columnar storage and SQL-like filters.
 
 See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-lancedb/CHANGELOG.md).
+
+## Changes in 1.1.7
+
+Reviewed `1.1.6` → `1.1.7` against SDK source on 2026-11-23. Refreshes runtime dependencies; filters still run through the shared Core matcher.
 
 ## Changes through 1.1.5
 

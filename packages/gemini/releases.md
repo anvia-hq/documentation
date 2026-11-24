@@ -1,19 +1,21 @@
 # Releases
 
-Reviewed source release: `1.1.10`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Reviewed source release: `1.2.0`. The entries below summarize the 1.0 line and preserve notable v0 history.
 
-## Changes through 1.1.10
+## Changes in 1.2.0
 
-Reviewed `1.1.8` → `1.1.10` against SDK source on 2026-11-04. `1.1.9` refreshes upstream dependencies and raises the `zod` peer range to `^4.6.7`. `1.1.10` stops sending another provider's thought signature as `thoughtSignature` when a conversation continues on Gemini.
+Reviewed `1.1.8` → `1.2.0` against SDK source on 2026-11-23. Aligns model IDs, context limits, and reasoning controls (including `xhigh`) with the current Gemini line, and fixes cross-provider continuation.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/provider-gemini/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+## Changes through 1.1.7
+
+Reviewed `1.1.4` → `1.1.7` against SDK source on 2026-10-15. Refreshed package guidance and updated upstream Google GenAI dependencies. Review the source changelog for the dependency versions crossed by your upgrade.
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/provider-gemini/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 
 | Version | Type | Summary |
 | --- | --- | --- |
-| `1.1.10` | Patch | Stopped sending another provider's thought signature as `thoughtSignature` when a conversation continues on Gemini. |
-| `1.1.9` | Patch | Updated upstream runtime dependencies; the `zod` peer range is now `^4.6.7`. |
 | `1.1.4` | Patch | Updated upstream runtime and schema dependencies across the workspace. |
 | `1.1.3` | Patch | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
 | `1.1.2` | Patch | Updated the Core dependency to `1.1.2`. |

@@ -75,7 +75,7 @@ const lookupOrder = createTool({
     orderId: z.string(),
     status: z.string(),
   }),
-  execute: async ({ orderId }) => ({ orderId, status: 'processing' }),
+  handler: async ({ orderId }) => ({ orderId, status: 'processing' }),
 })
 ```
 

@@ -49,19 +49,35 @@ Only send fields supported by the selected OpenAI API and model. `providerOption
 
 ## Typed reasoning controls
 
-`completionModel()` accepts a `controls` override typed per model:
+`completionModel()` derives the model's supported controls from its family. The exported union
+`OPENAI_REASONING_EFFORTS` covers `none | minimal | low | medium | high | xhigh | max`. The `gpt-5.6` family
+allows `none | low | medium | high | xhigh | max` with `medium` as the default; other families expose narrower
+sets — for example `gpt-5.3` allows `low` to `xhigh`, the `-pro` variants restrict `gpt-5-pro` to `high`, and
+legacy `o`-series models allow `low | medium | high`. Omitting an override applies these model-specific
+defaults.
+
+The `controls` option on `completionModel()` replaces the control **descriptors**, not the selected values.
+Supply a complete select descriptor when you need a different set of choices:
 
 ```ts
 const model = openai.completionModel({
   modelId: 'gpt-5.6-sol',
   api: 'responses',
-  controls: { reasoningEffort: 'xhigh' },
+  controls: {
+    reasoningEffort: {
+      type: 'select',
+      label: 'Reasoning effort',
+      options: ['low', 'medium', 'high', 'xhigh'],
+      defaultValue: 'high',
+    },
+  },
 })
 ```
 
-Effort choices are validated per model family through `OpenAIControlsFor`. The exported union `OPENAI_REASONING_EFFORTS` covers `none | minimal | low | medium | high | xhigh | max`. The `gpt-5.6` family allows `none | low | medium | high | xhigh | max` with `medium` as the default; other families expose narrower sets — for example `gpt-5.3` allows `low` to `xhigh`, the `-pro` variants restrict `gpt-5-pro` to `high`, and legacy `o`-series models allow `low | medium | high`. Omitting `controls` applies these model-specific defaults.
+Passing `controls: { reasoningEffort: 'xhigh' }` throws, because a string is not a descriptor.
 
-Requests override the model-level value. Every `generateCompletion` call and agent run accepts a `controls` object, and `controls.reasoningEffort` wins over both the factory controls and `providerOptions`:
+Requests override the model default. Every `generateCompletion` call and agent run accepts a `controls`
+object of values, and `controls.reasoningEffort` wins over the model default and `providerOptions`:
 
 ```ts
 const response = await model.completion({

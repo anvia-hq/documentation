@@ -46,6 +46,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Messages](https://docs.anvia.dev/sdk/messages): Message roles and content types.
 - [Tools](https://docs.anvia.dev/sdk/tools): Typed tools, validation, execution, middleware, and security.
 - [Memory](https://docs.anvia.dev/sdk/memory): Sessions, persistence policies, compaction, and store adapters.
+- [Versioned memory writes](https://docs.anvia.dev/sdk/memory/versioned-writes): Idempotency keys, optimistic versions, conflicts, and durable recorded memory.
 - [Knowledge](https://docs.anvia.dev/sdk/knowledges): Document loading, embeddings, vector stores, retrieval, and search tools.
 - [Structured output](https://docs.anvia.dev/sdk/structured-output): Schema-driven completion and agent output.
 - [Pipelines](https://docs.anvia.dev/sdk/pipelines): Typed multi-step workflows, composition, parallelism, and production workers.
@@ -62,6 +63,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [MCP](https://docs.anvia.dev/sdk/advanced/mcp): Connect MCP servers, map results, and define trust boundaries.
 - [Agent skills](https://docs.anvia.dev/sdk/advanced/skills): Skill directories, `SKILL.md`, assets, loading, tools, and validation.
 - [Dynamic tools](https://docs.anvia.dev/sdk/advanced/dynamic-tools): Large tool catalogs, indexing, embedding, and safety.
+- [Domain search](https://docs.anvia.dev/sdk/advanced/dynamic-tools/domain-search): One search tool over plain domain entries, lexical or semantic.
 - [Think tool](https://docs.anvia.dev/sdk/advanced/think-tool): Explicit reasoning-tool configuration and privacy guidance.
 - [Sandbox execution](https://docs.anvia.dev/sdk/advanced/sandbox): Docker and remote sandboxes, terminals, tunnels, desktops, and security boundaries.
 - [Multimodal inputs](https://docs.anvia.dev/sdk/advanced/multimodal): Images, audio, documents, and other media.

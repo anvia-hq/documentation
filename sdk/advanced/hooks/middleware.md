@@ -28,7 +28,16 @@ const hideInternalErrors = createMiddleware({
 })
 ```
 
-Returning `undefined` keeps the current value. Tool output middleware may return replacement text, an object whose `result` replaces the text, or an object whose `structuredResult` replaces the structured content. The two object fields are mutually exclusive in one result.
+Returning `undefined` keeps the current value. A tool output middleware return value is exactly one of:
+
+- a string, used as the replacement text;
+- `{ result: string }`;
+- `{ structuredResult: readonly ToolResultContentPart[] }`;
+- `undefined`.
+
+`result` and `structuredResult` are mutually exclusive. Returning both fails type-checking and throws a
+`TypeError` at runtime. A text replacement removes the previous rich content; a structured replacement derives
+its textual representation from the parts.
 
 Middleware also supports `onCompletionRequest`, `onCompletionResponse`, and `onToolInput`. Preserve valid request and response shapes when replacing them.
 

@@ -39,7 +39,7 @@ class GrokClient {
     const Controls extends CompletionModelControls = GrokControlsFor<ModelId>,
   >(options: {
     modelId: ModelId
-    api?: 'responses' | 'chat'
+    api?: 'responses' | 'chat' // defaults to 'chat'
     contextLimits?: ModelContextLimits
     controls?: Controls
   }): GrokCompletionModelHandle<Controls>
@@ -54,7 +54,7 @@ class GrokClient {
 }
 ```
 
-All model IDs are explicit. `api` is optional and defaults to `'chat'` when omitted. Omitting `controls` applies per-model reasoning defaults derived from the model ID (`GrokControlsFor`). When injecting an OpenAI SDK client, supply `http` separately because Grok media endpoints also need credentials and transport settings.
+Model IDs are explicit; `api` defaults to `'chat'`, so set `'responses'` when you need Grok provider tools. Omitting `controls` applies per-model reasoning defaults derived from the model ID (`GrokControlsFor`). When injecting an OpenAI SDK client, supply `http` separately because Grok media endpoints also need credentials and transport settings.
 
 ## Provider tools
 
@@ -86,7 +86,7 @@ function aspectRatio(width: number, height: number): string
 
 Use `imageResponseFromGrok()` only when adapting raw xAI image responses yourself; ordinary applications should call the image-generation model contract.
 
-Typed reasoning controls: `GROK_REASONING_EFFORTS` enumerates `none | low | medium | high | xhigh`, and `GrokControlsFor`, `GrokReasoningControls`, and `GrokReasoningEffort` type the per-model surface. The `grok-4.6` family (`grok-4.6`, `grok-4.6-latest`, `grok-4.20-multi-agent-0309`) allows `low` to `xhigh` with `high` as the default; `grok-4.5` allows `low | medium | high`, also defaulting to `high`; `grok-4.3` and `grok-4.3-latest` allow `none` to `high` with no default. Other model IDs expose no reasoning controls.
+Typed reasoning controls: `GROK_REASONING_EFFORTS` enumerates `none | low | medium | high | xhigh`, and `GrokControlsFor`, `GrokReasoningControls`, and `GrokReasoningEffort` type the per-model surface. The `grok-4.6`/`grok-4.7` families (`grok-4.6`, `grok-4.6-latest`, `grok-4.7`, `grok-4.7-latest`, `grok-4.20-multi-agent-0309`) allow `low` to `xhigh` with `high` as the default; `grok-4.5` allows `low | medium | high`, also defaulting to `high`; `grok-4.3` and `grok-4.3-latest` allow `none` to `high` with no default. Other model IDs expose no reasoning controls.
 
 ### Named model constants
 
@@ -95,6 +95,7 @@ Typed reasoning controls: `GROK_REASONING_EFFORTS` enumerates `none | low | medi
 | `GROK_4_3` | `grok-4.3` |
 | `GROK_4_5` | `grok-4.5` |
 | `GROK_4_6` | `grok-4.6` |
+| `GROK_4_7` | `grok-4.7` |
 | `GROK_4_20` | `grok-4.20` |
 | `GROK_4_20_NON_REASONING` | `grok-4.20-non-reasoning` |
 | `GROK_BUILD_0_1` | `grok-build-0.1` |

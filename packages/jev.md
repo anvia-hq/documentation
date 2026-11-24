@@ -5,7 +5,7 @@ The Jev provider adapter supplies typed-decision models built on TypeSafe's offi
 | | |
 | --- | --- |
 | Support | First-party |
-| Version | `0.2.1` |
+| Version | `0.3.0` |
 | Runtime | ESM, server-side JavaScript, Node.js 20 or newer |
 | Peer | Matching `@anvia/core` release |
 

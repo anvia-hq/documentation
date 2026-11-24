@@ -71,7 +71,7 @@ const supportAgent = new Agent({
 })
 ```
 
-`maxTurns` limits the number of model turns in a run. Tool-assisted agents often need more than one turn because the model must request a tool, receive its result, and then answer.
+`maxTurns` limits the model turns **after** the initial request: `0` permits one request, `1` permits two, and so on. Tool-assisted agents often need more than one turn because the model must request a tool, receive its result, and then answer. Retries have a separate budget.
 
 ## 5. Generate an answer
 

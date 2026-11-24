@@ -6,7 +6,7 @@ Anvia validates the model-facing contract. Your handler validates whether the re
 
 | Boundary | Responsibility |
 | --- | --- |
-| Input schema | Parse and validate model arguments before `execute(...)`. |
+| Input schema | Parse and validate model arguments before `handler(...)`. |
 | Handler | Enforce authorization, tenancy, business rules, and service behavior. |
 | Output schema | Validate the value returned to the runtime. |
 | Application runner | Map tool and provider failures to safe product responses. |
@@ -18,7 +18,7 @@ An input schema is not an authorization rule. A valid `invoiceId` can still belo
 Return a concise result when a miss is expected and safe for the model to reason about.
 
 ```ts
-async execute({ orderId }) {
+async handler({ orderId }) {
   const order = await orders.find(orderId)
 
   if (order === undefined) {
@@ -36,7 +36,7 @@ Throw for dependency failures, invalid service state, or rejected policy checks.
 `execute` receives a second `context` argument alongside the parsed input.
 
 ```ts
-async execute({ orderId }, context) {
+async handler({ orderId }, context) {
   const order = await orders.find(orderId, { signal: context.abortSignal })
   return `Order ${order.id} is ${order.status}.`
 }

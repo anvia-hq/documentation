@@ -5,8 +5,8 @@ only validate APIs present in examples; they cannot reveal an exported API that 
 
 ## Source and inventory
 
-`scripts/sdk-coverage.json` records 85 public entrypoints across 37 public SDK packages at reviewed
-source revision `e751560f4a02c8989928966c203ed8747c0072fb`. Each entry links its owning guide and
+`scripts/sdk-coverage.json` records 89 public entrypoints across 37 public SDK packages at reviewed
+source revision `aa39d29b6db6e6672750a0d9a71285b6230a730a`. Each entry links its owning guide and
 reference, with an export-name count and SHA-256 snapshot. The checker resolves TypeScript exports
 from source, including re-exports and types; `@anvia/core/internal/*` is excluded, as would be any
 package marked private. A new/removed entrypoint or changed exported name set requires editorial

@@ -1,7 +1,11 @@
 # Releases
 
-The reviewed source release is `@anvia/studio` **1.3.24**. The entries below summarize recent v1
+The reviewed source release is `@anvia/studio` **1.5.1**. The entries below summarize recent v1
 changes and preserve notable v0 Studio milestones.
+
+## Changes in 1.5.1
+
+Reviewed `1.3.24` → `1.5.1` against SDK source on 2026-11-23. Bounds JSON request bodies at 10 MiB, shows context breakdowns and tool match scores, and refreshes dependencies.
 
 ## Changes through 1.3.24
 

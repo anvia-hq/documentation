@@ -1,6 +1,10 @@
 # Releases
 
-Reviewed source release: `0.1.9`. `@anvia/azure` is a new package, so its release history starts here.
+Reviewed source release: `0.1.11`. `@anvia/azure` is a new package, so its release history starts here.
+
+## Changes in 0.1.11
+
+Reviewed `0.1.9` → `0.1.11` against SDK source on 2026-11-23. Refreshes runtime dependencies.
 
 ## Patch releases through 0.1.9
 

@@ -198,13 +198,13 @@ const tool = createTool({
   requiresApproval: ({ orderId }) => ({
     reason: `Review access to ${orderId}.`,
   }),
-  async execute(input, context) {
+  async handler(input, context) {
     return orders.lookup(input.orderId, context)
   },
 })
 ```
 
-`inputSchema` always validates arguments before execution. `outputSchema` is optional; when present, it validates and types the handler result. `requiresApproval` accepts a boolean, `{ reason? }`, or a callback returning one of those values or `false`.
+`inputSchema` always validates arguments before execution. `outputSchema` is optional; when present, it validates and types the handler result. `requiresApproval` accepts a boolean, `{ reason? }`, or a callback returning one of those values or `false`. Use `handler`; the older `execute` spelling still works but is deprecated for the next major, and supplying both throws. Optional `examples: [{ input, note? }]` are validated at creation and appended to the model-facing description, costing prompt tokens on every turn.
 
 Create a semantic tool catalog with:
 
@@ -619,8 +619,13 @@ The subpath also exports `Redactor`, `RedactionOptions`, and `RedactionPattern`.
 non-mutating copies and provides `redactString()`, `redactObject()`, `redactMessages()`, and
 `patternNames()`. Custom `patterns` replace the defaults rather than extending them. Default patterns
 cover email addresses, validated payment cards, IPv4 addresses, standalone phone-number runs, JWTs,
-common API-key prefixes, and bearer tokens. Traversal marks circular references and values deeper
+common API-key prefixes, bearer tokens, complete and truncated PEM private keys, and context-labelled AWS
+secret access keys. An arbitrary bare 40-character string is not treated as an AWS secret: the pattern needs a
+`secret_access_key`-style label. This is pattern matching, not a guarantee that every secret is found. Traversal marks circular references and values deeper
 than 16 levels instead of exporting them unchanged.
+
+Provider adapters also validate a provider-executed tool's normalized shape with
+`assertProviderToolShape(tool)`, which throws on a definition the durable or streaming paths cannot persist.
 
 ## Observability
 

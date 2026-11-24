@@ -11,7 +11,9 @@ Use `--append-to-schema` when your Prisma setup does not load split schema files
 
 After review, run `prisma validate`, create a migration, and regenerate the client. The runtime does not apply DDL.
 
-The generated models are `AgentMemorySession`, `AgentMemoryMessage`, and `AgentMemoryError`.
+The generated models are `AgentMemorySession`, `AgentMemoryMessage`, `AgentMemoryError`, and — for versioned
+writes and durable recorded memory — `AgentMemoryWrite` (`agent_memory_writes`). A store without that model
+rejects `idempotencyKey` with an explanatory error, so regenerate and migrate before enabling versioned writes.
 `AgentMemorySession.compactionState` is nullable JSON containing the latest summary checkpoint and
 canonical message boundary; compaction does not remove covered messages. Existing installations
 must generate and deploy the additive field migration, then regenerate Prisma Client.
@@ -39,9 +41,8 @@ For a new database, emit the reviewed contract and use the locally installed Pri
 preview and apply its database update. Existing Prisma 7 installations can reuse the same tables,
 but Prisma 7 should retain migration ownership during the transition.
 
-Since `1.3.0`, the generated contract uses `@onCreate(cuid(2))` for new IDs instead of
-`@default(cuid(2))`, and `init --prisma-version 8` starts a contract with the `// use prisma-8`
-directive the CLI requires; appending to a contract that lacks the directive warns instead of
-editing it. On the runtime side, build the Prisma 8 client with
-`contract: contractFromJson<Contract>(contractJson)` from `@prisma/orm-postgres/static`. Upgrading
-from `1.2.x` means updating the contract's ID defaults and re-running `prisma contract emit`.
+After upgrading, review every generated model: Prisma 8 contracts must carry the `// use prisma-8` directive and
+use `@id @onCreate(cuid(2))` IDs. `--append-to-contract` warns when the directive is missing rather than adding
+it, so update the contract explicitly, re-emit, validate, and only then create the migration and regenerate the
+client. On the runtime side, build the Prisma 8 client with `contract: contractFromJson<Contract>(contractJson)` from
+`@prisma/orm-postgres/static`; passing the raw `contractJson` no longer type-checks.

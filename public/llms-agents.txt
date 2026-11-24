@@ -118,7 +118,7 @@ headers, redirects, tool exposure, and lifecycle in server-owned configuration.
 - Expose specialist agents as narrow tools when delegation is clearer than one large agent.
 - Use `@anvia/sandbox` for isolated execution, while still enforcing command, network, resource,
   secret, and cleanup policy. `DockerSandboxClient` runs locally; `RemoteSandboxHub` with
-  `anvia-sandbox-daemon` runs workloads elsewhere and adds terminals, loopback tunnels, and a
+  the `@anvia/sandbox` daemon runs workloads elsewhere and adds terminals, loopback tunnels, and a
   desktop. The retired `@anvia/browser` semantic tools have no direct replacement; use
   `createDesktopTools()` against a sandbox desktop.
 
@@ -152,6 +152,11 @@ token use, and latency.
 - Skills: https://docs.anvia.dev/sdk/advanced/skills
 - Streaming: https://docs.anvia.dev/sdk/streaming
 - Memory compaction: https://docs.anvia.dev/sdk/memory/compaction
+- Versioned memory writes: https://docs.anvia.dev/sdk/memory/versioned-writes
+- Context token breakdown: https://docs.anvia.dev/sdk/agents/context
+- Tool authoring (`handler`, examples): https://docs.anvia.dev/sdk/tools/define
+- Domain search: https://docs.anvia.dev/sdk/advanced/dynamic-tools/domain-search
+- Anthropic prompt caching: https://docs.anvia.dev/sdk/providers/anthropic/prompt-caching
 - Sandbox: https://docs.anvia.dev/sdk/advanced/sandbox
 - Remote sandboxes: https://docs.anvia.dev/sdk/advanced/sandbox/remote
 - Sandbox desktop: https://docs.anvia.dev/sdk/advanced/sandbox/desktop

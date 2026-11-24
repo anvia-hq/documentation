@@ -62,7 +62,7 @@ const lookupAccount = createTool({
     plan: z.enum(['free', 'pro', 'enterprise']),
     active: z.boolean(),
   }),
-  async execute({ accountId }) {
+  async handler({ accountId }) {
     return accountRepository.summary(accountId)
   },
 })

@@ -37,7 +37,7 @@ const createTicket = createTool({
   inputSchema: z.object({ title: z.string().min(1) }),
   outputSchema: z.object({ ticketId: z.string() }),
   requiresApproval: true,
-  execute: async ({ title }, context) => {
+  handler: async ({ title }, context) => {
     if (context.operationId === undefined) throw new Error('Requires durable execution.')
     return tickets.create({ title, idempotencyKey: context.operationId, signal: context.abortSignal })
   },
@@ -119,13 +119,13 @@ to finish blocked old work, then call `retry()`.
 
 ```ts
 runtime.registerAgents([{ agent: reviewer, version: '1' }])
-const removed = runtime.unregisterAgent('reviewer') // false if it was not registered
+const removed = await runtime.unregisterAgent('reviewer') // false if it was not registered
 ```
 
 `registerAgents` validates the whole batch first and never replaces an existing ID. `unregisterAgent` throws
 `DurableConflictError` while any run, queued work, approval, retry wait, recovery block, or settling attempt
 still needs the agent. History and deduplication records are preserved. At startup, open without agents,
-discover unfinished runs with `listRuns()`, restore their exact registrations, then call `resume()`.
+discover unfinished runs with `await runtime.listRuns()`, restore their exact registrations, then call `resume()`.
 Registering a missing agent does not retry `needs_attention` runs by itself.
 
 Next: [custom tasks and owned subagents](/sdk/advanced/durable-execution/tasks).

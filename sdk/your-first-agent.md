@@ -51,14 +51,9 @@ const response = await supportAgent.generate({
 })
 
 if (response.type === 'interaction') {
-  const resumed = await supportAgent.resume(
-    response.continuation,
-    { type: 'tool-approval', approved: true }
+  throw new Error(
+    `Unexpected ${response.interaction.type} request; this tutorial's agent has no interaction-capable tools.`
   )
-
-  if (resumed.type === 'response') {
-    console.log(resumed.output)
-  }
 } else if (response.type === 'blocked') {
   throw new Error(`Blocked at ${response.stage}: ${response.reason}`)
 } else {
@@ -66,8 +61,11 @@ if (response.type === 'interaction') {
 }
 ```
 
-This agent has no guardrails or interaction-capable tools, so the expected type is `response`. The
-checks keep the code correct when capabilities are added later.
+This agent has no guardrails or interaction-capable tools, so the expected type is `response`. Do not
+blanket-approve an interaction here: a later question tool would fail, and approving every approval request
+without an application decision is implicit consent. When you add such a tool, branch on
+`response.interaction.type` and obtain the answer from your authenticated application flow; see
+[Interactions](/sdk/agents/interactions).
 
 An interaction pauses the run: the outcome carries the pending `interaction` request and a
 `continuation`. `Agent.resume(continuation, response)` (or `generate({ continuation, response })`)

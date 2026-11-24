@@ -1,6 +1,10 @@
 # Releases
 
-The reviewed source release is `@anvia/react` **1.1.5**. The entries below preserve notable v0 protocol milestones.
+The reviewed source release is `@anvia/react` **1.2.0**. The entries below preserve notable v0 protocol milestones.
+
+## Changes in 1.2.0
+
+Reviewed `1.1.5` → `1.2.0` against SDK source on 2026-11-23. Adds `useDurableChat()` and bounded `maxRetainedEvents` for both hooks.
 
 ## Changes through 1.1.5
 

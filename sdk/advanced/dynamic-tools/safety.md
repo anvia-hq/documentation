@@ -44,7 +44,7 @@ const requestRefund = createTool({
     amount > 100
       ? { reason: `Approve refund of ${amount}` }
       : false,
-  async execute(args) {
+  async handler(args) {
     await auth.requirePermission(
       scope.operatorId,
       'orders:refund',

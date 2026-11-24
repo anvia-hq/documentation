@@ -1,7 +1,11 @@
 # Releases
 
-The reviewed source release is `@anvia/durable` **0.13.0**. The package is experimental and its database records may
+The reviewed source release is `@anvia/durable` **0.18.0**. The package is experimental and its database records may
 change between releases.
+
+## Changes in 0.18.0
+
+Reviewed `0.13.0` → `0.18.0` against SDK source on 2026-11-23. Adds Postgres/Drizzle/Prisma stores, shared workers, a store-only client, a read-only observer, automatic versions, recorded memory reconciliation, per-field payload budgets, blob overflow, and schema 12.
 
 ## Changes through 0.13.0
 

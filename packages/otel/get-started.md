@@ -4,7 +4,7 @@
 application already owns. Configure an OpenTelemetry SDK before attaching the observer.
 
 ```bash
-pnpm add @anvia/core @anvia/otel @opentelemetry/api @opentelemetry/api-logs zod
+pnpm add @anvia/core @anvia/otel @opentelemetry/api zod
 ```
 
 ```ts

@@ -5,6 +5,7 @@ Calling `store.ensure()` creates:
 - `anvia_memory_sessions`
 - `anvia_memory_messages`
 - `anvia_memory_errors`
+- `anvia_memory_idempotency_keys` (rename with `tableNames.idempotencyKeys`)
 - a unique ordered-message index
 
 Messages and errors reference their session with cascading deletes. Appends run in a `BEGIN IMMEDIATE` transaction and positions are unique within a memory session.

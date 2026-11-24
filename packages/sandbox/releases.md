@@ -1,6 +1,10 @@
 # Releases
 
-The reviewed source release is `@anvia/sandbox` **1.3.2**. The entries below preserve notable v0 history.
+The reviewed source release is `@anvia/sandbox` **1.3.5**. The entries below preserve notable v0 history.
+
+## Changes in 1.3.5
+
+Reviewed `1.3.2` → `1.3.5` against SDK source on 2026-11-23. Stops desktop helper and agent processes reliably and kills terminal sessions that ignore SIGHUP.
 
 ## Changes through 1.3.2
 

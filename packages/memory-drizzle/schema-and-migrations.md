@@ -5,6 +5,7 @@ The package exports PostgreSQL table definitions for:
 - `agent_memory_sessions`
 - `agent_memory_messages`
 - `agent_memory_errors`
+- `agent_memory_writes` (idempotency ledger; exported as `schema.agentMemoryWrites`)
 
 The `init` CLI is a safe schema helper. It defaults to a dry run and creates a sibling `anvia-memory.ts` only with `--write`:
 

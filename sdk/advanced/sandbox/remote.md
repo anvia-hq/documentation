@@ -81,7 +81,7 @@ Start the daemon however your infrastructure starts workloads. It needs only an 
 ANVIA_CONTROL_URL=wss://agents.example.com/daemon \
 ANVIA_SANDBOX_TOKEN="$SANDBOX_DAEMON_TOKEN" \
 ANVIA_SANDBOX_WORKDIR=/workspace \
-npx anvia-sandbox-daemon
+npm exec --package=@anvia/sandbox -- anvia-sandbox-daemon
 ```
 
 | Variable | Purpose |

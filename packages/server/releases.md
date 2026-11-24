@@ -1,6 +1,10 @@
 # Releases
 
-The reviewed source release is `@anvia/server` **1.3.6**. The entries below preserve notable v0 transport milestones.
+The reviewed source release is `@anvia/server` **1.5.0**. The entries below preserve notable v0 transport milestones.
+
+## Changes in 1.5.0
+
+Reviewed `1.3.6` → `1.5.0` against SDK source on 2026-11-23. Accepts a store-only Durable client as the HTTP backend (task submission answers 503), serves memory-write reconciliation, per-field payload budgets, body-limit warnings, and `Retry-After` capacity hints.
 
 ## Changes through 1.3.6
 

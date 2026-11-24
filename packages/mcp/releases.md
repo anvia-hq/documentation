@@ -1,17 +1,19 @@
 # Releases
 
-The reviewed source release is `@anvia/mcp` **1.2.6**.
+The reviewed source release is `@anvia/mcp` **1.2.8**.
 
-## Changes through 1.2.6
+## Changes in 1.2.8
 
-Reviewed `1.2.4` → `1.2.6` against SDK source on 2026-11-04. `1.2.5` updated runtime dependencies to the latest compatible minor and patch releases. `1.2.6` refreshed upstream dependencies and raised the `zod` peer range to `^4.6.7`. The `1.2.4` work added cumulative `tools.discoveryLimits`, cancellation cleanup during protocol negotiation, and opt-in `transport.terminateSessionOnClose`; see [API reference](/packages/mcp/api-reference#discovery-budgets-and-session-cleanup).
+Reviewed `1.2.5` → `1.2.8` against SDK source on 2026-11-23. Refreshes runtime dependencies.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/e751560f4a02c8989928966c203ed8747c0072fb/packages/mcp/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+## Changes through 1.2.4
+
+Reviewed `1.2.3` → `1.2.4` against SDK source on 2026-10-15. Added cumulative `tools.discoveryLimits`, cancellation cleanup during protocol negotiation, and opt-in `transport.terminateSessionOnClose` with bounded best-effort session deletion. See [API reference](/packages/mcp/api-reference#discovery-budgets-and-session-cleanup).
+
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/10977b75a1518a553b7d5deb0193b788258ba093/packages/mcp/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
-| `1.2.6` | Updated upstream runtime dependencies; the `zod` peer range is now `^4.6.7`. |
-| `1.2.5` | Updated runtime dependencies to the latest compatible minor and patch releases. |
 | `1.2.3` | Refreshed the package README. |
 | `1.2.2` | Updated `@modelcontextprotocol/client` to `^2.1.0` and `undici` to `^8.11.2`. |
 | `1.2.1` | Updated `undici` to `^8.11.0`. |

@@ -1,6 +1,6 @@
 # Releases
 
-Reviewed source release: `1.2.0`. The entries below preserve notable v0 history.
+Reviewed source release: `1.2.1`. The entries below preserve notable v0 history.
 
 Reviewed `1.1.5` → `1.2.0` against SDK source on 2026-11-04. Added `ne`, `in` over tag fields, `gte`/`lte` over numeric fields, and n-ary `and`/`or`; undeclared fields and incompatible range/tag combinations are rejected. See [search and filters](/packages/redis/search-and-filters).
 
@@ -19,6 +19,10 @@ Notable releases include:
 - `0.2.0` introduced Redis hash storage and RediSearch HNSW retrieval.
 
 See the complete [source changelog](https://github.com/anvia-hq/anvia/blob/main/packages/vector-redis/CHANGELOG.md).
+
+## Changes in 1.2.1
+
+Reviewed `1.2.0` → `1.2.1` against SDK source on 2026-11-23. Refreshes runtime dependencies.
 
 ## Changes through 1.1.4
 

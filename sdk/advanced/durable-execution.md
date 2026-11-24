@@ -1,12 +1,13 @@
 # Durable execution
 
 Durable execution lets an Anvia agent run survive a process restart. `@anvia/durable` stores submissions,
-model responses, tool results, approvals, and progress events in SQLite, then reconstructs the agent loop
-from those committed results instead of starting over.
+model responses, tool results, approvals, and progress events in SQLite, Postgres, Drizzle, or Prisma, then
+reconstructs the agent loop from those committed results instead of starting over.
 
 ::: warning Experimental
-`@anvia/durable` is experimental. It supports **one runtime owner per local SQLite database** on a single
-host and requires **Node.js 22.16 or newer**. It is not a distributed worker service. Database records may
+`@anvia/durable` is experimental. A SQLite database supports **one runtime owner** on one host and requires
+**Node.js 22.16 or newer**. Postgres, Drizzle, and Prisma databases support either one owner or several shared
+workers; a store-only client can submit work and a read-only observer can inspect it. Database records may
 change between releases.
 :::
 
@@ -15,7 +16,7 @@ pnpm add @anvia/durable @anvia/core zod
 ```
 
 ```text
-Application -> submit -> journal (SQLite) -> model/tool checkpoints -> outcome
+Application -> submit -> journal (SQLite/SQL) -> model/tool checkpoints -> outcome
                               ^ restart: resume() replays committed results
 ```
 
