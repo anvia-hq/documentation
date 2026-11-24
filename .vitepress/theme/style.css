@@ -19,8 +19,6 @@
   --accent-pale: #e2fae9;
   --accent-border: #b8eac7;
   --docs-accent: var(--accent-text);
-  --docs-accent-soft: color-mix(in srgb, var(--accent) 16%, transparent);
-  --docs-accent-softer: color-mix(in srgb, var(--accent) 26%, transparent);
 
   /* Type */
   --ink: #141716;
@@ -129,8 +127,6 @@
   --ops-accent-ink: #080808;
   --ops-glow: transparent;
   --docs-accent: #62e989;
-  --docs-accent-soft: rgba(98, 233, 137, 0.1);
-  --docs-accent-softer: rgba(98, 233, 137, 0.18);
   --ops-invert: #c4c4c4;
   --ops-invert-text: #080808;
   --ops-code-text: #b7c0ca;
