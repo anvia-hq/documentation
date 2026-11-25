@@ -15,6 +15,16 @@ class MemgraphClient implements AsyncDisposable {
 Managed registrations expose provisioning, retrieval, exploration, replacement, and deletion.
 Existing registrations expose validation, retrieval, and exploration without mutation.
 
+`managedKnowledgeGraph()` accepts either `{ name, schema, dimensions, similarity?, text?, fulltext? }`
+or an explicit `{ name, schema, resources }`. Without `resources`, labels and index names are derived
+from `name` and validated as `ManagedMemgraphResources`. `ensure({ abortSignal? })` creates the
+missing constraints and indexes and then validates them; unlike the Neo4j adapter it takes no index
+timeout. `ManagedMemgraphTextShorthand` is `true | false | { chunks?, entities? }`. `MemgraphVectorSimilarity` covers `'cosine'`, `'euclidean'`,
+`'dotProduct'`, and `'inner-product'`; the last two both map to Memgraph's inner-product metric.
+
+The package also re-exports `defineGraphSchema()` and `extractGraphFacts()` from `@anvia/graph`, so an
+application that only needs extraction can import them from the adapter it already installed.
+
 ## Standalone retrieval and exploration
 
 `retrieveGraphContext()` and `exploreGraph()` run the same policies without going through a

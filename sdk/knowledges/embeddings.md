@@ -25,7 +25,26 @@ const { documents: embedded } = await embedDocuments({
 
 The `content` callback selects the text sent to the embedding provider. The complete original `article` remains available as `result.document` after a search.
 
-## 2. Create several vectors for one record
+## 2. Skip the callbacks for text-only input
+
+When every document is already text, omit `content`: strings and `{ text }` objects are embedded
+directly, and an `id` field is used when present.
+
+```ts
+const { documents: embedded } = await embedDocuments({
+  model: embeddingModel,
+  documents: [
+    'Password reset links expire after 30 minutes.',
+    { id: 'billing/invoices', text: 'Invoices are retained for 24 months.' },
+  ],
+})
+```
+
+A string without an `id` gets the positional id `doc0`, `doc1`, and so on, so pass `{ id, text }` or
+an `id` callback when the records must stay stable across runs. `metadata` still works alongside the
+defaults, and the hybrid `models: { dense, sparse }` overload accepts the same text-only input.
+
+## 3. Create several vectors for one record
 
 Return an array from `content()` when several passages should find the same logical document:
 
@@ -42,7 +61,7 @@ The vectors stay aligned with one document ID. Search uses the best matching vec
 
 Create separate documents instead when each passage needs a distinct ID, source location, permission boundary, or citation.
 
-## 3. Control ingestion concurrency
+## 4. Control ingestion concurrency
 
 The embedding model's `maxBatchSize` controls how many texts are sent in one provider call. The `concurrency` option controls how many batches `embedDocuments()` may process at once:
 
@@ -60,7 +79,7 @@ The default concurrency is `1`. Increase it gradually and observe provider rate 
 
 Anvia verifies that the provider returns one vector per input text. A mismatched result count throws instead of silently attaching vectors to the wrong documents.
 
-## 4. Embed dense and sparse vectors together
+## 5. Embed dense and sparse vectors together
 
 Pass `models: { dense, sparse }` instead of `model` to embed each text once per channel. The sparse
 model implements `SparseEmbeddingModel`, and results carry `sparseEmbeddings` aligned 1:1 with
@@ -80,7 +99,7 @@ encode texts manually, `embedSparseTexts({ model, texts })` embeds passages and
 `embedSparseQuery({ model, query })` embeds a search query; sparse models may encode queries
 differently from passages.
 
-## 5. Design metadata for retrieval
+## 6. Design metadata for retrieval
 
 Vector metadata is flat. Values may be strings, numbers, booleans, or `null`:
 

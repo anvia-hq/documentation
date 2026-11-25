@@ -55,6 +55,10 @@ const docsAgent = createDocsAgent(user.tenantId);
 
 Before each model turn, Anvia searches the context index using text from the current prompt. Tool results and steering messages can therefore change what is retrieved on a later turn.
 
+`context` accepts three kinds of entry: a static `Document`, a `VectorContext` from `createVectorContext()` or
+`createVectorIndex().asContext()`, and a `ContextSource` from `createContextSource()` for application-owned
+retrieval. Mix them in one array when an agent needs stable instructions plus retrieved material.
+
 `topK` must be positive. `minScore` is optional. Use the store filter to enforce tenant, product, language, or access boundaries before a document reaches the model.
 
 See [Knowledges](/sdk/knowledges) for loading documents, embeddings, vector stores, filters, and retrieval patterns.
@@ -128,18 +132,32 @@ for (const segment of breakdown.segments) {
 const exact = scaleContextBreakdown(breakdown, 1_234)
 ```
 
-The eight segments are `instructions`, `messages`, `toolResults`, `documents`, `tools`, `mcpTools`,
-`providerTools`, and `outputSchema`. `estimateContextTextTokens()` is the default provider-neutral counter
-(about four characters per token); pass `tokenCounter` for a model-specific estimate, and `mcpToolNames` to
-report MCP-served tools separately. Inline base64 media counts as at most 8,000 characters because providers
-bill media by pixels or duration rather than payload bytes. Estimates are local, and although the provider's
-input count may include fields this split does not model, `scaleContextBreakdown()` keeps the proportions and
-makes the segments add up to the reported total.
+The nine segments, in order, are `instructions`, `skills`, `messages`, `toolResults`, `documents`,
+`tools`, `mcpTools`, `providerTools`, and `outputSchema`; `CONTEXT_SEGMENT_IDS` lists that order. The
+`skills` segment combines skill catalog instructions, skill tool definitions, and loaded skill tool
+results, which `Agent` detects automatically from the tools it was given. `estimateContextTextTokens()`
+is the default provider-neutral counter (about four characters per token); pass `tokenCounter` for a
+model-specific estimate, and `mcpToolNames` to report MCP-served tools separately. Inline base64 media
+counts as at most 8,000 characters because providers bill media by pixels or duration rather than
+payload bytes. Estimates are local, and although the provider's input count may include fields this
+split does not model, `scaleContextBreakdown()` keeps the proportions and makes the segments add up to
+the reported total. `isContextBreakdown(value)` narrows an unknown value.
+
+A completed agent outcome also exposes the scaled breakdown:
+
+```ts
+if (result.type === 'response' && result.contextBreakdown !== undefined) {
+  for (const segment of result.contextBreakdown.segments) {
+    console.log(segment.id, segment.tokens)
+  }
+}
+```
 
 Agent observers receive the same structure on generation start and scaled on end through
-`args.context`; a failed generation carries the estimate. This is observability data, not authoritative
-billing. Structured-output retries report the final attempt's input tokens rather than cumulative retry usage.
-Durable runs persist requests, not these breakdowns, so they are not part of a terminal outcome or the client
-event protocol.
+`args.context`, streaming runs report it on `turn_end`, and `@anvia/client` forwards it on
+`message_end`, `turn_end`, and `run_end` frames and on `UIMessage.generation`. A failed generation
+carries the estimate. This is observability data, not authoritative billing. Structured-output retries
+report the final attempt's input tokens rather than cumulative retry usage. Durable runs persist
+requests, not these breakdowns.
 
 Continue with [Per-run controls](/sdk/agents/per-run-controls).

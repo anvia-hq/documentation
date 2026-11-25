@@ -2,7 +2,62 @@
 
 A vector store persists embedded documents and searches raw vectors. `retrieveDocuments()` combines it with an embedding model for text queries; the same store/model pair also powers automatic retrieval and search tools.
 
-## 1. Ingest raw text
+## 1. Create an index
+
+`createVectorIndex()` binds a store, an embedding model, and retrieval defaults into one handle, so
+ingestion and retrieval need no separate store plumbing:
+
+```ts
+import { createVectorIndex } from '@anvia/core/vector-store'
+
+const docsIndex = createVectorIndex({
+  model: embeddingModel,
+  topK: 4,
+  minScore: 0.74,
+})
+
+await docsIndex.ingest([
+  { id: 'support/reset-links', text: resetLinksDoc, metadata: { product: 'accounts' } },
+  'Billing invoices are available for 24 months.',
+])
+
+const results = await docsIndex.retrieve('How long do reset links last?')
+```
+
+Omitting `store` uses a process-local `InMemoryVectorStore`. Pass `{ store, model }` to attach a
+persistent adapter or `{ store, models: { dense, sparse }, fusion? }` for a hybrid collection. The
+handle exposes:
+
+| Member | Purpose |
+| --- | --- |
+| `ensure()`, `validate()` | Prepare and check the underlying store |
+| `ingest(input, options?)` | Embed one document or an array, with per-call `chunking`, `granularity`, `concurrency`, `retries`, and `abortSignal` |
+| `delete(documentIds, options?)` | Remove documents by id |
+| `retrieve(query, options?)` | Search with per-call `topK`, `minScore`, `filter`, `rerank`, `candidateTopK`, and `abortSignal` |
+| `asTool({ name, description?, ...defaults })` | A search tool for an agent's `tools` array |
+| `asContext(options?)` | A [vector context](/sdk/knowledges/automatic-retrieval) for an agent's `context` array |
+
+Options set on `createVectorIndex()` are defaults: a per-call value wins, and ingestion settings
+apply to every later `ingest()` call. Inputs can be plain strings or `{ id, text, metadata }`
+objects. An input without an `id` derives a deterministic content-hash id, so pass explicit ids when
+you plan to replace or delete the document later.
+
+`granularity: 'chunk'` stores one record per chunk instead of one record per source document. Set it
+on `createVectorIndex()` so `delete()` can resolve document ids to their stored chunk records through
+`store.inspect()`; with `granularity: 'document'`, ids are deleted as-is. Deleting by document id on
+a chunk-granularity index needs a store that implements `inspect()`, otherwise call `store.delete()`
+with chunk record ids.
+
+```ts
+await docsIndex.delete('support/reset-links')
+await docsIndex.delete(['support/reset-links', 'billing/invoices'])
+```
+
+Every bundled adapter client also implements `[Symbol.asyncDispose]()`, so
+`await using client = new PgVectorClient(...)` releases its pool or connection when the scope ends.
+The in-memory store needs no cleanup.
+
+## 2. Ingest raw text
 
 ```ts
 import type { TextDocument } from '@anvia/core/documents'
@@ -69,7 +124,7 @@ value rather than parsing or constructing it.
 
 The in-memory store accepts only a canonical nonnegative safe integer string as `cursor`. Signs, fractions, exponents, whitespace, and leading zeroes are rejected. Invalid cursors throw a `RangeError` subclass. Check for them with `VectorInspectCursorError.isCursorError(error)`, which is exported from `@anvia/core/vector-store`. Pass each returned `nextCursor` back unchanged.
 
-## 2. Search the store
+## 3. Search the store
 
 ```ts
 const results = await retrieveDocuments({
@@ -87,9 +142,9 @@ for (const result of results) {
 
 Results are ordered from highest to lowest score. Each result contains the stable ID, original document, score, and optional metadata.
 
-`topK` limits the number of results. `minScore` removes matches below a minimum score. Tune both with real queries because score distributions vary by model and store.
+`topK` limits the number of results and defaults to `5` when omitted. `minScore` removes matches below a minimum score. Tune both with real queries because score distributions vary by model and store. `matchedText` on a result carries the stored text that scored highest when the adapter can supply it.
 
-## 3. Replace in-memory documents manually
+## 4. Replace in-memory documents manually
 
 ```ts
 import { embedDocuments } from '@anvia/core/embeddings'
@@ -108,7 +163,7 @@ await store.upsert({
 `upsert()` replaces an existing in-memory document with the same ID. Prefer the ingestion helper
 when the input is raw text; it preserves document grouping across chunks automatically.
 
-## 4. Use a persistent adapter
+## 5. Use a persistent adapter
 
 Production adapters provide clients that create stores implementing the same `VectorStore` interface:
 
@@ -130,7 +185,26 @@ await store.upsert({
 
 Changing the embedding model or dimensions requires a compatible collection and normally a complete re-embedding job.
 
-## 5. Search with dense and sparse vectors
+## 6. Rerank candidates
+
+`retrieveDocuments()` and `createVectorIndex().retrieve()` accept a `rerank` function that reorders
+the candidates after the store search:
+
+```ts
+const results = await docsIndex.retrieve('refund policy for annual plans', {
+  topK: 5,
+  candidateTopK: 25,
+  rerank: async ({ query, results }) => rankWithCrossEncoder(query, results),
+})
+```
+
+The reranker receives `{ query, results, abortSignal }` and returns results in the order the
+application wants. `candidateTopK` sets how many store matches are fetched before reranking and
+defaults to three times `topK`; the final list is still cut to `topK`. A reranker may change scores
+or drop results, so treat its scores as application-defined rather than comparable to store
+similarity. Retrieval, search tools, and vector contexts all accept the same pair.
+
+## 7. Search with dense and sparse vectors
 
 Hybrid retrieval adds a sparse lexical channel to dense similarity. A `HybridVectorStore` extends
 the `VectorStore` interface with `searchHybrid()`, which ranks against both a dense query vector and

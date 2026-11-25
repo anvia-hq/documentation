@@ -12,6 +12,39 @@ Anvia separates portable graph behavior from database adapters:
 | `@anvia/neo4j` | Neo4j provisioning, persistence, search, traversal, exploration |
 | `@anvia/memgraph` | Memgraph provisioning, persistence, search, traversal, exploration |
 
+## Bind one handle
+
+`createKnowledgeGraph()` binds the graph registration, embedding model, and extraction model once, so
+ingestion, retrieval, tools, and context sources share the same defaults:
+
+```ts
+import { createKnowledgeGraph } from '@anvia/graph'
+
+const incidents = createKnowledgeGraph({
+  graph,
+  embeddingModel,
+  extractionModel,
+  chunking: { strategy: 'recursive', maxSize: 1_000, overlap: 100 },
+  conflict: 'error',
+  orphanEntities: 'delete',
+})
+
+await incidents.ingest({ id: 'incident-42', text })
+
+const agent = new Agent({
+  id: 'incident-analyst',
+  model,
+  instructions: 'Answer from the graph and name the entities you used.',
+  tools: [incidents.asTool({ name: 'search_incidents' })],
+  context: [incidents.asContext({ evidence: { type: 'chunks', maxChunks: 6 } })],
+})
+```
+
+`ingest()` requires an extraction model and a writable managed graph, `retrieve()` applies the
+bounded defaults described below, `asTool()` builds a graph search tool, and `asContext()` returns a
+Core `ContextSource` that formats `formatGraphContext()` output. Per-call options override the handle
+defaults. See the [`@anvia/graph` guide](/packages/graph#bind-one-handle) for the full option list.
+
 ## Ingest source text
 
 ```ts
@@ -74,7 +107,10 @@ graph transaction has committed, the helper throws `GraphIngestionStageError` wi
 `stage: 'vector'` and the receipt attached; re-run the job with `conflict: 'overwrite'`, because
 stable document IDs make both writes idempotent.
 
-Other ingestion options: `revision` stamps the receipt for queue reconciliation; `entityText`
+Other ingestion options: `onProgress` reports extraction and write stages as
+`GraphIngestionProgressEvent` values; `onInvalidFact: 'warn'` records a `GraphInvalidFactWarning`
+instead of failing the document when extraction produces a fact the schema rejects; `revision` stamps
+the receipt for queue reconciliation; `entityText`
 customizes the text embedded for each entity (by default, the entity type followed by its sorted
 properties); `factConflicts` resolves property-level extraction conflicts per entity or
 relationship with a `default` strategy — `reject`, `prefer-first`, `prefer-last`, or a custom

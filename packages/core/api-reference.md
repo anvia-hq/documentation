@@ -328,16 +328,49 @@ const { documents: hybridDocuments } = await embedDocuments({
 })
 ```
 
-It also exports dense, sparse, and hybrid model contracts plus distance helpers.
+`embedDocuments()` also accepts text-only input: strings and `{ text }` objects are embedded
+without `content`, and the hybrid overload takes the same shapes.
+
+It also exports dense, sparse, and hybrid model contracts plus distance helpers. Its option types
+include `EmbedTextDocumentsOptions`, `EmbedTextDocumentsBaseOptions`,
+`EmbedHybridTextDocumentsOptions`, and `TextLikeDocument`.
 
 `@anvia/core/vector-store` exports `InMemoryVectorStore`, `InMemoryVectorStoreOptions`,
-`InMemoryVectorStoreFromDocumentsOptions`, `VectorStore`, `HybridVectorStore`,
+`InMemoryVectorStoreFromDocumentsOptions`, `VectorStore`, `HybridVectorStore`, `createVectorIndex`,
 `createVectorSearchTool`, `retrieveDocuments`, `ingestVectorText`, `ingestVectorDocuments`,
-`vectorFilter`, `matchesVectorFilter`, `parseVectorInspectCursor`, and `VectorInspectCursorError`.
-Its types include `VectorFilter`, `VectorFilterOperator`, `VectorFilterComparisonOperator`,
+`vectorFilter`, `matchesVectorFilter`, `normalizeVectorFilter`, `isVectorFilter`,
+`parseVectorInspectCursor`, and `VectorInspectCursorError`.
+Its types include `VectorFilter`, `VectorFilterInput`, `VectorFilterShorthand`,
+`VectorFilterFieldOperators`, `VectorFilterOperator`, `VectorFilterComparisonOperator`,
 `VectorFilterList`, `VectorMetric`, `VectorFusion`, `VectorSearchRequest`, `VectorSearchResult`,
 `VectorInspectRequest`, `VectorInspectPage`, `VectorInspectItem`, `VectorStoreUpsertOptions`,
-`IngestVectorDocumentsOptions`, `IngestVectorTextOptions`, and `IngestVectorDocumentsResult`.
+`VectorStoreDeleteOptions`, `VectorReranker`, `VectorRerankOptions`, `VectorIndex`,
+`CreateVectorIndexOptions`, `CreateDenseVectorIndexOptions`, `CreateHybridVectorIndexOptions`,
+`VectorIndexDocumentInput`, `VectorIndexIngestInput`, `VectorIndexIngestOptions`,
+`VectorIndexRetrieveOptions`, `VectorIndexToolOptions`, `VectorIndexContextOptions`,
+`VectorIngestGranularity`, `IngestVectorDocumentsOptions`, `IngestVectorTextOptions`, and
+`IngestVectorDocumentsResult`.
+
+`createVectorIndex()` binds a store, an embedding model, and retrieval defaults into one handle with
+`ensure()`, `validate()`, `ingest()`, `delete()`, `retrieve()`, `asTool()`, and `asContext()`.
+Omitting `store` uses a process-local `InMemoryVectorStore`. See
+[vector stores](/sdk/knowledges/vector-stores).
+
+```ts
+const docsIndex = createVectorIndex({ model: embeddingModel, topK: 4 })
+
+await docsIndex.ingest([{ id: 'support/reset-links', text }])
+const hits = await docsIndex.retrieve('How long do reset links last?', { topK: 3 })
+await docsIndex.delete('support/reset-links')
+```
+
+`retrieveDocuments()` defaults `topK` to `5`. Pass `rerank` with `candidateTopK` (default three
+times `topK`) to reorder store matches before the final cut. A result may carry `matchedText`, the
+stored chunk text that produced its best score.
+
+`store.delete({ documentIds })` removes records by id; adapters implement it with an optional
+`inspect()` for chunk-granularity resolution. Bundled adapter clients also implement
+`[Symbol.asyncDispose]()`.
 
 `InMemoryVectorStore` scores with cosine similarity by default. Pass `metric: 'cosine' | 'euclidean'
 | 'dotProduct'` to change it. Scores always remain higher-is-better: `euclidean` returns negated
@@ -401,9 +434,11 @@ await ingestVectorText({
 
 ## Documents
 
-`@anvia/core/documents` exports `chunkText`, `chunkTextDocuments`, and their option/result types. The
-shared records are `TextDocument`, `TextDocumentChunk`, `TextDocumentMetadata`, and
-`TextDocumentChunkingOptions`.
+`@anvia/core/documents` exports `chunkText`, `chunkTextDocuments`, `DEFAULT_CHUNK_SIZE` (`1000`),
+`DEFAULT_CHUNK_SEPARATORS` (`['\n\n', '\n', '. ', ' ']`), and their option/result types. The shared
+records are `TextDocument`, `TextDocumentChunk`, `TextDocumentMetadata`, and
+`TextDocumentChunkingOptions`. Ingesting without `chunking`, or with `{ strategy: 'none' }`, embeds
+each source document as one chunk.
 
 The application owns file discovery, storage reads, document parsing or OCR, upload authorization,
 malware scanning, and source IDs. Pass normalized text into Core; provider-specific PDF attachments

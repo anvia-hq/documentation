@@ -1,6 +1,7 @@
 # Releases
 
-Reviewed source release: `0.3.1`. This is the first functional release of `@anvia/jev`.
+Reviewed source release: `1.0.0`. `@anvia/jev` graduated to v1 alongside the runtime packages; the first
+functional release was `0.3.1`.
 
 ## Changes in 0.3.1
 
@@ -19,7 +20,7 @@ Reviewed `0.2.0` → `0.3.0` against SDK source on 2026-11-23. Aligns model IDs 
 
 A `0.0.0-bootstrap.0` placeholder was published once to the `bootstrap` tag to establish the package on npm. It contains no adapter and should not be used in applications.
 
-- [Full `@anvia/jev` changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/provider-jev/CHANGELOG.md)
+- [Full `@anvia/jev` changelog](https://github.com/anvia-hq/anvia/blob/2322fcd9b00e4cb82166c7aca319454ee97abe4e/packages/provider-jev/CHANGELOG.md)
 - [Compatibility and versioning](/packages/compatibility-and-versioning)
 - [API reference](/packages/jev/api-reference)
 - [Typed decisions guide](/sdk/decisions)

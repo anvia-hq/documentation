@@ -46,22 +46,21 @@ await using client = new Neo4jClient({
 const graph = client.managedKnowledgeGraph({
   name: 'support',
   schema,
-  resources: {
-    labels: { document: 'SupportDocument', chunk: 'SupportChunk', entity: 'SupportEntity' },
-    indexes: {
-      chunks: {
-        vector: { name: 'support_chunks_vector', dimensions: 1536, similarity: 'cosine' },
-        fulltext: { name: 'support_chunks_text' },
-      },
-      entities: {
-        vector: { name: 'support_entities_vector', dimensions: 1536, similarity: 'cosine' },
-        fulltext: { name: 'support_entities_text', properties: ['id', 'name', 'title'] },
-      },
-    },
-  },
+  dimensions: 1536,
+  fulltext: true,
 })
 
-await graph.ensure({ indexTimeoutMs: 60_000 })
+await graph.ensure()
+```
+
+`name` and `dimensions` are enough for a managed graph. Labels are derived from the graph name
+(`SupportDocument`, `SupportChunk`, `SupportEntity`) and the indexes use a `support_*` prefix;
+`ensure()` waits up to 60 seconds for index creation. Pass `similarity` to choose `'cosine'`
+(default) or `'euclidean'`. `fulltext: true` creates chunk and entity full-text indexes and indexes
+every entity property the schema declares; pass `{ chunks, entities }` to name or narrow them, and
+`false` to skip them. A name outside `[a-z][a-z0-9]*` gets a short hash suffix so derived labels stay
+valid. Pass an explicit `resources` object instead of `dimensions` when the database names are
+provisioned elsewhere.
 ```
 
 Ingest raw text with the shared graph helper. It chunks, extracts, embeds, and replaces the source

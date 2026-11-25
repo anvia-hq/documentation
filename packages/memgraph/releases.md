@@ -1,6 +1,6 @@
 # Releases
 
-The reviewed source release is `@anvia/memgraph` **1.1.10**.
+The reviewed source release is `@anvia/memgraph` **1.2.0**.
 
 ## Changes in 1.1.10
 
@@ -10,7 +10,7 @@ Reviewed `1.1.5` → `1.1.10` against SDK source on 2026-11-23. Scopes entity/re
 
 Reviewed `1.1.4` → `1.1.5` against SDK source on 2026-10-15. Refreshed package READMEs with current overviews, quickstarts, and links to the detailed guides. Review the source changelog for any dependency changes included in your upgrade.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/graph-memgraph/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/2322fcd9b00e4cb82166c7aca319454ee97abe4e/packages/graph-memgraph/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |

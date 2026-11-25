@@ -14,7 +14,7 @@ Reviewed `1.1.11` → `1.2.0` against SDK source on 2026-11-23. Aligns model IDs
 
 Reviewed `1.1.9` → `1.1.10` against SDK source on 2026-10-15. Aligned the OpenAI dependency with its Decisions-capable release. Grok retains its documented completion API; use the OpenAI package for OpenAI Decisions.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/provider-grok/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/2322fcd9b00e4cb82166c7aca319454ee97abe4e/packages/provider-grok/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 

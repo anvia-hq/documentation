@@ -5,8 +5,8 @@ only validate APIs present in examples; they cannot reveal an exported API that 
 
 ## Source and inventory
 
-`scripts/sdk-coverage.json` records 89 public entrypoints across 37 public SDK packages at reviewed
-source revision `7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488`. Each entry links its owning guide and
+`scripts/sdk-coverage.json` records 87 public entrypoints across 36 public SDK packages at reviewed
+source revision `2322fcd9b00e4cb82166c7aca319454ee97abe4e`. Each entry links its owning guide and
 reference, with an export-name count and SHA-256 snapshot. The checker resolves TypeScript exports
 from source, including re-exports and types; `@anvia/core/internal/*` is excluded, as would be any
 package marked private. A new/removed entrypoint or changed exported name set requires editorial
@@ -20,7 +20,17 @@ tutorial. The `features` entries tie selected APIs to complete examples and name
 one named test may cover more than one feature; `utilities` records reference coverage or a reason
 for excluding a dedicated tutorial.
 
-The 2026-11-23 review moves the baseline from `e751560f` to `7aa42c0a` and covers the context token breakdown, dynamic domain search, versioned memory writes, the Durable async execution model with Postgres, Drizzle, and Prisma stores and its owning-runtime, shared-worker, store-only, and observer roles, the `@anvia/core/evals` developer-experience release (case tags and trials, target caching, judge metrics, baseline comparison, CLI flags, and dataset loading), the provider model-lineup refresh with shared helpers in `@anvia/core/internal/provider`, and evaluation metadata forwarding in the OTel, Lens, and Langfuse reporters.
+The 2026-11-25 review moves the baseline from `7aa42c0a` to `2322fcd9` and covers the React UI
+merge into `@anvia/react` (the separate package was removed and its 14 entrypoints became
+`@anvia/react/*`), the RAG and vector-store developer-experience release (`createVectorIndex()`,
+chunking defaults, text-only `embedDocuments()` input, filter shorthand, reranking, `VectorStore.delete()`,
+`ContextSource`, and adapter `[Symbol.asyncDispose]()`), the knowledge-graph DX release
+(`createKnowledgeGraph()`, `createGraphContext()`, `formatGraphContext()`, bounded retrieval defaults,
+schema strictness, progress and invalid-fact events, derived Neo4j/Memgraph resources, and Memgraph
+`dotProduct` parity), the `skills` context-breakdown segment with its client, React, and Studio
+plumbing, and the graduation of `@anvia/durable`, `@anvia/azure`, and `@anvia/jev` to v1.
+
+The 2026-11-23 review moved the baseline from `e751560f` to `7aa42c0a` and covers the context token breakdown, dynamic domain search, versioned memory writes, the Durable async execution model with Postgres, Drizzle, and Prisma stores and its owning-runtime, shared-worker, store-only, and observer roles, the `@anvia/core/evals` developer-experience release (case tags and trials, target caching, judge metrics, baseline comparison, CLI flags, and dataset loading), the provider model-lineup refresh with shared helpers in `@anvia/core/internal/provider`, and evaluation metadata forwarding in the OTel, Lens, and Langfuse reporters.
 
 The 2026-11-04 review covers the sandbox remote runtime, terminals, tunnels, and desktop;
 `@anvia/client/durable-chat`; the React UI sandbox viewers; richer vector filters and metrics;

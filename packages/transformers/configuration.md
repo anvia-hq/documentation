@@ -13,7 +13,7 @@ const embeddings = await loadTransformersEmbeddingModel({
 
 | Option | Default | Effect |
 | --- | --- | --- |
-| `modelId` | Required; `DEFAULT_TRANSFORMERS_EMBEDDING_MODEL` exports `Xenova/all-MiniLM-L6-v2` as the recommended default | Model passed to the feature-extraction pipeline. Omitting it or passing an empty value throws a `TypeError`. |
+| `modelId` | `DEFAULT_TRANSFORMERS_EMBEDDING_MODEL`, which is `Xenova/all-MiniLM-L6-v2` | Model passed to the feature-extraction pipeline. Omitting it uses the default; passing an empty value throws a `TypeError`. |
 | `pooling` | `'mean'` | Chooses mean or CLS output pooling. |
 | `normalize` | `true` | Requests normalized vectors from the pipeline. |
 | `maxBatchSize` | `16` | Exposed batch-size metadata. Values below 1 (or non-integers) throw `TypeError: maxBatchSize must be a positive safe integer`; the adapter does not clamp. |

@@ -9,9 +9,9 @@ pnpm add @anvia/core @anvia/transformers
 Initialize a local Transformers.js feature-extraction pipeline:
 
 ```ts
-import { DEFAULT_TRANSFORMERS_EMBEDDING_MODEL, loadTransformersEmbeddingModel } from '@anvia/transformers'
+import { loadTransformersEmbeddingModel } from '@anvia/transformers'
 
-const embeddings = await loadTransformersEmbeddingModel({ modelId: DEFAULT_TRANSFORMERS_EMBEDDING_MODEL })
+const embeddings = await loadTransformersEmbeddingModel()
 const vectors = await embeddings.embedTexts([
   'Password reset links expire after thirty minutes.',
   'Enterprise customers receive priority support.',

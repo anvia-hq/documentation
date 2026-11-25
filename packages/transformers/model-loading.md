@@ -1,14 +1,24 @@
 # Model loading
 
 `loadTransformersEmbeddingModel()` dynamically initializes a Transformers.js `feature-extraction` pipeline.
+`modelId` defaults to `DEFAULT_TRANSFORMERS_EMBEDDING_MODEL`, which is `Xenova/all-MiniLM-L6-v2`.
 
 ## Startup pattern
 
 Create the model once during process initialization:
 
 ```ts
+export const embeddings = await loadTransformersEmbeddingModel()
+```
+
+Import `DEFAULT_TRANSFORMERS_EMBEDDING_MODEL` when the application must name the default explicitly,
+and pass `modelId` to pin a model whose dimensions and retrieval quality you have measured:
+
+```ts
+import { DEFAULT_TRANSFORMERS_EMBEDDING_MODEL, loadTransformersEmbeddingModel } from '@anvia/transformers'
+
 export const embeddings = await loadTransformersEmbeddingModel({
-  modelId: process.env.EMBEDDING_MODEL ?? 'Xenova/all-MiniLM-L6-v2',
+  modelId: process.env.EMBEDDING_MODEL ?? DEFAULT_TRANSFORMERS_EMBEDDING_MODEL,
 })
 ```
 

@@ -40,6 +40,19 @@ const hybridDocsContext = createVectorContext({
 });
 ```
 
+### Build the context from an index
+
+If the application already created the index with
+[`createVectorIndex()`](/sdk/knowledges/vector-stores), call `asContext()` instead of rebuilding the
+store/model pair:
+
+```ts
+const docsContext = docsIndex.asContext({ topK: 4, minScore: 0.74, format: formatHit })
+```
+
+`asContext()` accepts the same `topK`, `minScore`, `filter`, `fusion`, `rerank`,
+`candidateTopK`, `retries`, and `format` options, and the index defaults apply first.
+
 ## 2. Scope retrieval per caller
 
 Build the agent or context index from trusted request state when the filter depends on the caller:
@@ -94,7 +107,37 @@ const policyContext = createVectorContext({
 
 The formatter must return an Anvia `Document` with an `id` and `text`.
 
-## 4. Tune retrieval with real prompts
+## 4. Retrieve context yourself
+
+When retrieval needs application logic the built-in index cannot express — several collections,
+a cache, an HTTP knowledge service, or per-turn budgets — wrap it in a `ContextSource`:
+
+```ts
+import { createContextSource } from '@anvia/core'
+
+const handbook = createContextSource(async ({ query, abortSignal }) => {
+  const hits = await handbookIndex.retrieve(query, { topK: 6, abortSignal })
+  return hits.map((hit) => ({
+    id: `handbook:${hit.id}`,
+    text: hit.document.text,
+    additionalProps: { source: String(hit.metadata?.source ?? 'handbook') },
+  }))
+})
+
+const agent = new Agent({
+  id: 'handbook-assistant',
+  model,
+  instructions: 'Answer from the handbook and say when it is silent.',
+  context: [handbook],
+})
+```
+
+A `ContextSource` receives `{ query, abortSignal }` on every model turn and resolves to Anvia
+`Document` values; return an empty array when nothing is relevant. The agent calls it before each
+turn, so honor `abortSignal` and keep the work bounded. `context` accepts plain documents, vector
+contexts, and context sources together.
+
+## 5. Tune retrieval with real prompts
 
 Lower `topK` when extra context distracts the model. Raise `minScore` when weak matches appear. Improve chunking when a result contains unrelated topics, and tighten metadata filters when stale or unauthorized records are eligible.
 
