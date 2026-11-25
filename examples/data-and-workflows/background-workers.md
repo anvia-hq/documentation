@@ -53,29 +53,28 @@ claims in the queue payload.
 
 ```ts
 async function processResearchJob(jobId: string): Promise<void> {
-    const claimed = await jobs.claim(jobId); // atomic application operation
-    if (!claimed)
-        return;
-    try {
-        const input = await projects.authorizedResearchInput(claimed.projectId);
-        const output = await researchPipeline.run({
-            input: input,
-            observer: {
-                onEvent: (event) => jobs.recordPipelineEvent(jobId, event),
-            }
-        });
-        await jobs.complete(jobId, output);
-    }
-    catch (error) {
-        await jobs.fail(jobId, safeErrorCode(error));
-        throw error; // let the queue apply its configured retry policy
-    }
-}
+  const claimed = await jobs.claim(jobId); // atomic application operation
+  if (!claimed) return;
 
+  try {
+    const input = await projects.authorizedResearchInput(claimed.projectId);
+    const { runId, output } = await researchPipeline.run({
+      input,
+      observer: {
+        onEvent: (event) => jobs.recordPipelineEvent(jobId, event),
+      },
+    });
+    await jobs.complete(jobId, { runId, report: output });
+  } catch (error) {
+    await jobs.fail(jobId, safeErrorCode(error));
+    throw error; // let the queue apply its configured retry policy
+  }
+}
 ```
 
-The repository methods and queue client above are intentionally application-owned interfaces, not
-exports from Anvia.
+`researchPipeline.run()` resolves to `{ runId, output }`; store the output, not the whole run result.
+`JobInput` (a Zod schema), `authorizeProject`, `jobs`, `queue`, `projects`, and `safeErrorCode` are
+intentionally application-owned interfaces, not exports from Anvia.
 
 ## Expected behavior and failures
 
@@ -94,6 +93,15 @@ Re-authorize access when reading job status. Use opaque IDs, encrypt sensitive s
 worker egress, and separate queues by trust level. Add idempotency keys for every external write,
 lease expiry, retry ceilings, a dead-letter queue, progress throttling, and graceful shutdown. Do not
 assume a `PipelineRunObserver` is a durable audit log.
+
+## When to use `@anvia/durable` instead
+
+`@anvia/durable` does not make an Anvia `Pipeline` durable, so a pipeline job like this one still
+needs your queue and job table. When the slow work is an agent run or a custom task, `@anvia/durable`
+can own submission, checkpoints, and restart recovery instead: committed model and tool results
+are replayed rather than repeated. See [durable execution](/sdk/advanced/durable-execution),
+[runs, queues, and prompts](/sdk/advanced/durable-execution/runs), and
+[custom tasks](/sdk/advanced/durable-execution/tasks).
 
 ## Tests
 

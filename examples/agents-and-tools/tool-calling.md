@@ -15,25 +15,21 @@ const add = createTool({
     y: z.number(),
   }),
   outputSchema: z.number(),
-  execute: ({ x, y }) => x + y,
+  handler: ({ x, y }) => x + y,
 })
 
 const agent = new Agent({
   id: 'calculator',
-  model: new OpenAIClient({
-      apiKey: process.env.OPENAI_API_KEY!,
-  }).completionModel({
-      modelId: 'gpt-5.6-sol',
-      api: "responses"
+  model: new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! }).completionModel({
+    modelId: 'gpt-5.6-sol',
+    api: 'responses',
   }),
   instructions: 'Use add for arithmetic, then explain the result briefly.',
   maxTurns: 2,
   tools: [add],
 })
 
-const result = await agent.generate({
-    prompt: 'What is 12 + 30? Use the add tool.'
-})
+const result = await agent.generate({ prompt: 'What is 12 + 30? Use the add tool.' })
 
 if (result.type === 'interaction') {
   throw new Error(`Agent requested ${result.interaction.type}`)
@@ -43,7 +39,7 @@ if (result.type === 'blocked') throw new Error(`Agent blocked at ${result.stage}
 console.log(result.output)
 ```
 
-The first model turn requests `add`. Anvia parses its arguments with `inputSchema`, executes the function, validates the returned number with `outputSchema`, and allows a second model turn to produce the final answer.
+The first model turn requests `add`. Anvia parses its arguments with `inputSchema`, runs `handler`, validates the returned number with `outputSchema`, and allows a second model turn to produce the final answer.
 
 Zod validates shape, not identity, authorization, or business rules. Enforce those inside the handler using trusted request scope. Keep side effects narrow and idempotent where practical, and always set a deliberate turn limit.
 

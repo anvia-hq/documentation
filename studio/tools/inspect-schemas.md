@@ -22,7 +22,7 @@ const issueRefund = createTool({
     refundId: z.string(),
     status: z.literal('issued'),
   }),
-  execute: issueRefundHandler,
+  handler: issueRefundHandler,
 })
 ```
 
@@ -46,7 +46,7 @@ Use **Form** for supported object schemas and **JSON** when you need to paste a 
 
 The raw editor catches malformed JSON before a request is sent. Form controls improve input quality, but they are not the validation boundary. The tool's Zod input schema parses the arguments again when the handler is called.
 
-For example, Studio may accept `-3` as syntactically valid JSON for `amount`, while `z.number().positive()` rejects it before `execute(...)` runs.
+For example, Studio may accept `-3` as syntactically valid JSON for `amount`, while `z.number().positive()` rejects it before `handler(...)` runs.
 
 ## Input and output are different contracts
 

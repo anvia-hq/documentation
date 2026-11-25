@@ -31,29 +31,45 @@ const response = await agent.generate({
 });
 ```
 
-`maxAttempts` includes the initial attempt. Anvia adds randomized exponential delay up to the cap.
-Its default classifier retries common connection/time-out errors, `408`, `409`, `425`, `429`, and
-`5xx`; it does not retry `AbortError`. Streaming completion calls are retried only before provider
+`agent`, `message`, and `isTransientProviderFailure` are application code. Retries are off unless
+`retries` is set on the run or the `Agent` constructor; a run-level `retries: false` disables an
+agent-level setting. `generateCompletion()` and the media helpers accept the same option.
+
+`maxAttempts` includes the initial attempt. Omitted fields default to 3 attempts, a 100 ms initial
+delay, and a 1,000 ms cap. Each delay is a random value up to `initialDelayMs * 2^(attempt - 1)`,
+capped at `maxDelayMs`. Without
+`shouldRetry`, the default classifier retries common connection/time-out errors, `408`, `409`,
+`425`, `429`, and `5xx`. A custom `shouldRetry` replaces that classifier rather than narrowing it.
+An `AbortError` is never retried. Streaming completion calls are retried only before provider
 progress is emitted.
 
 ## Time budgets
 
 Configure connection and request timeouts in the provider client or deployment network when that
-adapter exposes them. For tools, pass an application `AbortSignal` into the client used by the tool:
+adapter exposes them. For tools, pass an `AbortSignal` that combines run cancellation with a
+deadline into the client used by the tool:
 
 ```ts
+import { createTool } from "@anvia/core/tool";
+import { z } from "zod";
+
 const lookup = createTool({
   name: "lookup_order",
   description: "Read an order from the commerce service.",
   inputSchema: z.object({ orderId: z.string() }),
   outputSchema: Order,
-  async execute({ orderId }) {
+  async handler({ orderId }, { abortSignal }) {
+    const timeout = AbortSignal.timeout(5_000);
     return commerce.getOrder(orderId, {
-      signal: AbortSignal.timeout(5_000),
+      signal: abortSignal ? AbortSignal.any([abortSignal, timeout]) : timeout,
     });
   },
 });
 ```
+
+`Order` (a Zod schema) and `commerce` (an abortable HTTP client) are application code. The
+`abortSignal` in the tool context aborts when the run is cancelled or a stream consumer leaves;
+combining it with the timeout stops the upstream call in both cases.
 
 Anvia does not turn an arbitrary `Promise.race()` timeout into cancellation of provider work. A
 deadline that only stops waiting can leave the underlying call running, so use a client that
@@ -73,7 +89,8 @@ const response = await fetch("/api/chat", {
 controller.abort();
 ```
 
-This is a consumer cancellation boundary. A normal `createClientStreamResponse()` response closes the
+This is a consumer cancellation boundary. A normal `createClientStreamResponse()` response from
+`@anvia/server` closes the
 active agent iterator when its reader disconnects; whether provider network work has already
 completed still depends on the adapter and transport.
 

@@ -14,7 +14,7 @@ export function createOrderTools(store: OrderStore) {
     inputSchema: z.object({
       orderId: z.string().min(1).describe('Order id as printed on the confirmation, for example A-1042.'),
     }),
-    execute: async ({ orderId }) => {
+    handler: async ({ orderId }) => {
       const order = store.find(orderId)
 
       if (order === undefined) {
@@ -36,7 +36,7 @@ export function createOrderTools(store: OrderStore) {
     name: 'list_open_orders',
     description: 'List every order that has not been delivered yet, with its status and estimated arrival.',
     inputSchema: z.object({}),
-    execute: async () => ({
+    handler: async () => ({
       orders: store.open().map((order) => ({
         orderId: order.id,
         customer: order.customer,

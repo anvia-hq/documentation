@@ -30,7 +30,7 @@ const getOrder = createTool({
     customer: z.string(),
     notes: z.string(),
   }),
-  execute: ({ id }) => ({
+  handler: ({ id }) => ({
     id,
     status: 'blocked' as const,
     customer: 'Delta Kit Labs',

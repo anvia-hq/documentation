@@ -25,7 +25,7 @@ function createPayrollTools(actor: Actor) {
       employeeId: z.string(),
       payBand: z.string(),
     }),
-    async execute({ employeeId }) {
+    async handler({ employeeId }) {
       if (!actor.roles.includes('payroll')) {
         throw new Error('Payroll access denied')
       }
