@@ -11,7 +11,6 @@ changelogs for exact fixes, additions, breaking changes, and migration notes.
 - [`@anvia/mcp`](/packages/mcp/releases)
 - [`@anvia/server`](https://github.com/anvia-hq/anvia/blob/main/packages/server/CHANGELOG.md)
 - [`@anvia/react`](https://github.com/anvia-hq/anvia/blob/main/packages/react/CHANGELOG.md)
-- [`@anvia/react-ui`](https://github.com/anvia-hq/anvia/blob/main/packages/react-ui/CHANGELOG.md)
 - [`@anvia/cli`](/packages/cli/releases)
 
 ## Providers and embeddings

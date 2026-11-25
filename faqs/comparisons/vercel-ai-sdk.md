@@ -18,7 +18,7 @@ Vercel AI SDK is a provider-agnostic TypeScript toolkit for AI applications and 
 | Evaluations | No first-party evaluation API in the reviewed sources | [`@anvia/core/evals`](/sdk/evaluations) suites, judges, trials, and baselines |
 | Observability | OpenTelemetry through `@ai-sdk/otel` | OpenTelemetry, Langfuse, and self-hosted [Lens](/lens/) adapters |
 | Local dev UI | Not reviewed | [Studio](/studio/) |
-| Frontend | AI SDK UI for React, Vue, Svelte, and Angular; community SolidJS | Framework-neutral [`@anvia/client`](/packages/client), [`@anvia/react`](/packages/react), and headless [`@anvia/react-ui`](/packages/react-ui) |
+| Frontend | AI SDK UI for React, Vue, Svelte, and Angular; community SolidJS | Framework-neutral [`@anvia/client`](/packages/client), [`@anvia/react`](/packages/react) with its [headless primitives](/packages/react/capabilities) |
 | Runtimes | Not reviewed | Node.js; Bun 1.3.14 tested for Core, Client, Server, the OpenAI, Anthropic, Gemini, and Mistral providers, MCP, SQLite memory, and sandbox |
 
 ## What AI SDK does especially well
@@ -56,7 +56,7 @@ Anvia’s center is a reusable runtime object. An application constructs provide
 
 Anvia also separates surrounding products:
 
-- [`@anvia/server`](/packages/server) and [`@anvia/client`](/packages/client) handle the streaming protocol; [`@anvia/react`](/packages/react) and [`@anvia/react-ui`](/packages/react-ui) handle React state and headless chat components.
+- [`@anvia/server`](/packages/server) and [`@anvia/client`](/packages/client) handle the streaming protocol; [`@anvia/react`](/packages/react) handles React state and the [headless chat primitives](/packages/react/capabilities).
 - [`@anvia/durable`](/sdk/advanced/durable-execution) adds experimental durable runs without changing the agent definition.
 - [Studio](/studio/) inspects registered runtime objects locally.
 - [Lens](/lens/) receives production telemetry and stores evaluation results; [`@anvia/core/evals`](/sdk/evaluations) runs suites in code.

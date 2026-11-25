@@ -26,7 +26,7 @@ Bun 1.3.14 is the tested baseline. The SDK's CI runs a Bun compatibility suite o
 - `@anvia/memory-sqlite`, which uses `bun:sqlite` on Bun;
 - `@anvia/sandbox`.
 
-The suite builds `@anvia/durable` but does not test it on Bun. Other packages are not covered by the Bun suite, including Grok, Azure, Jev, Studio, Lens, React, React UI, graph, vector, and Postgres, Drizzle, or Prisma adapters. Test those under Bun before you depend on them.
+The suite builds `@anvia/durable` but does not test it on Bun. Other packages are not covered by the Bun suite, including Grok, Azure, Jev, Studio, Lens, React with its headless primitives, graph, vector, and Postgres, Drizzle, or Prisma adapters. Test those under Bun before you depend on them.
 
 The SDK repository itself is still developed with pnpm on Node.js; Bun support applies to applications that consume the published packages.
 

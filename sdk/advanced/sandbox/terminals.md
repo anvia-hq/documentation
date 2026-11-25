@@ -160,11 +160,11 @@ docker run --rm \
   my-sandbox
 ```
 
-**3. The browser** renders `SandboxTerminal` from `@anvia/react-ui/sandbox-terminal` and asks your backend for a ticket on every connection:
+**3. The browser** renders `SandboxTerminal` from `@anvia/react/sandbox-terminal` and asks your backend for a ticket on every connection:
 
 ```tsx
 import '@xterm/xterm/css/xterm.css'
-import { SandboxTerminal } from '@anvia/react-ui/sandbox-terminal'
+import { SandboxTerminal } from '@anvia/react/sandbox-terminal'
 
 export function TerminalPanel() {
   return (
@@ -178,7 +178,7 @@ export function TerminalPanel() {
 }
 ```
 
-See the [React UI API reference](/packages/react-ui/api-reference) for the component's props and status handling.
+See the [primitives API reference](/packages/react/primitives-api-reference) for the component's props and status handling.
 
 ## What is not included
 

@@ -10,7 +10,7 @@ In particular, Anvia is not:
 - A guarantee that different providers behave identically.
 - A no-code agent builder. Agents are defined and composed in TypeScript.
 - A general job queue or cron scheduler. The experimental `@anvia/durable` package persists and recovers agent runs and task graphs, but production pipelines and recurring jobs may still need BullMQ, Trigger.dev, or another application-owned worker system. See [durable execution, pipelines, or a job queue](/faqs/production/durable-execution).
-- A user interface framework. React UI provides optional composable primitives, not a finished product design.
+- A user interface framework. `@anvia/react` provides optional composable primitives, not a finished product design.
 - An automatic observability backend. Lens and telemetry adapters must be configured deliberately.
 - A reason to turn every model call into a multi-turn agent.
 

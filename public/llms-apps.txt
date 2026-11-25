@@ -6,7 +6,7 @@ Keep agents, provider credentials, tools, memory, retrieval, observers, continua
 control on the server. Send only the reviewed Client Protocol to the browser.
 
 ```text
-@anvia/react-ui or app components
+@anvia/react primitives or app components
         ↓ @anvia/react controller
 @anvia/client HTTP transport
         ↓ ClientStreamRequest over JSONL or SSE
@@ -20,13 +20,13 @@ server-side Agent stream
 
 ```sh
 pnpm add @anvia/core @anvia/client @anvia/server
-pnpm add @anvia/react @anvia/react-ui react react-dom
+pnpm add @anvia/react react react-dom
 ```
 
 - `@anvia/client` defines browser-safe request, event, message, and transport contracts.
 - `@anvia/server` frames client events as a Fetch `Response` using JSONL or SSE.
 - `@anvia/react` owns chat and completion controllers, cancellation, resumption, and interactions.
-- `@anvia/react-ui` provides strictly headless primitives and ships no CSS.
+- `@anvia/react` also provides strictly headless primitives, and the package ships no CSS.
 - `@anvia/cli` can copy editable shadcn/Tailwind components into the application.
 
 ## Server route
@@ -107,7 +107,7 @@ pnpm dlx @anvia/cli add chat
 Or compose headless primitives directly:
 
 ```tsx
-import { ChatProvider, ComposerPrimitive, MessagePrimitive, ThreadPrimitive } from '@anvia/react-ui'
+import { ChatProvider, ComposerPrimitive, MessagePrimitive, ThreadPrimitive } from '@anvia/react'
 
 export function ChatView({ chat }) {
   return (
@@ -135,7 +135,7 @@ export function ChatView({ chat }) {
 
 There is no package stylesheet and no `data-anvia-*` styling contract. Use application classes,
 `asChild`, ARIA, `data-state`, and `data-role`. CLI output belongs to the application and can be
-edited freely; `@anvia/react-ui` remains the behavior and accessibility foundation.
+edited freely; the `@anvia/react` primitives remain the behavior and accessibility foundation.
 
 ## Interactions and resumability
 
@@ -182,7 +182,7 @@ returns the chat plus the durable run identity, status, and controls (`steer`, `
 - Server: https://docs.anvia.dev/packages/server/
 - Durable execution: https://docs.anvia.dev/sdk/advanced/durable-execution
 - React controllers: https://docs.anvia.dev/packages/react/
-- React UI: https://docs.anvia.dev/packages/react-ui/
+- React primitives: https://docs.anvia.dev/packages/react/capabilities
 - CLI: https://docs.anvia.dev/packages/cli/
 - Secure streaming example: https://docs.anvia.dev/examples/applications/streaming-react-chat
 - Resumable streams: https://docs.anvia.dev/sdk/streaming/resumable-streams

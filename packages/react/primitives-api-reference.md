@@ -1,7 +1,9 @@
-# `@anvia/react-ui` API reference
+# Primitives API reference
 
-The package exposes a convenience root, component-family subpaths, and a shared context entry point.
-It exports no CSS. No public export is currently annotated as deprecated or experimental.
+Primitives ship from the same package as the hooks: a convenience root, component-family subpaths,
+and a shared context entry point. They export no CSS. No public export is currently annotated as
+deprecated or experimental. The hooks and controllers are documented in the
+[hook API reference](/packages/react/api-reference).
 
 ## Root entry point
 
@@ -11,7 +13,7 @@ import {
   ComposerPrimitive,
   MessagePrimitive,
   ThreadPrimitive,
-} from '@anvia/react-ui'
+} from '@anvia/react'
 ```
 
 The root exports the principal components, providers, hooks, and shared types. The sandbox viewers are the exception: `SandboxTerminal` and `SandboxDesktop` are available only from their own subpaths, so applications that never render a viewer do not need xterm or noVNC.
@@ -72,13 +74,16 @@ function useCompletionContext<Metadata extends ClientMetadata, Data extends Clie
 type ContextMeterProps = Omit<PrimitiveProps<'div'>, 'children'> & {
   usage?: ContextUsage
   display?: 'remaining' | 'used'
-  children?: ReactNode | ((usage: ContextUsage) => ReactNode)
+  breakdown?: ContextBreakdown
+  children?: ReactNode | ((usage: ContextUsage, breakdown?: ContextBreakdown) => ReactNode)
 }
 
 const ContextMeterPrimitive: ForwardRefExoticComponent<ContextMeterProps>
 ```
 
-Renders completion context usage. A render-function child receives the resolved `ContextUsage`; otherwise the component displays the selected percentage.
+Renders completion context usage. A render-function child receives the resolved `ContextUsage` and, when
+the controller reported one, the scaled `ContextBreakdown`; otherwise the component displays the selected
+percentage.
 
 ### Root export catalog
 
@@ -97,7 +102,7 @@ Renders completion context usage. A render-function child receives the resolved 
 | ComposerPrimitive types | `ComposerAttachmentInput`, `ComposerAttachmentsUpdate`, `ComposerEntitiesUpdate`, `ComposerEntity`, `ComposerEntityData`, `ComposerInputEntity`, `ComposerMessageMetadata`, `ComposerQuote`, `ComposerTriggerDefinition`, `ComposerTriggerItem`, `ComposerTriggerItems`, `ComposerTriggerItemsArgs`, `ComposerTriggerState`, `ComposerTriggerStateUpdate` |
 | Primitive types | `PrimitiveProps`, `PrimitiveRef` |
 
-## `@anvia/react-ui/chat`
+## `@anvia/react/chat`
 
 ```ts
 import {
@@ -107,7 +112,7 @@ import {
   useChatContext,
   useComposer,
   useThread,
-} from '@anvia/react-ui/chat'
+} from '@anvia/react/chat'
 ```
 
 ### `ComposerPrimitive`
@@ -177,7 +182,7 @@ renderEntity?: (entity: ComposerInputEntity) => ReactNode
 
 `ComposerInputEntity` carries `id`, `triggerId`, `trigger`, `label`, `text`, and optional `data`; `range` is omitted because it is meaningful only in the saved message. `renderEntity` changes how the token displays inside the editor, for example an avatar or display name from `entity.data`. It does not change the saved input text or submitted entities. Return `null` or `undefined` to fall back to `entity.text`.
 
-Keep the function a pure function of `entity`: a token re-renders only when its Tiptap node changes, not when state captured by the function's closure changes. `ComposerPrimitive.TextareaInput` does not accept `renderEntity`. `ComposerInputEntity` is exported from both `@anvia/react-ui/chat` and the root entry point.
+Keep the function a pure function of `entity`: a token re-renders only when its Tiptap node changes, not when state captured by the function's closure changes. `ComposerPrimitive.TextareaInput` does not accept `renderEntity`. `ComposerInputEntity` is exported from both `@anvia/react/chat` and the root entry point.
 
 ### `ThreadPrimitive`
 
@@ -187,7 +192,7 @@ Keep the function a pure function of `entity`: a token re-renders only when its 
 
 The chat subpath also exports `ChatController`, `ChatProviderProps`, `ComposerAttachmentInput`, `ComposerAttachmentsUpdate`, `ComposerContextValue`, `ComposerEntitiesUpdate`, `ComposerEntity`, `ComposerEntityData`, `ComposerInputEntity`, `ComposerMessageMetadata`, `ComposerQuote`, `ComposerTriggerDefinition`, `ComposerTriggerItem`, `ComposerTriggerItems`, `ComposerTriggerItemsArgs`, `ComposerTriggerState`, `ComposerTriggerStateUpdate`, and `ThreadContextValue`.
 
-## `@anvia/react-ui/completion`
+## `@anvia/react/completion`
 
 ```ts
 import {
@@ -195,17 +200,17 @@ import {
   CompletionProvider,
   useCompletionContext,
   useCompletionInput,
-} from '@anvia/react-ui/completion'
+} from '@anvia/react/completion'
 ```
 
 `CompletionPrimitive` exposes `Root`, `Output`, `Form`, `Input`, `Submit`, and `Stop`. `Root` and `Form` establish the local completion-input context; `Output` reads the controller's completion; `Submit` and `Stop` delegate to the controller.
 
 This entry point also exports `CompletionController`, `CompletionInputContextValue`, and `CompletionProviderProps`.
 
-## `@anvia/react-ui/message`
+## `@anvia/react/message`
 
 ```ts
-import { MessagePrimitive, useMessage, useMessagePart } from '@anvia/react-ui/message'
+import { MessagePrimitive, useMessage, useMessagePart } from '@anvia/react/message'
 ```
 
 `MessagePrimitive` is the largest compound component:
@@ -224,7 +229,7 @@ import { MessagePrimitive, useMessage, useMessagePart } from '@anvia/react-ui/me
 
 Public types are `MessageContextValue`, `MessagePartContextValue`, `MessageAttachmentPart`, `MessageEntityProps`, `MessagePartsFilter`, `MessageStreamOptions`, `MessageToolPart`, and `MessageToolRenderWhen`. The entry point also exports `useChatContext` because message actions can regenerate the active response.
 
-## `@anvia/react-ui/human-input`
+## `@anvia/react/human-input`
 
 ```ts
 import {
@@ -233,7 +238,7 @@ import {
   useHumanInput,
   useQuestion,
   useQuestionPrompt,
-} from '@anvia/react-ui/human-input'
+} from '@anvia/react/human-input'
 ```
 
 `HumanInputPrimitive` exposes:
@@ -244,29 +249,29 @@ import {
 
 Collection parts establish the item contexts read by the corresponding hooks. This entry point also exports `ApprovalContextValue`, `QuestionContextValue`, and `QuestionPromptContextValue`.
 
-## `@anvia/react-ui/attachment`
+## `@anvia/react/attachment`
 
 ```ts
-import { AttachmentPrimitive, useAttachment } from '@anvia/react-ui/attachment'
+import { AttachmentPrimitive, useAttachment } from '@anvia/react/attachment'
 ```
 
 `AttachmentPrimitive` exposes `Root`, `Name`, `Preview`, and `Remove`. `useAttachment(): AttachmentContextValue` reads the attachment and optional remove action for the current item.
 
-## `@anvia/react-ui/image`
+## `@anvia/react/image`
 
 ```ts
-import { ImagePrimitive, useImage } from '@anvia/react-ui/image'
+import { ImagePrimitive, useImage } from '@anvia/react/image'
 ```
 
 `ImagePrimitive` exposes `Root`, `Preview`, `Name`, `Actions`, `Copy`, `Download`, `ZoomTrigger`, and `ZoomOverlay`. `useImage(): ImageContextValue` reads the current image state. `ZoomOverlay` accepts an optional `container: Element | DocumentFragment` for its portal target.
 
-## `@anvia/react-ui/selection-toolbar`
+## `@anvia/react/selection-toolbar`
 
 ```ts
 import {
   SelectionToolbarPrimitive,
   useSelectionToolbar,
-} from '@anvia/react-ui/selection-toolbar'
+} from '@anvia/react/selection-toolbar'
 ```
 
 `SelectionToolbarPrimitive` exposes `Root`, `Quote`, and `Copy`.
@@ -283,14 +288,14 @@ function useSelectionToolbar(): SelectionToolbarContextValue
 
 The context reports the current selection and toolbar actions.
 
-## `@anvia/react-ui/thread-list`
+## `@anvia/react/thread-list`
 
 ```ts
 import {
   ThreadListPrimitive,
   ThreadListItemPrimitive,
   ThreadListProvider,
-} from '@anvia/react-ui/thread-list'
+} from '@anvia/react/thread-list'
 ```
 
 `ThreadListPrimitive` exposes `Root`, `New`, `Items`, and `Empty`. `ThreadListItemPrimitive` exposes `Root`, `Trigger`, `Title`, `Archive`, `Unarchive`, and `Delete`.
@@ -320,7 +325,7 @@ type ThreadListController = {
 
 `ThreadListProvider` accepts `{ controller, children? }`. `useThreadList()` returns the controller; `useThreadListItem()` returns `{ thread, active }` inside `ThreadListPrimitive.Items`.
 
-## `@anvia/react-ui/graph-explorer`
+## `@anvia/react/graph-explorer`
 
 ```ts
 import {
@@ -330,7 +335,7 @@ import {
   graphExplorerNodeLabel,
   useGraphExplorerContext,
   useGraphExplorerNode,
-} from '@anvia/react-ui/graph-explorer'
+} from '@anvia/react/graph-explorer'
 ```
 
 These primitives compose the controller returned by `useGraphExplorer()` in `@anvia/react/graph-explorer`; they render no graph layout themselves.
@@ -353,10 +358,10 @@ These primitives compose the controller returned by `useGraphExplorer()` in `@an
 
 The entry point also exports the `GraphExplorerController`, `GraphExplorerExpandNodeOptions`, `GraphExplorerNodeContextValue`, `GraphExplorerProviderProps`, `GraphExplorerStatus`, and `GraphExplorerNodeRootProps` types.
 
-## `@anvia/react-ui/sandbox-terminal`
+## `@anvia/react/sandbox-terminal`
 
 ```ts
-import { SandboxTerminal } from '@anvia/react-ui/sandbox-terminal'
+import { SandboxTerminal } from '@anvia/react/sandbox-terminal'
 ```
 
 `SandboxTerminal` draws a remote sandbox session's terminal with xterm.js and speaks the terminal relay of `RemoteSandboxHub` (`hub.handleTerminalUpgrade`). It is not exported from the root entry point. xterm is loaded on demand, and `@xterm/xterm` (>=5.5.0) and `@xterm/addon-fit` (>=0.10.0) are optional peer dependencies, so an application that never renders a terminal never needs them.
@@ -424,10 +429,10 @@ The subpath also exports `terminalSubprotocol` (`"anvia.terminal.v1"`), `ticketS
 
 The component does not choose who may see a session and does not mint or validate tickets. The application's backend mints the ticket, and the hub calls the application's `authorizeTerminal` callback, which redeems it and returns the sandbox, `sessionName`, and optional `readOnly` grant. That server-side grant is authoritative: the relay drops input and resize messages from a read-only viewer. Setting `readOnly` on the component is a UI and client-side guard, not an access-control decision. See [terminal behavior and security](/sdk/advanced/sandbox/terminals).
 
-## `@anvia/react-ui/sandbox-desktop`
+## `@anvia/react/sandbox-desktop`
 
 ```ts
-import { SandboxDesktop } from '@anvia/react-ui/sandbox-desktop'
+import { SandboxDesktop } from '@anvia/react/sandbox-desktop'
 ```
 
 `SandboxDesktop` shows a remote sandbox's desktop with noVNC and lets a person take control from the agent. It speaks the desktop relay of `RemoteSandboxHub` (`hub.handleDesktopUpgrade`). It is not exported from the root entry point, and `@novnc/novnc` (>=1.5.0) is an optional peer dependency loaded on demand.
@@ -509,7 +514,7 @@ The component does not authorize desktop access or control. The application's ba
 
 The subpath also exports `desktopSubprotocol` (`"anvia.desktop.v1"`), `ticketSubprotocolPrefix` (`"anvia.ticket."`), and the `SandboxDesktopControl`, `SandboxDesktopControlsState`, `SandboxDesktopHandle`, `SandboxDesktopNotice`, `SandboxDesktopProps`, `SandboxDesktopReconnectOptions`, `SandboxDesktopState`, and `SandboxDesktopStatus` types.
 
-## `@anvia/react-ui/stream`
+## `@anvia/react/stream`
 
 ```ts
 type StreamMarkdownProps = Omit<PrimitiveProps<'div'>, 'children'> & {
@@ -529,7 +534,7 @@ An explicit `data-state` prop overrides the root attribute, which is `streaming`
 `idle` otherwise. Supplying `remarkPlugins` replaces the default GFM plugin list. The growing tail
 exposes `data-state="revealing"`; the owning application supplies any transition.
 
-## `@anvia/react-ui/shared`
+## `@anvia/react/shared`
 
 This entry point exposes shared providers, hooks, context types, and primitive types without importing compound component objects.
 
@@ -553,4 +558,5 @@ There are no CSS entry points. Primitives forward `className` and ordinary DOM p
 `asChild` where applicable, and expose a small semantic contract through ARIA, `data-state`, and
 `data-role`. Use [`@anvia/cli`](/packages/cli) for editable application components and reveal CSS.
 
-Return to the [`@anvia/react-ui` overview](/packages/react-ui).
+Return to the [`@anvia/react` overview](/packages/react) or the
+[hook API reference](/packages/react/api-reference).

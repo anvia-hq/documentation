@@ -11,8 +11,7 @@ All packages below are maintained in the Anvia monorepo. “First-party” descr
 | `@anvia/durable` | Experimental durable agent execution on SQLite, Postgres, Drizzle, or Prisma: checkpoints, restart recovery, shared workers, approvals, task graphs, and owned subagents | [Open](/packages/durable) |
 | `@anvia/mcp` | MCP SDK v2 clients, transports, discovery, result mapping, and connection ownership | [Open](/packages/mcp) |
 | `@anvia/server` | Server-side event stream and UI transport helpers | [Open](/packages/server) |
-| `@anvia/react` | React state hooks over `@anvia/client` transports | [Open](/packages/react) |
-| `@anvia/react-ui` | Strictly headless React chat and completion primitives | [Open](/packages/react-ui) |
+| `@anvia/react` | React state hooks and strictly headless chat and completion primitives over `@anvia/client` transports | [Open](/packages/react) |
 | `@anvia/cli` | Agent Skills for coding agents and editable shadcn/Tailwind application components | [Open](/packages/cli) |
 
 ## Model providers

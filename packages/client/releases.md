@@ -1,6 +1,6 @@
 # Releases
 
-The reviewed source release is `@anvia/client` **1.9.0**.
+The reviewed source release is `@anvia/client` **1.9.1**.
 
 ## Changes in 1.9.0
 
@@ -10,7 +10,7 @@ Reviewed `1.7.0` → `1.9.0` against SDK source on 2026-11-23. Adds durable run 
 
 Reviewed `1.2.0` → `1.7.0` against SDK source on 2026-11-04. Added durable discovery, queues, graphs, custom tasks, and operations support, followed by multimodal prompts and compatibility with compaction and goals. Queued steering is available through `DurableClient.steer()`; releases now accept Durable 0.8–0.13 for goal controls, continuing rounds, tracing, and the payload/agent-compatibility changes. HTTP submission types exclude server-owned trace context. Stream readers hardened malformed-frame handling and SSE parsing, the protocol gained `message_reset`, and `@anvia/client/durable-chat` added a `useChat` transport for durable runs. See [Durable HTTP](/packages/durable/http) and [Durable chat transport](/packages/client/durable-chat).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/client/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/2322fcd9b00e4cb82166c7aca319454ee97abe4e/packages/client/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
@@ -36,7 +36,7 @@ See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14c
 
 - Add `type: 'messages'` to initial chat requests.
 - Handle `type: 'interaction_response'` only on routes that own a secure continuation registry.
-- Upgrade `@anvia/core`, `@anvia/server`, `@anvia/react`, and `@anvia/react-ui` together.
+- Upgrade `@anvia/core`, `@anvia/server`, and `@anvia/react` together.
 - Clear or migrate persisted v2 chat state before enabling v3 automatic resume.
 - Update custom `memory_compaction` decoders for the required token-count fields.
 - Handle `message_reset` in custom reducers, or use `applyClientStreamEvent()`; old validators reject it.

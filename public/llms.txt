@@ -9,7 +9,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 ## Topic Guides
 
 - [Agents, tools, and MCP](https://docs.anvia.dev/llms-agents.txt): Models, agents, tools, MCP, skills, multi-agent coordination, pipelines, sandboxing, and streaming.
-- [Full-stack applications](https://docs.anvia.dev/llms-apps.txt): Hono routes, `@anvia/server` streaming, `@anvia/react` client state, `@anvia/react-ui` components, authentication, cancellation, and resumption.
+- [Full-stack applications](https://docs.anvia.dev/llms-apps.txt): Hono routes, `@anvia/server` streaming, `@anvia/react` client state and headless primitives, authentication, cancellation, and resumption.
 - [Evaluations and observability](https://docs.anvia.dev/llms-evals.txt): Tracing, Lens, runtime scoring, evaluation suites, datasets, release comparison, quality gates, alerts, cost, and testing.
 - [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt): Raw-text ingestion, embeddings, vector stores, portable Neo4j/Memgraph GraphRAG, metadata filters, dynamic context, permission-aware retrieval, and memory boundaries.
 
@@ -18,7 +18,7 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - Construct agents, pipelines, and extractors directly; builder-era APIs are migration context only.
 - Use `@anvia/mcp` for MCP SDK v2 clients and transports. Core retains lightweight registration contracts.
 - Use Client Protocol v3 across `@anvia/client`, `@anvia/server`, and `@anvia/react`.
-- Treat `@anvia/react-ui` as strictly headless. Use the CLI component guide (`anvia ui add chat`) for editable
+- Treat the `@anvia/react` primitives as strictly headless. Use the CLI component guide (`anvia ui add chat`) for editable
   application-owned UI. The CLI also installs coding-agent skills.
 - Parse files or run OCR in application code, then pass normalized text to Core document helpers.
   Provider adapters may separately support PDF attachments for model input.
@@ -116,10 +116,10 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [`@anvia/server`](https://docs.anvia.dev/packages/server/): Server transports and streaming integration.
 - [`@anvia/react`](https://docs.anvia.dev/packages/react/): React state and hooks for Anvia streams.
 - [`@anvia/mcp`](https://docs.anvia.dev/packages/mcp/): MCP SDK v2 clients, transports, discovery, and lifecycle ownership.
-- [`@anvia/react-ui`](https://docs.anvia.dev/packages/react-ui/): Strictly headless React interface primitives.
+- [React primitives](https://docs.anvia.dev/packages/react/capabilities): Strictly headless React interface primitives that ship with `@anvia/react`.
 - [`@anvia/cli`](https://docs.anvia.dev/packages/cli/): Coding-agent skills and editable shadcn/Tailwind application components.
 - [CLI Agent Skills](https://docs.anvia.dev/packages/cli/agent-skills): Ten bundled skills (including experimental anvia-durable), Claude Code, Cursor, AGENTS.md/Codex, custom directories, and target-specific updates.
-- [CLI editable components](https://docs.anvia.dev/packages/cli/components): Registry items, optional explicit React UI version pinning, controller wiring, and shared-file updates.
+- [CLI editable components](https://docs.anvia.dev/packages/cli/components): Registry items, optional explicit `@anvia/react` version pinning, controller wiring, and shared-file updates.
 - [CLI troubleshooting](https://docs.anvia.dev/packages/cli/troubleshooting): Pre-1.4.0 CLI limitations, aliases, and configuration.
 - [Model providers](https://docs.anvia.dev/sdk/providers): OpenAI, Anthropic, Gemini, Mistral, Grok, and compatible provider APIs.
 - [Memory adapters](https://docs.anvia.dev/sdk/memory/store-adapters): SQLite, PostgreSQL, Drizzle, and Prisma-backed memory.

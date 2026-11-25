@@ -1,6 +1,7 @@
 # Components and theming
 
-React UI is a headless behavior layer designed for composition rather than one fixed chat layout.
+The `@anvia/react` primitives are a headless behavior layer designed for composition rather than
+one fixed chat layout.
 
 ## Compound components
 

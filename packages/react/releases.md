@@ -1,6 +1,25 @@
 # Releases
 
-The reviewed source release is `@anvia/react` **1.2.0**. The entries below preserve notable v0 protocol milestones.
+The reviewed source release is `@anvia/react` **1.3.0**. The entries below preserve notable v0
+protocol milestones and the primitive history the package inherited when `@anvia/react-ui` was
+merged into it.
+
+## Changes in 1.3.0
+
+Reviewed `1.2.0` → `1.3.0` against SDK source on 2026-11-25. `@anvia/react-ui` was merged into
+`@anvia/react` and the separate package was removed:
+
+- Every headless primitive, provider, and subpath now ships from `@anvia/react`: `./attachment`,
+  `./chat`, `./completion`, `./graph-explorer`, `./human-input`, `./image`, `./message`,
+  `./sandbox-terminal`, `./sandbox-desktop`, `./selection-toolbar`, `./stream`, `./shared`, and
+  `./thread-list`.
+- The package declares `"sideEffects": false`, so hooks-only imports tree-shake the UI
+  dependencies.
+- `@anvia/cli` registry templates and the installer target `@anvia/react`, and `@anvia/studio`
+  imports the graph explorer and stream Markdown primitives from the same package.
+
+Migration is a rename: `@anvia/react-ui/chat` becomes `@anvia/react/chat`, `@anvia/react-ui` becomes
+`@anvia/react`, and no component API changed. Remove `@anvia/react-ui` from `package.json`.
 
 ## Changes in 1.2.0
 
@@ -12,48 +31,50 @@ Reviewed `1.1.4` → `1.1.5` against SDK source on 2026-11-04. Preserved detaile
 
 Reviewed `1.1.3` → `1.1.4` against SDK source on 2026-10-15. Refreshed package READMEs with current overviews, quickstarts, and links to the detailed guides. Review the source changelog for any dependency changes included in your upgrade.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/react/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/2322fcd9b00e4cb82166c7aca319454ee97abe4e/packages/react/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.3.0` | Merged the headless primitives from `@anvia/react-ui` into this package with no API change, marked the package side-effect free, and moved the CLI registry and Studio onto `@anvia/react`. |
+| `1.2.0` | Added `useDurableChat()` and bounded `maxRetainedEvents` for `useChat()` and `useCompletion()`. |
 | `1.1.5` | Preserved detailed chat stream errors and reported them once when the stream ended with an error status. |
 | `1.0.0` | Adopted client protocol v3, persisted interaction-aware resume state, added `waiting` status, and replaced separate approval/question methods with `interactions` plus `respondToInteraction()`. |
-| `1.1.3` | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |
-| `1.1.2` | Updated the Core, Graph, and Client dependencies. |
-| `1.1.1` | Updated the Core, Graph, and Client dependencies to `1.1.1`. |
-| `1.0.12` | Updated the Core, Client, and Graph dependencies. |
 | `1.0.11` | Added renderer-agnostic graph explorer state and headless primitives for loading, expanding, searching, selecting, refreshing, and rendering bounded `@anvia/graph` exploration results, keeping asynchronous controller ownership in React. |
 | `1.0.10` | Hydrated persisted assistant usage, context usage, and sources into replayed UI messages; exposed aggregate run usage as `useChat().runUsage` and completion usage as `useCompletion().usage`. |
-| `1.0.9` | Updated the Core and Client dependencies to `1.0.9`. |
-| `1.0.8` | Updated the Core and Client dependencies to `1.0.8`. |
-| `1.0.7` | Updated the Core and Client dependencies to `1.0.7`. |
-| `1.0.6` | Updated the Core and Client dependencies to `1.0.6`. |
-| `1.0.5` | Updated the Core and Client dependencies to `1.0.5`. |
-| `1.0.4` | Updated the Core and Client dependencies to `1.0.4`. |
-| `1.0.3` | Updated the Core and Client dependencies to `1.0.3`. |
-| `1.0.2` | Updated the Core and Client dependencies to `1.0.2`. |
-| `1.0.1` | Updated the Core and Client dependencies to `1.0.1`. |
-| `1.0.0-rc.9` | Synchronized React with the Anvia 1.0 release-candidate train. |
-| `0.11.5` | Updated the Core dependency to `0.26.0`. |
-| `0.11.4` | Updated the Core dependency to `0.25.1`. |
 | `0.11.0` | Added model-aware context limits and active context usage to hook results. |
-| `0.10.3` | Added first-class resume cursor support for shared request/response APIs. |
-| `0.10.0` | Added memory-compaction-aware hydration that hides synthetic summaries by default. |
-| `0.9.2` | Added public tool-call deltas by default and consistent append/replace argument handling. |
-| `0.9.0` | Replaced stream animation presets with lifecycle-driven text and mixed-item smoothing. |
-| `0.8.12` | Added cancellation behavior used by Studio streams, including partial transcript and human-input terminal state handling. |
 | `0.8.0` | Added resumable chat state and transport envelopes. |
-| `0.7.11` | Added `initialMessagesFromMemory`. |
-| `0.7.9` | Expanded UI attachment, suggestion, tool-part, and human-input event handling for React UI. |
-| `0.7.6` | Hardened overlapping sends and prevented implicit request bodies for GET/HEAD transports. |
+| `0.7.9` | Expanded UI attachment, suggestion, tool-part, and human-input event handling for the merged primitives. |
+
+## Merged primitives history
+
+These releases shipped from `@anvia/react-ui`, whose final published version was `1.3.3`. They are
+listed because the components and the CLI registry still build on them.
+
+| Version | Summary |
+| --- | --- |
+| `1.3.3` | Rejected active URL schemes in attachment links and image sources, and refreshed dependencies. |
+| `1.3.0` | Added `renderEntity` to `ComposerPrimitive.Input` to customize how a mention token displays in the editor without changing the saved text or entities. |
+| `1.2.0` | Added `SandboxTerminal` and `SandboxDesktop` on their own subpaths, with optional xterm.js and noVNC peers kept off the root export. Both viewers share relay reconnection with backoff and a fresh single-use ticket per attempt; the desktop adds scaling, quality controls, and agent/viewer control handoff. |
+| `1.1.5` | Showed response actions and metrics only on the final assistant response of a completed exchange, including the shared `Message.Actions` group, and aligned fallback metrics with user exchanges. |
+| `1.0.0` | Renamed compound exports to explicit `*Primitive` namespaces, removed package CSS and `data-anvia-*`, standardized the semantic DOM contract on ARIA, `data-state`, and `data-role`, and aligned human-input actions with the unified pending-interaction controller. |
+| `0.7.0` | Added the `ContextMeter` and model-aware active context usage display. |
+| `0.6.0` | Added stable-block live Markdown rendering with lifecycle-driven text and mixed-item smoothing. |
+| `0.4.0` | Replaced the default native composer input with a Tiptap rich editor and added trigger/entity metadata; `ComposerPrimitive.TextareaInput` preserves the native option. |
+| `0.3.0` | Added image, selection-toolbar, and thread-list namespaces plus controlled quote state. |
+| `0.1.0` | Introduced the composable primitive package. |
+
+The last React UI changelog is available in the
+[source archive](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/react-ui/CHANGELOG.md).
 
 ## Upgrade checks
 
-- Align `@anvia/core`, `@anvia/server`, and `@anvia/react-ui` when adopting protocol changes.
+- Remove `@anvia/react-ui` and rename its imports to `@anvia/react` and its subpaths, then delete the duplicate dependency.
+- Align `@anvia/core`, `@anvia/server`, and `@anvia/react` when adopting protocol changes.
 - Replace `approveTool()`, `rejectTool()`, and `answerToolQuestion()` calls with `respondToInteraction({ interactionId, response })`.
 - Re-test custom event mappers whenever Core adds a stream event type.
 - Verify stop behavior for custom transports; they must honor `AbortSignal`.
 - When enabling resume, test reload, reconnect, terminal cleanup, and expired/missing server state.
 - Keep smoothing lifecycle mounted long enough to drain when upgrading from preset-era versions.
+- Snapshot or interaction-test design-system components used with `asChild`; forwarded refs and disabled state remain required.
 
 Read the complete [React changelog](https://github.com/anvia-hq/anvia/blob/main/packages/react/CHANGELOG.md).
