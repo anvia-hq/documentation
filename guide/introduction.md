@@ -35,7 +35,7 @@ Packages release independently; install versions whose declared dependency range
 | Model providers | `@anvia/openai`, `@anvia/azure`, `@anvia/anthropic`, `@anvia/gemini`, `@anvia/mistral`, `@anvia/grok`, and `@anvia/jev` for typed decisions. |
 | Memory | `@anvia/memory-sqlite`, `@anvia/memory-postgres`, `@anvia/memory-drizzle`, and `@anvia/memory-prisma`. |
 | Knowledge | Vector stores such as `@anvia/pgvector`, `@anvia/qdrant`, and `@anvia/pinecone`; `@anvia/graph` with `@anvia/neo4j` or `@anvia/memgraph` for GraphRAG; `@anvia/transformers` for local embeddings. |
-| Application surfaces | `@anvia/client` for the stream protocol, `@anvia/server` for HTTP responses, `@anvia/react` for client state, and `@anvia/react-ui` for headless chat primitives. |
+| Application surfaces | `@anvia/client` for the stream protocol, `@anvia/server` for HTTP responses, and `@anvia/react` for client state plus headless chat primitives. |
 | Observability | `@anvia/logger`, `@anvia/otel`, `@anvia/lens`, and `@anvia/langfuse`. |
 | Development tools | `@anvia/studio` for local inspection, `@anvia/sandbox` for isolated command and file tools, and `@anvia/cli` for coding-agent skills and components. |
 

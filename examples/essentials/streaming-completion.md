@@ -13,21 +13,22 @@ import { OpenAIClient } from '@anvia/openai'
 const apiKey = process.env.OPENAI_API_KEY
 if (!apiKey) throw new Error('Set OPENAI_API_KEY.')
 
-const model = new OpenAIClient({ apiKey })
-    .completionModel({
-    modelId: 'gpt-5.6-luna',
-    api: "responses"
-})
+const model = new OpenAIClient({ apiKey }).completionModel({ modelId: 'gpt-5.6-sol', api: 'responses' })
 
 const stream = streamCompletion({
-    prompt: 'Explain event streams in one concise paragraph.',
-    model,
-    instructions: 'Write for a TypeScript developer.'
+  model,
+  prompt: 'Explain event streams in one concise paragraph.',
+  instructions: 'Write for a TypeScript developer.',
 })
 
 for await (const event of stream) {
   if (event.type === 'text_delta') {
     process.stdout.write(event.delta)
+  }
+
+  if (event.type === 'error') {
+    process.stdout.write('\n')
+    throw event.error
   }
 
   if (event.type === 'final') {
@@ -43,7 +44,7 @@ for await (const event of stream) {
 pnpm tsx stream-text.ts
 ```
 
-Visible text arrives through `text_delta`. The final event contains the normalized completion response and usage. Other event types can represent reasoning, tool-call deltas, sources, or errors, so do not assume every event contains text.
+Visible text arrives through `text_delta`. The terminal event is either `final`, whose `result` has the same shape as a `generateCompletion(...)` result, or `error`, which carries the failure and the usage accumulated before it. Provider and stream failures end the iteration with that `error` event instead of rejecting the loop, so handle it explicitly; only setup errors, such as a model without streaming support, throw from `streamCompletion(...)` itself. Other event types can represent reasoning, tool-call deltas, or sources, so do not assume every event contains text.
 
 ## Streaming boundary
 

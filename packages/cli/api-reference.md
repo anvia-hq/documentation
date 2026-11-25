@@ -23,7 +23,7 @@ anvia skills list
 | Command | Behavior |
 | --- | --- |
 | `ui init` | Configure shadcn in an existing app. Optional template is `next` or `vite`; omitting it leaves detection to shadcn. Uses the Radix base and `--no-monorepo`. |
-| `ui add` | Install one registry item through shadcn, using the React UI version recorded with its bundled registry. Temporary registry JSON is removed afterward. |
+| `ui add` | Install one registry item through shadcn, using the `@anvia/react` version recorded with its bundled registry. Temporary registry JSON is removed afterward. |
 | `ui update` | Preview zero or more named items; no names means all registry items. Apply differing and missing files in items that count as installed with `--apply`. |
 | `skills init` | Install all bundled skills in the canonical directory and add selected integrations. |
 | `skills update` | Preview installed skill trees and selected integrations, including AGENTS.md. Apply changes with `--apply`. |
@@ -93,16 +93,16 @@ import {
 ### `createRegistryItem(name, options?)`
 
 Returns `AnviaRegistryItem` for a `RegistryItemName`. Options are `packageVersion?: string` and
-`registryDirectory?: string`; defaults are the React UI version stored in the registry metadata and bundled registry directory.
+`registryDirectory?: string`; defaults are the `@anvia/react` version stored in the registry metadata and bundled registry directory.
 Changing `registryDirectory` selects different source files; use `packageVersion` to override the
-React UI dependency version independently.
-`packageVersion` sets the exact React UI dependency string, rather than selecting component source
+`@anvia/react` dependency version independently.
+`packageVersion` sets the exact `@anvia/react` dependency string, rather than selecting component source
 from another CLI release.
 
 ```ts anvia-check
 import { createRegistryItem } from '@anvia/cli'
 
-const item = createRegistryItem('chat', { packageVersion: '1.1.6' })
+const item = createRegistryItem('chat', { packageVersion: '1.3.0' })
 console.log(item.dependencies, item.files.map((file) => file.target))
 ```
 

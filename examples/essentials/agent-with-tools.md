@@ -5,6 +5,8 @@ This recipe creates an order-status agent that calls typed application code and 
 ## 1. Install the dependencies
 
 ```sh
+pnpm init
+pnpm pkg set type=module
 pnpm add @anvia/core @anvia/openai zod
 pnpm add --save-dev tsx typescript @types/node
 ```
@@ -51,11 +53,11 @@ export const lookupOrder = createTool({
     orderId: z.string().min(1),
   }),
   outputSchema: orderStatusSchema,
-  execute: ({ orderId }) => findOrder(orderId),
+  handler: ({ orderId }) => findOrder(orderId),
 })
 ```
 
-`inputSchema` validates model-supplied arguments before `execute` runs. `outputSchema` validates application data before it returns to the model.
+`inputSchema` validates model-supplied arguments before `handler` runs. `outputSchema` validates application data before it returns to the model.
 
 ## 4. Run the agent
 
@@ -70,17 +72,14 @@ if (!apiKey) throw new Error('Set OPENAI_API_KEY.')
 
 const agent = new Agent({
   id: 'order-status',
-  model: new OpenAIClient({ apiKey }).completionModel({
-      modelId: 'gpt-5.6-sol',
-      api: "responses"
-  }),
+  model: new OpenAIClient({ apiKey }).completionModel({ modelId: 'gpt-5.6-sol', api: 'responses' }),
   instructions: 'Use lookup_order before answering. Never invent order data.',
   maxTurns: 3,
   tools: [lookupOrder],
 })
 
 const result = await agent.generate({
-    prompt: 'Look up order ord_123 and tell me its status and ship date.'
+  prompt: 'Look up order ord_123 and tell me its status and ship date.',
 })
 
 if (result.type === 'interaction') {
@@ -95,6 +94,6 @@ Run it with `pnpm tsx agent.ts`. The console first shows the service lookup, the
 
 ## Secure the real boundary
 
-A valid `orderId` does not authorize access. Capture authenticated scope when constructing the tool and enforce it inside `execute` before reading data. Return only fields the caller may see.
+A valid `orderId` does not authorize access. Capture authenticated scope when constructing the tool and enforce it inside `handler` before reading data. Return only fields the caller may see.
 
 Keep side-effecting tools narrow, authorized, audited, and idempotent where practical. Add [tool approval](../agents-and-tools/tool-approval) for sensitive actions.

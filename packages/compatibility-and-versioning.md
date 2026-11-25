@@ -17,21 +17,22 @@ Package pages summarize these boundaries, while the package manifest remains the
 ## Stable versions
 
 Each package publishes stable releases through its own npm `latest` tag. As of the current
-documentation baseline, Core is `1.22.0`, Studio is `1.5.1`, and the graph packages are `1.2.0`;
-other packages can have different versions. Check the package's release page or npm metadata rather
-than assuming one repository-wide version.
+documentation baseline, Core is `1.23.0`, Studio is `1.5.2`, and the graph packages are `1.3.0`
+(`@anvia/neo4j` and `@anvia/memgraph` are `1.2.0`); other packages can have different versions.
+Check the package's release page or npm metadata rather than assuming one repository-wide version.
 
-These are versions in the reviewed SDK source (`7aa42c0a`, 2026-11-23), not a live npm-tag query.
-Durable is `0.18.0`; Client `1.9.0` and Server `1.5.0` support its current protocol. Sandbox is
-`1.3.5`, React is `1.2.0`, and React UI is `1.3.3`. Pin exact versions in production environments when upgrades
-require deliberate review.
+These are versions in the reviewed SDK source (`2322fcd9`, 2026-11-25), not a live npm-tag query.
+Durable is `1.0.1`, Azure and Jev are `1.0.0`, Client is `1.9.1`, and Server is `1.5.1`. Sandbox is
+`1.3.5`, React is `1.3.0`, and the headless primitives now ship inside `@anvia/react`; the separate
+React UI package was removed. Pin exact versions in production environments when upgrades require
+deliberate review.
 
 ```json
 {
   "dependencies": {
-    "@anvia/core": "1.22.0",
+    "@anvia/core": "1.23.0",
     "@anvia/openai": "1.4.1",
-    "@anvia/studio": "1.5.1"
+    "@anvia/studio": "1.5.2"
   }
 }
 ```
@@ -60,7 +61,7 @@ Some adapters require a specific Node.js version, browser runtime, native depend
 - `@anvia/mcp` requires Node.js 20 or newer and pins MCP protocol `2026-07-28` by default;
 - `@anvia/cli` requires Node.js 20.18.1 or newer; its UI setup targets existing Next.js or Vite
   applications, while skills installation works in any project. CLI `1.3.0` and earlier have a
-  [React UI version-selection limitation](/packages/cli/troubleshooting#react-ui-version-cannot-be-found)
+  [React version-selection limitation](/packages/cli/troubleshooting#react-version-cannot-be-found)
   fixed in `1.4.0`;
 - Core document helpers operate on application-normalized text and do not require a file-parser peer;
 - applications must use Zod 4: `@anvia/core` declares `zod ^4.6.7` as a peer, as do Durable, `@anvia/graph`, and `@anvia/neo4j`, and schema conversion uses Zod 4 APIs such as `z.toJSONSchema`;
@@ -89,7 +90,9 @@ Anvia `1.0.0` established the final v1 migration boundary. For a current v1 targ
 - verify MCP servers support protocol `2026-07-28`, or configure `versionNegotiation` on `McpClient` for 2025-era servers;
 - move PDF parsing or OCR into application code and pass normalized text into Core document helpers;
 - rename React UI compound namespaces to `*Primitive`, remove package CSS imports, and move styling
-  into application code or generated `@anvia/cli` components.
+  into application code or generated `@anvia/cli` components;
+- replace `@anvia/react-ui` imports with `@anvia/react` and its subpaths, since the separate package
+  was removed in `@anvia/react` `1.3.0`.
 
 When moving from v0 to v1, select mutually compatible Core and adapter versions, then follow the
 [v1 Core API reference](/packages/core/api-reference) and provider-specific configuration pages.

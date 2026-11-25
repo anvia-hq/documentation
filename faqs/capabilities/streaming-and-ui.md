@@ -8,8 +8,8 @@ You need a server-side model or agent stream, an HTTP transport when the client 
 | Full agent run, including tools and runtime events | [Agent stream](/sdk/streaming/agent-streams) |
 | Browser-safe protocol, event mapping, and HTTP transport | [`@anvia/client`](/packages/client) |
 | JSONL or SSE HTTP response | [`@anvia/server`](/packages/server) |
-| Headless React state hooks | [`@anvia/react`](/packages/react) |
-| Composable chat components | [`@anvia/react-ui`](/packages/react-ui) |
+| Headless React state and transport | [`@anvia/react`](/packages/react) |
+| Composable chat components | [`@anvia/react` primitives](/packages/react/capabilities) |
 
 ## Which HTTP format should I use?
 

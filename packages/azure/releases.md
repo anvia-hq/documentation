@@ -1,6 +1,7 @@
 # Releases
 
-Reviewed source release: `0.1.12`. `@anvia/azure` is a new package, so its release history starts here.
+Reviewed source release: `1.0.0`. `@anvia/azure` graduated to v1 alongside the runtime packages; its release
+history starts at `0.1.x`.
 
 ## Changes in 0.1.12
 
@@ -18,13 +19,13 @@ Reviewed `0.1.4` → `0.1.9` against SDK source on 2026-11-04. These releases tr
 
 Reviewed `0.1.3` against SDK source on 2026-10-16. Both `endpoint` and `baseUrl` now require HTTPS for non-loopback hosts. Plain `http://` is allowed only for loopback development hosts (`localhost`, `127.0.0.1`, or `[::1]`). Other HTTP URLs throw a `TypeError` during construction, preventing credentials from being sent over cleartext to remote hosts. Existing HTTPS configurations and local emulator URLs such as `http://127.0.0.1:10000` keep working.
 
-See the [0.1.3 source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/provider-azure/CHANGELOG.md#013) and [upgrade guidance](/packages/azure/migration#upgrade-to-0-1-3).
+See the [0.1.3 source changelog](https://github.com/anvia-hq/anvia/blob/2322fcd9b00e4cb82166c7aca319454ee97abe4e/packages/provider-azure/CHANGELOG.md#013) and [upgrade guidance](/packages/azure/migration#upgrade-to-0-1-3).
 
 ## Changes through 0.1.1
 
 Reviewed `0.1.0` → `0.1.1` against SDK source on 2026-10-15. Aligned the OpenAI dependency with the Decisions-capable release. Azure continues to expose its documented Responses completion adapter; this dependency update does not add an Azure decision factory.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488/packages/provider-azure/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/2322fcd9b00e4cb82166c7aca319454ee97abe4e/packages/provider-azure/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 

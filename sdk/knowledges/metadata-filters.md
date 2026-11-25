@@ -53,7 +53,32 @@ const results = await retrieveDocuments({
 })
 ```
 
-## 3. Operator semantics
+## 3. Use the shorthand form
+
+Anywhere a filter is accepted, a plain object is shorthand for the same predicates. A bare value
+means equality and a nested object lists field operators:
+
+```ts
+const results = await retrieveDocuments({
+  store,
+  model: embeddingModel,
+  query: 'invoice settings',
+  filter: {
+    tenantId: request.auth.tenantId,
+    status: { ne: 'archived' },
+    product: { in: ['billing', 'accounts'] },
+    revision: { gte: 3, lte: 8 },
+  },
+})
+```
+
+Every field must match. The supported operators are `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, and
+`in`; use `vectorFilter.and()` and `vectorFilter.or()` when a filter needs explicit grouping.
+`normalizeVectorFilter()` converts the shorthand into the canonical `VectorFilter`, and
+`isVectorFilter()` narrows an unknown value. `createVectorIndex()`, `retrieveDocuments()`,
+`VectorContext`, and vector search tools accept either form.
+
+## 4. Operator semantics
 
 The in-memory matcher defines the reference semantics. Persistent adapters translate the same
 predicates to their backend and may apply provider-specific type rules.
@@ -137,7 +162,7 @@ const results = await store.search({ vector: [1, 0], topK: 5, filter })
 console.log(results.map(({ id }) => id))
 ```
 
-## 4. Adapter translation
+## 5. Adapter translation
 
 Chroma, Milvus, PgVector, Pinecone, Qdrant, Redis, and Weaviate translate filters natively. LanceDB
 has no server-side filter translator: it runs the vector query and then evaluates the same core
@@ -159,7 +184,7 @@ support beyond these rules follows the provider: for example, PgVector range fil
 filter values and Qdrant `in` filters accept only a uniform list of strings or integers. Test the
 exact operators and value types your application uses against its adapter.
 
-## 5. Treat filters as authorization boundaries
+## 6. Treat filters as authorization boundaries
 
 Build tenant and visibility filters from authenticated application state. Never let the model choose its tenant ID, workspace, role, or visibility scope.
 
@@ -171,7 +196,7 @@ Apply the same trusted filter wherever the index is exposed:
 
 Prompt instructions can tell a model how to use retrieved facts, but they cannot prevent an unauthorized document from entering its context. Filters narrow retrieval; they do not replace application authorization, row-level security, or namespace isolation.
 
-## 6. Verify adapter behavior
+## 7. Verify adapter behavior
 
 Test the operators and value types used by your application against the chosen adapter.
 

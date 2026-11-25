@@ -7,19 +7,20 @@ You are running a CLI release older than `1.4.0`, which introduced the grouped U
 development dependency. On an older release, use the
 [root commands](/packages/cli/releases#upgrading-from-cli-1-3-0-or-earlier).
 
-## React UI version cannot be found
+## React version cannot be found
 
-CLI `1.3.0` and earlier request the React UI version equal to the CLI's own version, for example
-`@anvia/react-ui@1.3.0`. CLI `1.4.0` and later record the React UI version with the registry
-instead. Anvia packages release independently.
+CLI `1.3.0` and earlier request a React UI package version equal to the CLI's own version, for
+example `@anvia/react-ui@1.3.0`, which may not be published. That package was merged into
+`@anvia/react`; CLI `1.4.0` and later record the `@anvia/react` version with the registry instead.
+Anvia packages release independently.
 
 Upgrade the CLI, or, if you must stay on an older release, follow the
-[explicit-version workaround](/packages/cli/components#install-the-registry-with-an-explicit-react-ui-version).
+[explicit-version workaround](/packages/cli/components#install-the-registry-with-an-explicit-react-version).
 Check the versions of the packages you intend to install:
 
 ```sh
 pnpm view @anvia/cli version
-pnpm view @anvia/react-ui version
+pnpm view @anvia/react version
 ```
 
 ## Missing or unreadable `components.json`

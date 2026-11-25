@@ -35,7 +35,7 @@ mkdir anvia-lens-smoke-test
 cd anvia-lens-smoke-test
 pnpm init
 pnpm pkg set type=module
-pnpm add @anvia/core @anvia/lens @anvia/openai
+pnpm add @anvia/core @anvia/lens @anvia/openai zod
 pnpm add --save-dev @types/node tsx typescript
 ```
 
@@ -98,7 +98,7 @@ export const tracing = lens.observer({ captureMode: "safe" });
 ```ts [src/agent.ts]
 import { Agent } from "@anvia/core/agent";
 import { OpenAIClient } from "@anvia/openai";
-import { lens } from "./observability.js";
+import { tracing } from "./observability.js";
 
 const apiKey = process.env.OPENAI_API_KEY?.trim();
 if (!apiKey) throw new Error("Missing OPENAI_API_KEY.");
@@ -120,7 +120,7 @@ export const supportAgent = new Agent({
 
 ```ts [src/smoke.ts]
 import { supportAgent } from "./agent.js";
-import { tracing } from "./observability.js";
+import { lens } from "./observability.js";
 
 try {
   const response = await supportAgent.generate({
@@ -199,43 +199,27 @@ process reaches `await lens.flush()` without an exporter timeout.
 
 ## How it works
 
-- `new LensClient()` validates the Lens configuration and lazily creates isolated trace and log
-  providers. It does not make a startup request to verify the URL or credentials; connectivity and
-  authentication errors surface when telemetry is exported or flushed. Unlike
-  `new LensClient({ optional: true })`, this production-oriented setup fails fast when Lens
-  configuration is absent or partial.
-- `observability: { observers: { tracing } }` registers the Lens observer when the agent is constructed, allowing it to record
-  the run, each generation, tool calls when present, usage, and failures.
-- The `trace` run option supplies searchable operational context for this request. The service,
-  environment, and release describe the process; the name, user, session, tags, version, and
-  metadata describe one run.
-- `captureMode: 'safe'` omits traced input and output bodies. It does not hide tags, metadata,
-  identifiers, exception messages, or any other values the application explicitly exports.
-- `lens.flush()` exports buffered data while leaving the observer usable. `lens.close()` performs final
-  delivery, releases its providers, and is idempotent; do not start new observed work afterward.
+- `new LensClient()` validates configuration but makes no startup request; connectivity and key
+  errors surface on export or `flush()`. Without `optional: true`, missing or partial configuration
+  fails fast.
+- The observer records the run, each generation, tool calls, usage, and failures. The `trace` run
+  option adds per-run context; service, environment, and release describe the process.
+- `captureMode: 'safe'` omits input and output bodies, not tags, metadata, identifiers, or
+  exception messages.
+- `lens.flush()` exports buffered data and keeps the client usable. `lens.close()` performs final
+  delivery, releases its providers, and is idempotent; start no observed work afterward.
 
-For a long-running server, create the observer once at application startup and do not flush after
-every request. During graceful termination, first stop accepting work and wait for active requests,
-then await `lens.close()` within the platform's termination grace period. Set `timeoutMs` so
-that exporter shutdown can finish inside that period, and integrate this cleanup with the server
-framework's existing signal handling rather than registering competing handlers in multiple
-modules.
+In a long-running server, create the client once, do not flush per request, and await
+`lens.close()` once during graceful termination. See
+[flush and shutdown](/lens/connect/anvia/flush-and-shutdown) for server, worker, and serverless
+lifecycles.
 
 ## Privacy and security
 
-- Keep `ANVIA_LENS_SECRET_KEY` and provider credentials server-only, scope Lens keys by project,
-  rotate them, and prevent them from appearing in logs, build output, screenshots, or client
-  bundles.
-- Use HTTPS between production workloads and Lens. Restrict project access, configure retention
-  and deletion, back up the self-hosted deployment, and include telemetry in incident-response
-  planning.
-- Prefer stable opaque user and session IDs. Lens telemetry is not authentication,
-  authorization, tenant isolation, conversation memory, or a business record.
-- Keep production on safe capture unless exporting prompts, responses, tool arguments, and tool
-  results has been explicitly approved. Full capture is an opt-in deployment decision.
-- If full capture is approved, enable `redactInputs` and `redactOutputs`, add application-specific
-  patterns, lower `captureMaxBytes` where appropriate, and test with synthetic data. Redaction and
-  truncation reduce exposure but do not guarantee that all sensitive data is removed.
+Keep `ANVIA_LENS_SECRET_KEY` and provider keys server-only, use opaque user and session IDs, and
+stay on safe capture until payload export is approved. Lens telemetry is not authentication,
+authorization, tenant isolation, conversation memory, or a business record. Redaction options and
+capture limits are covered in [capture and privacy](/lens/connect/anvia/capture-and-privacy).
 
 ## Production checklist
 
@@ -247,7 +231,7 @@ modules.
 - [ ] Keep safe capture enabled until access, redaction, retention, and deletion are approved.
 - [ ] Keep trace tags and metadata small, low-cardinality, and free of secrets or raw customer
   content.
-- [ ] Stop incoming work before awaiting `shutdown()` and fit `timeoutMs` inside the termination
+- [ ] Stop incoming work before awaiting `lens.close()` and fit `timeoutMs` inside the termination
   grace period.
 - [ ] Alert on exporter failures and test a controlled request plus `flush()` after network or key
   changes.
@@ -260,10 +244,6 @@ modules.
   option and environment variable.
 - Add safe [user and session trace context](/lens/connect/anvia/trace-context) to real request
   boundaries.
-- Read [capture and privacy](/lens/connect/anvia/capture-and-privacy) before considering payload
-  capture.
-- Adapt [flush and shutdown](/lens/connect/anvia/flush-and-shutdown) to your server, worker, or
-  serverless lifecycle.
 - Continue to [Lens evaluations](/lens/evaluations) when you want quality reporting and managed
   datasets in addition to live tracing.
 
@@ -271,7 +251,7 @@ modules.
 
 Use a fake completion model for deterministic observer lifecycle tests. Assert safe capture,
 run/generation correlation, error recording, `flush()` in a short-lived job, and one idempotent
-`shutdown()`. Keep the deployment smoke test synthetic and verify its trace ID in the expected Lens
+`close()`. Keep the deployment smoke test synthetic and verify its trace ID in the expected Lens
 project after key or network changes.
 
 - Cookbook source: [`10_integrations/08-lens-native.ts`](https://github.com/anvia-hq/anvia/blob/main/cookbook/10_integrations/08-lens-native.ts)

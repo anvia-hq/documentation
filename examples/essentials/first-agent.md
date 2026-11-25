@@ -4,7 +4,7 @@ An agent combines a completion model with stable identity and behavior. Use it w
 
 ## 1. Create the agent
 
-Save this as `first-agent.ts`:
+Use the setup from [Text completion](./basic-completion), then save this as `first-agent.ts`:
 
 ```ts
 import { Agent } from '@anvia/core'
@@ -13,11 +13,7 @@ import { OpenAIClient } from '@anvia/openai'
 const apiKey = process.env.OPENAI_API_KEY
 if (!apiKey) throw new Error('Set OPENAI_API_KEY.')
 
-const model = new OpenAIClient({ apiKey })
-    .completionModel({
-    modelId: 'gpt-5.6-sol',
-    api: "responses"
-})
+const model = new OpenAIClient({ apiKey }).completionModel({ modelId: 'gpt-5.6-sol', api: 'responses' })
 
 const reviewer = new Agent({
   id: 'release-reviewer',
@@ -31,9 +27,9 @@ const reviewer = new Agent({
   ].join('\n'),
 })
 
-const result = await reviewer.generate({
-    prompt: 'Added streaming support and changed the retry defaults.'
-})
+const releaseNotes = 'Added streaming support and changed the retry defaults.'
+
+const result = await reviewer.generate({ prompt: releaseNotes })
 
 if (result.type === 'interaction') {
   throw new Error(`Agent requested ${result.interaction.type}`)
@@ -49,19 +45,23 @@ console.log(result.output)
 pnpm tsx first-agent.ts
 ```
 
-`Agent` snapshots stable configuration. `generate(input, options?)` creates and runs a fresh execution. Its result is `completed`, `blocked` by a guardrail, or `suspended` with a JSON-safe approval or question interaction.
+`Agent` snapshots stable configuration. `generate(options)` takes one object with the input (`prompt` or `messages`) and optional per-run settings such as `maxTurns` or `abortSignal`, then runs a fresh execution. Its result `type` is `response` with the final `output`, `blocked` by a guardrail, or `interaction` with a JSON-safe approval or question request and a `continuation`.
 
 ## Stream the same agent
 
+Add this to the same file to stream instead of waiting for the whole answer:
+
 ```ts
-for await (const event of reviewer.stream({
-    prompt: releaseNotes
-})) {
+for await (const event of reviewer.stream({ prompt: releaseNotes })) {
   if (event.type === 'text_delta') {
     process.stdout.write(event.delta)
   }
+
+  if (event.type === 'error') throw event.error
 }
 ```
+
+The stream ends with the same `response`, `blocked`, or `interaction` outcome as `generate(...)`, or with an `error` event.
 
 Instructions guide the model but do not enforce truth, authorization, or output safety. Put facts and side effects behind authorized tools, validate important outputs, and keep secrets out of prompts.
 

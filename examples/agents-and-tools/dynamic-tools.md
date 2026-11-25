@@ -13,7 +13,7 @@ const issueRefund = createTool({
     description: 'Issue a refund for a customer order.',
     inputSchema: z.object({ orderId: z.string() }),
     outputSchema: z.string(),
-    execute: ({ orderId }) => `refund queued for ${orderId}`,
+    handler: ({ orderId }) => `refund queued for ${orderId}`,
 });
 const updateAddress = createTool({
     name: 'update_address',
@@ -23,7 +23,7 @@ const updateAddress = createTool({
         address: z.string(),
     }),
     outputSchema: z.string(),
-    execute: ({ orderId }) => `address updated for ${orderId}`,
+    handler: ({ orderId, address }) => `address for ${orderId} set to ${address}`,
 });
 const toolIndex = await createToolIndex({
     model: embeddingModel,

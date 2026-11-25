@@ -44,6 +44,16 @@ Managed registrations expose `ensure()`, `replaceDocuments()`, `deleteDocuments(
 and `explore()`. Existing registrations expose `validate()`, `retrieve()`, and `explore()` but no
 provisioning or mutation methods.
 
+`managedKnowledgeGraph()` accepts either `{ name, schema, dimensions, similarity?, fulltext? }` or an
+explicit `{ name, schema, resources }`. Without `resources`, labels and index names are derived from
+`name` and validated as `ManagedNeo4jResources`.
+`ManagedNeo4jFulltextShorthand` is `true | false | { chunks?, entities? }`, where an entity list
+narrows the indexed properties. `ensure({ indexTimeoutMs?, abortSignal? })` defaults the index wait to
+`60_000` ms.
+
+The package also re-exports `defineGraphSchema()` and `extractGraphFacts()` from `@anvia/graph`, so an
+application that only needs extraction can import them from the adapter it already installed.
+
 `tenant()` hashes the tenant ID into a sha256 namespace, and namespaces are created only through
 `tenant()`. A `Neo4jTenant.managedKnowledgeGraph()` provisions a tenant-scoped managed graph whose
 writes, vector and full-text search, traversal, evidence, and exploration are stamped and filtered

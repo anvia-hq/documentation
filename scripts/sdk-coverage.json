@@ -1,5 +1,5 @@
 {
-  "reviewedSdkRevision": "7aa42c0a16c14cd96e42e503a2dd4c68a2ba9488",
+  "reviewedSdkRevision": "2322fcd9b00e4cb82166c7aca319454ee97abe4e",
   "entries": [
     {
       "module": "@anvia/cli",
@@ -26,15 +26,15 @@
       "module": "@anvia/core",
       "guide": "sdk/index.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 291,
-      "exportNamesHash": "212a461bbcde6ce754623fbd1d03f1443842d7aeffdb9aade9f0d32c540fe844"
+      "exportCount": 297,
+      "exportNamesHash": "9b2b998ce91529379c41579e7a03fdf9426e64d0b9091879998883a05ca15789"
     },
     {
       "module": "@anvia/core/agent",
       "guide": "sdk/agents.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 67,
-      "exportNamesHash": "9d7308ef3bf6df914f20751b99e159cf2be317b862031a33267da998a6898059"
+      "exportCount": 71,
+      "exportNamesHash": "837d802afc03dc7ff10d19f7067da89cebc79493d467f283fc316f029085653e"
     },
     {
       "module": "@anvia/core/agent/interactions",
@@ -61,8 +61,8 @@
       "module": "@anvia/core/embeddings",
       "guide": "sdk/models/embeddings.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 36,
-      "exportNamesHash": "681b48ecfd695f72f9a419f355d651db3962a52920137f37684623e378de90ed"
+      "exportCount": 40,
+      "exportNamesHash": "ae9d13c469193c49eb8f1f88eac7707fb2f69e7f92b3d9087b51d307bbd622b8"
     },
     {
       "module": "@anvia/core/evals",
@@ -75,8 +75,8 @@
       "module": "@anvia/core/documents",
       "guide": "sdk/knowledges/load-documents.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 9,
-      "exportNamesHash": "35822af9fa856518bfb6433ab9fce91156af41391c37bf667bc0f529299708f6"
+      "exportCount": 11,
+      "exportNamesHash": "8f40d04b72f12af433339cf8c243d642db25aa02532c451983bf537dfef92393"
     },
     {
       "module": "@anvia/core/extractor",
@@ -173,8 +173,8 @@
       "module": "@anvia/core/vector-store",
       "guide": "sdk/knowledges/vector-stores.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 38,
-      "exportNamesHash": "b77aa9f31039aa13d1672f9fc0d38d3bbd083ac28b173808c7f0ed0a0f52d175"
+      "exportCount": 58,
+      "exportNamesHash": "bbe296364b66206424b91150797f7394284ebefc6139e8c0f5d6e83786846444"
     },
     {
       "module": "@anvia/transformers",
@@ -187,8 +187,8 @@
       "module": "@anvia/graph",
       "guide": "packages/graph/get-started.md",
       "reference": "packages/graph/api-reference.md",
-      "exportCount": 87,
-      "exportNamesHash": "5e81c241ab21d5f618d211e598c6fb5571d7a4f1f3428e7f6e84ed8e8d645a21"
+      "exportCount": 120,
+      "exportNamesHash": "a793215c3070de85e5de6641485bceda616d788ba487f1bd8546d4b16d555834"
     },
     {
       "module": "@anvia/graph/explore",
@@ -201,15 +201,15 @@
       "module": "@anvia/memgraph",
       "guide": "packages/memgraph/get-started.md",
       "reference": "packages/memgraph/api-reference.md",
-      "exportCount": 45,
-      "exportNamesHash": "0af57dfa62a000021006f80989cc50529ee0d92e18ff49c8b6eed64918586671"
+      "exportCount": 48,
+      "exportNamesHash": "d6677fcc267e5cc9558b379bae8d8c4e90b8c4f2dbdfa5fd605c55c0bfd8ac1a"
     },
     {
       "module": "@anvia/neo4j",
       "guide": "packages/neo4j/get-started.md",
       "reference": "packages/neo4j/api-reference.md",
-      "exportCount": 51,
-      "exportNamesHash": "1d5c14a9f78c072c3e5eec581b6f4b4d5a729ba6d0bdac4712f35d1d7842da3a"
+      "exportCount": 54,
+      "exportNamesHash": "1734650e4e302b7f7a6875be5526845633c8756d0184749cc33761301761f255"
     },
     {
       "module": "@anvia/logger",
@@ -320,97 +320,83 @@
       "module": "@anvia/react",
       "guide": "packages/react/get-started.md",
       "reference": "packages/react/api-reference.md",
-      "exportCount": 33,
-      "exportNamesHash": "37b2b1c5a93e79c6e2f13ee2dd34273376f6e352c8e4766644c10136dab8091d"
+      "exportCount": 110,
+      "exportNamesHash": "11f0b8b03c54ccdb53d269e256831559f6f6d045da17928eaa204069b2d131f4"
     },
     {
       "module": "@anvia/react/graph-explorer",
       "guide": "packages/react/get-started.md",
-      "reference": "packages/react/api-reference.md",
-      "exportCount": 7,
-      "exportNamesHash": "bb39454a40b625e5fcb3834a56b95e06d5c39dd89a04fb4516dcce3b0608696b"
+      "reference": "packages/react/primitives-api-reference.md",
+      "exportCount": 16,
+      "exportNamesHash": "3dbe02fb3ad28abe4682d6db82e9223ea31f3f4e253924c3381b008cc47c6d74"
     },
     {
-      "module": "@anvia/react-ui",
-      "guide": "packages/react-ui/get-started.md",
-      "reference": "packages/react-ui/api-reference.md",
-      "exportCount": 77,
-      "exportNamesHash": "5f8147f67e23f5ebace8452218efd96fd011617b933ca6ba1697979c9e77035f"
-    },
-    {
-      "module": "@anvia/react-ui/attachment",
-      "guide": "packages/react-ui/get-started.md",
-      "reference": "packages/react-ui/api-reference.md",
+      "module": "@anvia/react/attachment",
+      "guide": "packages/react/get-started.md",
+      "reference": "packages/react/primitives-api-reference.md",
       "exportCount": 3,
       "exportNamesHash": "9b4b8a24438f3043286491a039acff4be79ff4beddd34c007ce212a3eac5a973"
     },
     {
-      "module": "@anvia/react-ui/chat",
-      "guide": "packages/react-ui/get-started.md",
-      "reference": "packages/react-ui/api-reference.md",
+      "module": "@anvia/react/chat",
+      "guide": "packages/react/get-started.md",
+      "reference": "packages/react/primitives-api-reference.md",
       "exportCount": 26,
       "exportNamesHash": "8aff6d0807e213630e8f76118547bff3ccfb75e802bdd20f0fe941256b661c6b"
     },
     {
-      "module": "@anvia/react-ui/completion",
-      "guide": "packages/react-ui/get-started.md",
-      "reference": "packages/react-ui/api-reference.md",
+      "module": "@anvia/react/completion",
+      "guide": "packages/react/get-started.md",
+      "reference": "packages/react/primitives-api-reference.md",
       "exportCount": 7,
       "exportNamesHash": "fbae959d594c9d939ef4186054451d0db6381a834f353c201b27ee8837d94bf3"
     },
     {
-      "module": "@anvia/react-ui/graph-explorer",
-      "guide": "packages/react-ui/get-started.md",
-      "reference": "packages/react-ui/api-reference.md",
-      "exportCount": 12,
-      "exportNamesHash": "27d0f6ee8aab335ca4fc4861a3c3f06c3c823d24bfdec45144506c81ea3a9a8f"
-    },
-    {
-      "module": "@anvia/react-ui/human-input",
-      "guide": "packages/react-ui/get-started.md",
-      "reference": "packages/react-ui/api-reference.md",
+      "module": "@anvia/react/human-input",
+      "guide": "packages/react/get-started.md",
+      "reference": "packages/react/primitives-api-reference.md",
       "exportCount": 9,
       "exportNamesHash": "a78e04118b98a7766e3d7322f815c0f9f8ce20a6b187c6ddbe7cf80231b30a05"
     },
     {
-      "module": "@anvia/react-ui/image",
-      "guide": "packages/react-ui/get-started.md",
-      "reference": "packages/react-ui/api-reference.md",
+      "module": "@anvia/react/image",
+      "guide": "packages/react/get-started.md",
+      "reference": "packages/react/primitives-api-reference.md",
       "exportCount": 3,
       "exportNamesHash": "3510427879de37033602c6dc2b2aa7ec59aa07fe6e35112d64b459103c2cd350"
     },
     {
-      "module": "@anvia/react-ui/message",
-      "guide": "packages/react-ui/get-started.md",
-      "reference": "packages/react-ui/api-reference.md",
+      "module": "@anvia/react/message",
+      "guide": "packages/react/get-started.md",
+      "reference": "packages/react/primitives-api-reference.md",
       "exportCount": 12,
       "exportNamesHash": "a5bc8e9335dd27c9a17420599828076e99e280440ca8447e3795e8c2c5e4443e"
     },
     {
-      "module": "@anvia/react-ui/selection-toolbar",
-      "guide": "packages/react-ui/get-started.md",
-      "reference": "packages/react-ui/api-reference.md",
+      "module": "@anvia/react/selection-toolbar",
+      "guide": "packages/react/get-started.md",
+      "reference": "packages/react/primitives-api-reference.md",
       "exportCount": 4,
       "exportNamesHash": "4255514eac218a4f20e28862c660a54840538a6f4633a9274436301e662e43dc"
     },
     {
-      "module": "@anvia/react-ui/stream",
-      "guide": "packages/react-ui/get-started.md",
-      "reference": "packages/react-ui/api-reference.md",
+      "module": "@anvia/react/stream",
+      "guide": "packages/react/get-started.md",
+      "reference": "packages/react/primitives-api-reference.md",
       "exportCount": 2,
       "exportNamesHash": "d7f928000b423f0b95564c3a4f83d42f31092c161b4123b2ece14b1feddc382c"
     },
     {
-      "module": "@anvia/react-ui/shared",
-      "guide": "packages/react-ui/get-started.md",
-      "reference": "packages/react-ui/api-reference.md",
+      "module": "@anvia/react/shared",
+      "guide": "packages/react/get-started.md",
+      "reference": "packages/react/primitives-api-reference.md",
       "exportCount": 54,
       "exportNamesHash": "f19274deed26b6d4ad9fa35a3e8d0ce860b7fd9489b1fd5089c1ca94520cf938"
     },
     {
-      "module": "@anvia/react-ui/thread-list",
-      "guide": "packages/react-ui/get-started.md",
-      "reference": "packages/react-ui/api-reference.md",
+      "module": "@anvia/react/thread-list",
+      "guide": "packages/react/get-started.md",
+      "reference": "packages/react/primitives-api-reference.md",
       "exportCount": 9,
       "exportNamesHash": "37a117f2d2c913165ec678c568253c0df9633352fc700f880982042daa9232e6"
     },
@@ -569,16 +555,16 @@
       "exportNamesHash": "96e5504e529da5be99d72d12c97e6530b6da26211e4bb52fe0cebb2c685f7f4b"
     },
     {
-      "module": "@anvia/react-ui/sandbox-terminal",
-      "guide": "packages/react-ui/get-started.md",
-      "reference": "packages/react-ui/api-reference.md",
+      "module": "@anvia/react/sandbox-terminal",
+      "guide": "packages/react/get-started.md",
+      "reference": "packages/react/primitives-api-reference.md",
       "exportCount": 8,
       "exportNamesHash": "f36ae913b663558dd2b41fd9b36e46e1bf96fb2f20217ff3dcb49d0bdd69c736"
     },
     {
-      "module": "@anvia/react-ui/sandbox-desktop",
-      "guide": "packages/react-ui/get-started.md",
-      "reference": "packages/react-ui/api-reference.md",
+      "module": "@anvia/react/sandbox-desktop",
+      "guide": "packages/react/get-started.md",
+      "reference": "packages/react/primitives-api-reference.md",
       "exportCount": 11,
       "exportNamesHash": "83fce5f0759a9396c15fb3a2236184fa9c0b4d336127ce04e9424c62ec008084"
     },
@@ -600,8 +586,8 @@
       "module": "@anvia/core/context",
       "guide": "sdk/agents/context.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 8,
-      "exportNamesHash": "221f4e15241bb16107b32baf926aa0147de8c6fc18f1150256fb2d4a20c194e8"
+      "exportCount": 10,
+      "exportNamesHash": "b1c78f54539343809fbbba8ddbb21a2e645c1e1937c8c3b09b13fa1bdd25d184"
     },
     {
       "module": "@anvia/durable/postgres",

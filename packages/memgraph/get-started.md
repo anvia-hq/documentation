@@ -47,32 +47,9 @@ await using client = new MemgraphClient({
 const graph = client.managedKnowledgeGraph({
   name: 'support',
   schema,
-  resources: {
-    labels: {
-      document: 'SupportDocument',
-      chunk: 'SupportChunk',
-      entity: 'SupportEntity',
-    },
-    indexes: {
-      chunks: {
-        vector: {
-          name: 'support_chunks_vector',
-          dimensions: 1536,
-          similarity: 'cosine',
-          capacity: 100_000,
-          scalarKind: 'f16',
-        },
-        text: { name: 'support_chunks_text' },
-      },
-      entities: {
-        vector: {
-          name: 'support_entities_vector',
-          dimensions: 1536,
-          similarity: 'cosine',
-        },
-      },
-    },
-  },
+  dimensions: 1536,
+  similarity: 'cosine',
+  text: true,
 })
 
 await graph.ensure()
@@ -103,5 +80,15 @@ const searchGraph = createGraphSearchTool({
 })
 ```
 
+`name` and `dimensions` are enough for a managed graph: labels are derived from the name
+(`SupportDocument`, `SupportChunk`, `SupportEntity`), the vector and text indexes use a `support_*`
+prefix, and `similarity` defaults to `'cosine'`. `dotProduct` and `inner-product` both map to
+Memgraph's inner-product metric, so use whichever name matches the embedding model's convention.
+`text: true` (or `fulltext: true`) creates the chunk and entity text indexes; pass `{ chunks,
+entities }` to name or narrow them. Pass an explicit `resources` object when the database names are
+provisioned elsewhere.
+
 Vector index `capacity` defaults to `100_000`, `resizeCoefficient` to `2`, and `scalarKind` to
-`'f32'` when omitted. Configure dimensions to match the embedding model.
+`'f32'` when omitted. Configure dimensions to match the embedding model; retrieval checks them only
+when the model declares `dimensions`, so a model that omits them still works against a graph whose
+index dimensions are known.

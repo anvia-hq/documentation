@@ -67,14 +67,14 @@ in browser code, screenshots, or committed files.
 
 | Package | Version | Purpose |
 | --- | --- | --- |
-| `@anvia/core` | `^1.5.0` | Agent, typed tools, memory contracts, observability options |
-| `@anvia/openai` | `^1.1.5` | Completion model adapter |
-| `@anvia/memory-sqlite` | `^1.2.0` | Durable per-conversation message history |
-| `@anvia/discord` | `^0.3.0` | Discord Gateway input and REST delivery |
-| `@anvia/channel` | `^0.4.0` | Platform-neutral addresses, messages, and proactive delivery |
-| `@anvia/channel-agent` | `^0.4.1` | Agent bridge: filtering, sessions, streaming, interaction resumption |
-| `@anvia/lens` | `^1.2.0` | Native Lens tracing (owns its OpenTelemetry providers) |
-| `zod` | `^4.6.5` | Tool input schemas |
+| `@anvia/core` | `^1.22.0` | Agent, typed tools, memory contracts, observability options |
+| `@anvia/openai` | `^1.4.1` | Completion model adapter |
+| `@anvia/memory-sqlite` | `^1.3.1` | Durable per-conversation message history |
+| `@anvia/discord` | `^0.3.4` | Discord Gateway input and REST delivery |
+| `@anvia/channel` | `^0.5.0` | Platform-neutral addresses, messages, and proactive delivery |
+| `@anvia/channel-agent` | `^0.5.0` | Agent bridge: filtering, sessions, streaming, interaction resumption |
+| `@anvia/lens` | `^1.3.2` | Native Lens tracing (owns its OpenTelemetry providers) |
+| `zod` | `^4.6.7` | Tool input schemas |
 
 ```sh
 mkdir anvia-golden-path
@@ -106,7 +106,8 @@ OPENAI_API_KEY=sk-replace-me
 OPENAI_MODEL_ID=gpt-5.6-sol
 
 DISCORD_BOT_TOKEN=replace-me
-# Channel where the bot answers and where proactive reports are delivered.
+# Channel that receives proactive reports. The bot answers direct messages and
+# mentions in any conversation it can read, independently of this value.
 DISCORD_CHANNEL_ID=000000000000000000
 
 ANVIA_LENS_BASE_URL=http://localhost
@@ -153,6 +154,11 @@ export function loadConfig(env: Readonly<Record<string, string | undefined>> = p
 
 :::
 
+`DISCORD_CHANNEL_ID` is only the destination for proactive reports. The default bridge filter
+answers direct messages and messages that mention the bot in any conversation it can read, and
+each reply goes back to the conversation it came from. Add a `shouldHandle` filter to
+`createChannelAgent()` if the bot must answer in one channel only.
+
 `ANVIA_LENS_BASE_URL` is the Lens origin a browser uses. Do not append `/api` or an OTLP path;
 `@anvia/lens` builds its own ingestion URLs from the origin.
 
@@ -186,7 +192,7 @@ export function createOrderTools(store: OrderStore) {
     inputSchema: z.object({
       orderId: z.string().min(1).describe('Order id as printed on the confirmation, for example A-1042.'),
     }),
-    execute: async ({ orderId }) => {
+    handler: async ({ orderId }) => {
       const order = store.find(orderId)
 
       if (order === undefined) {

@@ -23,7 +23,7 @@ const issueRefund = createTool({
     amount > 0
       ? { reason: `Review refund of $${amount} for order ${orderId}.` }
       : false,
-  execute: issueRefundHandler,
+  handler: issueRefundHandler,
 })
 ```
 

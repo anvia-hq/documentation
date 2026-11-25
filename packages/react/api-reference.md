@@ -1,6 +1,8 @@
-# `@anvia/react` API reference
+# Hook API reference
 
-`@anvia/react` exports React hooks and their state types. Create transports with `@anvia/client`.
+These hooks and their state types are exported from `@anvia/react`. Create transports with
+`@anvia/client`. Component families live in the
+[primitives API reference](/packages/react/primitives-api-reference).
 
 ```ts
 import { useChat, useCompletion, useDurableChat, useSmoothStreamItems, useSmoothStreamText } from '@anvia/react'
@@ -48,7 +50,7 @@ For a structured question, pass `{ type: 'tool-question', answers: [{ questionId
 unbounded by default. It truncates the retained event list, not the transcript or `messages`; `onEvent` still
 receives every event.
 
-`runUsage` holds the aggregate `Usage` for the latest run; the hook refreshes it from `run_end` and `error` events while per-message usage stays on each assistant message.
+`runUsage` holds the aggregate `Usage` for the latest run; the hook refreshes it from `run_end` and `error` events while per-message usage stays on each assistant message. `contextBreakdown` holds the latest run's scaled segment split, taken from `message_end`, `turn_end`, and `run_end` frames or from a replayed message's `generation`.
 
 ## `useDurableChat`
 

@@ -27,35 +27,38 @@ pnpm add @anvia/core zod
 ```ts
 import { Pipeline } from "@anvia/core/pipeline";
 import { z } from "zod";
+
 const Ticket = z.object({ id: z.string(), summary: z.string().min(1) });
+
 const normalizeTicket = new Pipeline({ id: "normalize-ticket", inputSchema: Ticket })
-    .step({
-    id: "step-1",
-    run: ({ input: input }) => (({ id, summary }) => ({
-        id,
-        normalized: summary.trim().replace(/\s+/g, " "),
-    }))(input)
-})
-    .step({
-    id: "step-2",
+  .step({
+    id: "normalize-summary",
+    run: ({ input: { id, summary } }) => ({
+      id,
+      normalized: summary.trim().replace(/\s+/g, " "),
+    }),
+  })
+  .step({
+    id: "classify-priority",
     run: ({ input: ticket }) => ({
-        ...ticket,
-        priority: /outage|missed orders/i.test(ticket.normalized)
-            ? "high" as const
-            : "normal" as const,
-    })
-});
+      ...ticket,
+      priority: /outage|missed orders/i.test(ticket.normalized)
+        ? "high" as const
+        : "normal" as const,
+    }),
+  });
+
 const tickets = [
-    { id: "t1", summary: "Payment latency in EU." },
-    { id: "t2", summary: "Search outage for administrators." },
-    { id: "t3", summary: "Webhook retries are delayed." },
+  { id: "t1", summary: "Payment latency in EU." },
+  { id: "t2", summary: "Search outage for administrators." },
+  { id: "t3", summary: "Webhook retries are delayed." },
 ];
+
 const results = await normalizeTicket.runBatch({
-    inputs: tickets,
-    concurrency: 2
+  inputs: tickets,
+  concurrency: 2,
 });
 console.log(results);
-
 ```
 
 ## Expected behavior
@@ -66,7 +69,8 @@ second item finishes first. Every item is `{ status: 'completed', runId, output 
 
 ## Failure scenarios and production ownership
 
-- Validate the concurrency value in product configuration; Anvia normalizes it to at least one.
+- `concurrency` must be a positive safe integer; `runBatch()` throws a `RangeError` otherwise, so
+  validate the value in product configuration.
 - A failed item is recorded while other items continue.
 - Large arrays remain in memory and can overload a provider or database.
 - Provider rate limits need a rate-aware scheduler, not just a concurrency number.

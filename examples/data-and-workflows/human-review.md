@@ -28,35 +28,44 @@ Anvia draft pipeline -> application review record (pending)
 ## Draft boundary
 
 ```ts
+import { z } from "zod";
+
 const Draft = z.object({
-    action: z.literal("issue_refund"),
-    orderId: z.string(),
-    amount: z.number().positive(),
-    rationale: z.string(),
-});
-const draft = Draft.parse(await refundDraftPipeline.run({
-    input: requestText
-}));
-const review = await reviews.create({
-    tenantId,
-    draft,
-    draftHash: sha256(JSON.stringify(draft)),
-    state: "pending",
-    createdBy: actor.id,
+  action: z.literal("issue_refund"),
+  orderId: z.string(),
+  amount: z.number().positive(),
+  rationale: z.string(),
 });
 
+const { output } = await refundDraftPipeline.run({ input: requestText });
+const draft = Draft.parse(output);
+
+const review = await reviews.create({
+  tenantId,
+  draft,
+  draftHash: sha256(JSON.stringify(draft)),
+  state: "pending",
+  createdBy: actor.id,
+});
 ```
+
+`refundDraftPipeline` is your Anvia `Pipeline` that turns the request into a refund draft.
+`pipeline.run()` returns `{ runId, output }`, so validate `output`, not the run result.
+`requestText`, `tenantId`, and `actor` come from your authenticated request handler, and `sha256` is
+your hashing helper.
 
 ## Approval and execution boundaries
 
 ```ts
+const pending = await reviews.get({ reviewId, tenantId: actor.tenantId });
+await authorizeReviewer(actor, pending.tenantId, pending.draft.action);
+
 const review = await reviews.approve({
   reviewId,
   reviewerId: actor.id,
   expectedVersion,
 });
 
-await authorizeReviewer(actor, review.tenantId, review.draft.action);
 await payments.refund({
   orderId: review.draft.orderId,
   amount: review.draft.amount,
@@ -65,9 +74,20 @@ await payments.refund({
 await reviews.markExecuted(review.id, review.version);
 ```
 
-`reviews`, `authorizeReviewer`, hashing, and `payments` are application-owned. Anvia can produce the
-typed draft and offers tool-approval controls for interactive runs, but it is not the system of
-record for durable business approval.
+Authorize the reviewer before recording the approval, so an unauthorized request never changes the
+review state. `reviewId` and `expectedVersion` come from the reviewer UI; `reviews`,
+`authorizeReviewer`, and `payments` are application-owned. Anvia can produce the typed draft and
+offers tool-approval controls for agent runs, but it is not the system of record for durable
+business approval.
+
+## When to use `@anvia/durable` instead
+
+When the consequential action is an agent tool call, `@anvia/durable` can persist the pending
+approval across process restarts and resume the run after your application calls `run.respond()`.
+Durable execution covers agent runs, custom tasks, and their approvals; it does not make an Anvia
+`Pipeline` durable. Your application still owns reviewer authorization and any business review
+record. See [durable execution](/sdk/advanced/durable-execution) and
+[tools, approvals, and recovery](/sdk/advanced/durable-execution/recovery).
 
 ## Expected behavior and failure scenarios
 

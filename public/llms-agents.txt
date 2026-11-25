@@ -45,7 +45,7 @@ const refundOrder = createTool({
   description: 'Refund an eligible order.',
   inputSchema: z.object({ orderId: z.string() }),
   requiresApproval: ({ orderId }) => ({ reason: `Approve refund for ${orderId}` }),
-  execute: async ({ orderId }) => billing.refund(orderId),
+  handler: async ({ orderId }) => billing.refund(orderId),
 })
 ```
 

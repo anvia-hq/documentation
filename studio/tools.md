@@ -39,7 +39,7 @@ const getTicket = createTool({
     status: z.enum(['waiting_on_engineering', 'monitoring']),
     priority: z.enum(['high', 'medium']),
   }),
-  execute: ({ id }) => loadTicket(id),
+  handler: ({ id }) => loadTicket(id),
 })
 ```
 

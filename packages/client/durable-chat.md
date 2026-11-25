@@ -1,6 +1,6 @@
 # Durable chat transport
 
-`@anvia/client/durable-chat` adapts a `@anvia/durable` endpoint to the `ClientTransport` contract used by `useChat` from `@anvia/react` and the `@anvia/react-ui` chat primitives. Create one transport per chat session: the agent and session identity live in the transport because an individual chat request carries only messages.
+`@anvia/client/durable-chat` adapts a `@anvia/durable` endpoint to the `ClientTransport` contract used by `useChat` and the chat primitives from `@anvia/react`. Create one transport per chat session: the agent and session identity live in the transport because an individual chat request carries only messages.
 
 ```sh
 pnpm add @anvia/client @anvia/durable @anvia/react

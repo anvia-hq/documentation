@@ -16,7 +16,7 @@ Flue is a TypeScript framework for autonomous agents built around a harness: a m
 | MCP | `useMcpConnection` | [`@anvia/mcp`](/sdk/advanced/mcp) |
 | Multi-agent | `useSubagent` | [`agent.asTool()` and `AgentTeam`](/sdk/advanced/multi-agent) |
 | Observability | `@flue/opentelemetry` and a Sentry integration | OpenTelemetry, Langfuse, and [Lens](/lens/) adapters |
-| Frontend | Flue Agent SDK and `@flue/react` | Framework-neutral [`@anvia/client`](/packages/client), [`@anvia/react`](/packages/react), and headless [`@anvia/react-ui`](/packages/react-ui) |
+| Frontend | Flue Agent SDK and `@flue/react` | Framework-neutral [`@anvia/client`](/packages/client), [`@anvia/react`](/packages/react) with its [headless primitives](/packages/react/capabilities) |
 | Runtimes and hosting | Vite builds for Node.js or Cloudflare targets | Inside your own server; Node.js, with Bun 1.3.14 tested for Core, Client, Server, the OpenAI, Anthropic, Gemini, and Mistral providers, MCP, SQLite memory, and sandbox |
 
 ## What Flue does especially well

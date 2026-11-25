@@ -21,13 +21,13 @@ import {
 
 ```ts
 function loadTransformersEmbeddingModel(
-  options: LoadTransformersEmbeddingModelOptions,
+  options?: LoadTransformersEmbeddingModelOptions,
 ): Promise<LoadedTransformersEmbeddingModel>
 ```
 
 ```ts
 type LoadTransformersEmbeddingModelOptions = {
-  modelId: string
+  modelId?: string
   pooling?: 'mean' | 'cls'
   normalize?: boolean
   maxBatchSize?: number
@@ -39,7 +39,7 @@ type LoadTransformersEmbeddingModelOptions = {
 }
 ```
 
-`LoadedTransformersEmbeddingModel` implements `EmbeddingModel` and `AsyncDisposable`; call `close()` or use `await using` to release the owned pipeline.
+`modelId` defaults to `DEFAULT_TRANSFORMERS_EMBEDDING_MODEL`. `LoadedTransformersEmbeddingModel` implements `EmbeddingModel` and `AsyncDisposable`; call `close()` or use `await using` to release the owned pipeline.
 
 ## Adapt an existing pipeline
 

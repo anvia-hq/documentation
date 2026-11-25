@@ -67,6 +67,34 @@ const tool = createGraphSearchTool({
 The public contracts include `GraphContextRetriever`, `GraphSearchOptions`,
 `GraphTraversalOptions`, `GraphEvidenceOptions`, `GraphContext`, and `GraphSearchTool`.
 
+`createGraphContext()` wraps any `GraphContextRetriever` as a Core `ContextSource`:
+
+```ts
+createGraphContext({
+  graph,
+  model,
+  id,                 // default 'graph-context'
+  search,
+  traversal,
+  evidence,
+  retries,
+  format,             // default: one formatGraphContext() document, or none when empty
+})
+```
+
+`formatGraphContext(context)` renders the entities or seeds, relationships, and evidence sections as
+plain text. `resolveGraphRetrieveOptions()` applies and validates the bounded defaults, which the
+package exports as `DEFAULT_GRAPH_SEARCH_TOP_K` (`8`), `DEFAULT_GRAPH_HYBRID_RRF_K` (`60`),
+`DEFAULT_GRAPH_TRAVERSAL_MAX_DEPTH` (`2`), `DEFAULT_GRAPH_TRAVERSAL_MAX_NODES` (`40`),
+`DEFAULT_GRAPH_TRAVERSAL_MAX_RELATIONSHIPS` (`80`), and `DEFAULT_GRAPH_EVIDENCE_MAX_CHUNKS` (`12`).
+
+`createKnowledgeGraph({ graph, embeddingModel, extractionModel?, ...defaults })` returns a
+`KnowledgeGraphHandle` with `graph`, `ingest()`, `retrieve()`, `asTool()`, `asContext()`, and
+`explore()`. Its option types are `CreateKnowledgeGraphOptions`, `KnowledgeGraphIngestOptions`,
+`KnowledgeGraphRetrieveOptions`, `KnowledgeGraphToolOptions`, and `KnowledgeGraphContextOptions`;
+ingest input is `KnowledgeGraphDocumentInput` (a string or `{ id?, text, metadata? }`) or an array of
+them.
+
 ## Exploration and writes
 
 `GraphExplorer.explore()` accepts the `overview` and `expand` option unions and returns nodes,

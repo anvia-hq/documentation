@@ -331,7 +331,7 @@ test('approval suspension is an onFinish status', async () => {
     name: 'protected',
     inputSchema: z.object({}),
     requiresApproval: true,
-    execute: () => 'done',
+    handler: () => 'done',
   })
   const model = fakeModel({
     completion: async () =>
@@ -386,7 +386,7 @@ test('Mistral answering agent uses automatic tool choice', async () => {
     example.code,
     `
     let requests = 0
-    const getOrder = createTool({ name: 'get_order', inputSchema: z.object({}), execute: () => 'shipped' })
+    const getOrder = createTool({ name: 'get_order', inputSchema: z.object({}), handler: () => 'shipped' })
     const model = { provider: 'docs-test', modelId: 'offline', capabilities: ${JSON.stringify(capabilities)},
       completion: async (request) => {
         requests++
@@ -434,7 +434,7 @@ test('tool error messages preserve embedded paths unless the application maps th
   const tool = createTool({
     name: 'failing',
     inputSchema: z.object({}),
-    execute: () => {
+    handler: () => {
       throw new Error('Failure at /private/demo/config.ts')
     },
   })
@@ -451,7 +451,7 @@ test('tool error messages preserve embedded paths unless the application maps th
 })
 
 test('maxTurns permits the initial request plus the subsequent turn budget', async () => {
-  const tool = createTool({ name: 'lookup', inputSchema: z.object({}), execute: () => 'done' })
+  const tool = createTool({ name: 'lookup', inputSchema: z.object({}), handler: () => 'done' })
   for (const maxTurns of [0, 1]) {
     let requests = 0
     const model = fakeModel({
@@ -658,7 +658,7 @@ test('adapter and tool errors match their documented boundaries', async () => {
   const { ToolCallError, ToolJsonError, ToolNotFoundError, ToolResultSerializationError, normalizeToolResultOutput } = await import(await sourceEntry('@anvia/core/tool'))
   const { PipelineAgentSuspensionError } = await import(await sourceEntry('@anvia/core/pipeline'))
   const { agentEvalTarget, AgentEvalSuspensionError } = await import(await sourceEntry('@anvia/core/evals'))
-  const guarded = createTool({ name: 'guarded', description: 'Synthetic approval', inputSchema: z.object({}), requiresApproval: true, execute: () => 'done' })
+  const guarded = createTool({ name: 'guarded', description: 'Synthetic approval', inputSchema: z.object({}), requiresApproval: true, handler: () => 'done' })
   const agent = new Agent({ id: 'adapter-errors', model: fakeModel({ completion: async () => completion([
     { type: 'tool-call', toolCallId: 'c1', toolName: 'guarded', input: {} },
   ]) }), tools: [guarded] })
@@ -671,7 +671,7 @@ test('adapter and tool errors match their documented boundaries', async () => {
   await assert.rejects(target('test', { id: 'case', input: 'test' }), AgentEvalSuspensionError)
   await assert.rejects(agent.callTool('missing', '{}'), ToolNotFoundError)
   await assert.rejects(agent.callTool('guarded', '{'), ToolJsonError)
-  const broken = createTool({ name: 'broken', description: 'Invalid output', inputSchema: z.object({}), execute: () => new Date() })
+  const broken = createTool({ name: 'broken', description: 'Invalid output', inputSchema: z.object({}), handler: () => new Date() })
   const registry = new Agent({ id: 'registry', model: agent.model, tools: [broken] })
   assert.throws(() => normalizeToolResultOutput(new Date()), ToolResultSerializationError)
   await assert.rejects(registry.callTool('broken', '{}'), error => error instanceof ToolCallError && error.cause instanceof ToolResultSerializationError)

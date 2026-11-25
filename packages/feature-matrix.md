@@ -11,12 +11,11 @@ Use this matrix to find the package family that owns a capability. A check means
 | `@anvia/durable` | Restart-safe agent runs (experimental) | Persisted progress events | — | — |
 | `@anvia/mcp` | Agent tools | Client transports (stdio, Streamable HTTP, custom) | — | — |
 | `@anvia/server` | — | ✓ | — | — |
-| `@anvia/react` | — | Client | ✓ | — |
-| `@anvia/react-ui` | — | Client | — | Headless primitives |
+| `@anvia/react` | — | Client | ✓ | Headless primitives |
 | `@anvia/cli` | — | — | — | Editable components |
 
 The CLI also installs [Agent Skills](/packages/cli/agent-skills) for coding agents, with Claude
-Code, Cursor, and AGENTS.md integrations. Skills installation works independently of the React UI.
+Code, Cursor, and AGENTS.md integrations. Skills installation works independently of the React primitives.
 
 ## Model integrations
 

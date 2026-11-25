@@ -33,7 +33,7 @@ const lookupOrder = createTool({
   name: 'lookup_order',
   description: 'Look up an order by id.',
   inputSchema: z.object({ orderId: z.string() }),
-  execute: async ({ orderId }) => ({
+  handler: async ({ orderId }) => ({
     orderId,
     status: 'processing',
   }),

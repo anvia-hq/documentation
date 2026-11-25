@@ -20,9 +20,9 @@ pnpm add @anvia/transformers @anvia/core
 ## Create local embeddings
 
 ```ts
-import { DEFAULT_TRANSFORMERS_EMBEDDING_MODEL, loadTransformersEmbeddingModel } from '@anvia/transformers'
+import { loadTransformersEmbeddingModel } from '@anvia/transformers'
 
-const embeddings = await loadTransformersEmbeddingModel({ modelId: DEFAULT_TRANSFORMERS_EMBEDDING_MODEL })
+const embeddings = await loadTransformersEmbeddingModel()
 const vectors = await embeddings.embedTexts([
   'Password reset links expire after 30 minutes.',
   'Enterprise customers receive priority support.',

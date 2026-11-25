@@ -19,7 +19,7 @@ const issueRefund = createTool({
   requiresApproval: ({ orderId, amount }) => ({
     reason: `Review $${amount} refund for ${orderId}.`,
   }),
-  async execute({ orderId, amount }) {
+  async handler({ orderId, amount }) {
     await auth.requireRefundAccess(actor, orderId)
     return refundService.issue({ orderId, amount })
   },
@@ -68,6 +68,6 @@ matching interaction response. The continued phase receives a new `runId` and li
 
 Core validates the agent, interaction, tool registration, and response shape. It does not provide a durable continuation store or exactly-once execution, so the application must claim each interaction atomically and reject duplicate or expired decisions.
 
-Approval is not authentication. Bind the decision to the actor, tenant, tool, normalized input, and request identity. Expire stale decisions, recheck authorization and resource state inside `execute`, and make the side effect idempotent.
+Approval is not authentication. Bind the decision to the actor, tenant, tool, normalized input, and request identity. Expire stale decisions, recheck authorization and resource state inside `handler`, and make the side effect idempotent.
 
 For delayed human review, persist application state around the pending operation or use [Studio approval behavior](/studio/tools/approval-behavior).

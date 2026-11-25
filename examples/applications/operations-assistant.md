@@ -56,7 +56,7 @@ export function createOperationsTools(operator: Operator) {
     requiresApproval: ({ service, incidentId }) => ({
       reason: `Review restart of ${service} for incident ${incidentId}.`,
     }),
-    async execute(input) {
+    async handler(input) {
       if (!operator.canRestart) throw new Error("Restart access denied");
       return executor.requestRestart({ ...input, tenantId: operator.tenantId });
     },

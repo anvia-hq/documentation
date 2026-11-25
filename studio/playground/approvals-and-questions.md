@@ -33,14 +33,14 @@ const issueRefund = createTool({
     amount > 0
       ? { reason: `Review refund of $${amount} for order ${orderId}.` }
       : false,
-  execute: ({ orderId }) => ({
+  handler: ({ orderId }) => ({
     refundId: `rf_${orderId.toLowerCase()}`,
     status: 'issued' as const,
   }),
 })
 ```
 
-When the agent calls `issue_refund`, Studio streams the proposed tool arguments and approval reason into the transcript. The tool does not enter `execute` until the operator selects **Approve**.
+When the agent calls `issue_refund`, Studio streams the proposed tool arguments and approval reason into the transcript. The tool does not enter `handler` until the operator selects **Approve**.
 
 Selecting **Reject** resumes the agent with a denied result and records the operator reason, allowing the agent to explain that the action was denied or choose a safer alternative.
 

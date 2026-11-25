@@ -8,7 +8,7 @@ Platform independence means Anvia is not tied to one web framework or hosting ve
 
 - MCP `stdio` requires a process-capable server runtime.
 - File reads and application-owned document parsing require appropriate file or binary access.
-- React UI targets React DOM and browser interactions.
+- The `@anvia/react` primitives target React DOM and browser interactions.
 - Resumable streams need shared durable storage in multi-worker deployments.
 - Long-running pipelines may need application-owned queues and workers.
 - Some packages declare a minimum Node.js version, from 20 for `@anvia/mcp` to 24 for `@anvia/lens` and Channels. Bun 1.3.14 is tested for a subset of packages, and edge runtimes are not claimed. See [Which runtimes are supported?](/faqs/production/runtime-support).

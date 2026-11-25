@@ -7,9 +7,11 @@ This recipe sends one text request through an Anvia completion model and prints 
 ```sh
 pnpm init
 pnpm pkg set type=module
-pnpm add @anvia/core @anvia/openai
+pnpm add @anvia/core @anvia/openai zod
 pnpm add --save-dev tsx typescript @types/node
 ```
+
+The other essentials recipes reuse this setup. `type=module` lets the examples use top-level `await`, and `zod` is needed by the structured output and tool recipes.
 
 Set the provider key in the server environment:
 
@@ -32,22 +34,19 @@ if (!apiKey) {
 }
 
 const openai = new OpenAIClient({ apiKey })
-const model = openai.completionModel({
-    modelId: 'gpt-5.6-luna',
-    api: "responses"
-})
+const model = openai.completionModel({ modelId: 'gpt-5.6-sol', api: 'responses' })
 
 const result = await generateCompletion({
-    prompt: 'What is the difference between a library and a framework?',
-    model,
-    instructions: 'Answer clearly in no more than two sentences.'
+  model,
+  prompt: 'What is the difference between a library and a framework?',
+  instructions: 'Answer clearly in no more than two sentences.',
 })
 
 console.log(result.text)
 console.log(result.usage)
 ```
 
-The input is the first argument. The model and request controls belong in the second argument.
+`generateCompletion(...)` takes one options object: the model, exactly one input (`prompt` or `messages`), and optional request controls such as `instructions`, `temperature`, `maxTokens`, `retries`, and `abortSignal`.
 
 ## 3. Run it
 
@@ -61,6 +60,6 @@ The wording can vary, but the response should be short. Missing credentials, an 
 
 `OpenAIClient` creates a provider-backed model that implements Anvia's completion contract. `generateCompletion(...)` performs one request; it does not start an agent loop, execute tools, or save history.
 
-The result contains visible `text`, normalized assistant `content`, token `usage`, and the normalized provider `response`. Keep credentials server-side, treat generated text as untrusted, and map provider errors to application-safe responses.
+The result contains `output` (the text, or the parsed object when an `outputSchema` is set), visible `text`, normalized assistant `content`, token `usage`, an optional `finishReason`, and the provider's unmodified `rawResponse`. Keep credentials server-side, treat generated text as untrusted, and map provider errors to application-safe responses.
 
 Continue with [streaming completion](./streaming-completion) or [build an agent](./first-agent).

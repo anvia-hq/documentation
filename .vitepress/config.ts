@@ -1008,20 +1008,10 @@ export default defineConfig({
                 { text: 'Capabilities', link: '/packages/react/capabilities' },
                 { text: 'State and streaming', link: '/packages/react/state-and-streaming' },
                 { text: 'Durable chat', link: '/packages/react/durable-chat' },
-                { text: 'API', link: '/packages/react/api-reference' },
+                { text: 'Components and theming', link: '/packages/react/components-and-theming' },
+                { text: 'Hook API', link: '/packages/react/api-reference' },
+                { text: 'Primitives API', link: '/packages/react/primitives-api-reference' },
                 { text: 'Releases', link: '/packages/react/releases' }
-              ]
-            },
-            {
-              text: '@anvia/react-ui',
-              collapsed: true,
-              items: [
-                { text: 'Overview', link: '/packages/react-ui' },
-                { text: 'Get started', link: '/packages/react-ui/get-started' },
-                { text: 'Capabilities', link: '/packages/react-ui/capabilities' },
-                { text: 'Components and theming', link: '/packages/react-ui/components-and-theming' },
-                { text: 'API', link: '/packages/react-ui/api-reference' },
-                { text: 'Releases', link: '/packages/react-ui/releases' }
               ]
             },
             {

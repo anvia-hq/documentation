@@ -44,7 +44,7 @@ import { z } from "zod";
 
 const ResearchInput = z.object({
   topic: z.string().trim().min(3).max(200),
-  tenantId: z.string().uuid(),
+  tenantId: z.uuid(),
 });
 
 type Evidence = {
@@ -84,69 +84,68 @@ Build small branch pipelines, then combine their named outputs:
 
 ```ts
 const internalSearch = new Pipeline({ id: "internal-search", inputSchema: ResearchInput })
-    .step({
-    id: "step-1",
-    run: ({ input: input }) => (({ topic, tenantId }) => searchInternal(topic, tenantId))(input)
-});
+  .step({
+    id: "search-internal",
+    run: ({ input: { topic, tenantId } }) => searchInternal(topic, tenantId),
+  });
+
 const metricsSearch = new Pipeline({ id: "metrics-search", inputSchema: ResearchInput })
-    .step({
-    id: "step-2",
-    run: ({ input: input }) => (({ topic, tenantId }) => readMetrics(topic, tenantId))(input)
-});
+  .step({
+    id: "read-metrics",
+    run: ({ input: { topic, tenantId } }) => readMetrics(topic, tenantId),
+  });
+
 const openai = new OpenAIClient({ apiKey: process.env.OPENAI_API_KEY! });
 const synthesizer = new Agent({
-    id: "research-synthesizer",
-    model: openai.completionModel({
-        modelId: "gpt-5.6-sol"
-    }),
-    instructions: [
-        "Use only the supplied evidence.",
-        "Separate findings, uncertainty, and follow-up checks.",
-        "Cite source IDs in square brackets. Never invent a source ID.",
-    ].join("\n"),
-});
-export const researchPipeline = new Pipeline({
-    id: "research-report",
-    inputSchema: ResearchInput,
-})
-    .parallel({
-    id: "parallel-1",
-    name: "Collect evidence",
-    branches: { internal: internalSearch, metrics: metricsSearch }
-})
-    .step({
-    id: "step-3",
-    name: "Build evidence packet",
-    run: ({ input: input }) => (({ internal, metrics }) => {
-        const evidence = [...internal, ...metrics];
-        if (evidence.length === 0)
-            throw new Error("No authorized evidence was found.");
-        return JSON.stringify({ evidence });
-    })(input)
-})
-    .agent({
-    id: "agent-1",
-    name: "Synthesize report",
-    agent: synthesizer,
-    approval: "reject",
-    request({ input: input }) {
-        return { prompt: String(input) };
-    }
+  id: "research-synthesizer",
+  model: openai.completionModel({ modelId: "gpt-5.6-sol", api: "responses" }),
+  instructions: [
+    "Use only the supplied evidence.",
+    "Separate findings, uncertainty, and follow-up checks.",
+    "Cite source IDs in square brackets. Never invent a source ID.",
+  ].join("\n"),
 });
 
+export const researchPipeline = new Pipeline({
+  id: "research-report",
+  inputSchema: ResearchInput,
+})
+  .parallel({
+    id: "collect-evidence",
+    name: "Collect evidence",
+    branches: { internal: internalSearch, metrics: metricsSearch },
+  })
+  .step({
+    id: "build-evidence-packet",
+    name: "Build evidence packet",
+    run: ({ input: { internal, metrics } }) => {
+      const evidence = [...internal, ...metrics];
+      if (evidence.length === 0) throw new Error("No authorized evidence was found.");
+      return JSON.stringify({ evidence });
+    },
+  })
+  .agent({
+    id: "synthesize-report",
+    name: "Synthesize report",
+    agent: synthesizer,
+    suspension: "reject",
+    request: ({ input }) => ({ prompt: input }),
+  });
 ```
+
+Pipeline Agent stages require `suspension: "reject"`: if the agent pauses for a tool approval or
+question, the stage rejects with `PipelineAgentSuspensionError` instead of waiting.
 
 ## Run and expected behavior
 
 ```ts
 const report = await researchPipeline.run({
-    input: {
-        topic: "webhook retry failures",
-        tenantId: "10e93df0-8e59-4a2e-a4a4-b12f37e64365",
-    }
+  input: {
+    topic: "webhook retry failures",
+    tenantId: "10e93df0-8e59-4a2e-a4a4-b12f37e64365",
+  },
 });
-console.log(report);
-
+console.log(report.output);
 ```
 
 Both lookups begin concurrently. The final report should contain findings, caveats, next checks,

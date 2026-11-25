@@ -38,7 +38,10 @@ function createRefundOrderTool(
 }
 ```
 
-`AuthenticatedActor` and `orders` are application-owned: your authenticated identity type and order service. The exact context shape belongs to the application. Do not let the model declare its own user, role, tenant, or permission scope.
+`AuthenticatedActor` and `orders` are application-owned: your authenticated identity type and order
+service. `refundSchema` is the tool's input schema, and `operationId` is created by the request
+handler that authorizes the call. The exact context shape belongs to the application. Do not let the
+model declare its own user, role, tenant, or permission scope.
 
 The application should create `operationId` and keep it stable across retries; it must not come from model-generated arguments.
 
