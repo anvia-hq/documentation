@@ -50,6 +50,8 @@ const response = await agent.generate({
 
 Load only skills appropriate for the agent role and environment. Too many overlapping descriptions add tool context and make selection ambiguous.
 
+`Agent` attributes the catalog instructions, the four skill tool definitions, and loaded skill tool results to the `skills` segment of the [context breakdown](/sdk/agents/context), so a skill-heavy run shows what it costs in input tokens.
+
 ## 4. Cancel script runs
 
 `run_skill_script` uses the tool invocation's abort signal. A signal that is already aborted prevents the process from starting. Cancellation rejects with an `AbortError` that retains the abort reason as its `cause`; normal output formatting, nonzero-exit errors, and the timeout diagnostic are unchanged.

@@ -16,7 +16,7 @@ import {
 } from '@anvia/sandbox'
 
 const client = new DockerSandboxClient()
-await client.pullImage({ image: 'node:22-bookworm' })
+await client.ensureImage({ image: 'node:22-bookworm' })
 
 const sandbox = await client.createSandbox({
   image: 'node:22-bookworm',
@@ -34,7 +34,7 @@ const sandbox = await client.createSandbox({
 
 try {
   const tools = createDockerSandboxTools({
-    sandbox: sandbox.runtime,
+    sandbox,
     tools: ['list_files', 'read_file', 'write_file', 'exec_command'],
     exec: {
       commands: { mode: 'allow', values: ['node'] },
@@ -69,7 +69,11 @@ try {
 
 Use `createDockerSandboxTools()` only for capabilities the model may choose. Use `sandbox.runtime` from trusted code for setup, validation, artifact export, and processes. Use the `DockerSandbox` handle for inspection, stop, and destruction.
 
-Start with the smallest tool tuple required by the workflow.
+Start with the smallest tool tuple required by the workflow. Omitting `tools` exposes every sandbox tool.
+
+### Errors
+
+Failures from the Docker and remote runtimes are `SandboxError` instances with a stable `code`. Use `isSandboxError(error)` or `isSandboxError(error, 'docker_unavailable')` to narrow them; both are exported from `@anvia/sandbox` and `@anvia/sandbox/remote`. Docker CLI failures include a redacted stderr snippet in the message.
 
 ### Container runtime
 

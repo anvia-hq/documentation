@@ -21,7 +21,7 @@ Review the complete execution boundary before allowing agents to run commands or
 
 ## Capabilities
 
-- Use an explicit, non-empty `tools` tuple for model-facing tools.
+- Pass an explicit, non-empty `tools` tuple for model-facing tools; omitting it exposes all ten sandbox tools.
 - Prefer executable allowlists over blocklists.
 - Keep network access disabled unless the task requires it.
 - Add file writes, processes, and ports only for workflows that need them.
@@ -34,7 +34,7 @@ Review the complete execution boundary before allowing agents to run commands or
 - Bound file size and paginated text reads.
 - Set memory, CPU, and PID limits.
 - Cap managed process count and retained process logs.
-- Reconcile stopped or leaked containers after worker crashes.
+- Reconcile stopped or leaked containers after worker crashes with `listSandboxes()` and `destroySandbox()`.
 - Load-test the host for concurrent container creation and execution.
 
 ## Lifecycle and durability

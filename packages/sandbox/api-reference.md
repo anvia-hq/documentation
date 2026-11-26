@@ -7,7 +7,11 @@ All public runtime symbols are exported from `@anvia/sandbox`. Remote and daemon
 ```ts
 class DockerSandboxClient {
   constructor(options?: { dockerPath?: string })
+  hasImage(options: HasDockerImageOptions): Promise<boolean>
   pullImage(options: PullDockerImageOptions): Promise<void>
+  ensureImage(options: EnsureDockerImageOptions): Promise<{ pulled: boolean }>
+  listSandboxes(options?: ListDockerSandboxesOptions): Promise<readonly DockerSandboxSummary[]>
+  destroySandbox(options: DestroyDockerSandboxOptions): Promise<void>
   createSandbox(options: CreateDockerSandboxOptions): Promise<DockerSandbox>
   resumeSandbox(options: ResumeDockerSandboxOptions): Promise<DockerSandbox>
 }
@@ -45,7 +49,7 @@ type CreateDockerSandboxOptions = {
 }
 ```
 
-Images and named volumes must already exist. `pullImage()` is the explicit image acquisition operation.
+Images and named volumes must already exist. `pullImage()` is the explicit image acquisition operation. `hasImage()` checks for a local image without pulling, and `ensureImage()` pulls only when the image is missing, resolving `{ pulled }`. `listSandboxes()` returns a `DockerSandboxSummary` (`id`, `containerName`, `image`, `state`, `status`, and optional `workdir`, `workspaceType`, `networkMode`) for each sandbox container. `destroySandbox({ id, ignoreNotFound? })` removes a container by id without a live handle, which suits cleanup after a restart; with `ignoreNotFound: true` it does not throw `sandbox_not_found`.
 
 ## Neutral runtime
 
@@ -59,6 +63,7 @@ interface SandboxRuntime {
   readonly publishedPorts: readonly SandboxPublishedPort[]
 
   exec(options: SandboxExecOptions): Promise<SandboxExecResult>
+  execText(options: SandboxExecOptions): Promise<SandboxExecTextResult>
   execStream(options: SandboxExecOptions): AsyncIterable<SandboxExecStreamEvent>
   readFile(options: SandboxReadFileOptions): Promise<Uint8Array>
   readTextFile(options: SandboxReadFileOptions): Promise<string>
@@ -75,6 +80,8 @@ interface SandboxRuntime {
 ```
 
 `SandboxPortStatus` reports `containerPort` and `protocol`. Its `host` and `hostPort` are optional because a remote runtime has no host-reachable endpoint. Mutating methods accept an optional `operationId`; a runtime that supports it executes each id once.
+
+`execText()` runs a command like `exec()` but returns `stdout` and `stderr` as decoded strings, with `durationMs`, `stdoutTruncated`, `stderrTruncated`, and `status: 'exited' | 'timed_out'` (only the exited form has `exitCode`). Paths that are absolute inside the sandbox workdir are accepted wherever a runtime takes a path. Custom `SandboxRuntime` implementations must provide `execText()`.
 
 ## Runtime
 
@@ -109,7 +116,7 @@ function createDockerSandboxTools(
 ): readonly import('@anvia/core/tool').AnyTool[]
 ```
 
-`options.tools` is a required, ordered, non-empty tuple of `DockerSandboxToolName`. Supported names are command, file, port, and process operations. The policy families are `DockerSandboxExecToolPolicy`, `DockerSandboxReadFileToolPolicy`, `DockerSandboxFileToolPolicy`, and `DockerSandboxProcessToolPolicy`.
+`options.sandbox` accepts a `DockerSandboxRuntime` or the `DockerSandbox` handle itself. `options.tools` is an optional, ordered, non-empty tuple of `DockerSandboxToolName`; when omitted, every sandbox tool is registered. Supported names are command, file, port, and process operations. The policy families are `DockerSandboxExecToolPolicy`, `DockerSandboxReadFileToolPolicy`, `DockerSandboxFileToolPolicy`, and `DockerSandboxProcessToolPolicy`.
 
 Command policies are discriminated allow or block lists:
 
@@ -127,7 +134,13 @@ function createSandboxTools(
 ): readonly import('@anvia/core/tool').AnyTool[]
 ```
 
-It uses the neutral option and policy types `CreateSandboxToolsOptions`, `SandboxToolName`, `SandboxCommandPolicy`, `SandboxExecToolPolicy`, `SandboxReadFileToolPolicy`, `SandboxFileToolPolicy`, and `SandboxProcessToolPolicy`. `createDockerSandboxTools()` is a wrapper around it. Both forward `ToolCallContext.operationId` to mutating runtime calls.
+Its `sandbox` option accepts a `SandboxRuntime` or a `DockerSandbox` handle, and `tools` defaults to all tool names. It uses the neutral option and policy types `CreateSandboxToolsOptions`, `SandboxToolName`, `SandboxCommandPolicy`, `SandboxExecToolPolicy`, `SandboxReadFileToolPolicy`, `SandboxFileToolPolicy`, and `SandboxProcessToolPolicy`. `createDockerSandboxTools()` is a wrapper around it. Both forward `ToolCallContext.operationId` to mutating runtime calls.
+
+```ts
+const sandboxToolRecovery: Readonly<Record<SandboxToolName, 'safe' | 'idempotent'>>
+```
+
+`sandboxToolRecovery` is the table to spread into a durable registration's `toolRecovery`: read-only tools are `safe`, while `exec_command`, `write_file`, `start_process`, and `stop_process` are `idempotent` on runtimes that deduplicate by `operationId`, such as `RemoteSandboxRuntime`.
 
 ### Desktop tools
 
@@ -148,7 +161,7 @@ const desktopToolRecovery: Readonly<Record<DesktopToolName, 'safe' | 'idempotent
 Remote exports come from `@anvia/sandbox/remote`:
 
 ```ts
-class RemoteSandboxHub {
+class RemoteSandboxHub implements AsyncDisposable {
   constructor(options: RemoteSandboxHubOptions)
   runtime(sandboxId: string, options?: { workdir?: string }): SandboxRuntime
   terminal(sandboxId: string): SandboxTerminal
@@ -156,15 +169,21 @@ class RemoteSandboxHub {
   desktop(sandboxId: string): SandboxDesktop
   connected(): string[]
   isConnected(sandboxId: string): boolean
+  capabilities(sandboxId: string): readonly string[] | undefined
+  waitForConnection(sandboxId: string, options?: WaitForConnectionOptions): Promise<void>
   forget(sandboxId: string): void
   listen(options?: RemoteSandboxHubListenOptions): Promise<{ port: number }>
+  attach(server: http.Server, options?: RemoteSandboxHubAttachOptions): () => void
   handleUpgrade(request: IncomingMessage, socket: Duplex, head: Buffer): void
   handleTerminalUpgrade(request: IncomingMessage, socket: Duplex, head: Buffer): void
   handleTunnelUpgrade(request: IncomingMessage, socket: Duplex, head: Buffer): void
   handleDesktopUpgrade(request: IncomingMessage, socket: Duplex, head: Buffer): void
   close(): Promise<void>
+  [Symbol.asyncDispose](): Promise<void>
 }
 ```
+
+`capabilities()` returns the capability list the sandbox's live daemon advertised, or `undefined` when it is not connected. `waitForConnection()` resolves once a daemon is connected and otherwise fails with `sandbox_unavailable` after `timeoutMs` (default: the hub's `connectTimeoutMs`) or when `abortSignal` fires. `attach()` routes WebSocket upgrades on an existing `http.Server` and returns a function that detaches the listener; `RemoteSandboxHubAttachOptions` has `path`, `terminalPath`, `tunnelPath`, `desktopPath`, and `rejectUnmatched`, and by default leaves unmatched upgrade paths for other handlers.
 
 `RemoteSandboxHubOptions` controls authorization and link limits:
 
@@ -182,6 +201,9 @@ class RemoteSandboxHub {
 | `authorizeTerminal(request)` | Browser terminal authorizer. Required for `handleTerminalUpgrade`. |
 | `authorizeTunnel(request)` | Browser tunnel authorizer. Required for `handleTunnelUpgrade`. |
 | `authorizeDesktop(request)` | Browser desktop authorizer. Required for `handleDesktopUpgrade`. |
+| `onConnect(event)` | Called after a daemon completes its handshake, with `RemoteSandboxConnectEvent` (`sandboxId`, `workdir`, `daemonVersion`, `capabilities`). |
+| `onDisconnect(event)` | Called when a daemon disconnects, with `RemoteSandboxDisconnectEvent` (`sandboxId`, `replaced`). `replaced` is true when a newer daemon took over the sandbox. |
+| `onError(error, context)` | Called when an authorizer throws or a handshake, terminal, tunnel, or desktop operation fails. `RemoteSandboxHubErrorContext` has `stage` and an optional `sandboxId`. |
 | `allowedOrigins` | Browser origins allowed to open terminal, tunnel, or desktop relays. Without a list, the Origin must match `Host`. |
 
 `RemoteSandboxHubListenOptions` contains `port`, `host`, `path`, `terminalPath`, `tunnelPath`, and `desktopPath`. `RemoteSandboxAuthorization` is the `{ sandboxId }` result of `authorize`.
@@ -224,6 +246,7 @@ Relay helpers for browser upgrades:
 | `relayTicket(request)` | Read the ticket from the `anvia.ticket.<ticket>` subprotocol or `?ticket=`. |
 | `terminalTicket` | Alias of `relayTicket`, kept for earlier terminal examples. |
 | `originAllowed(request, allowedOrigins)` | Apply the Origin rule used by all browser relays. |
+| `createRelayTicketStore(options?)` | Create an in-memory `RelayTicketStore<Grant>` of single-use, expiring tickets (`ttlMs` default 30 seconds, `maxEntries` default 10,000). Its `mint(grant)`, `redeem(ticket)`, `redeemRequest(request)`, `revoke(ticket)`, `clear()`, and `size` back `authorizeTerminal`, `authorizeTunnel`, and `authorizeDesktop`. |
 | `terminalSubprotocol`, `tunnelSubprotocol`, `desktopSubprotocol` | Subprotocol names the relays select. |
 
 Studio registration helpers:
@@ -256,13 +279,34 @@ class SandboxDaemon {
   start(): void
   ready(): Promise<void>
   stop(): Promise<void>
+  [Symbol.asyncDispose](): Promise<void>
 }
 ```
 
 `SandboxDaemonOptions` requires `controlUrl`, `token`, `workdir`, and `stateDir`. Optional fields are `limits`, `terminal`, `tunnel`, `desktop`, `env`, `maxOperations`, `maxStoredResultBytes`, `reconnect`, `handshakeTimeoutMs`, `binaryData`, `maxPayloadBytes`, `version`, and `onLog`. The related types are `SandboxDaemonTerminalOptions`, `SandboxDaemonTunnelOptions`, `SandboxDaemonDesktopOptions`, and `SandboxDaemonLogLevel`; the terminal PTY extension points are `PtySpawner`, `PtySpawnOptions`, and `PtyProcess`.
 
-The `anvia-sandbox-daemon` executable reads the same required values from `ANVIA_CONTROL_URL` and `ANVIA_SANDBOX_TOKEN`, with `ANVIA_SANDBOX_WORKDIR` and `ANVIA_SANDBOX_STATE_DIR` for local paths.
+The `anvia-sandbox-daemon` executable reads the same required values from `ANVIA_CONTROL_URL` and `ANVIA_SANDBOX_TOKEN`, with `ANVIA_SANDBOX_WORKDIR` and `ANVIA_SANDBOX_STATE_DIR` for local paths. Set `ANVIA_SANDBOX_TUNNEL=0` to turn TCP tunnels off, or `ANVIA_SANDBOX_TUNNEL_ALLOWED_PORTS` to a comma-separated list of loopback ports tunnels may reach. The executable accepts `--check`, `--require`, `--help`, and `--version`, and exits with status 2 on an unknown flag or on `--require` without `--check`.
+
+## CLI
+
+`anvia-sandbox create-image` accepts `--from <dir|manifest>` to build from an existing manifest or directory and `--version` to print the package version. A non-interactive run needs `--name` and at least one `--runtime` or `--feature`, or `--from`.
 
 ## Errors
 
-`DockerSandboxError` exposes a `code` and optional `details`. `DockerSandboxErrorCode` includes Docker availability and command failures, missing images or volumes, missing or invalid sandbox state, invalid paths, timeouts, oversized files, tool-policy failures, ports, and processes. Remote links add `sandbox_unavailable`, `unsupported`, `desktop_locked`, and `protocol`.
+`SandboxError` is the provider-neutral name for `DockerSandboxError`; both are exported from `@anvia/sandbox` and `@anvia/sandbox/remote`, as are `SandboxErrorCode`, `DockerSandboxErrorCode`, and the code lists `sandboxErrorCodes` and `dockerSandboxErrorCodes`. `isSandboxError(error, code?)` narrows an unknown value and, when given a code, also checks it:
+
+```ts
+import { isSandboxError } from '@anvia/sandbox'
+
+try {
+  await client.createSandbox(options)
+} catch (error) {
+  if (isSandboxError(error, 'docker_unavailable')) {
+    console.error('Start Docker, then retry.')
+  } else {
+    throw error
+  }
+}
+```
+
+`DockerSandboxError` exposes a `code` and optional `details`. Docker CLI failures include a redacted stderr snippet in the message. `DockerSandboxErrorCode` includes Docker availability and command failures, missing images or volumes, missing or invalid sandbox state, invalid paths, timeouts, oversized files, tool-policy failures, ports, and processes. Remote links add `sandbox_unavailable`, `unsupported`, `desktop_locked`, and `protocol`.

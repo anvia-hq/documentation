@@ -1,6 +1,6 @@
 # Agent as a tool
 
-`agent.asTool()` creates a normal Anvia tool whose input is a focused prompt and whose output is the child agent's final text.
+`agent.asTool()` creates a normal Anvia tool whose input is a focused prompt and whose output is the child agent's final output (text unless the child declares an `outputSchema`).
 
 ## 1. Build a narrow specialist
 

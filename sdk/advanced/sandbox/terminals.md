@@ -20,7 +20,7 @@ await terminal.kill('main')
 
 `open()` attaches to the session named `sessionName`, creating it in the workdir if needed. `cwd` is relative to the workdir and is used only when the session is created; `env` works the same way. Session names use letters, digits, `_`, and `-`, up to 64 characters. `cols` and `rows` are integers from 1 to 1000.
 
-Several handles can attach to one session and all see the same output. `close()` detaches; the session keeps running until `kill()` or until the sandbox stops. Read `output` once. `exit` never rejects.
+Several handles can attach to one session and all see the same output. `close()` detaches; the session keeps running until `kill()` or until the sandbox stops. Read `output` once. `exit` never rejects. Handles implement `Disposable`, so `using handle = await terminal.open(...)` closes the handle on scope exit.
 
 Opening a terminal waits for a disconnected daemon like any other call, then fails with `sandbox_unavailable`. A terminal is bound to one daemon connection, so it is never retried across a reconnect.
 
@@ -100,7 +100,7 @@ const hub = new RemoteSandboxHub({
 await hub.listen({ port: 8787, path: '/daemon', terminalPath: '/terminal' })
 ```
 
-`terminalTicket(request)` reads the ticket from the `anvia.ticket.<ticket>` WebSocket subprotocol or the `ticket` query parameter. Prefer the subprotocol: URLs end up in access logs. `redeemTerminalTicket` is application code: check that the ticket exists, has not expired, has not been used, and that the signed-in user may access that sandbox and session.
+`terminalTicket(request)` reads the ticket from the `anvia.ticket.<ticket>` WebSocket subprotocol or the `ticket` query parameter. Prefer the subprotocol: URLs end up in access logs. `redeemTerminalTicket` is application code. `createRelayTicketStore<Grant>()` from `@anvia/sandbox/remote` provides an in-memory, single-use store you can use for it: `store.mint(grant, { ttlMs })` returns a URL-safe ticket (default TTL 30 seconds, at most 10,000 unredeemed entries) and `store.redeemRequest(request)` reads the ticket from an upgrade request and consumes it once, returning the grant or `null`. It is per-process, so multi-node deployments need a shared store. Whichever store you use, check that the ticket exists, has not expired, has not been used, and that the signed-in user may access that sandbox and session.
 
 The hub checks `Origin` before it calls `authorizeTerminal`: it must be in `allowedOrigins`, or, with no list, match the `Host` the browser connected to. Anything else gets 403. Requests with no `Origin` (not a browser page) pass this check and still need a ticket.
 

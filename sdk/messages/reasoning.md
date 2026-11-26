@@ -97,6 +97,7 @@ console.log(generation?.provider)
 console.log(generation?.modelId)
 console.log(generation?.usage.totalTokens)
 console.log(generation?.contextUsage)
+console.log(generation?.contextBreakdown)
 console.log(generation?.sources)
 console.log(generation?.providerToolCalls)
 ```

@@ -59,7 +59,7 @@ const result = await supportAgent.generate({
 })
 ```
 
-The generated tool accepts `{ prompt: string }` and returns the child's final output string. Agent tools require an explicit suspension policy; `reject` prevents a child interaction from crossing the nested tool boundary.
+The generated tool accepts `{ prompt: string }` and returns the child's final output (a string unless the child declares an `outputSchema`). Agent tools require an explicit suspension policy; `reject` prevents a child interaction from crossing the nested tool boundary.
 
 ## 3. Use a meaningful boundary
 

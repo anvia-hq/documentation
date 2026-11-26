@@ -20,6 +20,13 @@ if (result.exitCode !== 0) {
 
 `exec()` returns byte stdout/stderr, duration, and truncation flags. Its discriminated result is either `status: 'exited'` with `exitCode`, or `status: 'timed_out'`.
 
+For text output, `execText()` takes the same options and returns `stdout` and `stderr` as strings with the same `status`, `exitCode`, duration, and truncation fields.
+
+```ts
+const result = await sandbox.runtime.execText({ command: 'node', args: ['--version'] })
+if (result.status === 'exited') console.log(result.stdout.trim())
+```
+
 ## Stream command output
 
 ```ts
@@ -44,7 +51,7 @@ Pass `abortSignal` to cancel application-owned work. Cancellation affects the op
 
 ```ts
 const commandTools = createDockerSandboxTools({
-  sandbox: sandbox.runtime,
+  sandbox,
   tools: ['exec_command'],
   exec: {
     commands: { mode: 'allow', values: ['node', 'pnpm'] },

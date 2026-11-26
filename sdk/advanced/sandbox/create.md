@@ -12,7 +12,7 @@ pnpm add @anvia/sandbox @anvia/core
 import { DockerSandboxClient } from '@anvia/sandbox'
 
 const client = new DockerSandboxClient()
-await client.pullImage({ image: 'node:22-bookworm' })
+await client.ensureImage({ image: 'node:22-bookworm' })
 
 const sandbox = await client.createSandbox({
   image: 'node:22-bookworm',
@@ -34,7 +34,7 @@ const sandbox = await client.createSandbox({
 })
 ```
 
-Images are explicit and must be local. Choose them in application configuration, not from prompt input. `pullImage()` makes networked image acquisition a separate, reviewable operation.
+Images are explicit and must be local. Choose them in application configuration, not from prompt input. `hasImage()` reports whether an image is present locally. `ensureImage()` pulls only when it is missing and returns `{ pulled }`. `pullImage()` always pulls. Each makes networked image acquisition a separate, reviewable operation.
 
 ## Build a custom image
 
@@ -45,6 +45,8 @@ pnpm dlx --package=@anvia/sandbox anvia-sandbox create-image \
   --feature artifacts
 ```
 
+Pass `--from <dir|manifest>` to regenerate an image from an existing `anvia-sandbox.json` manifest, and `--version` to print the CLI version.
+
 Use the generated tag as the `image` passed to `createSandbox()`. Build dependencies into the image instead of installing them during each agent run.
 
 ## Expose a narrow tool bundle
@@ -53,7 +55,7 @@ Use the generated tag as the `image` passed to `createSandbox()`. Build dependen
 import { createDockerSandboxTools } from '@anvia/sandbox'
 
 const tools = createDockerSandboxTools({
-  sandbox: sandbox.runtime,
+  sandbox, // a DockerSandbox handle or sandbox.runtime
   tools: ['list_files', 'read_file', 'write_file', 'exec_command'],
   exec: {
     commands: { mode: 'allow', values: ['python'] },
@@ -65,6 +67,6 @@ const tools = createDockerSandboxTools({
 })
 ```
 
-The tool tuple is required and ordered. Add process and port tools only for workflows that intentionally manage a live process.
+`sandbox` accepts a `DockerSandbox` handle or its `runtime`. When `tools` is omitted, the factory exposes all ten sandbox tools, including process and port tools. Pass an explicit, non-empty tuple to keep the surface narrow, and add process and port tools only for workflows that intentionally manage a live process.
 
-Creation can fail because Docker is unavailable, the image or named volume is absent, or an initial path is unsafe. Treat those as infrastructure or input failures before starting the agent. Once creation succeeds, place complete use inside `try` and cleanup in `finally`.
+Creation can fail because Docker is unavailable (`docker_unavailable`), the image or named volume is absent, or an initial path is unsafe. Treat those as infrastructure or input failures before starting the agent. Once creation succeeds, place complete use inside `try` and cleanup in `finally`.

@@ -83,9 +83,10 @@ may bill both attempts. Interrupted tools follow their recovery policy, and a ma
 is no exactly-once guarantee for external services.
 
 Registered code must therefore stay deterministic and side-effect free where it is replayed: tool
-definitions, parsers, schemas, and approval predicates. Registration also rejects agent features that lack a
-persistence boundary: memory, lifecycle callbacks, middleware, guardrails, context sources, MCP servers,
-provider tools, and dynamic tool indexes.
+definitions, parsers, schemas, and approval predicates. Registration rejects agent features that lack a
+persistence boundary unless the registration opts in with a mode marker: memory, lifecycle callbacks,
+middleware, guardrails, control hooks, live vector context, MCP servers, provider tools, and dynamic tool
+indexes. See [durable capabilities](/packages/durable/capabilities) for each marker.
 
 ## 4. Continue through the section
 

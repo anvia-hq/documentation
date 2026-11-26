@@ -27,7 +27,7 @@ The port must be an integer from 1 to 65535. A port nothing listens on fails wit
 | --- | --- |
 | `write(data)` | Sends a string or `Uint8Array`. Settles once there is room; while the service is slow to read, writes wait instead of piling up. Rejects once the tunnel has ended. |
 | `output` | Ordered `Uint8Array` chunks. Read it once; a slow reader slows the service rather than growing memory. |
-| `close()` | Closes the tunnel. |
+| `close()` | Closes the tunnel. Handles also implement `Disposable`. |
 | `exit` | Settles with `{ reason }`. It never rejects. |
 
 `exit.reason` is one of:
@@ -60,6 +60,7 @@ const daemon = new SandboxDaemon({
 - `allowedPorts` limits the ports a tunnel may reach. Other ports fail with the `port` error code. The desktop's VNC port is always allowed, even when the list omits it.
 - `maxTunnels` bounds how many tunnels one hub connection may hold open. The default is 64; opening another fails with `invalid_state`.
 - `connectTimeoutMs` sets how long the daemon waits for the local service to accept. The default is 5 seconds.
+- The `anvia-sandbox-daemon` CLI reads `ANVIA_SANDBOX_TUNNEL=0` to switch tunnels off and `ANVIA_SANDBOX_TUNNEL_ALLOWED_PORTS` (comma-separated ports) to set `allowedPorts`.
 - `tunnel: false` switches tunnels off. The daemon does not advertise `tunnel`, and a hub gets the `unsupported` error code.
 
 ## Flow control
@@ -99,7 +100,7 @@ tunnel: {
 
 `hub.handleTunnelUpgrade(request, socket, head)` relays a browser's WebSocket to a tunnel byte for byte, in binary frames, which is the framing noVNC and websockify use. Give the hub an `authorizeTunnel` function that returns the sandbox and port a ticket grants, and, behind a proxy, `allowedOrigins`.
 
-Tickets and the Origin check work exactly as they do for [browser terminals](/sdk/advanced/sandbox/terminals#browser-relay): `relayTicket(request)` reads the ticket from the `anvia.ticket.<ticket>` subprotocol or `?ticket=`, a foreign Origin gets 403 before the authorizer runs, and a missing or refused ticket gets 401. `terminalTicket` is the same function under its earlier name.
+Tickets can be minted and redeemed with `createRelayTicketStore()` (see [browser terminals](/sdk/advanced/sandbox/terminals#browser-relay)). Tickets and the Origin check work exactly as they do for [browser terminals](/sdk/advanced/sandbox/terminals#browser-relay): `relayTicket(request)` reads the ticket from the `anvia.ticket.<ticket>` subprotocol or `?ticket=`, a foreign Origin gets 403 before the authorizer runs, and a missing or refused ticket gets 401. `terminalTicket` is the same function under its earlier name.
 
 ```ts
 import { RemoteSandboxHub, relayTicket } from '@anvia/sandbox/remote'

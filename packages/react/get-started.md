@@ -90,7 +90,7 @@ export function Chat() {
 }
 ```
 
-Providers accept existing `useChat` or `useCompletion` results. The primitives do not create a
+`ChatProvider` also accepts `transport` (and any other `useChat` option) instead of `controller` and creates the chat itself; read it with `useChatContext()`. `CompletionProvider` accepts an existing `useCompletion` result. The primitives do not create a
 transport, own server state, run an agent, or ship CSS. Their semantic DOM contract uses ARIA,
 `data-state`, and `data-role` only.
 

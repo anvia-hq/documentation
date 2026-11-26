@@ -86,6 +86,8 @@ import {
 
 Public types include `ClientStreamRequest`, `ClientStreamEvent`, `ClientStreamFrame`, `ClientInteraction`, `ClientTransport`, `UIMessage`, `UIMessagePart`, attachments, errors, metadata, data maps, and cursors. `CLIENT_STREAM_PROTOCOL` is the current protocol identifier.
 
+The reducer keeps an optional, validated `contextBreakdown` from `message_end`, `turn_end`, and `run_end` events on the assistant message's `generation`, and `messagesToUIMessages()` restores it when hydrating history.
+
 ## Generic event transport reference
 
 Import from `@anvia/client/transport`. These APIs operate on your own event schema:

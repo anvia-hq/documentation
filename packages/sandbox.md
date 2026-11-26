@@ -8,7 +8,7 @@
 pnpm add @anvia/core @anvia/sandbox
 ```
 
-Docker must be available to the application process for local sandboxes. Images must exist locally before `createSandbox()` runs; call `pullImage()` explicitly when your application owns image acquisition. The remote runtime replaces Docker on the agent host with a daemon inside the sandbox.
+Docker must be available to the application process for local sandboxes. Images must exist locally before `createSandbox()` runs; call `pullImage()` explicitly when your application owns image acquisition (or `ensureImage()` to pull only when `hasImage()` is false). The remote runtime replaces Docker on the agent host with a daemon inside the sandbox.
 
 ## Create a sandbox
 
@@ -45,13 +45,17 @@ try {
 }
 ```
 
+## Handle errors
+
+Sandbox failures are `SandboxError` instances with a stable `code`. Narrow with `isSandboxError(error, 'docker_unavailable')`; the same exports are available from `@anvia/sandbox/remote`.
+
 ## Give tools to an agent
 
 ```ts
 import { createDockerSandboxTools } from '@anvia/sandbox'
 
 const tools = createDockerSandboxTools({
-  sandbox: sandbox.runtime,
+  sandbox, // a DockerSandbox handle or sandbox.runtime
   tools: ['read_file', 'write_file', 'list_files', 'exec_command'],
   exec: {
     commands: { mode: 'allow', values: ['node', 'pnpm'] },

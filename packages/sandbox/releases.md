@@ -1,6 +1,16 @@
 # Releases
 
-The reviewed source release is `@anvia/sandbox` **1.3.5**. The entries below preserve notable v0 history.
+The reviewed source release is `@anvia/sandbox` **1.4.0**. The entries below preserve notable v0 history.
+
+## Changes in 1.4.0
+
+Reviewed `1.3.5` → `1.4.0` against SDK source on 2026-11-26. Improves developer experience across Docker sandboxes, remote hubs, tools, and the CLIs. See the [API reference](/packages/sandbox/api-reference) for each export.
+
+- `SandboxError`, `SandboxErrorCode`, and `isSandboxError` are exported from `@anvia/sandbox` and `@anvia/sandbox/remote`; Docker CLI failures include a redacted stderr snippet and `docker_unavailable` detection.
+- `DockerSandboxClient` gains `hasImage`, `ensureImage`, `listSandboxes`, and `destroySandbox`; `SandboxRuntime` gains `execText` and accepts workdir-absolute paths.
+- `createSandboxTools` and `createDockerSandboxTools` accept a `DockerSandbox` handle, default `tools` to all tools, and `sandboxToolRecovery` is exported for `@anvia/durable`.
+- `RemoteSandboxHub` adds `onConnect`, `onDisconnect`, `onError`, `capabilities`, `waitForConnection`, `attach`, and async disposal; `SandboxDaemon` is `AsyncDisposable`, terminal and tunnel handles are `Disposable`, and `createRelayTicketStore` backs browser relay tickets.
+- `anvia-sandbox` adds `--from <dir|manifest>` and `--version`; `anvia-sandbox-daemon` validates flags strictly, adds `--version`, and reads `ANVIA_SANDBOX_TUNNEL*` environment options.
 
 ## Changes in 1.3.5
 
@@ -12,10 +22,11 @@ Reviewed `1.2.1` → `1.3.2` against SDK source on 2026-11-04. The 1.3 line adde
 
 Reviewed `1.1.8` → `1.2.0` against SDK source on 2026-10-15. Natural commands in `exec_command` and `start_process` now prefer `/bin/bash -c`, falling back to `sh -c` only if Bash is unavailable. Allow policies check the selected executable; explicit argv and low-level APIs keep their behavior. See [Commands](/sdk/advanced/sandbox/commands#natural-command-lines).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/2322fcd9b00e4cb82166c7aca319454ee97abe4e/packages/tool-sandbox/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7815383f045fa45ac64534bbfcc67fcb52b70e86/packages/tool-sandbox/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.4.0` | Added `SandboxError`/`isSandboxError`, Docker image and sandbox management (`hasImage`, `ensureImage`, `listSandboxes`, `destroySandbox`), `execText`, `sandboxToolRecovery`, handle-accepting tool factories with default tools, hub connection events, `waitForConnection`, `attach`, `createRelayTicketStore`, `anvia-sandbox --from`/`--version`, and stricter daemon CLI flags with tunnel environment options. |
 | `1.3.2` | Added `anvia-sandbox-daemon --check` and `--require`, desktop configuration from `ANVIA_SANDBOX_DESKTOP*` environment variables, `create-image --feature desktop`, and `studioSandbox`/`studioDesktopView` for Studio. Updated upstream runtime dependencies and the `zod` peer range. |
 | `1.3.1` | Fixed the browser tunnel and desktop relays on runtimes whose WebSocket cannot pause, such as Bun; a browser more than 4 MiB ahead of the service is closed with code 1008 instead of growing memory. |
 | `1.3.0` | Added the neutral `SandboxRuntime` and `createSandboxTools`; the remote runtime with `RemoteSandboxHub`, `SandboxDaemon`, and `operationId` deduplication; interactive terminals; loopback tunnels with binary framing; and the remote desktop with `createDesktopTools`. `DockerSandboxRuntime` now extends `SandboxRuntime`. |

@@ -109,7 +109,7 @@ When a run uses a memory session, `sessionId` and `userId` reach observers even 
 destinations and redaction when those identifiers are sensitive. Observers still must not use them for
 authorization.
 
-## 3. Account for input tokens
+## 5. Account for input tokens
 
 `@anvia/core/context` estimates how a request's input tokens are spent, without another model call:
 
@@ -137,7 +137,7 @@ The nine segments, in order, are `instructions`, `skills`, `messages`, `toolResu
 `skills` segment combines skill catalog instructions, skill tool definitions, and loaded skill tool
 results, which `Agent` detects automatically from the tools it was given. `estimateContextTextTokens()`
 is the default provider-neutral counter (about four characters per token); pass `tokenCounter` for a
-model-specific estimate, and `mcpToolNames` to report MCP-served tools separately. Inline base64 media
+model-specific estimate, and `mcpToolNames` to report MCP-served tools separately. Direct callers can attribute skills themselves with `skillInstructions` (the catalog text appended to `instructions`) and `skillToolNames`. Inline base64 media
 counts as at most 8,000 characters because providers bill media by pixels or duration rather than
 payload bytes. Estimates are local, and although the provider's input count may include fields this
 split does not model, `scaleContextBreakdown()` keeps the proportions and makes the segments add up to

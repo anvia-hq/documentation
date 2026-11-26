@@ -16,7 +16,7 @@ const mistral = new MistralClient({
 const ocr = mistral.ocrModel({ modelId: 'mistral-ocr-latest' })
 ```
 
-Pass an explicit model ID to `ocrModel(modelId)` when the application must pin a version.
+`modelId` is required. Pass a dated model ID instead of `mistral-ocr-latest` when the application must pin a version.
 
 ## 2. Process uploaded bytes
 

@@ -4,7 +4,7 @@ Formatting converts a vector search result into the `Document` sent to the compl
 
 ## 1. Understand the default format
 
-Without `format()`, Anvia uses the result ID as the document ID. A string document becomes the text directly; any other document is serialized as indented JSON.
+Without `format()`, Anvia uses the result ID as the document ID. A string document becomes the text directly; an object with a string `text` field uses that text (or the matched chunk text when the store reports one); any other document is serialized as indented JSON.
 
 Search metadata is converted to string-valued `additionalProps`. The default is useful when the index stores plain text or a small object whose JSON representation is already clear.
 

@@ -40,6 +40,14 @@ await sandbox.stop()
 const resumed = await client.resumeSandbox({ id: sandbox.id })
 ```
 
+`client.listSandboxes()` returns a `DockerSandboxSummary` for every container Anvia created (`id`, `containerName`, `image`, `state`, `status`, and, when known, `workdir`, `workspaceType`, `networkMode`). `client.destroySandbox({ id, ignoreNotFound })` removes a container and its owned volume without a live handle, which suits crash reconciliation. Set `ignoreNotFound: true` to skip the `sandbox_not_found` error.
+
+```ts
+for (const summary of await client.listSandboxes()) {
+  if (isOrphaned(summary.id)) await client.destroySandbox({ id: summary.id, ignoreNotFound: true })
+}
+```
+
 Stopping preserves the container. Resumption restarts it and returns a new handle. Destroying is terminal. The application must retain and authorize IDs and reconcile stopped containers after crashes.
 
 ## Reuse an application-owned volume

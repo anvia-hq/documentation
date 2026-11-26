@@ -744,6 +744,8 @@ question types. Parsing checks shape; the assertion matches answers to the reque
 | `calculateContextUsage(usage, modelInfo)` | root or completion | Input-token context-window snapshot, or undefined. |
 | `withContextUsage(response, modelInfo)` | root or completion | Attach usable context accounting to a response. |
 
+For the per-segment input split, `@anvia/core/context` exports `CONTEXT_SEGMENT_IDS` and `isContextBreakdown`, and its estimator accepts `skillInstructions` and `skillToolNames` to fill the `skills` segment (`Agent` detects skills automatically). See [Context](/sdk/agents/context).
+
 Here root means `@anvia/core`; completion means `@anvia/core/completion`. Types include
 `CompletionModelControls`, `CompletionModelSelectControl`, `CompletionControlValues`,
 `CompletionModelControlsOf`, `ModelContextLimits`, `CompletionModelInfo`, and `ContextUsage`.
