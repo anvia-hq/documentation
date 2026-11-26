@@ -67,7 +67,7 @@ execution. See [Commands](/sdk/advanced/sandbox/commands#natural-command-lines).
 
 `authorize(token)` must resolve a token to exactly one sandbox. The hub does not issue or rotate tokens. Use `wss://` for the control URL, keep `ANVIA_SANDBOX_STATE_DIR` outside the workspace, and treat the token as a secret. The daemon removes `ANVIA_SANDBOX_TOKEN` and `ANVIA_CONTROL_URL` from the environment of commands it runs, but that does not make the token safe to expose to sandbox code.
 
-Browser terminals, tunnels, and desktops use short-lived tickets. The hub checks the browser `Origin` before running the authorizer, and `allowedOrigins` covers proxies that rewrite Host. Read-only desktop viewers are enforced by the relay's server-side filtering, not by browser UI.
+Browser terminals, tunnels, and desktops use short-lived tickets; `createRelayTicketStore()` provides an in-memory single-use store for them, which does not replace a shared store when several server processes run. The hub checks the browser `Origin` before running the authorizer, and `allowedOrigins` covers proxies that rewrite Host. Read-only desktop viewers are enforced by the relay's server-side filtering, not by browser UI.
 
 ## Desktop boundary
 

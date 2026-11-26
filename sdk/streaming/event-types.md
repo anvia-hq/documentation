@@ -28,7 +28,7 @@ Completion and agent streams share provider-generation events. Agent streams add
 
 Provider-generation events such as `text_delta`, `reasoning_delta`, `tool_call_delta`, `tool_call`, `source`, and `provider_tool_call` include the agent turn number.
 
-`turn_end` contains the completed provider response and optional time-to-first-delta measurement.
+`turn_end` contains the completed provider response, optional time-to-first-delta measurement, and optional `contextBreakdown`, the scaled split of the turn's input tokens by segment. The terminal `response` outcome carries the same split as `contextBreakdown` on the outcome, and `@anvia/client` forwards it on `message_end`, `turn_end`, and `run_end` frames. See [Context](/sdk/agents/context).
 
 ## Agent runtime events
 

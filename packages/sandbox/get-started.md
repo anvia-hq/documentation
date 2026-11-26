@@ -12,7 +12,7 @@ Create and always destroy a sandbox:
 import { DockerSandboxClient } from '@anvia/sandbox'
 
 const client = new DockerSandboxClient()
-await client.pullImage({ image: 'node:22-bookworm' })
+await client.ensureImage({ image: 'node:22-bookworm' })
 
 const sandbox = await client.createSandbox({
   image: 'node:22-bookworm',

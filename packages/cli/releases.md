@@ -1,7 +1,11 @@
 # CLI releases
 
 The CLI package versions independently from `@anvia/react` and the runtime SDK. The reviewed
-source release is `@anvia/cli` **1.5.7**.
+source release is `@anvia/cli` **1.5.8**.
+
+## Changes in 1.5.8
+
+Reviewed `1.5.7` → `1.5.8` against SDK source on 2026-11-26. The bundled `anvia-*` Agent Skills are manual-invocation only: each `SKILL.md` sets `disable-model-invocation: true` for Claude Code, and each `agents/openai.yaml` sets `allow_implicit_invocation: false` for Codex. Invoke a skill explicitly, such as `/anvia-agent` or `$anvia-agent`.
 
 ## Changes in 1.5.7
 
@@ -17,10 +21,11 @@ Reviewed `1.5.2` → `1.5.6` against SDK source on 2026-11-23. Adds richer vecto
 
 Reviewed `1.5.0` → `1.5.1` against SDK source on 2026-10-15. Bundled the durable-goals skill guidance for persisted handoffs, verified completion, budgets, and resumable sessions. UI installation and skills installation remain separate workflows.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/2322fcd9b00e4cb82166c7aca319454ee97abe4e/packages/cli/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7815383f045fa45ac64534bbfcc67fcb52b70e86/packages/cli/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.5.8` | Made the bundled Agent Skills manual-invocation only for Claude Code and Codex. |
 | `1.5.7` | Registry items declare `@anvia/react` after the headless primitives moved there from `@anvia/react-ui`. |
 | `1.5.0` | Bundled the experimental `anvia-durable` skill (durable main agents, owned subagents, replay-safe effects, approvals, persisted waits, task graphs, remote controls, operations, and a local restart smoke check), exposed through `skills list` and `skills init`. |
 | `1.4.1` | Refreshed the package README. |

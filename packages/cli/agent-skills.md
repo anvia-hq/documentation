@@ -21,6 +21,11 @@ CLI `1.5.0` includes these ten skills:
 | `anvia-studio` | Serving and inspecting agents, traces, approvals, and observability |
 | `release-notes` | A generic release-note drafting demo |
 
+Since CLI `1.5.8`, the bundled skills are manual-invocation only. Each `SKILL.md` sets
+`disable-model-invocation: true` (Claude Code), and each `agents/openai.yaml` sets
+`allow_implicit_invocation: false` (Codex). Invoke a skill explicitly, such as `/anvia-agent` in
+Claude Code or `$anvia-agent` in Codex; the agent does not load it on its own.
+
 ```sh
 anvia skills list
 ```

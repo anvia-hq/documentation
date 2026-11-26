@@ -1,8 +1,15 @@
 # Releases
 
-The reviewed source release is `@anvia/react` **1.3.0**. The entries below preserve notable v0
+The reviewed source release is `@anvia/react` **1.4.0**. The entries below preserve notable v0
 protocol milestones and the primitive history the package inherited when `@anvia/react-ui` was
 merged into it.
+
+## Changes in 1.4.0
+
+Reviewed `1.3.0` → `1.4.0` against SDK source on 2026-11-26:
+
+- `ChatProvider` accepts `transport` and any other `useChat` option and creates the chat itself; passing `controller` works as before. Read the controller with `useChatContext()`.
+- `useChat` exposes `contextBreakdown`, and `ContextMeterPrimitive` passes an optional `breakdown` to its render prop.
 
 ## Changes in 1.3.0
 
@@ -31,10 +38,11 @@ Reviewed `1.1.4` → `1.1.5` against SDK source on 2026-11-04. Preserved detaile
 
 Reviewed `1.1.3` → `1.1.4` against SDK source on 2026-10-15. Refreshed package READMEs with current overviews, quickstarts, and links to the detailed guides. Review the source changelog for any dependency changes included in your upgrade.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/2322fcd9b00e4cb82166c7aca319454ee97abe4e/packages/react/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7815383f045fa45ac64534bbfcc67fcb52b70e86/packages/react/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.4.0` | `ChatProvider` accepts `transport` and `useChat` options as an alternative to `controller`; `useChat` exposes `contextBreakdown` and `ContextMeterPrimitive` passes `breakdown` to its render prop. |
 | `1.3.0` | Merged the headless primitives from `@anvia/react-ui` into this package with no API change, marked the package side-effect free, and moved the CLI registry and Studio onto `@anvia/react`. |
 | `1.2.0` | Added `useDurableChat()` and bounded `maxRetainedEvents` for `useChat()` and `useCompletion()`. |
 | `1.1.5` | Preserved detailed chat stream errors and reported them once when the stream ended with an error status. |

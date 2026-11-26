@@ -1,6 +1,10 @@
 # Releases
 
-The reviewed source release is `@anvia/client` **1.9.1**.
+The reviewed source release is `@anvia/client` **1.10.0**.
+
+## Changes in 1.10.0
+
+Reviewed `1.9.1` → `1.10.0` against SDK source on 2026-11-26. Forwards and validates `contextBreakdown` on `message_end`, `turn_end`, `run_end`, and `UIMessage.generation`, including hydration through `messagesToUIMessages`.
 
 ## Changes in 1.9.0
 
@@ -10,10 +14,11 @@ Reviewed `1.7.0` → `1.9.0` against SDK source on 2026-11-23. Adds durable run 
 
 Reviewed `1.2.0` → `1.7.0` against SDK source on 2026-11-04. Added durable discovery, queues, graphs, custom tasks, and operations support, followed by multimodal prompts and compatibility with compaction and goals. Queued steering is available through `DurableClient.steer()`; releases now accept Durable 0.8–0.13 for goal controls, continuing rounds, tracing, and the payload/agent-compatibility changes. HTTP submission types exclude server-owned trace context. Stream readers hardened malformed-frame handling and SSE parsing, the protocol gained `message_reset`, and `@anvia/client/durable-chat` added a `useChat` transport for durable runs. See [Durable HTTP](/packages/durable/http) and [Durable chat transport](/packages/client/durable-chat).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/2322fcd9b00e4cb82166c7aca319454ee97abe4e/packages/client/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7815383f045fa45ac64534bbfcc67fcb52b70e86/packages/client/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.10.0` | Added validated `contextBreakdown` on `message_end`, `turn_end`, `run_end`, and `UIMessage.generation`, including `messagesToUIMessages` hydration. |
 | `1.7.0` | Added `@anvia/client/durable-chat`, a `ClientTransport` adapter for `useChat` over `@anvia/durable`, with interaction routing, run-ID/sequence resume, explicit run controls, and `DurableBusyError` for HTTP 409. `DurableHttpError` now exposes `status`, `code`, `field`, and the server message; the optional Durable peer range accepts 0.13. |
 | `1.6.0` | Added the validated `message_reset` stream event for retried unfinished generations. The reducer clears the message's parts, metadata, and generation state while retaining its ID and role. Upgrade server and frontend Client packages together. |
 | `1.5.0` | Hardened JSONL and SSE readers: malformed frames are skipped and reported through `onParseError` (or thrown with `strict: true`), SSE parsing follows the event-stream format including multi-line data and CRLF/LF/CR, and `readSseFrames`, `EventStreamParseError`, and `EventStreamReadOptions` were exported. Durable client streams parse strictly. |

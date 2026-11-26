@@ -57,7 +57,7 @@ if (result.type === 'response') {
 }
 ```
 
-A response may also contain context usage, guardrail decisions, normalized sources,
+A response may also contain context usage and its `contextBreakdown` (see [Context](/sdk/agents/context#_5-account-for-input-tokens)), guardrail decisions, normalized sources,
 provider-executed tool metadata, and memory-compaction details.
 
 ## 3. Continue an approval

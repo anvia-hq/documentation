@@ -1,5 +1,5 @@
 {
-  "reviewedSdkRevision": "2322fcd9b00e4cb82166c7aca319454ee97abe4e",
+  "reviewedSdkRevision": "7815383f045fa45ac64534bbfcc67fcb52b70e86",
   "entries": [
     {
       "module": "@anvia/cli",
@@ -411,8 +411,8 @@
       "module": "@anvia/sandbox",
       "guide": "packages/sandbox/get-started.md",
       "reference": "packages/sandbox/api-reference.md",
-      "exportCount": 83,
-      "exportNamesHash": "6c65dd3bf35488b1da6aa0c5411a60b22858d4742cb15488580694db0014dbd4"
+      "exportCount": 101,
+      "exportNamesHash": "f82b1aa88aea61e23707c72daf0ba5a32b62340285342a276afe2ca914339da5"
     },
     {
       "module": "@anvia/studio",
@@ -572,8 +572,8 @@
       "module": "@anvia/sandbox/remote",
       "guide": "sdk/advanced/sandbox/remote.md",
       "reference": "packages/sandbox/api-reference.md",
-      "exportCount": 43,
-      "exportNamesHash": "1e1d853b3df821146479441d1ae9654cd5d51ebb3629fb5e525f814128d2c429"
+      "exportCount": 58,
+      "exportNamesHash": "5702e7e7800df370fb505a95f8f11f51d923b35928d5b7247ddf369bea84f462"
     },
     {
       "module": "@anvia/sandbox/daemon",

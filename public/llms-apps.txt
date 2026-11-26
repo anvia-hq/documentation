@@ -133,6 +133,9 @@ export function ChatView({ chat }) {
 }
 ```
 
+`ChatProvider` also accepts `transport` and other `useChat` options instead of `controller`, and
+creates the chat itself; read it with `useChatContext()`.
+
 There is no package stylesheet and no `data-anvia-*` styling contract. Use application classes,
 `asChild`, ARIA, `data-state`, and `data-role`. CLI output belongs to the application and can be
 edited freely; the `@anvia/react` primitives remain the behavior and accessibility foundation.

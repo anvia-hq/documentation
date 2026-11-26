@@ -24,6 +24,14 @@ agents: [
 | `safe` | The call runs again. Use for reads and pure work where repetition is acceptable. |
 | `idempotent` | The call runs again with the same `operationId`. The service must deduplicate it. |
 
+For `@anvia/sandbox` tools, spread the exported `sandboxToolRecovery` map instead of writing the policy by hand: reads are `safe`, and `exec_command`, `write_file`, `start_process`, and `stop_process` are `idempotent`. Use it with a runtime that deduplicates by `operationId`, such as `RemoteSandboxRuntime`; see [remote sandboxes](/sdk/advanced/sandbox/remote#idempotent-operations).
+
+```ts
+import { sandboxToolRecovery } from '@anvia/sandbox'
+
+toolRecovery: { ...sandboxToolRecovery, search: 'safe' },
+```
+
 A committed tool result is reused under every policy. Choosing `idempotent` does not make an API safe: the
 tool must pass `context.operationId` to a service that actually enforces deduplication.
 

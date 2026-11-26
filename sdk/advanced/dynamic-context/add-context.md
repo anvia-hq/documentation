@@ -47,7 +47,7 @@ const agent = new Agent({
 });
 ```
 
-`topK` is required and must be a positive safe integer. `minScore` is optional and must be finite. Tune it against real results from that store and embedding model.
+`topK` is optional, defaults to 5, and must be a positive safe integer. `minScore` is optional and must be finite. Tune it against real results from that store and embedding model.
 
 ## 3. Run the agent normally
 

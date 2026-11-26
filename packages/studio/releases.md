@@ -1,7 +1,11 @@
 # Releases
 
-The reviewed source release is `@anvia/studio` **1.5.2**. The entries below summarize recent v1
+The reviewed source release is `@anvia/studio` **1.5.3**. The entries below summarize recent v1
 changes and preserve notable v0 Studio milestones.
+
+## Changes in 1.5.3
+
+Reviewed `1.5.1` → `1.5.3` against SDK source on 2026-11-26. Context breakdowns show a `Skills` segment with its own theme color, and Studio updates to `@anvia/react` 1.4.0 and `@anvia/client` 1.10.0.
 
 ## Changes in 1.5.1
 
@@ -11,10 +15,11 @@ Reviewed `1.3.24` → `1.5.1` against SDK source on 2026-11-23. Bounds JSON requ
 
 Reviewed `1.3.14` → `1.3.24` against SDK source on 2026-11-04. Added Host/Origin validation with `allowedHosts` (1.3.19), remote sandbox desktop views and asynchronous view control (1.3.22), the suspended-run guard in Playground (1.3.21), and provider-switch filtering for remembered model controls (1.3.24). Dependency releases also align Client, Server, React, React UI, and Graph.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/2322fcd9b00e4cb82166c7aca319454ee97abe4e/packages/tool-studio/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/7815383f045fa45ac64534bbfcc67fcb52b70e86/packages/tool-studio/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.5.3` | Added the `Skills` label and color to the context breakdown and updated Client and React. |
 | `1.3.24` | Filtered replayed history when a conversation switches providers and kept only model controls the newly selected model offers, avoiding HTTP 400 responses. |
 | `1.3.22` | Let a sandbox desktop view open its own connection through a tunnel instead of a published port, and allowed asynchronous view control operations. |
 | `1.3.21` | Blocked composer submit, new chat, agent switch, and session load/delete while a run waits for an approval or question. |

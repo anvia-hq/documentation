@@ -10,7 +10,7 @@ Use the Docker runtime when the agent and the container share a host and the app
 
 ## The neutral runtime contract
 
-Both backends implement `SandboxRuntime`. The interface identifies its implementation with `provider: string` and exposes commands, files, processes, and port readiness. `createSandboxTools()` builds the same agent tools for any implementation; `createDockerSandboxTools()` is a wrapper around it.
+Both backends implement `SandboxRuntime`, including `execText()`. The interface identifies its implementation with `provider: string` and exposes commands, files, processes, and port readiness. `createSandboxTools()` builds the same agent tools for any implementation; `createDockerSandboxTools()` is a wrapper around it.
 
 ```ts
 import { createSandboxTools, type SandboxRuntime } from '@anvia/sandbox'
@@ -57,15 +57,36 @@ const tools = createSandboxTools({
 
 `hub.runtime(id)` returns the same runtime object for the same id. Its `workdir` is the daemon's reported workdir once connected, otherwise the `workdir` passed to `runtime()`, otherwise `/workspace`.
 
-`hub.listen()` is a convenience HTTP listener for deployments that have no server of their own. To attach the hub to an existing server, route its `upgrade` event:
+`hub.listen()` is a convenience HTTP listener for deployments that have no server of their own. To attach the hub to an existing `http.Server`, use `hub.attach()`. It routes the server's `upgrade` events and returns a function that detaches them:
 
 ```ts
-server.on('upgrade', (request, socket, head) => {
-  const path = new URL(request.url ?? '/', 'http://hub').pathname
-  if (path === '/daemon') hub.handleUpgrade(request, socket, head)
-  else socket.destroy()
+const detach = hub.attach(server, { path: '/daemon', terminalPath: '/terminal' })
+```
+
+`path` defaults to `/daemon` when a terminal, tunnel, or desktop path is set. Requests for other paths are left alone so other WebSocket handlers can serve them; set `rejectUnmatched: true` to answer them with HTTP 404. You can still route `upgrade` yourself and call `hub.handleUpgrade(request, socket, head)`.
+
+### Observe connections
+
+`RemoteSandboxHub` options include callbacks for daemon lifecycle and failures:
+
+```ts
+const hub = new RemoteSandboxHub({
+  authorize,
+  onConnect: ({ sandboxId, workdir, daemonVersion, capabilities }) => {
+    log.info({ sandboxId, daemonVersion, capabilities }, 'daemon connected')
+  },
+  onDisconnect: ({ sandboxId, replaced }) => {
+    log.info({ sandboxId, replaced }, 'daemon disconnected')
+  },
+  onError: (error, { stage, sandboxId }) => {
+    log.warn({ err: error, stage, sandboxId }, 'hub error')
+  },
 })
 ```
+
+`onConnect` runs after the `hello`/`welcome` handshake. `onDisconnect` reports `replaced: true` when a newer daemon took over the sandbox id. `onError` receives authorizer exceptions and handshake failures with a `stage` of `authorize`, `handshake`, `terminal`, `tunnel`, or `desktop`. Exceptions thrown by these callbacks are swallowed. Never log the daemon token.
+
+`hub.capabilities(id)` returns the capabilities the live daemon advertised, or `undefined` when it is not connected. `await hub.waitForConnection(id, { timeoutMs, abortSignal })` resolves once a daemon is connected and otherwise fails with `sandbox_unavailable`; `timeoutMs` defaults to the hub's `connectTimeoutMs`. `RemoteSandboxHub` implements `AsyncDisposable`, so `await using hub = new RemoteSandboxHub(...)` closes it on scope exit.
 
 The daemon sends its token as an `Authorization: Bearer` header. The hub calls `authorize` before the upgrade, so a missing or refused token gets HTTP 401 and an authorizer exception gets HTTP 500. Use `wss://` outside loopback: the token is sent in clear text over `ws://`.
 
@@ -94,6 +115,11 @@ npm exec --package=@anvia/sandbox -- anvia-sandbox-daemon
 | `ANVIA_SANDBOX_MAX_OUTPUT_BYTES` | Maximum buffered command output. |
 | `ANVIA_SANDBOX_MAX_FILE_BYTES` | Maximum file size for reads and writes. |
 | `ANVIA_SANDBOX_MAX_PROCESSES` | Maximum managed processes. |
+| `ANVIA_SANDBOX_TERMINAL=0` | Turns interactive terminals off. |
+| `ANVIA_SANDBOX_TUNNEL=0` | Turns TCP tunnels off. |
+| `ANVIA_SANDBOX_TUNNEL_ALLOWED_PORTS` | Comma-separated loopback ports tunnels may reach. |
+
+The daemon CLI also accepts `--help`, `--version`, `--check`, and `--require=<features>` (only with `--check`). Unknown flags and a `--require` without `--check` are rejected with exit code 2 instead of being ignored. The desktop variables are listed in [Give an agent a desktop](/sdk/advanced/sandbox/desktop).
 
 The daemon removes `ANVIA_SANDBOX_TOKEN` and `ANVIA_CONTROL_URL` from the environment of every command and process it runs, so agent-run code cannot read its own credentials. Keep `ANVIA_SANDBOX_STATE_DIR` outside the workdir and somewhere private: stored operation results can include command output.
 
@@ -113,7 +139,7 @@ daemon.start()
 await daemon.ready()
 ```
 
-`start()` begins connecting; `ready()` resolves after the first handshake. `stop()` closes the link and disposes the daemon's local state. The daemon runs on POSIX hosts only.
+`start()` begins connecting; `ready()` resolves after the first handshake. `stop()` closes the link and disposes the daemon's local state. `SandboxDaemon` also implements `AsyncDisposable`. The daemon runs on POSIX hosts only.
 
 ## Hub state and lifecycle
 
@@ -145,16 +171,15 @@ A request carrying an `operationId` keeps running on the daemon after the link d
 
 Only successful results are stored, so a failed or cancelled attempt can be retried for real. Reusing an id with different parameters fails with `invalid_state`. Without `@anvia/durable`, pass your own stable `operationId` to the runtime methods.
 
-`createSandboxTools()` forwards `ToolCallContext.operationId`, which lets a durable run's stable operation key reach the daemon. The mutating tools can then be marked `idempotent` in the durable registration:
+`createSandboxTools()` forwards `ToolCallContext.operationId`, which lets a durable run's stable operation key reach the daemon. `@anvia/sandbox` exports `sandboxToolRecovery`, a ready-made `toolRecovery` map for `@anvia/durable`: read-only tools are `safe`, and `exec_command`, `write_file`, `start_process`, and `stop_process` are `idempotent`. Spread it into the durable registration:
 
 ```ts
-toolRecovery: {
-  exec_command: 'idempotent',
-  write_file: 'idempotent',
-  start_process: 'idempotent',
-  stop_process: 'idempotent',
-},
+import { sandboxToolRecovery } from '@anvia/sandbox'
+
+toolRecovery: { ...sandboxToolRecovery },
 ```
+
+The `idempotent` classification is accurate only on runtimes that deduplicate by `operationId`, such as `RemoteSandboxRuntime`. Review it before using the map with a Docker runtime.
 
 The operation table is bounded to 256 entries by default; the oldest entry is evicted first. Deduplication therefore covers recent operations, not all history. An evicted operation runs again if retried.
 

@@ -27,11 +27,11 @@ const searchRunbooks = createVectorSearchTool({
 })
 ```
 
-The generated tool accepts `query` and an optional positive `topK`. A call-time `topK` overrides the configured default; the configured minimum score and filter still apply.
+The generated tool accepts `query` and an optional positive `topK`. `topK` defaults to `5` when not configured, and a call-time `topK` can only lower it: the model's value is clamped to the configured limit. The configured minimum score and filter still apply.
 
 For a [`HybridVectorStore`](/sdk/knowledges/vector-stores), configure the tool with
 `models: { dense, sparse }` and an optional `fusion` (`'rrf'` or `'dbsf'`) instead of `model`. The
-input schema and the call-time `topK` override behave identically.
+input schema and the call-time `topK` clamp behave identically.
 
 ## Add it to an agent
 

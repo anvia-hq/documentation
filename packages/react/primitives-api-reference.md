@@ -26,13 +26,28 @@ type ChatController<
   Data extends ClientDataMap = ClientDataMap,
 > = UseChatResult<ClientTransport<ClientStreamRequest, Data, Metadata>>
 
-type ChatProviderProps<
+// ChatProviderProps is the union of these two shapes.
+type ChatProviderControllerProps<
   Metadata extends ClientMetadata = ClientMetadata,
   Data extends ClientDataMap = ClientDataMap,
 > = {
   controller: ChatController<Metadata, Data>
+  transport?: never
   children?: ReactNode
 }
+
+type ChatProviderTransportProps<
+  Metadata extends ClientMetadata = ClientMetadata,
+  Data extends ClientDataMap = ClientDataMap,
+> = UseChatOptions<ClientTransport<ClientStreamRequest, Data, Metadata>> & {
+  controller?: never
+  children?: ReactNode
+}
+
+type ChatProviderProps<
+  Metadata extends ClientMetadata = ClientMetadata,
+  Data extends ClientDataMap = ClientDataMap,
+> = ChatProviderControllerProps<Metadata, Data> | ChatProviderTransportProps<Metadata, Data>
 
 function ChatProvider<Metadata extends ClientMetadata, Data extends ClientDataMap>(
   props: ChatProviderProps<Metadata, Data>,
@@ -42,7 +57,7 @@ function useChatContext<Metadata extends ClientMetadata, Data extends ClientData
   ChatController<Metadata, Data>
 ```
 
-`ChatProvider` makes an `@anvia/react` `useChat` result available to chat, composer, message, and human-input primitives. `useChatContext` throws when used outside the provider.
+`ChatProvider` makes an `@anvia/react` `useChat` result available to chat, composer, message, and human-input primitives. Pass `controller` to supply an existing `useChat` result, or pass `transport` and any other `useChat` option to let the provider create the chat itself; read the controller with `useChatContext()`. `useChatContext` throws when used outside the provider.
 
 ```ts
 type CompletionController<

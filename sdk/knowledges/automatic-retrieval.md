@@ -4,13 +4,13 @@ Automatic retrieval searches an index before each model turn and adds relevant r
 
 ## 1. Create a context index
 
-In v1, combine a `VectorStore` with its embedding model through `createVectorContext()` and place it in the agent's `context` array:
+In v1, combine a `VectorStore` (here `docsStore`, for example an adapter store or `InMemoryVectorStore`) with its embedding model through `createVectorContext()` and place it in the agent's `context` array:
 
 ```ts
 import { Agent, createVectorContext } from '@anvia/core';
 import { vectorFilter } from '@anvia/core/vector-store';
 const docsContext = createVectorContext({
-    store: docsIndex,
+    store: docsStore,
     model: embeddingModel,
     topK: 4,
     minScore: 0.74,
@@ -32,7 +32,7 @@ For a [hybrid store](/sdk/knowledges/vector-stores), pass `models` instead of `m
 
 ```ts
 const hybridDocsContext = createVectorContext({
-    store: hybridDocsIndex,
+    store: hybridDocsStore,
     models: { dense: embeddingModel, sparse: sparseModel },
     fusion: 'rrf',
     topK: 4,
@@ -60,7 +60,7 @@ Build the agent or context index from trusted request state when the filter depe
 ```ts
 function createSupportAgent(tenantId: string) {
     const tenantContext = createVectorContext({
-        store: docsIndex,
+        store: docsStore,
         model: embeddingModel,
         topK: 4,
         minScore: 0.74,
@@ -86,7 +86,7 @@ Use `format()` when the stored record needs a more concise or source-aware `Docu
 
 ```ts
 const policyContext = createVectorContext({
-    store: policyIndex,
+    store: policyStore,
     model: embeddingModel,
     topK: 3,
     minScore: 0.76,

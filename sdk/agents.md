@@ -53,7 +53,7 @@ switch (result.type) {
 ```
 
 A response includes the final output. Every outcome includes `text`, run ID, accumulated token
-usage, messages created during the run, and optional trace, source, guardrail, provider-tool, and
+usage, messages created during the run, and optional trace, source, guardrail, provider-tool, context-usage, context-breakdown, and
 memory-compaction metadata. Interactions are expected control flow rather than failed runs.
 
 ## 3. Understand the loop
