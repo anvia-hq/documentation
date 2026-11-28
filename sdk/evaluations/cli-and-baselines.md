@@ -43,9 +43,9 @@ CLI values win over the options object, and an unset flag never overrides: `form
 
 ## Streams and exit codes
 
-The report goes to stdout. Progress lines, expectation mismatches, baseline notices, and comparison text go to stderr, which keeps `--format json` parseable on stdout. `output: { stdout, stderr }` overrides both writers, and `format: 'quiet'` writes nothing.
+The report goes to stdout. Progress lines, expectation mismatches, and baseline notices go to stderr. Baseline comparison text follows the report in `pretty` format (stdout) and moves to stderr in `json` format, which keeps `--format json` parseable on stdout. `output: { stdout, stderr }` overrides both writers, and `format: 'quiet'` writes nothing.
 
-`evalExitCode(result)` returns `2` for a required invalid judgment, `1` for a required failure, and `0` otherwise. With expectations, a match returns `0`; an unexpected invalid returns `2`; any other mismatch returns `1`. A baseline regression only raises `0` to `1`.
+`evalExitCode(result)` returns `2` for a required invalid judgment, `1` for a required failure, and `0` otherwise. With expectations, a match returns `0`; an unexpected invalid returns `2`; any other mismatch returns `1`. A baseline regression only raises `0` to `1`, and only while `failOnRegression` is enabled (the default). Set `failOnRegression: false` to report regressions without failing the exit code; the same-path `--save` overwrite protection below is then also skipped for regressions.
 
 With `exitCode: true` the runner raises `process.exitCode` when the computed code is higher than the current one. It never calls `process.exit` and never lowers an existing code, so a later failure in the same process still wins.
 
@@ -63,9 +63,11 @@ const baseline = await loadEvalResult('evals/baseline.json')
 const comparison = compareEvalResults(baseline, result, { scoreTolerance: 0.02 })
 
 comparison.hasRegressions // gate on this
-comparison.regressions    // [{ caseId, metricName, required, baseline, candidate, ... }]
+comparison.regressions    // [{ caseId, metricName, required, baselineOutcome, candidateOutcome, scoreDelta?, kind, ... }]
 comparison.metricDeltas   // per-metric pass-rate and mean-score movement
 ```
+
+Each regression or improvement item carries `baselineOutcome` and `candidateOutcome`, plus `baselineScore`, `candidateScore`, `scoreDelta`, and `direction` when the scores exist. `kind` is `regression`, `improvement`, or `unchanged`.
 
 `saveEvalResult(path, result, { redact, maxValueLength })` writes pretty JSON and creates parent directories. `loadEvalResult(path)` validates the snapshot structure, not the cases, so a truncated file can still load: compare a snapshot only when you also trust its provenance.
 
@@ -74,7 +76,7 @@ comparison.metricDeltas   // per-metric pass-rate and mean-score movement
 - An outcome moving down (`pass` → `fail` → `invalid`) is a regression, and moving up is an improvement, regardless of any tolerance.
 - With **no** `scoreTolerance`, a same-outcome score change is `unchanged`; the delta still appears in `metricDeltas`. Set a tolerance when you want numeric drift to gate.
 - `includeOptionalMetrics` defaults to `false`, so optional-metric regressions are reported but do not set `hasRegressions`.
-- Removed cases and missing baseline metrics count as regressions unless `ignoreRemovedCases` or `ignoreMissingMetrics` is set. Added cases never do.
+- Removed cases set `hasRegressions` unless `ignoreRemovedCases` is set. Missing baseline metrics set it only when the metric is required (or `includeOptionalMetrics` is on), unless `ignoreMissingMetrics` is set. Added cases never do.
 - `scoreTolerance` must be finite and non-negative.
 
 Optional regressions are rendered with an `[optional]` tag, which is the difference between "noticed" and "blocks the merge".
@@ -89,7 +91,7 @@ Optional regressions are rendered with an `[optional]` tag, which is the differe
 
 - A missing baseline file prints a notice to stderr and the suite still runs, so `--save` can bootstrap the first snapshot.
 - When the run is a subset (explicit `caseIds`, `tags`, `caseFilter`, or a shard), removed cases are ignored so the filtered-out cases do not appear as regressions. Pass `compareOptions.ignoreRemovedCases: false` to opt out.
-- Writing the same path you read from is skipped when regressions were detected, or when the run was filtered or sharded, and the reason is printed. Otherwise the baseline is replaced.
+- Writing the same path you read from is skipped when regressions were detected (while `failOnRegression` is enabled), or when the run was filtered or sharded, and the reason is printed. Otherwise the baseline is replaced.
 
 `--save` forwards `redact` but **not** `maxValueLength`, so a stored baseline is not truncated the way printed output is.
 
@@ -109,7 +111,7 @@ const { results, comparisons } = await compareEvalTargets({
 comparisons.candidate.hasRegressions
 ```
 
-The baseline defaults to the first key, and an unknown name throws. Each target runs under `<name>:<target>`, comparisons exclude the baseline, and a shared `targetCache` is namespaced per target so one target never returns another's outputs.
+The baseline defaults to the first key, and an unknown name throws. `scoreTolerance` is forwarded to each comparison with the same rules as `compareEvalResults`. Each target runs under `<name>:<target>`, comparisons exclude the baseline, and a shared `targetCache` is namespaced per target so one target never returns another's outputs.
 
 ## Load cases from a file
 
@@ -122,7 +124,7 @@ await runEvalSuite({ ...suite, cases })
 
 `loadEvalCases(path, { format, autoId, schema })` reads a JSON array, a `{ cases: [...] }` object, or JSONL/NDJSON. `format` defaults to `auto`, which picks JSONL for `.jsonl` and `.ndjson` paths. Every record needs an `input` own-property; `id` must be a non-empty string unless `autoId` generates `case-<n>` ids that skip any id already used in the file. `schema` adds Zod validation and reports the first failing index.
 
-Validation is strict and typed: duplicate ids, a missing `input`, malformed JSONL lines, and a top-level shape other than an array or `{ cases }` all throw `TypeError` with the file and index in the message. A dataset file is untrusted input, so validate it before a case reaches a judge or a reporter.
+Validation is strict and typed: duplicate ids, a missing `input`, malformed JSONL lines, and a top-level shape other than an array or `{ cases }` all throw `TypeError` naming the file; record-level errors also name the index, while a duplicate id names the id instead. A dataset file is untrusted input, so validate it before a case reaches a judge or a reporter.
 
 ## A complete gate
 

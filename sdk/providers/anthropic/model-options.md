@@ -54,7 +54,7 @@ const result = await generateCompletion({
 })
 ```
 
-`maxTokens`, tools, and tool choice are mapped to Anthropic request fields by the adapter. Claude Sonnet 5 and Claude Opus 5 use adaptive thinking; avoid non-default `temperature`, `top_p`, and `top_k` values because these model generations reject manual sampling changes.
+`maxTokens`, tools, and tool choice are mapped to Anthropic request fields by the adapter. Since `@anvia/anthropic` 1.4.2 the model declares `capabilities.temperature: false`: a completion request or Agent that sets `temperature` fails with `CompletionCapabilityError` before the provider call, and the adapter never serializes the normalized field. Claude Sonnet 5 and Claude Opus 5 use adaptive thinking and reject manual sampling changes, so also avoid `top_p` and `top_k`.
 
 Reasoning-capable Anthropic models also advertise a typed `reasoningEffort` control. Inspect `model.controls` for the allowed values, then pass `controls: { reasoningEffort: 'high' }` on the completion or Agent run. Invalid values are rejected before the provider call.
 
@@ -75,7 +75,7 @@ const result = await generateCompletion({
 })
 ```
 
-The adapter spreads these values into the request first and then applies its normalized fields, so `model`, `max_tokens`, `messages`, and `tools` always win over a matching provider key, and `system`, `temperature`, `tool_choice`, and the reasoning `effort` value win whenever the normalized request supplies them. Keys the adapter never sets, such as `stop_sequences`, pass through unchanged. Keep them in the model integration layer, type-check their shape against Anthropic's SDK, and add a live test for every parameter the application depends on.
+The adapter spreads these values into the request first and then applies its normalized fields, so `model`, `max_tokens`, `messages`, and `tools` always win over a matching provider key, and `system`, `tool_choice`, and the reasoning `effort` value win whenever the normalized request supplies them. Keys the adapter never sets, such as `stop_sequences`, pass through unchanged. That includes a `temperature` key in `providerOptions`: the capability check covers only the normalized field, so a provider-option `temperature` reaches Anthropic unvalidated and fails there on models that reject it. Keep them in the model integration layer, type-check their shape against Anthropic's SDK, and add a live test for every parameter the application depends on.
 
 ## Choose by workload
 

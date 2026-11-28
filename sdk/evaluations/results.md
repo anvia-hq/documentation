@@ -10,7 +10,9 @@ const result = await runEvalSuite(suite)
 result.passed            // cases.failed === 0 && cases.invalid === 0
 result.cases             // { total, passed, failed, invalid }
 result.metrics           // the same shape, counted per metric judgment
-result.run               // { id, name, startedAt, durationMs, ... }
+result.name              // the suite name
+result.durationMs        // wall-clock run duration
+result.run               // { id, startedAt, completedAt, datasetName?, datasetVersion?, promptRef?, metadata? }
 result.usage             // { target, evaluation, total }
 result.cost              // only when the suite configures `cost`
 result.metricSummaries   // Record<metricName, EvalMetricSummary>
@@ -87,9 +89,9 @@ The message is `Evaluation stopped after case <caseId> produced a required <outc
 
 ## Progress events
 
-`onProgress` receives `case-start`, `target-complete`, `metric-complete`, `case-complete`, and run-level events. `case-complete` carries a result whose `usage` and `cost` are already computed; `target-complete` and `metric-complete` carry neither, so read those from the case result rather than from every event.
+`onProgress` receives four case-level events: `case-start`, `target-complete`, `metric-complete`, and `case-complete`. There are no run-level events; read run totals from the returned result. `case-complete` carries a result whose `usage` and `cost` are already computed; `target-complete` and `metric-complete` carry neither, so read those from the case result rather than from every event.
 
-A throw from `onProgress` is not swallowed: it fails the case, and with a shared callback it can fail the run. Keep progress handlers non-throwing.
+A throw (or rejected promise) from `onProgress` is not swallowed and does not become an invalid case: the runner awaits each event, so the error rejects `runEvalSuite` itself. Keep progress handlers non-throwing.
 
 ## Formatting and persistence
 

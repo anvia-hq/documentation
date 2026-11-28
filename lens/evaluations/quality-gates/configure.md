@@ -1,6 +1,6 @@
 # Configure gates
 
-Open **Evaluations → Quality gates**, then select **New gate**. Owners and admins can create or edit a gate; other project members can inspect the saved policy.
+Open **Evaluations → Gates** (the page is titled **Quality gates**), then select **New gate**. Owners and admins can create or edit a gate; other project members can inspect the saved policy.
 
 ![Lens quality gate configuration with scope and approval rules](/images/lens/quality-gate.png)
 

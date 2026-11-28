@@ -49,7 +49,7 @@ String matching is case sensitive. A phrase appearing in a denial still counts a
 
 For an object returned by your target, use `actual` to select the value to check, such as `actual: ({ output }) => output.answer`. Anvia automatically reads the `output` field of an agent response.
 
-An `invalid` result means the metric could not make a valid judgment, for example because required input was missing or a model call failed. Inspect it separately from a failed check.
+An `invalid` result means the metric could not make a valid judgment, for example because required input was missing or a model call failed. Inspect it separately from a failed check; its `reason` and `kind` say why. See [Invalid results](/lens/evaluations/metrics#invalid-results).
 
 ## Related metrics
 

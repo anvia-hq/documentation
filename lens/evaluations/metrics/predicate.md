@@ -5,28 +5,34 @@
 ```ts
 import { predicate } from '@anvia/core/evals'
 
-const mentionsWindow = predicate('mentions_window', ({ output }) => ({
-  pass: String(output).includes('30 days'),
+const mentionsWindow = predicate<string, string>('mentions_window', ({ output }) => ({
+  pass: output.includes('30 days'),
   comment: 'The answer must state the refund window.',
 }))
 ```
 
-The check returns a boolean or `{ pass, comment }`. A boolean uses the option `comment` for the failure message; the returned comment wins when both exist.
+`output` is the raw value the target returned, not text. With a function target that returns a string, read it directly. With `agentEvalTarget(agent)` the output is an `AgentResponse`, so read the reply from `output.output`; `String(output)` would give `"[object Object]"`:
 
 ```ts
-const startsCorrectly = predicate('starts_with_refund', ({ output }) => {
-  return { pass: String(output).startsWith('Refunds'), comment: 'Answer must open with "Refunds".' }
+import type { AgentResponse } from '@anvia/core'
+import { predicate } from '@anvia/core/evals'
+
+const startsCorrectly = predicate<string, AgentResponse<string>>('starts_with_refund', ({ output }) => {
+  return { pass: output.output.startsWith('Refunds'), comment: 'Answer must open with "Refunds".' }
 })
 ```
 
-## Options
+The check returns a boolean or `{ pass, comment }`. A boolean uses the option `comment` for the failure message; the returned comment wins when both exist.
+
+## Arguments and options
+
+`predicate(name, check, options?)` takes the metric name as its first argument. That name is what `scores` and `metricSummaries` key on. The optional third argument accepts:
 
 | Option | Default | Effect |
 | --- | --- | --- |
-| `name` | required | Metric name; it must be the first argument and is what `scores` and `metricSummaries` key on. |
 | `required` | `true` | Whether a failure gates the case. |
 | `comment` | none | Failure text when the check returns a boolean. |
-| `metadata` | none | Attached to the outcome for reporters. |
+| `metadata` | none | Attached to the metric definition, not the outcome. Reporters that export metric metadata, such as the OTel and Lens reporters (`anvia.eval.metric.metadata`) and the Langfuse reporter, include it. |
 
 A thrown error inside the check makes the judgment invalid rather than failed, which distinguishes "the rule could not run" from "the rule rejected the output".
 

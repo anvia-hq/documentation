@@ -14,7 +14,7 @@ v1 published ── immutable and fetchable
 v2 draft ── copied from latest published version
 ```
 
-A dataset can have only one draft at a time. After publishing it, **New version** creates another draft and copies the latest published cases into it. The new version label must be unique within the dataset.
+A dataset can have only one draft at a time. After publishing it, **New version** creates another draft and copies the latest published cases into it. The new version label must be unique within the dataset, ignoring case: `V2` and `v2` collide, and a fetch for either label returns the same version. Dataset names are matched case-insensitively in the same way.
 
 ## Work safely in a draft
 

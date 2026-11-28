@@ -64,7 +64,13 @@ Use `createEvalTypes<Input, Output, Expected>()` and `EvalOutcome.pass`, `.fail`
 
 ## Choose metrics and judges
 
-Start with deterministic metrics such as `exactMatch`, `contains`, `matches`, `maxLength`, and `requiredFields`. Each one accepts a positional value, an options object, or nothing at all: with no expectation it reads `case.expected`, and the case type then requires that field.
+Start with deterministic metrics: `exactMatch`, `contains`, `notContains`, `containsAll`, `containsAny`, `matches`, `doesNotMatch`, `notBlank`, `maxLength`, `requiredFields`, `schemaMatch`, and `predicate`. Call forms differ:
+
+- `contains`, `notContains`, `containsAll`, `containsAny`, `matches`, and `doesNotMatch` accept a positional expectation, an options object, or no expectation at all. Without one they read `case.expected`, and the case type then requires that field.
+- `exactMatch` takes an options object (with or without `expected`) and otherwise reads `case.expected`. `notBlank` takes optional options only.
+- `maxLength(max)`, `requiredFields(fields)`, and `schemaMatch(schema)` require their argument, positionally or in options. `predicate(name, check)` takes its name first.
+
+Each metric's default `name` is snake_case (`exact_match`, `contains`, `not_blank`), and that name, not the factory name, keys `scores` and `metricSummaries`. Pass `name` when a suite uses the same metric twice or when you want a readable key.
 
 ```ts
 metrics: [
@@ -75,7 +81,9 @@ metrics: [
 ]
 ```
 
-Agent trajectories have their own metrics: `toolCalled`, `toolNotCalled`, `toolCallOrder`, `maxTurns`, `maxTokens`, and `maxDurationMs`. `semanticSimilarity` calls an embedding model. `llmJudge`, `llmScore`, and task-specific judge metrics call a completion model and add evaluation usage, cost, and variance; `createJudgeMetrics({ model })` shares one judge model and defaults across all of them.
+Agent trajectories have their own metrics: `toolCalled`, `toolNotCalled`, `toolCallOrder`, `maxTurns`, `maxTokens`, and `maxDurationMs`. `semanticSimilarity` calls an embedding model. `llmJudge`, `llmScore`, and task-specific judge metrics call a completion model and add evaluation usage, cost, and variance; `createJudgeMetrics({ model })` shares one judge model and defaults (`retries`, `temperature`, `includeReason`, `strictMode`, `required`) across all of them.
+
+Since `@anvia/core` 1.24.1, judges omit `temperature` unless you set it, so each judge runs at the provider's default sampling. Pass `temperature` on `llmJudge`, `llmScore`, a task-specific judge metric, or `createJudgeMetrics` defaults when you want lower variance and the model accepts it. Models that declare `temperature: false`, including every Anthropic completion model, reject the field with `CompletionCapabilityError`, which records an invalid judgment; leave `temperature` unset for Anthropic judges.
 
 Choose a metric for a defined product requirement. Pin dataset, prompt, model, and evaluator versions before comparing changes. Use approved or synthetic inputs and redact private data before external judges or reporters. See the [metric reference](/lens/evaluations/metrics) and [quality gates](/examples/production/quality-gates).
 
@@ -85,7 +93,9 @@ Choose a metric for a defined product requirement. Pin dataset, prompt, model, a
 
 `caseTimeoutMs` covers the target and its metrics, once per trial. A suite-level `signal` stops scheduling and rejects on abort with the original abort reason, including an explicit `null`. `failFast: true` rejects with `EvalFailFastError` after the first completed required failure or invalid case; the error carries the case ID, its outcome, that case's result, and the partial results, and it is distinct from pipeline batch behavior.
 
-Select cases with `caseIds`, `caseFilter`, or `shard: { index, count }`. `selectEvalCaseIds(previousResult)` selects failed and invalid cases for a rerun. `onProgress` receives case, target, metric, and completion events.
+Select cases with `caseIds`, `caseFilter`, or `shard: { index, count }`. `selectEvalCaseIds(previousResult)` selects failed and invalid cases for a rerun. `onProgress` receives case-start, target-complete, metric-complete, and case-complete events; a throw from it rejects the run.
+
+An `invalid` outcome carries a `reason` and a `kind`: `target`, `metric`, `configuration`, `provider`, or `timeout`. A thrown target or metric error becomes `invalid` rather than `fail`. `EvalOutcome.fromError(error, kind?)` builds one from an error: without an explicit kind it reports `timeout` for an `EvalTimeoutError`, `provider` for provider SDK errors and HTTP 4xx/5xx statuses anywhere in the cause chain, `configuration` for a `CompletionCapabilityError`, and `metric` otherwise. The reason appends the direct cause's message, so a wrapped provider error stays readable. Treat a run with invalid judgments as not ready; it is not a quality failure of the target.
 
 Reporters receive run-start, per-metric, and run-end contexts. Their default `reporterErrorPolicy: 'collect'` records dispatch errors; `'throw'` fails the run. Inspect `reporterErrors` even when the suite resolves. `targetUsage` selects target usage, and `cost` configures cost accounting; keep target and evaluation usage distinct.
 

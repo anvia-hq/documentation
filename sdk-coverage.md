@@ -6,7 +6,7 @@ only validate APIs present in examples; they cannot reveal an exported API that 
 ## Source and inventory
 
 `scripts/sdk-coverage.json` records 87 public entrypoints across 36 public SDK packages at reviewed
-source revision `2322fcd9b00e4cb82166c7aca319454ee97abe4e`. Each entry links its owning guide and
+source revision `dd0dec5c0458547409cf04a701fe1dc3d8530e3f`. Each entry links its owning guide and
 reference, with an export-name count and SHA-256 snapshot. The checker resolves TypeScript exports
 from source, including re-exports and types; `@anvia/core/internal/*` is excluded, as would be any
 package marked private. A new/removed entrypoint or changed exported name set requires editorial
@@ -20,7 +20,14 @@ tutorial. The `features` entries tie selected APIs to complete examples and name
 one named test may cover more than one feature; `utilities` records reference coverage or a reason
 for excluding a dedicated tutorial.
 
-The 2026-11-25 review moves the baseline from `7aa42c0a` to `2322fcd9` and covers the React UI
+The 2026-11-28 review moves the baseline from `7815383f` to `dd0dec5c` and covers `@anvia/core`
+1.24.1 and `@anvia/anthropic` 1.4.2: LLM judges omit `temperature` unless set and accept an opt-in
+`temperature`, the `temperature` completion capability and Anthropic's `temperature: false`, cause
+messages and inferred invalid kinds in `EvalOutcome.fromError()`, and non-retryable 4xx handling in
+`extract()`. No exported names changed. The 2026-11-26 review moved the baseline from `2322fcd9`
+to `7815383f`.
+
+The 2026-11-25 review moved the baseline from `7aa42c0a` to `2322fcd9` and covers the React UI
 merge into `@anvia/react` (the separate package was removed and its 14 entrypoints became
 `@anvia/react/*`), the RAG and vector-store developer-experience release (`createVectorIndex()`,
 chunking defaults, text-only `embedDocuments()` input, filter shorthand, reranking, `VectorStore.delete()`,

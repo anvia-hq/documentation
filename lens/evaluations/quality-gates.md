@@ -42,7 +42,7 @@ Quality gates are also available as an alert signal. A **Failed quality gate** a
 
 ## Ownership
 
-All project members can view gates and apply them in Compare. Only owners and admins can create, edit, or delete them. Gate names are unique within a project, ignoring case.
+All project members can view gates and apply them in Compare. Only owners and admins can create, edit, or delete them. Gate names are trimmed and must be unique within a project; the comparison is case-sensitive, so `Release` and `release` can coexist.
 
 Deleting a gate also removes alert rules that depend on it. It does not remove earlier evaluation runs.
 

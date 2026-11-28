@@ -17,11 +17,11 @@ Package pages summarize these boundaries, while the package manifest remains the
 ## Stable versions
 
 Each package publishes stable releases through its own npm `latest` tag. As of the current
-documentation baseline, Core is `1.24.0`, Studio is `1.5.3`, and the graph packages are `1.3.0`
+documentation baseline, Core is `1.24.1`, Studio is `1.5.3`, and the graph packages are `1.3.0`
 (`@anvia/neo4j` and `@anvia/memgraph` are `1.2.0`); other packages can have different versions.
 Check the package's release page or npm metadata rather than assuming one repository-wide version.
 
-These are versions in the reviewed SDK source (`7815383f`, 2026-11-26), not a live npm-tag query.
+These are versions in the reviewed SDK source (`dd0dec5c`, 2026-11-28), not a live npm-tag query.
 Durable is `1.0.1`, Azure and Jev are `1.0.0`, Client is `1.10.0`, and Server is `1.5.1`. Sandbox is
 `1.4.0`, React is `1.4.0`, and the headless primitives now ship inside `@anvia/react`; the separate
 React UI package was removed. Pin exact versions in production environments when upgrades require
@@ -30,7 +30,7 @@ deliberate review.
 ```json
 {
   "dependencies": {
-    "@anvia/core": "1.24.0",
+    "@anvia/core": "1.24.1",
     "@anvia/openai": "1.4.1",
     "@anvia/studio": "1.5.3"
   }

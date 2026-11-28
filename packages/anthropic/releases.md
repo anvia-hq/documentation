@@ -1,6 +1,10 @@
 # Releases
 
-Reviewed source release: `1.4.1`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Reviewed source release: `1.4.2`. The entries below summarize the 1.0 line and preserve notable v0 history.
+
+## Changes in 1.4.2
+
+Reviewed `1.4.1` → `1.4.2` against SDK source on 2026-11-28. `AnthropicCompletionModel` declares `capabilities.temperature: false` and no longer serializes the normalized `temperature` field, so a request or Agent that sets `temperature` fails with `CompletionCapabilityError` before the provider call. The rejection comes from the capability check added in `@anvia/core` 1.24.1; with an older Core the field is silently dropped instead. See [model options](/sdk/providers/anthropic/model-options).
 
 ## Changes in 1.4.1
 
@@ -14,12 +18,13 @@ Reviewed `1.1.8` → `1.4.0` against SDK source on 2026-11-23. Adds prompt cachi
 
 Reviewed `1.1.4` → `1.1.7` against SDK source on 2026-10-15. Refreshed package guidance and updated upstream Anthropic and Vertex SDK dependencies. Review the source changelog for the dependency versions crossed by your upgrade.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/2322fcd9b00e4cb82166c7aca319454ee97abe4e/packages/provider-anthropic/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/dd0dec5c0458547409cf04a701fe1dc3d8530e3f/packages/provider-anthropic/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 
 | Version | Type | Summary |
 | --- | --- | --- |
+| `1.4.2` | Patch | Declared `temperature: false`; the normalized `temperature` field is rejected with `CompletionCapabilityError` and never serialized. |
 | `1.4.1` | Patch | Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and guards against non-object provider responses in the embedding, image, and transcription adapters. |
 | `1.1.4` | Patch | Updated upstream runtime and schema dependencies across the workspace. |
 | `1.1.3` | Patch | Declared compatible workspace peer ranges so additive internal dependency releases do not force major releases of dependents. |

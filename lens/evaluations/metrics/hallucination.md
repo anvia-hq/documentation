@@ -53,7 +53,9 @@ The score is the fraction of context passages judged contradictory, not the frac
 
 For an object returned by your target, use `actual` to select the value to check, such as `actual: ({ output }) => output.answer`. Anvia automatically reads the `output` field of an agent response.
 
-An `invalid` result means the metric could not make a valid judgment, for example because required input was missing or a model call failed. Inspect it separately from a failed check.
+Judge calls accept `retries` and an opt-in `temperature`, which is omitted unless you set it. Leave `temperature` unset for models that reject it, such as Anthropic models. See [Judge model settings](/lens/evaluations/metrics#judge-model-settings).
+
+An `invalid` result means the metric could not make a valid judgment, for example because required input was missing or a model call failed. Inspect it separately from a failed check; its `reason` and `kind` say why. See [Invalid results](/lens/evaluations/metrics#invalid-results).
 
 ## Related metrics
 

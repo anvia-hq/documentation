@@ -38,6 +38,7 @@ import {
   type CompletionResponse,
   Usage,
 } from "@anvia/core";
+import { expect, it } from "vitest";
 
 class StaticModel implements CompletionModel {
   readonly provider = "test";
@@ -61,15 +62,17 @@ class StaticModel implements CompletionModel {
   }
 }
 
-const agent = new Agent({
-  id: "support-test",
-  model: new StaticModel(),
+it("answers the refund window from the fixture", async () => {
+  const agent = new Agent({
+    id: "support-test",
+    model: new StaticModel(),
+  });
+  const response = await agent.generate({
+    prompt: "What is the refund window?",
+  });
+  if (response.type !== "response") throw new Error(`Unexpected agent outcome: ${response.type}`);
+  expect(response.output).toContain("30 days");
 });
-const response = await agent.generate({
-    prompt: "What is the refund window?"
-});
-if (response.type !== "response") throw new Error(`Unexpected agent outcome: ${response.type}`);
-expect(response.output).toContain("30 days");
 ```
 
 Use scripted models that emit tool calls to test authorization and tool-result handling. Test tools

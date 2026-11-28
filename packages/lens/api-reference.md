@@ -49,11 +49,13 @@ through the client-owned logs provider. A disabled optional client treats it as 
 ## Managed datasets
 
 ```ts
-const dataset = await lens.datasetClient({ pageSize: 50 }).getDataset<Input, Expected>({
+const dataset = await lens.datasetClient({ pageSize: 50, timeoutMs: 10_000 }).getDataset<Input, Expected>({
   name: 'support-cases',
   version: 'v2',
 })
 ```
+
+`datasetClient()` accepts `pageSize`, `timeoutMs`, and per-client `baseUrl`, `publicKey`, and `secretKey` overrides of the client connection. It throws when the client has no configured connection.
 
 The returned `LensDataset` contains `name`, `version`, optional description and metadata, and normalized items. `LensDatasetError` exposes an optional `status` and a stable `code`. Page size defaults to 50 and accepts 1–100; retrieval is capped at 100 pages and throws `pagination_limit` beyond that limit rather than returning partial data. Changing dataset identity/version or page counts during retrieval yields `invalid_response`.
 

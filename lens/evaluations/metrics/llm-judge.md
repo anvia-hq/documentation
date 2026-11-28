@@ -40,7 +40,7 @@ const result = await runEvalSuite({
   ],
 })
 
-console.log(result.results[0]?.scores.llmJudge)
+console.log(result.results[0]?.scores.llm_judge)
 ```
 
 ## Read the result
@@ -53,11 +53,15 @@ Requires a completion `model`, `schema`, and `passes`. Returns the schema output
 
 ## Keep in mind
 
-The default judge prompt includes the suite name, case ID, input, expected value, and target output. Add context or retrieval evidence through a custom `prompt` when the judge needs it. Use `prompt` to select different evidence. The schema’s reason is part of the score object; copy or inspect it there. A model judgment can vary, so test the rule with answers that must fail.
+The default judge prompt includes the suite name, case ID, input, expected value, and target output. Add context or retrieval evidence through a custom `prompt` when the judge needs it. A model judgment can vary, so test the rule with answers that must fail.
+
+The outcome `comment` is filled automatically from the first non-empty string field named `reason`, `feedback`, or `explanation` in the judgment. Pass `comment: (judgment) => ...` to build it from other fields. The full judgment stays available as the score.
 
 Use the optional `prompt` selector when the judge needs evidence beyond the default case input, expected value, and output.
 
-An `invalid` result means the metric could not make a valid judgment, for example because required input was missing or a model call failed. Inspect it separately from a failed check.
+Judge calls accept `retries` and an opt-in `temperature`, which is omitted unless you set it. Leave `temperature` unset for models that reject it, such as Anthropic models. See [Judge model settings](/lens/evaluations/metrics#judge-model-settings).
+
+An `invalid` result means the metric could not make a valid judgment, for example because required input was missing or a model call failed. Inspect it separately from a failed check; its `reason` and `kind` say why. See [Invalid results](/lens/evaluations/metrics#invalid-results).
 
 ## Related metrics
 

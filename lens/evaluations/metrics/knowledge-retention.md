@@ -38,7 +38,7 @@ const result = await runEvalSuite({
   ],
 })
 
-console.log(result.results[0]?.scores.knowledgeRetention)
+console.log(result.results[0]?.scores.knowledge_retention)
 ```
 
 ## Read the result
@@ -55,7 +55,9 @@ The default threshold is `0.5`; this example sets one explicitly. A score at or 
 
 Provide a nonempty array of user/assistant turns, messages, or an output object with `messages`. The judge extracts user-supplied facts and checks subsequent replies for forgetting, contradiction, or needless repeat questions. No eligible replies produces a score of 1; include cases where a later reply must use earlier information.
 
-An `invalid` result means the metric could not make a valid judgment, for example because required input was missing or a model call failed. Inspect it separately from a failed check.
+Judge calls accept `retries` and an opt-in `temperature`, which is omitted unless you set it. Leave `temperature` unset for models that reject it, such as Anthropic models. See [Judge model settings](/lens/evaluations/metrics#judge-model-settings).
+
+An `invalid` result means the metric could not make a valid judgment, for example because required input was missing or a model call failed. Inspect it separately from a failed check; its `reason` and `kind` say why. See [Invalid results](/lens/evaluations/metrics#invalid-results).
 
 ## Related metrics
 

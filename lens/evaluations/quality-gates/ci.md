@@ -15,6 +15,7 @@ Create both runs before the gate step and keep their IDs as job outputs or artif
 Store the Lens URL and project ingestion credentials as CI secrets, then run:
 
 ```sh
+set -o pipefail
 curl --fail-with-body --silent --show-error \
   --user "$ANVIA_LENS_PUBLIC_KEY:$ANVIA_LENS_SECRET_KEY" \
   --header 'Content-Type: application/json' \
@@ -24,7 +25,7 @@ curl --fail-with-body --silent --show-error \
   | jq --exit-status '.verdict == "pass"'
 ```
 
-The endpoint returns HTTP `200` for all valid verdicts, including `fail` and `insufficient_data`. `jq --exit-status` is what makes the shell step fail unless the verdict is exactly `pass`.
+The endpoint returns HTTP `200` for all valid verdicts, including `fail` and `insufficient_data`. `jq --exit-status` is what makes the shell step fail unless the verdict is exactly `pass`; `set -o pipefail` keeps a `curl` failure from being masked by the pipe.
 
 ## Read the response
 
@@ -32,19 +33,54 @@ A successful request returns the gate definition, both run IDs, the overall verd
 
 ```json
 {
-  "candidateRunId": "candidate-run-id",
-  "baselineRunId": "baseline-run-id",
+  "gate": {
+    "id": "gate-id",
+    "projectId": "project-id",
+    "name": "Release gate",
+    "suiteName": "support-regression",
+    "environment": "staging",
+    "minimumCaseCount": 50,
+    "rules": [
+      {
+        "type": "evaluation_threshold",
+        "metricName": "exact_match",
+        "measure": "pass_rate",
+        "operator": "gte",
+        "value": 0.9
+      }
+    ],
+    "createdAt": "2026-11-28T00:00:00.000Z",
+    "updatedAt": "2026-11-28T00:00:00.000Z"
+  },
   "verdict": "pass",
   "rules": [
     {
+      "rule": { "type": "minimum_case_count", "value": 50 },
       "verdict": "pass",
       "message": "Candidate has 52 cases",
       "candidateValue": 52,
       "baselineValue": null
+    },
+    {
+      "rule": {
+        "type": "evaluation_threshold",
+        "metricName": "exact_match",
+        "measure": "pass_rate",
+        "operator": "gte",
+        "value": 0.9
+      },
+      "verdict": "pass",
+      "message": "exact_match pass rate is 0.940; must be gte 0.900",
+      "candidateValue": 0.94,
+      "baselineValue": 0.92
     }
-  ]
+  ],
+  "candidateRunId": "candidate-run-id",
+  "baselineRunId": "baseline-run-id"
 }
 ```
+
+`gate.rules` holds the saved rule definitions; each `rules[]` entry echoes the rule it evaluated under `rule`, starting with the minimum case count. Rule `message` text is for people; gate automation on `verdict`.
 
 Keep `quality-gate.json` as a CI artifact. It explains which rule blocked a release without requiring a reviewer to reconstruct the original shell output.
 
@@ -60,6 +96,7 @@ Keep `quality-gate.json` as a CI artifact. It explains which rule blocked a rele
     CANDIDATE_RUN_ID: ${{ steps.candidate.outputs.run_id }}
     BASELINE_RUN_ID: ${{ vars.LENS_BASELINE_RUN_ID }}
   run: |
+    set -o pipefail
     curl --fail-with-body --silent --show-error \
       --user "$ANVIA_LENS_PUBLIC_KEY:$ANVIA_LENS_SECRET_KEY" \
       --header 'Content-Type: application/json' \
@@ -81,6 +118,7 @@ Keep `quality-gate.json` as a CI artifact. It explains which rule blocked a rele
 | Response | Meaning |
 | --- | --- |
 | `401` | The project key is missing, invalid, revoked, or belongs to an inactive project. |
+| `400 invalid_check` | The body is malformed, a run ID is empty or longer than 128 characters, or the candidate and baseline IDs are identical. |
 | `404` | The gate or either run does not exist in that project. |
 | `400 incomplete_runs` | Candidate or baseline is not completed. |
 | `400 incompatible_runs` | The runs do not share a suite and environment. |

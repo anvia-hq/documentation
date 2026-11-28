@@ -41,7 +41,24 @@ The three budget metrics report `threshold` equal to their cap, so a failing gat
 - `toolCalled`: `toolName`, `minCalls`, `maxCalls`, `args` (a partial deep-equal record or a predicate), and `messages`.
 - `toolNotCalled`: `toolName` and `messages`.
 - `toolCallOrder`: `tools`, `strict`, and `messages`.
-- `maxTurns`, `maxTokens`, `maxDurationMs`: the cap, the value source, and `messages` or `usage`.
+- `maxTurns`: `max` and `messages`.
+- `maxTokens`: `max`, `field` (`total`, `input`, or `output`), and `usage`.
+- `maxDurationMs`: `max` and `durationMs`, a selector that defaults to the recorded `targetDurationMs`.
+
+Every metric also accepts `name` and `required`.
+
+## Score names
+
+Read results from `scores` with each metric's default name, or pass `name` to choose your own:
+
+| Metric | Default name in `scores` |
+| --- | --- |
+| `toolCalled('lookup_order')` | `tool_called_lookup_order` |
+| `toolNotCalled('issue_refund')` | `tool_not_called_issue_refund` |
+| `toolCallOrder([...])` | `tool_call_order` |
+| `maxTurns(4)` | `max_turns` |
+| `maxTokens(8_000)` | `max_tokens` |
+| `maxDurationMs(15_000)` | `max_duration_ms` |
 
 Construction fails early rather than at judgment time: a blank `toolName`, an empty `tools` array, a non-positive `maxTurns`, a negative `maxTokens`, or a non-finite `maxDurationMs` throw when the metric is created.
 
