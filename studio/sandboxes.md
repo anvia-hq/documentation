@@ -1,26 +1,24 @@
 # Sandboxes
 
-Studio inspects explicitly registered sandboxes: a read-only view of files, processes, and logs, plus a remote sandbox's live desktop that a person can watch and take over. Use it to answer, “What is in the workspace, what is running, and what did it print?” while developing an agent.
+Studio inspects the sandboxes your agents use: a read-only view of files, processes, and logs, plus a remote sandbox's live desktop that a person can watch and take over. Use it to answer, “What is in the workspace, what is running, and what did it print?” while developing an agent.
 
 Open `http://localhost:4021/sandboxes`. The compatibility path `http://localhost:4021/ui/sandboxes` redirects to the same page with the default UI configuration.
 
 ![Studio sandbox inspector showing files, a published port, and a managed process](/images/studio/sandbox-inspector.png)
 
-## Register an inspector
+## Discover sandboxes from agent tools
 
-Studio does not discover sandboxes from agent tools. Create a sandbox, choose the read capabilities to expose, and register the inspector explicitly:
+Studio 1.6.0 and `@anvia/sandbox` 1.5.0 find sandboxes automatically. Give an agent tools from `sandboxToolkit`, `desktopToolkit`, `createSandboxTools`, `createDockerSandboxTools`, or `createDesktopTools`, then pass the agent to Studio without a `sandboxes` option:
 
 ```ts
 import { Agent } from '@anvia/core/agent'
-import {
-  DockerSandboxClient,
-  createDockerSandboxTools,
-} from '@anvia/sandbox'
+import { DockerSandboxClient, sandboxToolkit } from '@anvia/sandbox'
 import { Studio } from '@anvia/studio'
 
 const client = new DockerSandboxClient()
 const sandbox = await client.createSandbox({
   image: 'node:22-bookworm',
+  pull: 'if-missing',
   workspace: { type: 'ephemeral' },
   network: { mode: 'bridge', ports: [3000] },
   files: {
@@ -35,37 +33,73 @@ const sandbox = await client.createSandbox({
   },
 })
 
-const tools = createDockerSandboxTools({
-  sandbox: sandbox.runtime,
-  tools: [
-    'exec_command', 'read_file', 'write_file', 'list_files',
-    'list_ports', 'list_processes', 'read_process_logs',
-  ],
-  exec: {
-    commands: { mode: 'allow', values: ['node'] },
-    maxTimeoutMs: 30_000,
-  },
-  readFile: { maxBytes: 128_000 },
-  writeFile: { maxBytes: 128_000 },
-  process: { maxLogBytes: 64_000 },
-})
-
 const agent = new Agent({
   id: 'sandbox-builder',
   model,
-  tools: [...tools],
+  tools: [
+    sandboxToolkit({
+      sandbox,
+      include: [
+        'exec_command', 'read_file', 'write_file', 'list_files',
+        'list_ports', 'list_processes', 'read_process_logs',
+      ],
+      exec: {
+        commands: { mode: 'allow', values: ['node'] },
+        maxTimeoutMs: 30_000,
+      },
+      readFile: { maxBytes: 128_000 },
+      writeFile: { maxBytes: 128_000 },
+      process: { maxLogBytes: 64_000 },
+    }),
+  ],
 })
 
+const studio = new Studio([agent])
+```
+
+Each sandbox tool carries discovery metadata. Studio scans every registered agent's `tools`, including tools inside toolkits, and groups them by sandbox provider and ID. A discovered sandbox lists the agents that hold its tools and the tool names as the agent sees them, so a toolkit `prefix` appears in the name. Desktop tools add their live desktop view to the same entry.
+
+Discovery has these limits:
+
+- Studio sees only an agent's `tools`. Sandbox tools reached through a tool index are not discovered; register those sandboxes explicitly.
+- Discovered inspection exposes files, published ports, and processes by default. Set `studio: { files, ports, processes }` on the toolkit or tool factory to narrow it. At least one must stay enabled.
+- `studio: false` on the toolkit or tool factory omits the metadata for those tools.
+- `autoDiscoverSandboxes: false` on `new Studio(agents, options)` turns discovery off for the whole Studio instance.
+
+## Register a sandbox explicitly
+
+Register a sandbox yourself when its tools are not on an agent's `tools`, when Studio should show it to different agents or tools, or when discovery is off. `studioSandbox` builds the registration for a local `DockerSandbox` or any `SandboxRuntime`:
+
+```ts
+import { studioSandbox } from '@anvia/sandbox'
+import { Studio } from '@anvia/studio'
+
 const studio = new Studio([agent], {
-  sandboxes: [{
-    inspector: sandbox.inspector({ files: true, ports: true, processes: true }),
-    agentIds: ['sandbox-builder'],
-    toolNames: tools.map((tool) => tool.name),
-  }],
+  sandboxes: [
+    studioSandbox(sandbox, {
+      agentIds: ['sandbox-builder'],
+      files: true,
+      ports: false,
+      processes: true,
+    }),
+  ],
 })
 ```
 
-At least one inspector capability must be enabled. File inspection requires both listing and reading; process inspection requires both listing and log reading. `agentIds` must reference registered agents. Duplicate provider/ID registrations are rejected.
+`files`, `ports`, and `processes` default to `true`. You can also pass a raw registration object, such as `{ inspector: sandbox.inspector({ files: true, processes: true }), agentIds, toolNames }`.
+
+At least one inspector capability or view must be enabled. File inspection requires both listing and reading; process inspection requires both listing and log reading. `agentIds` must reference registered agents.
+
+When an explicit registration and a discovered sandbox share a provider and ID, Studio merges them:
+
+| Field | Result |
+| --- | --- |
+| `inspector` | Always the explicit one. |
+| `agentIds`, `toolNames` | The explicit list replaces the discovered list when set; otherwise the discovered list is kept. |
+| `views` | The explicit list replaces discovered views when set; `views: []` removes them. |
+| `dispose` | The explicit cleanup when set; otherwise the discovered one. |
+
+Two explicit registrations with the same provider and ID are rejected.
 
 ## What you can inspect
 
@@ -79,37 +113,40 @@ At least one inspector capability must be enabled. File inspection requires both
 
 Studio previews recognized text and image files up to 1 MiB. Other binary files and larger previews are downloads. The runtime refuses file responses larger than 10 MiB, requires relative paths, rejects traversal, disables caching, and bounds process-log reads.
 
-Register a desktop view through the sandbox registration's `views` array. A remote sandbox registers its desktop with `studioSandbox`; see [Inspect a remote sandbox](#inspect-a-remote-sandbox).
+Register a desktop view through the sandbox registration's `views` array, or let desktop tools register it; see [Inspect a remote sandbox](#inspect-a-remote-sandbox).
 
 ## Inspect a remote sandbox
 
-`studioSandbox` from `@anvia/sandbox/remote` builds the registration for a sandbox connected to a `RemoteSandboxHub`: a read-only inspector for files, processes, and logs, plus a live desktop view.
+Desktop tools from `desktopToolkit` or `createDesktopTools` carry a live desktop view, so an agent that uses them appears in Studio with that view and no extra registration. To also browse the remote sandbox's files, processes, and logs, either give the agent `sandboxToolkit({ sandbox: hub.runtime('sbx_123') })` or register `studioSandbox(hub, sandboxId)`, which builds the inspector and the desktop view together:
 
 ```ts anvia-check
-import { createDesktopTools } from '@anvia/sandbox'
-import { RemoteSandboxHub, studioSandbox } from '@anvia/sandbox/remote'
+import { desktopToolkit, studioSandbox } from '@anvia/sandbox'
+import { RemoteSandboxHub } from '@anvia/sandbox/remote'
 import { Studio } from '@anvia/studio'
+import { Agent } from '@anvia/core/agent'
 
-declare const agent: import('@anvia/core/agent').Agent
+declare const model: import('@anvia/core').CompletionModel
 
 const hub = new RemoteSandboxHub({
   authorize: (token) => (token === 'local-dev-token' ? { sandboxId: 'sbx_123' } : null),
 })
-const tools = createDesktopTools({ sandbox: hub.desktop('sbx_123') })
+
+const agent = new Agent({
+  id: 'desktop-agent',
+  model,
+  tools: [desktopToolkit({ sandbox: hub.desktop('sbx_123') })],
+})
 
 const studio = new Studio([agent], {
-  sandboxes: [
-    studioSandbox(hub, 'sbx_123', {
-      agentIds: [agent.id],
-      toolNames: tools.map((tool) => tool.name),
-    }),
-  ],
+  sandboxes: [studioSandbox(hub, 'sbx_123')],
 })
 ```
 
+The explicit registration and the discovered desktop share the provider and ID `remote/sbx_123`, so Studio merges them: the agent and desktop tool names come from discovery, and the inspector comes from `studioSandbox`. `studioSandbox` and `studioDesktopView` are exported from both `@anvia/sandbox` and `@anvia/sandbox/remote`.
+
 Studio and the hub must run in the same process, because the desktop is streamed through the hub's own link. The hub still authorizes and routes the daemon connection; `studioSandbox` only turns an already connected sandbox into a Studio registration.
 
-Pass `desktop: false` to register the inspector alone, or `desktop: { id, label }` to name the view. `studioDesktopView(hub.desktop('sbx_123'))` returns just the view.
+Pass `desktop: false` to register the inspector alone, or `desktop: { id, label }` to name the view. `studioDesktopView(hub.desktop('sbx_123'))` returns just the view. Desktop tools take `studio: { id, label }` to name their discovered view, or `studio: false` to omit it.
 
 The desktop panel is view-only until a person explicitly takes control. A viewer watches the live display and can type and click only while it holds control. While they hold it, their input reaches the desktop and the agent's desktop tools fail with `desktop_locked` until they release control or stop renewing. The lease is renewed by the UI and expires when abandoned. Closing the panel does not forget the desktop; use the **Browser** button beside the composer to show it again.
 
@@ -121,7 +158,7 @@ The read-only inspector cannot write files, execute commands, start or stop proc
 
 ## Own the lifecycle
 
-Studio never owns or destroys a registered sandbox:
+By default, Studio does not own or destroy a sandbox, whether discovered or registered. Destroy it in your own shutdown code:
 
 ```ts
 try {
@@ -137,6 +174,14 @@ try {
   throw error
 }
 ```
+
+To hand a local Docker sandbox's cleanup to Studio instead, set `disposeOnShutdown: true` on `studioSandbox(sandbox, options)` or in the toolkit's `studio` option:
+
+```ts
+sandboxToolkit({ sandbox, studio: { disposeOnShutdown: true } })
+```
+
+Studio then calls `sandbox.destroy()` from `studio.shutdown()`, after in-flight runs drain, and each cleanup runs once. `studio.serve(...)` calls `shutdown()` when it stops, before `onShutdown`. `studio.close()` does not dispose sandboxes. `disposeOnShutdown` requires a `DockerSandbox` handle and throws for a bare `SandboxRuntime`; remote sandboxes are never disposed by Studio. A raw registration can supply its own `dispose` function.
 
 Studio is a development inspector, not a hosted sandbox control plane. Protect the Studio origin and treat file previews, process logs, and port addresses as sensitive.
 

@@ -78,24 +78,24 @@ A hold is a lease, 60 seconds by default. The holder renews it by calling `takeo
 
 ## Agent tools
 
-`createDesktopTools()` turns a `SandboxDesktop` into Anvia tools:
+`desktopToolkit()` turns a `SandboxDesktop` into an Anvia toolkit:
 
 ```ts anvia-check
-import { createDesktopTools } from '@anvia/sandbox'
+import { desktopToolkit } from '@anvia/sandbox'
 import { RemoteSandboxHub } from '@anvia/sandbox/remote'
 
 const hub = new RemoteSandboxHub({
   authorize: (token) => (token === 'local-dev-token' ? { sandboxId: 'sbx_123' } : null),
 })
-const tools = createDesktopTools({
+const desktop = desktopToolkit({
   sandbox: hub.desktop('sbx_123'),
-  tools: ['desktop_screenshot', 'desktop_click', 'desktop_key'],
+  include: ['desktop_screenshot', 'desktop_click', 'desktop_key'],
   settleMs: 300,
   screenshot: { maxEdge: 1568, maxPixels: 1_150_000 },
 })
 ```
 
-Pass the returned tools to an `Agent` like any other tool list. Omitting it exposes every desktop tool; select only the ones the workflow needs. Unknown names throw a `TypeError`.
+Pass the toolkit in an `Agent`'s `tools` array. Omitting `include` exposes every desktop tool; select only the ones the workflow needs. Unknown names throw. The toolkit also accepts `exclude`, `prefix`, `requiresApproval`, `timeoutMs`, and `instructions`, and adds short default instructions about the desktop tools. The lower-level `createDesktopTools()` returns the same tools as a plain array selected with `tools`.
 
 | Tool | Arguments | Behaviour |
 | --- | --- | --- |
@@ -247,33 +247,34 @@ Anyone who can run commands inside the sandbox can also connect to the VNC port 
 
 ## Studio
 
-`studioSandbox` from `@anvia/sandbox/remote` returns the registration Studio's `sandboxes` option takes for a remote sandbox: a read-only inspector for files, processes, and logs, plus a live desktop view. Studio and the hub must run in the same process, because the desktop is streamed through the hub's link.
+Desktop tools carry a Studio desktop view, so Studio shows the live desktop for any registered agent that uses them, with no `sandboxes` entry. Add `studioSandbox(hub, sandboxId)` to also browse the sandbox's files, processes, and logs. Studio merges it with the discovered desktop because both use the provider and ID `remote/<sandboxId>`. Studio and the hub must run in the same process, because the desktop is streamed through the hub's link.
 
 ```ts anvia-check
-import { createDesktopTools } from '@anvia/sandbox'
-import { RemoteSandboxHub, studioSandbox } from '@anvia/sandbox/remote'
+import { desktopToolkit, studioSandbox } from '@anvia/sandbox'
+import { RemoteSandboxHub } from '@anvia/sandbox/remote'
+import { Agent } from '@anvia/core/agent'
 import { Studio } from '@anvia/studio'
 
-declare const agent: import('@anvia/core/agent').Agent
+declare const model: import('@anvia/core').CompletionModel
 
 const hub = new RemoteSandboxHub({
   authorize: (token) => (token === 'local-dev-token' ? { sandboxId: 'sbx_123' } : null),
 })
-const tools = createDesktopTools({ sandbox: hub.desktop('sbx_123') })
+
+const agent = new Agent({
+  id: 'desktop-agent',
+  model,
+  tools: [desktopToolkit({ sandbox: hub.desktop('sbx_123') })],
+})
 
 const studio = new Studio([agent], {
-  sandboxes: [
-    studioSandbox(hub, 'sbx_123', {
-      agentIds: [agent.id],
-      toolNames: tools.map((tool) => tool.name),
-    }),
-  ],
+  sandboxes: [studioSandbox(hub, 'sbx_123')],
 })
 ```
 
-When the agent calls one of `toolNames`, the Playground opens a desktop panel. The panel is view-only until a person explicitly takes control. While they hold it, their input reaches the desktop and the agent's desktop tools fail with `desktop_locked` until they release control or stop renewing. Closing the panel does not forget the desktop.
+When the agent calls one of its desktop tools, the Playground opens a desktop panel. The panel is view-only until a person explicitly takes control. While they hold it, their input reaches the desktop and the agent's desktop tools fail with `desktop_locked` until they release control or stop renewing. Closing the panel does not forget the desktop.
 
-Pass `desktop: false` to register the inspector alone, or `desktop: { id, label }` to name the view. `studioDesktopView(hub.desktop(id))` gives just the view. The view is registered with local access and no authentication, so keep Studio on localhost or behind your own access control. See [Studio sandboxes](/studio/sandboxes).
+Pass `desktop: false` to register the inspector alone, or `desktop: { id, label }` to name the view. On the toolkit, `studio: { id, label }` names the discovered view and `studio: false` omits it. `studioDesktopView(hub.desktop(id))` gives just the view. The view is registered with local access and no authentication, so keep Studio on localhost or behind your own access control. See [Studio sandboxes](/studio/sandboxes).
 
 ## Not included
 

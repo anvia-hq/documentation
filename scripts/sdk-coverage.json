@@ -1,5 +1,5 @@
 {
-  "reviewedSdkRevision": "dd0dec5c0458547409cf04a701fe1dc3d8530e3f",
+  "reviewedSdkRevision": "386b66ba97225f6378d57c586e0f75173d3efc8d",
   "entries": [
     {
       "module": "@anvia/cli",
@@ -26,15 +26,15 @@
       "module": "@anvia/core",
       "guide": "sdk/index.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 297,
-      "exportNamesHash": "9b2b998ce91529379c41579e7a03fdf9426e64d0b9091879998883a05ca15789"
+      "exportCount": 305,
+      "exportNamesHash": "f91f72d5ec82325cbba38b38ab112dd5e61121995564f6246a42c88d4a8866b7"
     },
     {
       "module": "@anvia/core/agent",
       "guide": "sdk/agents.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 71,
-      "exportNamesHash": "837d802afc03dc7ff10d19f7067da89cebc79493d467f283fc316f029085653e"
+      "exportCount": 74,
+      "exportNamesHash": "89df7496d60ea9f9d8c023635bb5a9afc03b8ae168a768ae47815cb58cabf36c"
     },
     {
       "module": "@anvia/core/agent/interactions",
@@ -159,8 +159,8 @@
       "module": "@anvia/core/tool",
       "guide": "sdk/tools.md",
       "reference": "packages/core/api-reference.md",
-      "exportCount": 53,
-      "exportNamesHash": "45945d8f600aa01b960d870bd32b3acfe1397b8dd2cae3bd18c838c13fc37905"
+      "exportCount": 58,
+      "exportNamesHash": "e504b9f0e4631df975e42e04c04436f74b4188bd33f473b5d19f6a5fa1913332"
     },
     {
       "module": "@anvia/core/transcription",
@@ -182,6 +182,111 @@
       "reference": "packages/transformers/api-reference.md",
       "exportCount": 10,
       "exportNamesHash": "9bcc54a41a43ffe1932ca2567823964fa1a1df93b5026952efbcb08bd89dbc72"
+    },
+    {
+      "module": "@anvia/extensions",
+      "guide": "packages/extensions/get-started.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 126,
+      "exportNamesHash": "b255ace9a61329344afa6dc85280c605d611072740d93cf18de921c0c7526597"
+    },
+    {
+      "module": "@anvia/extensions/tools",
+      "guide": "packages/extensions/toolkits.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 76,
+      "exportNamesHash": "cf9af1caadefed4ae2c4abf836d9f79e1198c4a7fecc5f4f1f1054db108148e3"
+    },
+    {
+      "module": "@anvia/extensions/tools/web-search",
+      "guide": "packages/extensions/toolkits.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 23,
+      "exportNamesHash": "7fa8e4b6bf1628b874896a750c01f2af7ab6445f615d86bec932505d71a6a42c"
+    },
+    {
+      "module": "@anvia/extensions/tools/web-fetch",
+      "guide": "packages/extensions/toolkits.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 3,
+      "exportNamesHash": "f129f6f7207a12c2aa62afb9a0a2ce2f2f06c5a70b43953962bf4fe9812dad07"
+    },
+    {
+      "module": "@anvia/extensions/tools/fs",
+      "guide": "packages/extensions/toolkits.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 5,
+      "exportNamesHash": "96292d47428276954b0f8032b747d1fbb86ad007fc3d010d80ecea40f8c71135"
+    },
+    {
+      "module": "@anvia/extensions/tools/shell",
+      "guide": "packages/extensions/toolkits.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 5,
+      "exportNamesHash": "dcc00d1eda71835ce671b361559db1ec112c502e9f2bb83444099bce870f8613"
+    },
+    {
+      "module": "@anvia/extensions/tools/git",
+      "guide": "packages/extensions/toolkits.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 5,
+      "exportNamesHash": "f62cad55bd2e8e0bbbb5ade93d3fb1b24d56f055972f0c5f2baff0154322ba2e"
+    },
+    {
+      "module": "@anvia/extensions/tools/datetime",
+      "guide": "packages/extensions/toolkits.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 3,
+      "exportNamesHash": "2e4f574fb1f38635affb283b2a56a204cbb3fefbcd3671cadc0ee17b0a1f24f2"
+    },
+    {
+      "module": "@anvia/extensions/tools/scratchpad",
+      "guide": "packages/extensions/toolkits.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 6,
+      "exportNamesHash": "ac5b80de05e08ab407e7869522cc66e970dbadae740db39ba86ba620035bb1dc"
+    },
+    {
+      "module": "@anvia/extensions/tools/math",
+      "guide": "packages/extensions/toolkits.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 4,
+      "exportNamesHash": "35775fca1ef0477203ed4df06b034f2f09db168af3279c189d252c411892c5d0"
+    },
+    {
+      "module": "@anvia/extensions/tools/http",
+      "guide": "packages/extensions/toolkits.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 4,
+      "exportNamesHash": "68635ed2be61269ec5d95f0743997a201b9e5235b6a21dd855268e03e11a5a7f"
+    },
+    {
+      "module": "@anvia/extensions/tools/todo",
+      "guide": "packages/extensions/toolkits.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 7,
+      "exportNamesHash": "07ecf0032e730462f86d6460d528b1d50eeff5b50f0cb08afbf0e96c3a3f64af"
+    },
+    {
+      "module": "@anvia/extensions/guardrails",
+      "guide": "packages/extensions/guardrails-middlewares-hooks.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 21,
+      "exportNamesHash": "c64c520de70c2056937837c822f350544462784d1c64e0291dc60c174df87561"
+    },
+    {
+      "module": "@anvia/extensions/middlewares",
+      "guide": "packages/extensions/guardrails-middlewares-hooks.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 10,
+      "exportNamesHash": "93e9cffa2047405c84a0054dee45e57f37dba5e09faaf65c76705d2f0256ce58"
+    },
+    {
+      "module": "@anvia/extensions/hooks",
+      "guide": "packages/extensions/guardrails-middlewares-hooks.md",
+      "reference": "packages/extensions/api-reference.md",
+      "exportCount": 19,
+      "exportNamesHash": "4eda3d0632c0e16a6411a081df87b3ed412a31e95ee97ea5f71faf0ac084c860"
     },
     {
       "module": "@anvia/graph",
@@ -411,8 +516,8 @@
       "module": "@anvia/sandbox",
       "guide": "packages/sandbox/get-started.md",
       "reference": "packages/sandbox/api-reference.md",
-      "exportCount": 101,
-      "exportNamesHash": "f82b1aa88aea61e23707c72daf0ba5a32b62340285342a276afe2ca914339da5"
+      "exportCount": 114,
+      "exportNamesHash": "064deb348442e88bdf6ae6a46afa9c297872ad644eb82daa4147a043d8b2ec1a"
     },
     {
       "module": "@anvia/studio",
@@ -572,8 +677,8 @@
       "module": "@anvia/sandbox/remote",
       "guide": "sdk/advanced/sandbox/remote.md",
       "reference": "packages/sandbox/api-reference.md",
-      "exportCount": 58,
-      "exportNamesHash": "5702e7e7800df370fb505a95f8f11f51d923b35928d5b7247ddf369bea84f462"
+      "exportCount": 59,
+      "exportNamesHash": "38e102c7f0fc6c1114671aa7c3cc19d4a8966266b8c2fe437dd3566e56352a0c"
     },
     {
       "module": "@anvia/sandbox/daemon",

@@ -16,7 +16,7 @@ const invoiceSchema = z.object({
 
 ```
 
-The model must support tools and required tool choice. Unlike provider-native output schemas, extraction succeeds through a generated tool call named `submit`.
+The model must support tools. Unlike provider-native output schemas, extraction succeeds through a generated tool call named `submit`. Anvia normally forces that call with required tool choice. A model that declares `capabilities.forcedToolChoice: false` receives `toolChoice: 'auto'` instead: an attempt in which the model answers without calling `submit` fails and is retried, and the last failure throws `ExtractionError`. Since `@anvia/core` 1.25.0, Anthropic's `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-haiku-5-5`, `claude-fable-5-1`, `claude-fable-5-2`, `claude-mythos-5-1`, and `claude-mythos-5-2` declare this.
 
 ## 2. Extract validated data
 

@@ -1,7 +1,11 @@
 # Releases
 
-The reviewed source release is `@anvia/studio` **1.5.3**. The entries below summarize recent v1
+The reviewed source release is `@anvia/studio` **1.6.0**. The entries below summarize recent v1
 changes and preserve notable v0 Studio milestones.
+
+## Changes in 1.6.0
+
+Reviewed `1.5.3` → `1.6.0` against SDK source on 2026-11-28. Studio discovers sandboxes from registered agents' sandbox and desktop tools, controlled by `autoDiscoverSandboxes` (default `true`). Explicit `sandboxes` registrations for the same provider and ID override discovered fields. A registration's optional `dispose` runs once during `shutdown()`; `@anvia/sandbox` 1.5.0 sets it only when you opt in with `disposeOnShutdown: true`. See [Sandboxes](/studio/sandboxes).
 
 ## Changes in 1.5.3
 
@@ -19,6 +23,7 @@ See the [source changelog](https://github.com/anvia-hq/anvia/blob/7815383f045fa4
 
 | Version | Summary |
 | --- | --- |
+| `1.6.0` | Added automatic sandbox discovery from agent tools (`autoDiscoverSandboxes`) and opt-in sandbox disposal during `shutdown()` through a registration `dispose` function. |
 | `1.5.3` | Added the `Skills` label and color to the context breakdown and updated Client and React. |
 | `1.3.24` | Filtered replayed history when a conversation switches providers and kept only model controls the newly selected model offers, avoiding HTTP 400 responses. |
 | `1.3.22` | Let a sandbox desktop view open its own connection through a tunnel instead of a published port, and allowed asynchronous view control operations. |

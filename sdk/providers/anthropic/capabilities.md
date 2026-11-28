@@ -101,6 +101,6 @@ const incident = await extract({
 console.log(incident.output)
 ```
 
-`extract()` requires the model to call its `submit` tool and validates the arguments. Test required-tool behavior for the exact model or compatible endpoint.
+`extract()` requires the model to call its `submit` tool and validates the arguments. Since `@anvia/anthropic` 1.4.3, `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-haiku-5-5`, `claude-fable-5-1`, `claude-fable-5-2`, `claude-mythos-5-1`, and `claude-mythos-5-2` (and their dated `-…` IDs) declare `capabilities.forcedToolChoice: false`. For those models `extract()` sends `toolChoice: 'auto'`, so an attempt where Claude answers without calling `submit` fails and is retried before `ExtractionError`. Test extraction for the exact model or compatible endpoint.
 
 Next, configure [model options](/sdk/providers/anthropic/model-options).

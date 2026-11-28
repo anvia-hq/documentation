@@ -26,7 +26,7 @@ There is no separate public `ToolSet` to construct. A `ToolIndex` exposes a read
 
 Tool names are the link between search results, model-facing definitions, and implementations.
 
-`createToolIndex()` deduplicates repeated names before embedding; the last tool with a name wins. Prefer rejecting duplicates in your own catalog builder so an accidental replacement cannot pass unnoticed.
+`createToolIndex()` deduplicates repeated names before embedding; the last tool with a name wins. Since `@anvia/core` 1.25.0, `createToolIndex()` and `embedTools()` also accept [toolkits](/sdk/tools/toolkits) in `tools`: each toolkit is flattened into its selected tools under the same last-wins rule, and its instructions are not used. Prefer rejecting duplicates in your own catalog builder so an accidental replacement cannot pass unnoticed.
 
 An agent rejects a name registered by more than one source. A name shared by two tool indexes, or by an indexed tool and a static tool, skill, MCP server, or provider tool, throws a `Tool name collision` `TypeError` at construction.
 

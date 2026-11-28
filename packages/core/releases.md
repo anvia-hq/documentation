@@ -1,7 +1,15 @@
 # Releases
 
-The reviewed source release is `@anvia/core` **1.24.1**. The source changelog is authoritative; the
+The reviewed source release is `@anvia/core` **1.25.1**. The source changelog is authoritative; the
 entries below summarize recent v1 changes and preserve notable v0 compatibility milestones.
+
+## Changes in 1.25.1
+
+Reviewed `1.25.0` → `1.25.1` against SDK source on 2026-11-28. `createToolkit` preserves the Studio sandbox discovery metadata that `@anvia/sandbox` 1.5.0 attaches to sandbox and desktop tools, so `sandboxToolkit()` and `desktopToolkit()` tools are discovered by `@anvia/studio` 1.6.0. See [Studio sandboxes](/studio/sandboxes).
+
+## Changes in 1.25.0
+
+Reviewed `1.24.1` → `1.25.0` against SDK source on 2026-11-28. Adds the `Toolkit` primitive (`createToolkit`, `isToolkit`, `ToolkitDefinition`, `ToolkitOptions`), accepted by `Agent.tools`, `createToolIndex`, and `embedTools`; and array composition for `Agent.lifecycle` and run-level `lifecycle` (`AgentLifecycleInput`, `normalizeAgentLifecycle`, exported `composeAgentLifecycle`). `CompletionModelCapabilities` gains an optional `forcedToolChoice` flag: when it is `false`, `toolChoice: 'required'` or a named tool fails with `CompletionCapabilityError`, while `extract()` and LLM evaluation judges fall back to `'auto'`. The redactor also passes through the `data` string of `{ type: 'data' }` objects. This release introduced [`@anvia/extensions`](/packages/extensions). See [Toolkits](/sdk/tools/toolkits) and [lifecycle](/sdk/advanced/hooks/create).
 
 ## Changes in 1.24.1
 
@@ -23,10 +31,12 @@ Reviewed `1.17.3` → `1.21.1` against SDK source on 2026-11-23. Adds the contex
 
 Reviewed `1.9.0` → `1.17.3` against SDK source on 2026-11-04. Added OpenAI Decisions and typed refusal errors (1.10), active-loop compaction and broader credential redaction (1.11), summary temperature omission (1.11.1), question-tool defaults and input limits (1.12), durable steering protocol 4 (1.13), observer failure reporting (1.14), replay-aware durable tracing (1.14.1), Pipeline decision and route stages (1.15), richer vector metrics and filters (1.16), model-listing metadata (1.17.0 and 1.17.1), and bounded media estimates plus optional compaction temperature (1.17.3). See [Decisions](/sdk/decisions), [compaction](/sdk/memory/compaction), [observability](/sdk/observability), and [Pipeline decisions and routing](/sdk/pipelines/decisions-and-routing).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/dd0dec5c0458547409cf04a701fe1dc3d8530e3f/packages/core/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/386b66ba97225f6378d57c586e0f75173d3efc8d/packages/core/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.25.1` | Preserves Studio sandbox discovery metadata through `createToolkit`. |
+| `1.25.0` | Added `createToolkit`/`isToolkit` and toolkit support in `Agent.tools` and tool indexes; lifecycle arrays (`AgentLifecycleInput`, `normalizeAgentLifecycle`); optional `forcedToolChoice` capability with `'auto'` fallback in `extract()` and judges. |
 | `1.24.1` | Judges omit `temperature` unless set (new opt-in `temperature` on judge metrics); `temperature` capability validation; cause messages and inferred `provider`/`configuration`/`timeout` kinds in `EvalOutcome.fromError()`; no `extract()` retries for non-retryable 4xx errors; TypeScript 7 suite typing. |
 | `1.24.0` | Added the `skills` context-breakdown segment, `CONTEXT_SEGMENT_IDS`, `isContextBreakdown`, and `contextBreakdown` on `AgentOutcome`, `turn_end` events, and generation metadata. |
 | `1.23.0` | Added progressive RAG defaults (recursive chunking, `embedDocuments` overloads, filter shorthand, default `topK`, `rerank`, `ContextSource`, `createVectorIndex()`), `VectorStore.delete()`, and graph-ingestion and retrieval defaults. |

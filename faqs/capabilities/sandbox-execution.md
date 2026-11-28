@@ -14,12 +14,13 @@ The application owns image selection, input seeding, exposed tools, artifact exp
 ```ts
 import {
   DockerSandboxClient,
-  createDockerSandboxTools,
+  sandboxToolkit,
 } from '@anvia/sandbox'
 
 const client = new DockerSandboxClient()
 const sandbox = await client.createSandbox({
   image: 'node:22-bookworm',
+  pull: 'if-missing',
   workspace: { type: 'ephemeral' },
   network: { mode: 'none' },
   resources: { memoryMb: 512, cpus: 1 },
@@ -27,11 +28,11 @@ const sandbox = await client.createSandbox({
 })
 
 try {
-  const tools = createDockerSandboxTools({
-    sandbox: sandbox.runtime,
-    tools: ['list_files', 'read_file'],
+  const toolkit = sandboxToolkit({
+    sandbox,
+    include: ['list_files', 'read_file'],
   })
-  // Pass `tools` to an Agent and run it before the sandbox is destroyed.
+  // Pass `toolkit` in an Agent's tools and run it before the sandbox is destroyed.
 } finally {
   await sandbox.destroy()
 }
@@ -43,7 +44,7 @@ No. The application still owns image provenance, host privileges, network and eg
 
 ## What does it require?
 
-The package requires Node.js 20.12 or newer; Bun 1.3.14 is also tested. Local sandboxes need a compatible Docker CLI and daemon, and images must be local before creation; call `pullImage()` when the application should acquire one. The remote runtime instead needs a POSIX daemon host with outbound WebSocket access.
+The package requires Node.js 20.12 or newer; Bun 1.3.14 is also tested. Local sandboxes need a compatible Docker CLI and daemon, and by default images must be local before creation; pass `pull: 'if-missing'` to `createSandbox()` or call `pullImage()` when the application should acquire one. The remote runtime instead needs a POSIX daemon host with outbound WebSocket access.
 
 Start with the [Sandbox execution guide](/sdk/advanced/sandbox), [remote sandboxes](/sdk/advanced/sandbox/remote), review [Limits and security](/sdk/advanced/sandbox/security), and use the [package reference](/packages/sandbox).
 

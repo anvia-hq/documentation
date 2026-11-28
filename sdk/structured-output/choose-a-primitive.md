@@ -35,7 +35,7 @@ Check that the run completed as `type: 'response'`. `response.output` is already
 
 ## Use an extractor for fields already in text
 
-Choose `extract()` for invoices, tickets, resumes, transcripts, notes, and other sources whose fields already exist. It uses a required generated `submit` tool and can retry complete extraction attempts.
+Choose `extract()` for invoices, tickets, resumes, transcripts, notes, and other sources whose fields already exist. It uses a generated `submit` tool and can retry complete extraction attempts.
 
 ```ts
 const result = await extract({
@@ -47,7 +47,7 @@ const result = await extract({
 return result.output
 ```
 
-The model must support tools and required tool choice, but it does not need provider-native output schemas.
+The model must support tools, but it does not need provider-native output schemas. Extraction forces the `submit` call unless the model declares `capabilities.forcedToolChoice: false`; those models receive `toolChoice: 'auto'`, and an attempt without a `submit` call is retried. See [Extractors](/sdk/structured-output/extractors).
 
 ## Use tool output schemas at tool boundaries
 

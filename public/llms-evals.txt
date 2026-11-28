@@ -1,6 +1,6 @@
 # Anvia Evaluations and Observability
 
-> Current stable v1 context for tracing, runtime scoring, evaluation suites, datasets, and release gates. Reviewed 2026-11-28 against Anvia SDK `dd0dec5c` (`@anvia/core` 1.24.1, `@anvia/lens` 1.3.2) and Lens server v0.22.1.
+> Current stable v1 context for tracing, runtime scoring, evaluation suites, datasets, and release gates. Reviewed 2026-11-28 against Anvia SDK `386b66ba` (`@anvia/core` 1.25.1, `@anvia/lens` 1.3.2) and Lens server v0.22.1.
 
 Use unit and integration tests for deterministic code. Use evaluations for model behavior whose
 wording or reasoning can vary. Observability explains runtime activity; it is not application state.
@@ -176,6 +176,9 @@ model and defaults across the judge metrics.
 Since `@anvia/core` 1.24.1, judges omit `temperature` unless set; `temperature` is opt-in on
 `llmJudge`, `llmScore`, the task-specific judges, and `createJudgeMetrics`. Anthropic models declare
 `temperature: false` and reject it with `CompletionCapabilityError`, so leave it unset for them.
+Judges return verdicts through `extract()`; since Core 1.25.0 a judge model declaring
+`forcedToolChoice: false` (Claude Opus/Sonnet/Haiku 5.5, Fable and Mythos 5.1+) is asked with
+`toolChoice: 'auto'`, and a reply without the submit call is retried before the metric is invalid.
 
 Start with deterministic checks. Add semantic similarity, judge, score, RAG, or conversation metrics
 only when each one represents a named product requirement. Judge metrics add cost and variance.

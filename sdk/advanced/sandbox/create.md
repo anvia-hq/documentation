@@ -12,10 +12,10 @@ pnpm add @anvia/sandbox @anvia/core
 import { DockerSandboxClient } from '@anvia/sandbox'
 
 const client = new DockerSandboxClient()
-await client.ensureImage({ image: 'node:22-bookworm' })
 
 const sandbox = await client.createSandbox({
   image: 'node:22-bookworm',
+  pull: 'if-missing',
   workspace: { type: 'ephemeral' },
   network: { mode: 'none' },
   directories: ['input', 'output'],
@@ -34,7 +34,15 @@ const sandbox = await client.createSandbox({
 })
 ```
 
-Images are explicit and must be local. Choose them in application configuration, not from prompt input. `hasImage()` reports whether an image is present locally. `ensureImage()` pulls only when it is missing and returns `{ pulled }`. `pullImage()` always pulls. Each makes networked image acquisition a separate, reviewable operation.
+Images are explicit. Choose them in application configuration, not from prompt input. The `pull` option controls acquisition during `createSandbox()`:
+
+| `pull` | Behavior |
+| --- | --- |
+| `'never'` (default) | Fails unless the image is already local. |
+| `'if-missing'` | Pulls only when the image is absent. |
+| `'always'` | Pulls before every create. |
+
+To keep networked image acquisition a separate, reviewable step, leave the default and call `hasImage()`, `ensureImage()` (pulls only when missing and returns `{ pulled }`), or `pullImage()` (always pulls) yourself.
 
 ## Build a custom image
 
@@ -52,11 +60,12 @@ Use the generated tag as the `image` passed to `createSandbox()`. Build dependen
 ## Expose a narrow tool bundle
 
 ```ts
-import { createDockerSandboxTools } from '@anvia/sandbox'
+import { sandboxToolkit } from '@anvia/sandbox'
 
-const tools = createDockerSandboxTools({
+const toolkit = sandboxToolkit({
   sandbox, // a DockerSandbox handle or sandbox.runtime
-  tools: ['list_files', 'read_file', 'write_file', 'exec_command'],
+  include: ['list_files', 'read_file', 'write_file', 'exec_command'],
+  requiresApproval: { exec_command: true },
   exec: {
     commands: { mode: 'allow', values: ['python'] },
     defaultTimeoutMs: 10_000,
@@ -67,6 +76,8 @@ const tools = createDockerSandboxTools({
 })
 ```
 
-`sandbox` accepts a `DockerSandbox` handle or its `runtime`. When `tools` is omitted, the factory exposes all ten sandbox tools, including process and port tools. Pass an explicit, non-empty tuple to keep the surface narrow, and add process and port tools only for workflows that intentionally manage a live process.
+Pass the toolkit in the agent's `tools` array. `sandbox` accepts a `DockerSandbox` handle or its `runtime`. When `include` is omitted, the toolkit exposes all ten sandbox tools, including process and port tools. List only the tools the workflow needs, and add process and port tools only for workflows that intentionally manage a live process.
+
+`requiresApproval` pauses the listed tools for review; a boolean applies to every selected tool. `prefix` renames the tools, for example to `docs_exec_command`, when an agent uses two sandboxes. `createDockerSandboxTools()` builds the same tools as a plain array selected with a `tools` tuple.
 
 Creation can fail because Docker is unavailable (`docker_unavailable`), the image or named volume is absent, or an initial path is unsafe. Treat those as infrastructure or input failures before starting the agent. Once creation succeeds, place complete use inside `try` and cleanup in `finally`.

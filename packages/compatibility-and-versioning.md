@@ -17,22 +17,23 @@ Package pages summarize these boundaries, while the package manifest remains the
 ## Stable versions
 
 Each package publishes stable releases through its own npm `latest` tag. As of the current
-documentation baseline, Core is `1.24.1`, Studio is `1.5.3`, and the graph packages are `1.3.0`
+documentation baseline, Core is `1.25.1`, Studio is `1.6.0`, and the graph packages are `1.3.0`
 (`@anvia/neo4j` and `@anvia/memgraph` are `1.2.0`); other packages can have different versions.
 Check the package's release page or npm metadata rather than assuming one repository-wide version.
 
-These are versions in the reviewed SDK source (`dd0dec5c`, 2026-11-28), not a live npm-tag query.
+These are versions in the reviewed SDK source (`386b66ba`, 2026-11-28), not a live npm-tag query.
 Durable is `1.0.1`, Azure and Jev are `1.0.0`, Client is `1.10.0`, and Server is `1.5.1`. Sandbox is
-`1.4.0`, React is `1.4.0`, and the headless primitives now ship inside `@anvia/react`; the separate
-React UI package was removed. Pin exact versions in production environments when upgrades require
+`1.5.0`, Anthropic is `1.4.3`, React is `1.4.0`, and the headless primitives now ship inside `@anvia/react`; the separate
+React UI package was removed. `@anvia/extensions` is `0.3.0`: it is pre-1.0, outside the stable v1
+boundary, and may change in minor releases. Pin exact versions in production environments when upgrades require
 deliberate review.
 
 ```json
 {
   "dependencies": {
-    "@anvia/core": "1.24.1",
+    "@anvia/core": "1.25.1",
     "@anvia/openai": "1.4.1",
-    "@anvia/studio": "1.5.3"
+    "@anvia/studio": "1.6.0"
   }
 }
 ```
@@ -43,7 +44,7 @@ public behavior did not change.
 
 ## Lens server versus SDK
 
-Lens server documentation has its own [source/release review](/lens/#reviewed-baselines) dated 2026-11-23, with deployment/startup guidance checked against v0.20.1. Evaluation guidance was rechecked on 2026-11-28 against Lens v0.22.1, which stores per-trial evaluation results (trial number, trial count, and cache status). The SDK inventory is reviewed at `dd0dec5c` with `@anvia/lens` source 1.3.2; npm’s 1.2.5 artifact was independently checked for prompt APIs, and later source releases add OpenTelemetry 3.x alignment. Server and adapter versions are not synchronized. Use release-matched Compose assets and verify declared SDK ranges rather than refreshing coverage snapshots solely for a newer server.
+Lens server documentation has its own [source/release review](/lens/#reviewed-baselines) dated 2026-11-23, with deployment/startup guidance checked against v0.20.1. Evaluation guidance was rechecked on 2026-11-28 against Lens v0.22.1, which stores per-trial evaluation results (trial number, trial count, and cache status). The SDK inventory is reviewed at `386b66ba` with `@anvia/lens` source 1.3.2; npm’s 1.2.5 artifact was independently checked for prompt APIs, and later source releases add OpenTelemetry 3.x alignment. Server and adapter versions are not synchronized. Use release-matched Compose assets and verify declared SDK ranges rather than refreshing coverage snapshots solely for a newer server.
 
 ## Runtime compatibility
 

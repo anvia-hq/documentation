@@ -81,7 +81,7 @@ console.log(completionModel.capabilities)
 // }
 ```
 
-The shown values are illustrative. Read the actual object at runtime and smoke test the exact model ID, provider account, region, endpoint, and feature combination used by the product.
+The shown values are illustrative. Optional flags such as `temperature` and `forcedToolChoice` appear only when a provider restricts them: `forcedToolChoice: false` means `toolChoice: 'required'` and named-tool choice are rejected with `CompletionCapabilityError`, while `extract()` and evaluation judges fall back to `'auto'`. Read the actual object at runtime and smoke test the exact model ID, provider account, region, endpoint, and feature combination used by the product.
 
 ## Provider support differs
 

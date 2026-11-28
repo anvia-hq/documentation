@@ -14,7 +14,7 @@ Studio discovers its surfaces from registered targets and configured stores.
 | Traces | Records local run/generation/tool trees with status, timing, usage, and request context |
 | Knowledge | Inspects static context, dynamic context, dynamic tools, and retrieval evidence |
 | Memory | Uses an agent's read-only `MemoryInspector` when available, otherwise Studio session storage |
-| Sandboxes | Discovers sessions attached to sandbox tools and exposes read-only files, ports, processes, and bounded logs |
+| Sandboxes | Discovers sandboxes attached to agent sandbox tools, accepts explicit registrations, and exposes read-only files, ports, processes, and bounded logs |
 | Team runs | Serves registered AgentTeam definitions with attributed JSONL run streams, steering, cancellation, and application-only interaction responses |
 | Status | Reports enabled capabilities, stores, registered targets, and available record counts |
 | Evaluations | Registers typed suites and exposes evaluation configuration/run HTTP routes |

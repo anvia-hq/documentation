@@ -73,7 +73,7 @@ Provider keys stay in the server process rather than being configured in the bro
 
 The sandbox inspector's HTTP routes are read-only, but agents can still use the sandbox tools you register. Those tools may read or write files, execute allowed commands, and expose published ports according to their own configuration.
 
-Restrict sandbox networks, commands, file sizes, process counts, and timeouts. Destroy ephemeral sessions in `serve({ onShutdown })`; Studio does not destroy them automatically. See [Lifecycle and cleanup](/studio/configure/lifecycle-and-cleanup).
+Restrict sandbox networks, commands, file sizes, process counts, and timeouts. Destroy ephemeral sandboxes in `serve({ onShutdown })`; Studio destroys one only when its registration opts in with `disposeOnShutdown: true`. See [Lifecycle and cleanup](/studio/configure/lifecycle-and-cleanup).
 
 ## Protect stored development data
 

@@ -52,7 +52,8 @@ const supportAgent = new Agent({
 
 // A smaller model grades subjective quality. Leave `temperature` unset: Anthropic models reject it.
 // `llmScore` returns its own `feedback` as the outcome comment; `includeReason` only affects the
-// task-specific judges (such as `answerRelevancy`) and `gEval`.
+// task-specific judges (such as `answerRelevancy`) and `gEval`. Claude Haiku 5.5 does not accept forced
+// tool choice, so judges ask it with `toolChoice: 'auto'` and retry a reply that skips the submit tool.
 const judge = createJudgeMetrics({
   model: anthropic.completionModel({ modelId: "claude-haiku-5-5" }),
 });

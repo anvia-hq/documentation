@@ -28,6 +28,8 @@ The model chooses whether to call a tool and supplies its arguments. The runtime
 
 The `tools` array also accepts provider tools, which the model provider executes itself instead of Anvia's local runtime, and a `ToolIndex` for dynamic discovery: build one with `createToolIndex({ model, tools, topK })` and the agent exposes only the tools most relevant to each prompt. See [Dynamic tools](/sdk/advanced/dynamic-tools).
 
+Since `@anvia/core` 1.25.0 the array also accepts a `Toolkit`: a named group of tools with optional shared instructions, created with `createToolkit(...)`. The agent expands it into its selected tools. See [Toolkits](/sdk/tools/toolkits).
+
 ## Build user-scoped tools
 
 Create the tools from the current application scope when handlers depend on user or tenant state.

@@ -37,6 +37,8 @@ const agent = new Agent({ id: 'billing', model, tools: [refundOrder], maxTurns: 
 
 Beyond local tools:
 
+- **Toolkits.** `createToolkit()` from `@anvia/core` groups tools with shared instructions, and per-agent `include`, `exclude`, `prefix`, approval, and timeout options. Pass it in `Agent.tools`.
+- **Ready-made tools.** `@anvia/extensions` (pre-1.0) provides web search, web fetch, filesystem, shell, git, HTTP, todo, scratchpad, date and time, and math toolkits, plus tool wrappers, guardrails, middleware, and lifecycle hooks. Review each toolkit's approval defaults and limits before exposing it.
 - **Questions.** `createQuestionTool()` from `@anvia/core/tool` lets the model ask structured clarifying questions, returned as a `tool-question` interaction.
 - **Dynamic tools.** `createToolIndex()` from `@anvia/core/tool` embeds a catalog and exposes only matching definitions each turn. `searchTool()` gives the model one tool that searches your entries, such as runbooks. Pass either in `Agent.tools`.
 - **MCP.** `new McpClient({ name, transport })` from `@anvia/mcp` connects over stdio or streamable HTTP; `await client.connect()` returns a server you register through `mcpServers`, not `tools`. Close the client when you are done.
@@ -53,6 +55,8 @@ Beyond local tools:
 ## Go deeper
 
 - [Tools](/sdk/tools): define, register, stream, and approve tools.
+- [Toolkits](/sdk/tools/toolkits): group, select, and prefix tools per agent.
+- [`@anvia/extensions`](/packages/extensions): ready-made toolkits, guardrails, middleware, and hooks.
 - [Tool security](/sdk/tools/security): enforce permissions at the handler boundary.
 - [Interactions and continuations](/sdk/agents/interactions): approvals and structured questions.
 - [Dynamic tools](/sdk/advanced/dynamic-tools): tool indexes for large catalogs.

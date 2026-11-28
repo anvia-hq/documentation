@@ -137,6 +137,7 @@ export default defineConfig({
                 { text: 'Validation and execution', link: '/sdk/tools/validation-and-execution' },
                 { text: 'Add tools to an agent', link: '/sdk/tools/add-to-an-agent' },
                 { text: 'Tool results', link: '/sdk/tools/results' },
+                { text: 'Toolkits', link: '/sdk/tools/toolkits' },
                 { text: 'Middleware', link: '/sdk/tools/middleware' },
                 { text: 'Security', link: '/sdk/tools/security' }
               ]
@@ -941,6 +942,19 @@ export default defineConfig({
                 { text: 'Durable chat', link: '/packages/client/durable-chat' },
                 { text: 'API', link: '/packages/client/api-reference' },
                 { text: 'Releases', link: '/packages/client/releases' }
+              ]
+            },
+            {
+              text: '@anvia/extensions',
+              collapsed: true,
+              items: [
+                { text: 'Overview', link: '/packages/extensions' },
+                { text: 'Get started', link: '/packages/extensions/get-started' },
+                { text: 'Toolkits', link: '/packages/extensions/toolkits' },
+                { text: 'Guardrails and hooks', link: '/packages/extensions/guardrails-middlewares-hooks' },
+                { text: 'Security', link: '/packages/extensions/security' },
+                { text: 'API', link: '/packages/extensions/api-reference' },
+                { text: 'Releases', link: '/packages/extensions/releases' }
               ]
             },
             {

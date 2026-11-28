@@ -58,3 +58,5 @@ Use client abort and iterator closure to stop a normal stream. Cancellation cann
 - [Protect tools with approval](/sdk/advanced/hooks/tool-control)
 - [Choose lifecycle or middleware](/sdk/advanced/hooks/middleware)
 - [Apply production guidance](/sdk/advanced/hooks/production-guidance)
+
+For ready-made lifecycle hooks (`usageHook`, `costHook`, `auditHook`, `jsonlHook`, and `consoleHook`), see [`@anvia/extensions/hooks`](/packages/extensions/guardrails-middlewares-hooks). `@anvia/extensions` is pre-1.0.

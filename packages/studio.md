@@ -56,7 +56,7 @@ Studio is a trusted local development surface. Binding to a public interface can
 - Register model providers and per-agent policies when users should switch models in the Playground.
 - Register Neo4j or Memgraph explorers through `options.graphs` for a bounded, searchable graph view.
 - Provide dedicated stores when sessions, traces, or pipeline replays must survive restarts.
-- Pass sandbox instances only when the application owns their cleanup.
+- Studio discovers sandboxes from agent tools but does not destroy them unless a registration opts in with `disposeOnShutdown: true`; otherwise the application owns cleanup.
 
 ## Next steps
 

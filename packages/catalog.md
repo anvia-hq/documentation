@@ -9,6 +9,7 @@ All packages below are maintained in the Anvia monorepo, except the [Channels](#
 | `@anvia/core` | Agent, model, tool, memory, pipeline, evaluation, and streaming primitives | [Open](/packages/core) |
 | `@anvia/client` | Framework-neutral protocol v3, transports, UI messages, interactions, and stream state | [Open](/packages/client) |
 | `@anvia/durable` | Experimental durable agent execution on SQLite, Postgres, Drizzle, or Prisma: checkpoints, restart recovery, shared workers, approvals, task graphs, and owned subagents | [Open](/packages/durable) |
+| `@anvia/extensions` | Pre-1.0 ready-made toolkits (web search, web fetch, filesystem, shell, git, HTTP, todo, scratchpad, date and time, math), tool wrappers, guardrails, middleware, and lifecycle hooks | [Open](/packages/extensions) |
 | `@anvia/mcp` | MCP SDK v2 clients, transports, discovery, result mapping, and connection ownership | [Open](/packages/mcp) |
 | `@anvia/server` | Server-side event stream and UI transport helpers | [Open](/packages/server) |
 | `@anvia/react` | React state hooks and strictly headless chat and completion primitives over `@anvia/client` transports | [Open](/packages/react) |

@@ -12,6 +12,7 @@
 | Document input | Image and PDF files only |
 | Reasoning content and usage | Normalized when returned |
 | Normalized `temperature` | Rejected with a capability error (1.4.2+) |
+| Forced tool choice (`toolChoice: 'required'` or a named tool) | Rejected with a capability error for `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-haiku-5-5`, `claude-fable-5-1`/`5-2`, and `claude-mythos-5-1`/`5-2` (1.4.3+); other models accept it |
 | Model listing | Anthropic API client only |
 | Vertex AI | Dedicated `AnthropicVertexClient` |
 | Embeddings | Not implemented |

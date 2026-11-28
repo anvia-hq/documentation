@@ -1,7 +1,7 @@
 # Anvia Agents, Tools, and MCP
 
 > Current stable v1 implementation context for coding agents. Updated 2026-11-28; reviewed against
-> Anvia SDK `dd0dec5` (`@anvia/core` 1.24.1).
+> Anvia SDK `386b66ba` (`@anvia/core` 1.25.1, `@anvia/extensions` 0.3.0).
 
 Anvia is a provider-neutral TypeScript runtime. The host application owns authentication,
 authorization, tenant scope, business services, persistence policy, deployment, and the response
@@ -45,7 +45,11 @@ table, which custom or newly released model IDs need for context accounting. Rea
 advertise typed controls on `model.controls`; pass values per call, for example
 `controls: { reasoningEffort: 'high' }` on `generateCompletion()` or an agent run. Invalid control
 names or values are rejected before the provider call. Anthropic models reject `temperature` with
-`CompletionCapabilityError` since `@anvia/anthropic` 1.4.2.
+`CompletionCapabilityError` since `@anvia/anthropic` 1.4.2. Since 1.4.3, `claude-opus-5-5`,
+`claude-sonnet-5-5`, `claude-haiku-5-5`, and Fable/Mythos 5.1 and 5.2 declare
+`capabilities.forcedToolChoice: false`: `toolChoice: 'required'` or a named tool is rejected with
+`CompletionCapabilityError`, while `extract()` and evaluation judges fall back to `toolChoice: 'auto'`
+and retry a reply that skips the `submit` tool.
 
 ## Typed tools
 
@@ -82,6 +86,67 @@ Continuations are trusted server-side runtime state, not browser authorization t
 with actor, tenant, interaction, expiry, and claim state, and atomically claim a pending interaction
 before continuing it. For structured human answers instead of approval, build a tool with
 `createQuestionTool()` from `@anvia/core/tool`; it pauses with a `tool-question` interaction.
+
+Group tools with `createToolkit()` (Core 1.25.0+) and pass the toolkit in `Agent.tools`:
+
+```ts
+import { createToolkit } from '@anvia/core'
+
+const billingTools = createToolkit(
+  { name: 'billing', tools: [lookupOrder, refundOrder], instructions: 'Use for order questions.' },
+  { include: ['lookup_order'], prefix: 'billing_', timeoutMs: 10_000 },
+)
+```
+
+`lookupOrder` is another application-owned tool. `include`/`exclude` use unprefixed names; unknown names throw.
+Toolkit instructions are appended after `Agent.instructions`. A toolkit `requiresApproval` value
+replaces each selected tool's own setting, so `false` removes approval. Agent tool names must stay
+unique; use `prefix` to mount a toolkit twice. `createToolIndex()` also accepts toolkits.
+
+`Agent.lifecycle` and run-level `lifecycle` accept an array of lifecycle objects (Core 1.25.0+);
+handlers run in order per event, and a throw fails the run and skips later handlers for that event.
+
+## Ready-made extensions (pre-1.0)
+
+`@anvia/extensions` 0.3.0 ships toolkits, wrappers, guardrails, middleware, and hooks on subpaths.
+Most subpaths use Node built-ins (Node 20.3+). It is outside the stable v1 boundary.
+
+```ts
+import { Agent } from '@anvia/core'
+import { webFetch } from '@anvia/extensions/tools/web-fetch'
+import { filesystem } from '@anvia/extensions/tools/fs'
+import { piiGuardrail } from '@anvia/extensions/guardrails'
+import { toolOutputLimit } from '@anvia/extensions/middlewares'
+import { usageHook } from '@anvia/extensions/hooks'
+
+const agent = new Agent({
+  id: 'research',
+  model,
+  instructions: 'Research carefully and cite sources.',
+  tools: [
+    webFetch({ allowedHosts: ['docs.anvia.dev'] }),
+    filesystem({ rootDir: './workspace', readOnly: true }),
+  ],
+  guardrails: [piiGuardrail({ boundary: 'both', action: 'redact' })],
+  middlewares: [toolOutputLimit({ maxChars: 16_000 })],
+  lifecycle: [usageHook({ onReport: (report) => console.log(report) })],
+})
+```
+
+- Toolkits: `webSearch` (tavily, exa, brave, searxng, serper, perplexity, firecrawl, jina providers),
+  `webFetch`, `httpClient`, `filesystem`, `shell`, `git`, `todo`, `scratchpad`, `datetime`, `math`.
+  Each returns a `Toolkit` and accepts `ToolkitOptions`.
+- Approval defaults: `shell`'s `run_command` always; `filesystem`'s `delete_file`; `git_commit`
+  (only with `readOnly: false`). `git` is read-only by default and commits run repository hooks.
+- `webFetch`/`httpClient` block private addresses and revalidate redirects; a custom `fetch` skips
+  DNS pinning. Use `@anvia/sandbox`, not `shell`, for untrusted code.
+- Wrappers on `@anvia/extensions/tools`: `withToolCache`, `withToolTimeout`, `withToolRetry`,
+  `withToolRateLimit`, `withToolSummary`.
+- Guardrails: `piiGuardrail`, `secretLeakGuardrail`, `patternGuardrail`, `lengthGuardrail` (input
+  only by default), `promptInjectionGuardrail`, `topicGuardrail`, `llmGuardrail`.
+- Middleware: `toolOutputLimit`, `redactToolOutput`, `redactCompletionRequest`, `sanitizeToolErrors`,
+  `historyWindow` (requires `maxMessages` or `maxChars`).
+- Hooks: `usageHook`, `costHook` (with `calculateUsageCost`), `auditHook`, `jsonlHook`, `consoleHook`.
 
 ## MCP SDK v2
 
@@ -141,12 +206,15 @@ headers, redirects, tool exposure, and lifecycle in server-owned configuration.
 - Use `AgentTeam` (from `@anvia/core/agent`) when a coordinator should spawn members dynamically;
   `limits` bound the team, and exceeding them raises `AgentTeamLimitError`.
 - Use `@anvia/sandbox` for isolated execution, while still enforcing command, network, resource,
-  secret, and cleanup policy. `DockerSandboxClient` runs locally, and `createSandboxTools()` or
-  `createDockerSandboxTools()` expose a sandbox as policy-constrained tools. `RemoteSandboxHub` from
+  secret, and cleanup policy. `DockerSandboxClient` runs locally (`createSandbox({ image, pull })`, pull defaults
+  to `'never'`), and `sandboxToolkit({ sandbox })` (1.5.0+), `createSandboxTools()`, or
+  `createDockerSandboxTools()` expose a sandbox as policy-constrained tools. `@anvia/studio` 1.6.0
+  discovers sandboxes attached to agent tools automatically; Studio destroys one on shutdown only
+  with `studio: { disposeOnShutdown: true }`. `RemoteSandboxHub` from
   `@anvia/sandbox/remote` accepts outbound connections from the daemon (`@anvia/sandbox/daemon`)
   running inside each sandbox, and adds terminals, loopback tunnels, and a desktop. The retired
-  `@anvia/browser` semantic tools have no direct replacement; use `createDesktopTools()` against a
-  sandbox desktop.
+  `@anvia/browser` semantic tools have no direct replacement; use `desktopToolkit()` or `createDesktopTools()`
+  against a sandbox desktop.
 
 ## Streaming and production boundaries
 
@@ -179,6 +247,9 @@ token use, and latency.
 - Agents: https://docs.anvia.dev/sdk/agents
 - Guardrails: https://docs.anvia.dev/sdk/guardrails
 - Tools: https://docs.anvia.dev/sdk/tools
+- Toolkits: https://docs.anvia.dev/sdk/tools/toolkits
+- Extensions (pre-1.0): https://docs.anvia.dev/packages/extensions
+- Extensions security: https://docs.anvia.dev/packages/extensions/security
 - Interactions: https://docs.anvia.dev/sdk/agents/interactions
 - MCP: https://docs.anvia.dev/packages/mcp
 - MCP integration guide: https://docs.anvia.dev/sdk/advanced/mcp

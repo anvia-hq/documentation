@@ -65,4 +65,4 @@ const sandbox = await client.createSandbox({
 
 The volume must already exist and survives sandbox destruction. Scope names to a tenant and project, authorize every use, prevent unsupported concurrent writers, and define a separate retention/deletion path.
 
-Conversation memory and sandbox state are separate resources. Deleting one does not delete the other. Studio can inspect an explicitly registered inspector but does not own the sandbox lifecycle.
+Conversation memory and sandbox state are separate resources. Deleting one does not delete the other. Studio inspects sandboxes it discovers from agent tools or that you register, and destroys one only when you opt in with `disposeOnShutdown: true`; otherwise the application owns the sandbox lifecycle.

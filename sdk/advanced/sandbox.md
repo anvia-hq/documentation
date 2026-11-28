@@ -12,14 +12,14 @@ A container reduces host exposure. It does not make arbitrary hostile code safe 
 import { Agent } from '@anvia/core/agent'
 import {
   DockerSandboxClient,
-  createDockerSandboxTools,
+  sandboxToolkit,
 } from '@anvia/sandbox'
 
 const client = new DockerSandboxClient()
-await client.ensureImage({ image: 'node:22-bookworm' })
 
 const sandbox = await client.createSandbox({
   image: 'node:22-bookworm',
+  pull: 'if-missing',
   workspace: { type: 'ephemeral' },
   network: { mode: 'none' },
   files: { 'input/ticket.txt': ticket.body },
@@ -33,9 +33,9 @@ const sandbox = await client.createSandbox({
 })
 
 try {
-  const tools = createDockerSandboxTools({
+  const toolkit = sandboxToolkit({
     sandbox,
-    tools: ['list_files', 'read_file', 'write_file', 'exec_command'],
+    include: ['list_files', 'read_file', 'write_file', 'exec_command'],
     exec: {
       commands: { mode: 'allow', values: ['node'] },
       maxTimeoutMs: 20_000,
@@ -48,7 +48,7 @@ try {
     id: 'ticket-analyzer',
     model,
     instructions: 'Read input/ticket.txt and write output/report.md.',
-    tools: [...tools],
+    tools: [toolkit],
     maxTurns: 8,
   })
 
@@ -67,9 +67,9 @@ try {
 
 ## 2. Use the right interface
 
-Use `createDockerSandboxTools()` only for capabilities the model may choose. Use `sandbox.runtime` from trusted code for setup, validation, artifact export, and processes. Use the `DockerSandbox` handle for inspection, stop, and destruction.
+Use `sandboxToolkit()` only for capabilities the model may choose. It returns a core `Toolkit`, so `include`, `exclude`, `prefix`, `requiresApproval`, and `timeoutMs` apply, and it adds short instructions about the sandbox tools unless you pass `instructions: false`. The lower-level `createDockerSandboxTools()` and `createSandboxTools()` return the same tools as a plain array, selected with a `tools` tuple. Use `sandbox.runtime` from trusted code for setup, validation, artifact export, and processes. Use the `DockerSandbox` handle for inspection, stop, and destruction.
 
-Start with the smallest tool tuple required by the workflow. Omitting `tools` exposes every sandbox tool.
+Start with the smallest tool selection required by the workflow. Omitting `include` (or `tools` on the lower-level factories) exposes every sandbox tool. [Studio](/studio/sandboxes) discovers the sandbox from these tools automatically; pass `studio: false` to opt out.
 
 ### Errors
 

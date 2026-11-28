@@ -43,7 +43,7 @@ never use approval as the only permission or policy check.
 
 ## Layer the enforcement points
 
-`requiresApproval` on a tool declares when that tool must pause for approval. Enforce user and tenant permissions inside the handler before reading data or performing a side effect. The public v1 API has no `hooks.onToolCall` gate; lifecycle callbacks observe execution and return no control action. [Guardrails](/sdk/guardrails) can block or rewrite model input and output, while [middleware](/sdk/tools/middleware) transforms completion and tool data. Neither replaces handler authorization. See [lifecycle and run control](/sdk/advanced/hooks).
+`requiresApproval` on a tool declares when that tool must pause for approval. A [toolkit](/sdk/tools/toolkits) `requiresApproval` option replaces that value for the tools it selects, so `requiresApproval: false` on a toolkit removes approval from tools that declared it. Enforce user and tenant permissions inside the handler before reading data or performing a side effect. The public v1 API has no `hooks.onToolCall` gate; lifecycle callbacks observe execution and return no control action. [Guardrails](/sdk/guardrails) can block or rewrite model input and output, while [middleware](/sdk/tools/middleware) transforms completion and tool data. Neither replaces handler authorization. See [lifecycle and run control](/sdk/advanced/hooks).
 
 ## Before shipping
 

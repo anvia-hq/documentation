@@ -10,15 +10,15 @@ Use the Docker runtime when the agent and the container share a host and the app
 
 ## The neutral runtime contract
 
-Both backends implement `SandboxRuntime`, including `execText()`. The interface identifies its implementation with `provider: string` and exposes commands, files, processes, and port readiness. `createSandboxTools()` builds the same agent tools for any implementation; `createDockerSandboxTools()` is a wrapper around it.
+Both backends implement `SandboxRuntime`, including `execText()`. The interface identifies its implementation with `provider: string` and exposes commands, files, processes, and port readiness. `sandboxToolkit()` builds the same agent toolkit for any implementation. The lower-level `createSandboxTools()` returns the tools as a plain array, and `createDockerSandboxTools()` is a wrapper around it.
 
 ```ts
-import { createSandboxTools, type SandboxRuntime } from '@anvia/sandbox'
+import { sandboxToolkit, type SandboxRuntime } from '@anvia/sandbox'
 
-function toolsFor(sandbox: SandboxRuntime) {
-  return createSandboxTools({
+function toolkitFor(sandbox: SandboxRuntime) {
+  return sandboxToolkit({
     sandbox,
-    tools: ['list_files', 'read_file', 'exec_command'],
+    include: ['list_files', 'read_file', 'exec_command'],
     exec: { commands: { mode: 'allow', values: ['node'] } },
   })
 }
@@ -31,7 +31,7 @@ function toolsFor(sandbox: SandboxRuntime) {
 Create one hub per control-plane process. `authorize` receives the daemon's bearer token once per connection attempt, before the WebSocket upgrade completes. Return the sandbox id the token belongs to, or `null` to refuse it with HTTP 401.
 
 ```ts
-import { createSandboxTools } from '@anvia/sandbox'
+import { sandboxToolkit } from '@anvia/sandbox'
 import { RemoteSandboxHub } from '@anvia/sandbox/remote'
 
 // Application-owned token store. The example keeps one token in memory.
@@ -49,9 +49,9 @@ await hub.listen({ port: 8787, path: '/daemon' })
 
 // Usable before the daemon has connected. Calls wait for it up to connectTimeoutMs.
 const sandbox = hub.runtime('sandbox-1', { workdir: '/workspace' })
-const tools = createSandboxTools({
+const toolkit = sandboxToolkit({
   sandbox,
-  tools: ['exec_command', 'read_file', 'write_file', 'list_files'],
+  include: ['exec_command', 'read_file', 'write_file', 'list_files'],
 })
 ```
 

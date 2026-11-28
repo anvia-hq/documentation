@@ -1,6 +1,10 @@
 # Releases
 
-Reviewed source release: `1.4.2`. The entries below summarize the 1.0 line and preserve notable v0 history.
+Reviewed source release: `1.4.3`. The entries below summarize the 1.0 line and preserve notable v0 history.
+
+## Changes in 1.4.3
+
+Reviewed `1.4.2` → `1.4.3` against SDK source on 2026-11-28. `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-haiku-5-5`, `claude-fable-5-1`, `claude-fable-5-2`, `claude-mythos-5-1`, and `claude-mythos-5-2`, including their `-`-suffixed IDs, declare `capabilities.forcedToolChoice: false`. A request or Agent that sets `toolChoice: 'required'` or a named tool on those models fails with `CompletionCapabilityError` before the provider call; `extract()` and evaluation judges send `'auto'` instead (`@anvia/core` 1.25.0+). Other models are unchanged. See [model options](/sdk/providers/anthropic/model-options).
 
 ## Changes in 1.4.2
 
@@ -18,12 +22,13 @@ Reviewed `1.1.8` → `1.4.0` against SDK source on 2026-11-23. Adds prompt cachi
 
 Reviewed `1.1.4` → `1.1.7` against SDK source on 2026-10-15. Refreshed package guidance and updated upstream Anthropic and Vertex SDK dependencies. Review the source changelog for the dependency versions crossed by your upgrade.
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/dd0dec5c0458547409cf04a701fe1dc3d8530e3f/packages/provider-anthropic/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/386b66ba97225f6378d57c586e0f75173d3efc8d/packages/provider-anthropic/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 ## Recent changes
 
 | Version | Type | Summary |
 | --- | --- | --- |
+| `1.4.3` | Patch | Claude Opus, Sonnet, and Haiku 5.5 and Fable and Mythos 5.1+ declare `forcedToolChoice: false`; forced tool choice is rejected and `extract()` falls back to `'auto'`. |
 | `1.4.2` | Patch | Declared `temperature: false`; the normalized `temperature` field is rejected with `CompletionCapabilityError` and never serialized. |
 | `1.4.1` | Patch | Moved shared provider utilities to the internal `@anvia/core/internal/provider` subpath, split monolithic completion and decision modules, and guards against non-object provider responses in the embedding, image, and transcription adapters. |
 | `1.1.4` | Patch | Updated upstream runtime and schema dependencies across the workspace. |

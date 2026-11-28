@@ -8,7 +8,7 @@
 pnpm add @anvia/core @anvia/sandbox
 ```
 
-Docker must be available to the application process for local sandboxes. Images must exist locally before `createSandbox()` runs; call `pullImage()` explicitly when your application owns image acquisition (or `ensureImage()` to pull only when `hasImage()` is false). The remote runtime replaces Docker on the agent host with a daemon inside the sandbox.
+Docker must be available to the application process for local sandboxes. By default, `createSandbox()` requires the image to exist locally. Pass `pull: 'if-missing'` to pull it only when absent, or `pull: 'always'` to pull before every create; `pullImage()` and `ensureImage()` remain available when your application owns image acquisition separately. The remote runtime replaces Docker on the agent host with a daemon inside the sandbox.
 
 ## Create a sandbox
 
@@ -16,10 +16,10 @@ Docker must be available to the application process for local sandboxes. Images 
 import { DockerSandboxClient } from '@anvia/sandbox'
 
 const client = new DockerSandboxClient()
-await client.pullImage({ image: 'node:22-bookworm' })
 
 const sandbox = await client.createSandbox({
   image: 'node:22-bookworm',
+  pull: 'if-missing',
   workspace: { type: 'ephemeral' },
   network: { mode: 'none' },
   files: { 'README.md': '# Workspace\n' },
@@ -52,17 +52,27 @@ Sandbox failures are `SandboxError` instances with a stable `code`. Narrow with 
 ## Give tools to an agent
 
 ```ts
-import { createDockerSandboxTools } from '@anvia/sandbox'
+import { Agent } from '@anvia/core/agent'
+import { sandboxToolkit } from '@anvia/sandbox'
 
-const tools = createDockerSandboxTools({
-  sandbox, // a DockerSandbox handle or sandbox.runtime
-  tools: ['read_file', 'write_file', 'list_files', 'exec_command'],
-  exec: {
-    commands: { mode: 'allow', values: ['node', 'pnpm'] },
-    maxTimeoutMs: 30_000,
-  },
+const agent = new Agent({
+  id: 'sandbox-coder',
+  model,
+  tools: [
+    sandboxToolkit({
+      sandbox, // a DockerSandbox handle or any SandboxRuntime
+      include: ['read_file', 'write_file', 'list_files', 'exec_command'],
+      requiresApproval: { exec_command: true },
+      exec: {
+        commands: { mode: 'allow', values: ['node', 'pnpm'] },
+        maxTimeoutMs: 30_000,
+      },
+    }),
+  ],
 })
 ```
+
+`sandboxToolkit` returns an `@anvia/core` `Toolkit` named `sandbox`. It accepts the toolkit options `include`, `exclude`, `prefix`, `requiresApproval`, `timeoutMs`, and `instructions`, plus the sandbox tool policies. It adds default instructions about the sandbox tools unless you pass `instructions: false`, and attaches metadata that lets [Studio](/studio/sandboxes) discover the sandbox. `createSandboxTools` and `createDockerSandboxTools` are the lower-level factories: they return a plain tool array selected with `tools`, and carry the same Studio metadata.
 
 The tool policy narrows the runtime API presented to the model. Docker configuration, host privileges, image contents, credentials, and network access still determine the real boundary.
 
@@ -71,7 +81,7 @@ The tool policy narrows the runtime API presented to the model. Docker configura
 A `RemoteSandboxHub` accepts outbound connections from daemons inside sandboxes, so the control plane does not need Docker or direct network access to the sandbox:
 
 ```ts
-import { createSandboxTools } from '@anvia/sandbox'
+import { sandboxToolkit } from '@anvia/sandbox'
 import { RemoteSandboxHub } from '@anvia/sandbox/remote'
 
 const daemonToken = process.env.ANVIA_SANDBOX_TOKEN ?? ''
@@ -82,9 +92,9 @@ const hub = new RemoteSandboxHub({
 await hub.listen({ port: 8787, path: '/daemon' })
 
 const sandbox = hub.runtime('sbx_123', { workdir: '/workspace' })
-const tools = createSandboxTools({
+const toolkit = sandboxToolkit({
   sandbox,
-  tools: ['exec_command', 'read_file', 'write_file', 'list_files'],
+  include: ['exec_command', 'read_file', 'write_file', 'list_files'],
 })
 ```
 
@@ -103,11 +113,11 @@ The hub authorizes, routes, and reports connected sandboxes. It never creates, s
 A remote sandbox image with the desktop programs can expose a virtual display. Using the hub from the previous example:
 
 ```ts
-import { createDesktopTools } from '@anvia/sandbox'
+import { desktopToolkit } from '@anvia/sandbox'
 
-const tools = createDesktopTools({
+const desktop = desktopToolkit({
   sandbox: hub.desktop('sbx_123'),
-  tools: ['desktop_screenshot', 'desktop_click', 'desktop_key'],
+  include: ['desktop_screenshot', 'desktop_click', 'desktop_key'],
 })
 ```
 

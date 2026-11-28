@@ -1,6 +1,6 @@
 # Runtime status
 
-Studio's Status page summarizes what the current Studio process has registered and which development surfaces it can expose. Use it to verify wiring—targets, stores, explicit sandbox registrations, and feature availability—without digging through the process at runtime.
+Studio's Status page summarizes what the current Studio process has registered and which development surfaces it can expose. Use it to verify wiring—targets, stores, registered and discovered sandboxes, and feature availability—without digging through the process at runtime.
 
 Open `http://localhost:4021/status` in the browser console. To read the raw JSON instead, request the same path with an API client; the browser console itself fetches `GET /status` and renders that payload.
 
@@ -53,7 +53,7 @@ The SQLite adapter implements all four interfaces. The status payload reports it
 
 ## Understand the counters
 
-`agents` and `pipelines` are exact counts of the targets registered in this process. `sandboxes`, when present, is the number of inspectors supplied through `StudioOptions.sandboxes`.
+`agents` and `pipelines` are exact counts of the targets registered in this process. `sandboxes`, when present, is the number of sandboxes Studio inspects: those registered through `StudioOptions.sandboxes` plus those discovered from agent tools.
 
 Stored record counters are lightweight summaries rather than database totals:
 
@@ -79,7 +79,7 @@ Capabilities reflect current registration and adapter availability:
 | `evals` | At least one evaluation suite is registered. |
 | `tools` | An agent has static or dynamic tools. |
 | `mcps` | An agent has a tool carrying MCP server provenance. |
-| `sandboxes` | At least one sandbox inspector is explicitly registered. |
+| `sandboxes` | At least one sandbox is registered or discovered from agent tools. |
 | `interactions` | An agent has an approval-capable tool or a question tool. |
 | `knowledge` | An agent has static context, dynamic context, or dynamic tools. |
 

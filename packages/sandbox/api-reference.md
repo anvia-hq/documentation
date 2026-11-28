@@ -33,6 +33,7 @@ interface DockerSandbox extends AsyncDisposable {
 type CreateDockerSandboxOptions = {
   id?: string
   image: string
+  pull?: DockerImagePullPolicy // 'never' | 'if-missing' | 'always'; default 'never'
   workdir?: string
   containerRuntime?: string
   workspace: { type: 'ephemeral' } | { type: 'docker-volume'; name: string }
@@ -49,7 +50,7 @@ type CreateDockerSandboxOptions = {
 }
 ```
 
-Images and named volumes must already exist. `pullImage()` is the explicit image acquisition operation. `hasImage()` checks for a local image without pulling, and `ensureImage()` pulls only when the image is missing, resolving `{ pulled }`. `listSandboxes()` returns a `DockerSandboxSummary` (`id`, `containerName`, `image`, `state`, `status`, and optional `workdir`, `workspaceType`, `networkMode`) for each sandbox container. `destroySandbox({ id, ignoreNotFound? })` removes a container by id without a live handle, which suits cleanup after a restart; with `ignoreNotFound: true` it does not throw `sandbox_not_found`.
+Named volumes must already exist. `pull` (type `DockerImagePullPolicy`) decides how `createSandbox()` acquires the image: `'never'`, the default, requires a local image; `'if-missing'` pulls only when it is absent, like `ensureImage()`; `'always'` pulls before every create, like `pullImage()`. `pullImage()` is the explicit image acquisition operation. `hasImage()` checks for a local image without pulling, and `ensureImage()` pulls only when the image is missing, resolving `{ pulled }`. `listSandboxes()` returns a `DockerSandboxSummary` (`id`, `containerName`, `image`, `state`, `status`, and optional `workdir`, `workspaceType`, `networkMode`) for each sandbox container. `destroySandbox({ id, ignoreNotFound? })` removes a container by id without a live handle, which suits cleanup after a restart; with `ignoreNotFound: true` it does not throw `sandbox_not_found`.
 
 ## Neutral runtime
 
@@ -111,6 +112,30 @@ At least one capability must be enabled. The returned `DockerSandboxInspector` e
 ## Agent tools
 
 ```ts
+function sandboxToolkit(options: SandboxToolkitOptions): import('@anvia/core/tool').Toolkit
+
+type SandboxToolkitOptions = import('@anvia/core/tool').ToolkitOptions<SandboxToolName> & {
+  sandbox: SandboxRuntime | DockerSandbox
+  exec?: SandboxExecToolPolicy
+  readFile?: SandboxReadFileToolPolicy
+  writeFile?: SandboxFileToolPolicy
+  process?: SandboxProcessToolPolicy
+  studio?: false | SandboxStudioDiscoveryOptions
+}
+
+type SandboxStudioDiscoveryOptions = {
+  files?: boolean // default true
+  ports?: boolean // default true
+  processes?: boolean // default true
+  disposeOnShutdown?: boolean // default false
+}
+```
+
+`sandboxToolkit()` is the recommended way to give an agent sandbox tools. It builds the tools with `createSandboxTools()` and wraps them in a `Toolkit` named `sandbox` with default instructions. Select tools with `include` and `exclude` instead of a `tools` tuple; `prefix`, `requiresApproval`, `timeoutMs`, and `instructions` follow the core `ToolkitOptions` rules.
+
+`studio` controls the metadata that lets `@anvia/studio` discover the sandbox from the agent's tools. `false` omits it. `files`, `ports`, and `processes` choose the inspection surfaces, and at least one must stay enabled. `disposeOnShutdown: true` lets Studio destroy the sandbox during `studio.shutdown()`; it requires the `DockerSandbox` handle and throws for a bare `SandboxRuntime`, including `sandbox.runtime`.
+
+```ts
 function createDockerSandboxTools(
   options: CreateDockerSandboxToolsOptions,
 ): readonly import('@anvia/core/tool').AnyTool[]
@@ -134,7 +159,7 @@ function createSandboxTools(
 ): readonly import('@anvia/core/tool').AnyTool[]
 ```
 
-Its `sandbox` option accepts a `SandboxRuntime` or a `DockerSandbox` handle, and `tools` defaults to all tool names. It uses the neutral option and policy types `CreateSandboxToolsOptions`, `SandboxToolName`, `SandboxCommandPolicy`, `SandboxExecToolPolicy`, `SandboxReadFileToolPolicy`, `SandboxFileToolPolicy`, and `SandboxProcessToolPolicy`. `createDockerSandboxTools()` is a wrapper around it. Both forward `ToolCallContext.operationId` to mutating runtime calls.
+Its `sandbox` option accepts a `SandboxRuntime` or a `DockerSandbox` handle, and `tools` defaults to all tool names. Both lower-level factories accept the same `studio` option as `sandboxToolkit()` and attach the same discovery metadata. It uses the neutral option and policy types `CreateSandboxToolsOptions`, `SandboxToolName`, `SandboxCommandPolicy`, `SandboxExecToolPolicy`, `SandboxReadFileToolPolicy`, `SandboxFileToolPolicy`, and `SandboxProcessToolPolicy`. `createDockerSandboxTools()` is a wrapper around it. Both forward `ToolCallContext.operationId` to mutating runtime calls.
 
 ```ts
 const sandboxToolRecovery: Readonly<Record<SandboxToolName, 'safe' | 'idempotent'>>
@@ -145,6 +170,15 @@ const sandboxToolRecovery: Readonly<Record<SandboxToolName, 'safe' | 'idempotent
 ### Desktop tools
 
 ```ts
+function desktopToolkit(options: DesktopToolkitOptions): import('@anvia/core/tool').Toolkit
+
+type DesktopToolkitOptions = import('@anvia/core/tool').ToolkitOptions<DesktopToolName> & {
+  sandbox: SandboxDesktop
+  settleMs?: number
+  screenshot?: DesktopScreenshotPolicy
+  studio?: false | DesktopStudioDiscoveryOptions // { id?: string; label?: string }
+}
+
 function createDesktopTools(
   options: CreateDesktopToolsOptions,
 ): readonly import('@anvia/core/tool').AnyTool[]
@@ -153,6 +187,8 @@ const desktopToolRecovery: Readonly<Record<DesktopToolName, 'safe' | 'idempotent
 ```
 
 `options.sandbox` is a `SandboxDesktop` such as `hub.desktop(id)`. `tools` defaults to all nine names: `desktop_screenshot`, `desktop_click`, `desktop_mouse_move`, `desktop_drag`, `desktop_scroll`, `desktop_type`, `desktop_key`, `desktop_cursor_position`, and `desktop_wait`. `settleMs` (300 by default) delays input tools so the application can react; `screenshot: { maxEdge, maxPixels }` changes the image limits.
+
+`desktopToolkit()` wraps the same tools in a `Toolkit` named `desktop`, selected with `include` and `exclude`. Both desktop factories attach a Studio desktop view to their tools, with view id `desktop` and label `Desktop` unless `studio: { id, label }` sets them; `studio: false` omits it.
 
 `desktopToolRecovery` is the table to spread into a durable registration's `toolRecovery`: screenshots, the cursor position, and waiting are `safe`; every input is `idempotent`.
 
@@ -253,6 +289,11 @@ Studio registration helpers:
 
 ```ts
 function studioSandbox(
+  sandbox: DockerSandbox | SandboxRuntime,
+  options?: LocalStudioSandboxOptions,
+): StudioSandbox
+
+function studioSandbox(
   hub: RemoteSandboxHub,
   sandboxId: string,
   options?: StudioSandboxOptions,
@@ -264,7 +305,11 @@ function studioDesktopView(
 ): StudioDesktopView
 ```
 
-`studioSandbox()` returns a read-only inspector for files, processes, and logs plus a live desktop view. `StudioSandboxOptions` contains `agentIds`, `toolNames`, `workdir`, and `desktop` (`false` to omit the view, or `{ id, label }`). The view is registered with local access and no authentication.
+Both helpers are exported from `@anvia/sandbox` and `@anvia/sandbox/remote`.
+
+With a local `DockerSandbox` or `SandboxRuntime`, `studioSandbox()` returns a read-only inspector. `LocalStudioSandboxOptions` contains `agentIds`, `toolNames`, `files`, `ports`, `processes` (each default `true`, at least one enabled), and `disposeOnShutdown` (default `false`, `DockerSandbox` handles only), which sets the registration's `dispose` to `sandbox.destroy()`.
+
+With a hub and sandbox ID, `studioSandbox()` returns a read-only inspector for files, processes, and logs plus a live desktop view. It never sets `dispose`. `StudioSandboxOptions` contains `agentIds`, `toolNames`, `workdir`, and `desktop` (`false` to omit the view, or `{ id, label }`). The view is registered with local access and no authentication.
 
 `PROTOCOL_VERSION` is exported for diagnostics; applications should use the hub and daemon rather than crafting frames.
 

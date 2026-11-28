@@ -67,4 +67,8 @@ An enforced output policy buffers text and reasoning deltas until the output dec
 
 Guardrails do not redact every message, tool result, trace, or provider request. Redact those at their owning boundaries. Enforce permissions inside tool handlers, and use [tool approval](/sdk/advanced/hooks/tool-control) for protected side effects.
 
+## Use built-in guardrails
+
+[`@anvia/extensions/guardrails`](/packages/extensions/guardrails-middlewares-hooks) provides ready-made policies: `piiGuardrail`, `secretLeakGuardrail`, `patternGuardrail`, `lengthGuardrail`, `promptInjectionGuardrail`, `topicGuardrail`, and the model-judged `llmGuardrail`. They plug into `guardrails` like your own. Check each one's default boundary and action before enforcing it; for example, `lengthGuardrail` checks input only unless you set `boundary`. `@anvia/extensions` is pre-1.0.
+
 Continue with [observability](/sdk/observability) to record decisions and run outcomes.

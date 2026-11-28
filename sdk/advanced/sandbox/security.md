@@ -49,7 +49,7 @@ In allow mode, shell interpreters (`sh`, `bash`, `zsh`, and similar) are blocked
 
 ## Put approval before sensitive operations
 
-`createDockerSandboxTools()` does not add approval requirements. When one operation must pause for review, expose a purpose-built tool with `requiresApproval` and call `sandbox.runtime` inside its handler. Approval does not replace authorization or sandbox policy.
+The sandbox tools do not require approval by default. Use `sandboxToolkit({ sandbox, requiresApproval: { exec_command: true, write_file: true } })` to pause chosen tools for review, or `requiresApproval: true` for every selected tool. The toolkit value replaces each tool's own setting, so `false` removes approval. `createDockerSandboxTools()` has no approval option; for a narrower review step, expose a purpose-built tool with `requiresApproval` and call `sandbox.runtime` inside its handler. Approval does not replace authorization or sandbox policy.
 
 ## Treat all sandbox data as exposed
 

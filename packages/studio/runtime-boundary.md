@@ -42,6 +42,6 @@ startup fails. `start()` handles both `SIGINT` and `SIGTERM` unless `handleSigna
 Application-owned lifecycles should await `shutdown()`; `close()` aborts active work synchronously
 without waiting for observer cleanup.
 
-Studio exposes only sandbox inspectors registered through `StudioOptions.sandboxes`; it does not own or destroy their sandboxes. It also does not close provider clients, database pools, MCP connections, or custom observers. Clean those up at the same process boundary.
+Studio exposes sandboxes registered through `StudioOptions.sandboxes` and, unless `autoDiscoverSandboxes: false`, those discovered from agent tools. It destroys a sandbox only when its registration opts in with `disposeOnShutdown: true` or a `dispose` function, and then only during `shutdown()`. It also does not close provider clients, database pools, MCP connections, or custom observers. Clean those up at the same process boundary.
 
 See [Studio security boundaries](/studio/configure/security-boundaries) and [lifecycle and cleanup](/studio/configure/lifecycle-and-cleanup).

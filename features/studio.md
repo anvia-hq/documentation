@@ -48,7 +48,7 @@ Studio stores sessions, local traces, pipeline logs, and pipeline runs for the d
 - **Access control**: Studio executes agents, tools, and pipelines with the credentials and permissions of its process. Bind it to a loopback address and do not expose it to an untrusted network. `protectShell` is not authentication.
 - **Secrets**: provider keys stay in the server process's environment; the browser never needs them.
 - **Entry point**: keep the Studio entry point separate from production startup so the console is not started in production.
-- **Persistence and cleanup**: choose the stores, close an application-owned SQLite store during shutdown, and clean up any sandboxes you register.
+- **Persistence and cleanup**: choose the stores, close an application-owned SQLite store during shutdown, and clean up any sandboxes your agents use, unless you opt in to `disposeOnShutdown`.
 
 ## Go deeper
 

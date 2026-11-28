@@ -1,6 +1,6 @@
 # Anvia RAG, Knowledge, and Retrieval
 
-> Current stable v1 context for ingestion, embeddings, vector stores, GraphRAG, and retrieval policy. Updated 2026-11-28; reviewed against Anvia SDK revision `dd0dec5`.
+> Current stable v1 context for ingestion, embeddings, vector stores, GraphRAG, and retrieval policy. Updated 2026-11-28; reviewed against Anvia SDK revision `386b66ba`.
 
 Anvia calls its retrieval layer knowledge. Ingest outside the request path; at runtime search a
 prepared index and send only relevant, authorized evidence to the model.
