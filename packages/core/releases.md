@@ -1,7 +1,11 @@
 # Releases
 
-The reviewed source release is `@anvia/core` **1.24.0**. The source changelog is authoritative; the
+The reviewed source release is `@anvia/core` **1.24.1**. The source changelog is authoritative; the
 entries below summarize recent v1 changes and preserve notable v0 compatibility milestones.
+
+## Changes in 1.24.1
+
+Reviewed `1.24.0` → `1.24.1` against SDK source on 2026-11-28. LLM judges no longer send `temperature: 0`: `runJudge()` omits `temperature` unless set, and `llmJudge`, `llmScore`, the advanced judge metrics, and `createJudgeMetrics` accept an opt-in `temperature`. `CompletionModelCapabilities` gains an optional `temperature` flag; a request that sets `temperature` on a model declaring `temperature: false` fails with `CompletionCapabilityError`. `ExtractionError` and `EvalOutcome.fromError()` reasons include the underlying cause message, `extract()` no longer retries non-retryable 4xx HTTP errors, and `fromError()` infers `kind: "provider"`, `"configuration"`, or `"timeout"` when no kind is passed. `defineEvalSuite` tuple typing also works under TypeScript 7. See [Evaluations](/sdk/evaluations).
 
 ## Changes in 1.24.0
 
@@ -19,10 +23,11 @@ Reviewed `1.17.3` → `1.21.1` against SDK source on 2026-11-23. Adds the contex
 
 Reviewed `1.9.0` → `1.17.3` against SDK source on 2026-11-04. Added OpenAI Decisions and typed refusal errors (1.10), active-loop compaction and broader credential redaction (1.11), summary temperature omission (1.11.1), question-tool defaults and input limits (1.12), durable steering protocol 4 (1.13), observer failure reporting (1.14), replay-aware durable tracing (1.14.1), Pipeline decision and route stages (1.15), richer vector metrics and filters (1.16), model-listing metadata (1.17.0 and 1.17.1), and bounded media estimates plus optional compaction temperature (1.17.3). See [Decisions](/sdk/decisions), [compaction](/sdk/memory/compaction), [observability](/sdk/observability), and [Pipeline decisions and routing](/sdk/pipelines/decisions-and-routing).
 
-See the [source changelog](https://github.com/anvia-hq/anvia/blob/7815383f045fa45ac64534bbfcc67fcb52b70e86/packages/core/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
+See the [source changelog](https://github.com/anvia-hq/anvia/blob/dd0dec5c0458547409cf04a701fe1dc3d8530e3f/packages/core/CHANGELOG.md) for individual release entries. The reviewed version is a source baseline; consult npm for the currently published tag.
 
 | Version | Summary |
 | --- | --- |
+| `1.24.1` | Judges omit `temperature` unless set (new opt-in `temperature` on judge metrics); `temperature` capability validation; cause messages and inferred `provider`/`configuration`/`timeout` kinds in `EvalOutcome.fromError()`; no `extract()` retries for non-retryable 4xx errors; TypeScript 7 suite typing. |
 | `1.24.0` | Added the `skills` context-breakdown segment, `CONTEXT_SEGMENT_IDS`, `isContextBreakdown`, and `contextBreakdown` on `AgentOutcome`, `turn_end` events, and generation metadata. |
 | `1.23.0` | Added progressive RAG defaults (recursive chunking, `embedDocuments` overloads, filter shorthand, default `topK`, `rerank`, `ContextSource`, `createVectorIndex()`), `VectorStore.delete()`, and graph-ingestion and retrieval defaults. |
 | `1.17.3` | Bounded inline image and file base64 at about 2,000 tokens per payload in `estimateMemoryTokens()`, so one attachment no longer triggers premature compaction. `createSummaryMemoryCompactor()` sends no `temperature` unless set; use `temperature: 0` for deterministic summaries. Summary-request failures now include the provider message in the error, while accumulated usage remains available on `usage`. See [compaction](/sdk/memory/compaction). |

@@ -35,9 +35,9 @@ result.results[0]?.trials
 // }
 ```
 
-`passAtK` is "at least one trial matched the case outcome" and `passAllK` is "all trials matched"; `k` is the trial count, not a separate option. A case whose trials pass at exactly `minPassRate` still passes.
+`passAtK` is `true` when at least one trial's outcome was `pass`, and `passAllK` when every trial's outcome was `pass`; failed and invalid trials count against both. `k` is the trial count, not a separate option. A case whose trials pass at exactly `minPassRate` still passes.
 
-The overall outcome follows the rate: `pass` when `passed / count >= minPassRate`; otherwise `invalid` while any trial is invalid and the rate is unreachable; otherwise `fail`. Metrics are evaluated per trial, so aggregate `usage` and `cost` are sums over trials.
+The overall outcome follows the rate: `pass` when `passed / count >= minPassRate`. Otherwise it is `invalid` when at least one trial is invalid and either no trial failed or `(passed + failed) / count` is below `minPassRate` (the decided trials alone cannot settle the case); everything else is `fail`. Metrics are evaluated per trial, so aggregate `usage` and `cost` are sums over trials.
 
 Trials run sequentially inside a case even when `targetConcurrency` is greater than one. Use concurrency across cases, and keep trial counts modest because each trial is a full target run.
 
@@ -63,7 +63,7 @@ A case matches when any of its tags is in the filter. Cases without tags never m
 
 ## Decorate a target with a cache
 
-`agentEvalTarget`, `cachedEvalTarget`, and the `targetCache` suite option all run the same target, so keep the cache key in mind: it is `<caseId>::trial=<n>::<JSON of case.input>`. `expected`, `context`, `retrievalContext`, `tags`, `metadata`, and the request builder are not part of the key. Two cases with different expectations but the same `id` and `input` therefore share an entry.
+`cachedEvalTarget` and the `targetCache` suite option share one cache contract. (`agentEvalTarget` only adapts an agent into a target; it does not cache, so wrap it or pass `targetCache` when you want reuse.) Keep the cache key in mind: it is `<caseId>::trial=<n>::<JSON of case.input>`. `expected`, `context`, `retrievalContext`, `tags`, `metadata`, and the request builder are not part of the key. Two cases with different expectations but the same `id` and `input` therefore share an entry.
 
 ```ts
 import { createFileEvalCache, cachedEvalTarget, runEvalSuite } from '@anvia/core/evals'
@@ -88,6 +88,6 @@ Three rules are easy to get wrong:
 - Do not wrap a target in `cachedEvalTarget` and also pass `targetCache` for the same entries. The suite records only the hits it performs itself, so the inner wrapper's hits are invisible and the runner then writes its own copy.
 - A hit restores the recorded `targetDurationMs`, so `maxDurationMs` judges the original duration rather than zero.
 
-Cache failures do not fail the run: a failed read runs the target anyway, and a failed write still returns the result. `createFileEvalCache` recovers after a failed write and retries a load that failed once, which makes a broken cache path a performance problem rather than a correctness one.
+Cache failures handled by the runner do not fail the run: a failed read runs the target anyway, and a failed write still returns the result. This covers `targetCache` and a `cachedEvalTarget` passed on its own, which the runner unwraps. When a `cachedEvalTarget` is combined with `targetCache`, the wrapper runs as a plain target and its cache errors become target failures. `createFileEvalCache` recovers after a failed write and retries a load that failed once, which makes a broken cache path a performance problem rather than a correctness one.
 
 Caches reduce provider spend and make reruns deterministic, but a stale entry can hide a target regression. Delete the cache file when you change the target, and never share a cache across targets: use [`compareEvalTargets`](/sdk/evaluations/cli-and-baselines#compare-two-targets), which namespaces the cache per target.

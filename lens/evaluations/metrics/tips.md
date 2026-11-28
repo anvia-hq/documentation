@@ -36,7 +36,7 @@ Start with the simplest metric that detects the failure you are trying to preven
 This example checks only two requirements: the answer mentions the refund window, and it is not blank.
 
 ```ts
-import { contains, exactMatch, runEvalSuite } from '@anvia/core/evals'
+import { contains, notBlank, runEvalSuite } from '@anvia/core/evals'
 
 const result = await runEvalSuite({
   name: 'refund-policy',
@@ -50,11 +50,7 @@ const result = await runEvalSuite({
   target: async () => 'Refunds are available for 30 days.',
   metrics: [
     contains<string, string, string>({ name: 'refund-window-present' }),
-    exactMatch<string, string, string>({
-      name: 'not-blank',
-      actual: ({ output }) => output.trim().length > 0,
-      expected: true,
-    }),
+    notBlank({ name: 'not-blank' }),
   ],
 })
 

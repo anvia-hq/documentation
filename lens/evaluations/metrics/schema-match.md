@@ -21,7 +21,7 @@ const metric = schemaMatch(z.object({ status: z.string(), count: z.number() }), 
 
 With `parseJson: false` the output itself is validated, which is what you want when the target already returns an object. With `parseJson: true` a string is parsed first.
 
-Both a JSON parse error and a schema violation are recorded as a **failure**, not an invalid judgment, with the prettified Zod error as the comment. That is deliberate: the output was judged and it did not meet the contract. Only an unusable input, such as non-serializable output, becomes invalid.
+Both a JSON parse error and a schema violation are recorded as a **failure**, not an invalid judgment, with the prettified Zod error as the comment. That is deliberate: the output was judged and it did not meet the contract. The value is passed to `safeParse` as is, without serializing, so any output can be judged. The outcome is invalid only when evaluation throws, for example when a custom `actual` selector throws.
 
 ## Relationship to structured output
 

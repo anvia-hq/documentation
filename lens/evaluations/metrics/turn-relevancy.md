@@ -38,7 +38,7 @@ const result = await runEvalSuite({
   ],
 })
 
-console.log(result.results[0]?.scores.turnRelevancy)
+console.log(result.results[0]?.scores.turn_relevancy)
 ```
 
 ## Read the result
@@ -55,7 +55,9 @@ The default threshold is `0.5`; this example sets one explicitly. A score at or 
 
 Provide a nonempty array of user/assistant turns, messages, or an output object with `messages`. Use the `turns` selector for another output shape. `windowSize` counts interactions and defaults to 10. With no completed user/assistant interaction, the metric scores 1; use cases that actually contain replies to judge.
 
-An `invalid` result means the metric could not make a valid judgment, for example because required input was missing or a model call failed. Inspect it separately from a failed check.
+Judge calls accept `retries` and an opt-in `temperature`, which is omitted unless you set it. Leave `temperature` unset for models that reject it, such as Anthropic models. See [Judge model settings](/lens/evaluations/metrics#judge-model-settings).
+
+An `invalid` result means the metric could not make a valid judgment, for example because required input was missing or a model call failed. Inspect it separately from a failed check; its `reason` and `kind` say why. See [Invalid results](/lens/evaluations/metrics#invalid-results).
 
 ## Related metrics
 

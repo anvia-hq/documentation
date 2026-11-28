@@ -21,54 +21,81 @@ versioned cases -> agentEvalTarget({ agent, request }) -> outputs/traces
 
 ## Setup and agent target
 
+Install `@anvia/core` and `@anvia/anthropic`, and set `ANTHROPIC_API_KEY`. Keep the agent in its own
+module in a real application so the app and the suite import the same definition; it is inline here
+so the example runs on its own.
+
 ```ts
-import { Agent } from "@anvia/core/agent";
-import type { AgentResponse } from "@anvia/core/agent";
+import { AnthropicClient } from "@anvia/anthropic";
+import { Agent } from "@anvia/core";
 import {
   agentEvalTarget,
+  assertEvalPassed,
   contains,
-  exactMatch,
+  createJudgeMetrics,
+  notBlank,
+  printEvalResult,
   runEvalSuite,
 } from "@anvia/core/evals";
 
-const cases = [
-  { id: "refund-window", input: "When can I request a refund?", expected: "30 days" },
-  { id: "billing-owner", input: "Who changes billing?", expected: "Workspace owners" },
-];
+const anthropic = new AnthropicClient({
+  apiKey: process.env.ANTHROPIC_API_KEY!,
+});
+
+const supportAgent = new Agent({
+  id: "support-policy",
+  model: anthropic.completionModel({ modelId: "claude-sonnet-5" }),
+  instructions:
+    "Answer billing questions in one short sentence. Facts: refunds are available within 30 days; " +
+    "only Workspace owners can change billing.",
+});
+
+// A smaller model grades subjective quality. Leave `temperature` unset: Anthropic models reject it.
+const judge = createJudgeMetrics({
+  model: anthropic.completionModel({ modelId: "claude-haiku-5-5" }),
+  includeReason: "on-fail",
+});
 
 const result = await runEvalSuite({
   name: "support-policy-v3",
-  cases,
-  target: agentEvalTarget<string>({
-    agent: supportAgent,
-    request: ({ input }) => ({ prompt: input }),
-  }),
+  cases: [
+    { id: "refund-window", input: "When can I request a refund?", expected: "30 days" },
+    { id: "billing-owner", input: "Who changes billing?", expected: "Workspace owners" },
+  ],
+  target: agentEvalTarget(supportAgent),
   metrics: [
-    contains<string, AgentResponse<string>, string>({
-      actual: ({ output }) => output.output,
-    }),
-    exactMatch<string, AgentResponse<string>, string>({
-      name: "not_blank",
-      actual: ({ output }) => output.output.trim().length > 0,
-      expected: true,
+    notBlank(),
+    contains({ caseSensitive: false }),
+    judge.llmScore({
+      name: "answers_directly",
+      threshold: 0.75,
+      criteria: "The reply directly answers the customer's question without inventing policy.",
     }),
   ],
   concurrency: 2,
 });
 
-console.log(result.metrics);
+printEvalResult(result);
+assertEvalPassed(result);
 ```
+
+`agentEvalTarget(supportAgent)` sends each string input as the prompt and returns the full
+`AgentResponse`; text metrics read its `output` field automatically. Scores are keyed by metric name:
+`scores.not_blank`, `scores.contains`, and `scores.answers_directly` here.
 
 Start with deterministic checks. Add `semanticSimilarity`, `llmJudge`, `llmScore`, RAG metrics, or
 conversation metrics only when they measure a defined product requirement. Judge metrics make model
-calls and introduce cost and variance.
+calls and introduce cost and variance. Judges omit `temperature` by default; set it only for a judge
+model that accepts it.
 
 See the [built-in metric reference](/lens/evaluations/metrics) for what each metric checks and when to use it.
 
 ## Expected behavior and failure scenarios
 
 Each case contains metric outcomes of pass, fail, or invalid, and the suite aggregates totals. Invalid
-means the metric could not make a valid judgment; do not silently count it as a pass. Network errors,
+means the target or metric could not produce a valid judgment; do not silently count it as a pass. Its
+`kind` (`target`, `metric`, `configuration`, `provider`, or `timeout`) tells you where to look: a
+judge that rejects `temperature`, for example, is a `configuration` error. Network errors,
 judge schema failures, missing expected values, and rate limits need visible reporting.
 
 ## Security and production ownership

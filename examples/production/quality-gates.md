@@ -28,7 +28,14 @@ candidate build -> eval suite -> metric outcomes -> application gate policy
 
 ## Suite and policy boundaries
 
+`supportSuite` is the application's suite definition, for example the `defineEvalSuite({ name, cases,
+target, metrics })` value built from the [agent evaluation example](/examples/production/evaluations).
+Keep it in its own module so the gate and local runs share one definition.
+
 ```ts
+import { runEvalSuite } from "@anvia/core/evals";
+import { supportSuite } from "./support-suite";
+
 const result = await runEvalSuite(supportSuite);
 
 const criticalIds = new Set(["refund-window", "account-deletion"]);

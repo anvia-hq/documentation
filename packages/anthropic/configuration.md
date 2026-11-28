@@ -32,7 +32,7 @@ const anthropic = new AnthropicClient({ client: native })
 
 ## Completion options
 
-Use Anvia request fields for messages, documents, tools, token limits, temperature, and cancellation. Put provider-specific options in completion `providerOptions`. Validate them against the selected Anthropic SDK and model; the adapter does not make vendor options portable.
+Use Anvia request fields for messages, documents, tools, token limits, and cancellation. Do not set `temperature`: since 1.4.2 the model declares `capabilities.temperature: false`, so a request or Agent with `temperature` fails with `CompletionCapabilityError` before the provider call. Put provider-specific options in completion `providerOptions`. Validate them against the selected Anthropic SDK and model; the adapter does not make vendor options portable.
 
 ## Vertex AI
 

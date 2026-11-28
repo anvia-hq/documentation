@@ -43,11 +43,14 @@ interpretation.
 ## Correlation and identity
 
 - `traceId` is required and must be a valid 32-character OpenTelemetry trace ID.
-- `observationId` is optional; when supplied, it must be a valid 16-character span ID and the log
-  record receives that span context.
+- `observationId` is optional, but the log record receives span context only when a valid
+  16-character span ID is supplied. Without it the record is emitted with no trace context, and the
+  trace ID survives only as the `anvia.eval.target.trace_id` attribute.
 - `responseId` can associate the score with a model response when the application has one.
 - Use a stable opaque `id` when a later score should replace or supersede the same application
   feedback record. Omitting it generates a new ID for every event.
+- Omitting `suiteName` records `production-feedback` for `source: 'end_user'` and
+  `production-score` otherwise.
 - Set `source: 'end_user'` explicitly for user-submitted feedback. Omitted sources are treated as
   telemetry by Lens.
 

@@ -76,37 +76,34 @@ authentication, authorization, metadata validation, and delivery boundaries. Cal
 
 ## Run an evaluation suite
 
-```ts
-import type { AgentResponse } from '@anvia/core/agent'
-import { agentEvalTarget, contains, exactMatch, runEvalSuite } from '@anvia/core/evals'
+Fragments below use application-owned identifiers: `model`, `judgeModel`, `agent`, `suite`, `myTarget`, `cases`,
+`metrics`, `traceId`, `observationId`, `feedbackId`, `liked`, and `comment` come from your code.
 
-const cases = [
-  { id: 'refund-window', input: 'When can I request a refund?', expected: '30 days' },
-  { id: 'billing-owner', input: 'Who changes billing?', expected: 'Workspace owners' },
-]
+```ts
+import { agentEvalTarget, contains, createJudgeMetrics, notBlank, runEvalSuite } from '@anvia/core/evals'
+
+const judge = createJudgeMetrics({ model: judgeModel, includeReason: 'on-fail' })
 
 const result = await runEvalSuite({
   name: 'support-policy-v3',
-  cases,
-  target: agentEvalTarget<string>({
-    agent,
-    request: ({ input }) => ({ prompt: input }),
-  }),
+  cases: [
+    { id: 'refund-window', input: 'When can I request a refund?', expected: '30 days' },
+    { id: 'billing-owner', input: 'Who changes billing?', expected: 'Workspace owners' },
+  ],
+  target: agentEvalTarget(agent),
   metrics: [
-    contains<string, AgentResponse<string>, string>({
-      actual: ({ output }) => output.output,
-    }),
-    exactMatch<string, AgentResponse<string>, string>({
-      name: 'not_blank',
-      actual: ({ output }) => output.output.trim().length > 0,
-      expected: true,
-    }),
+    notBlank(),
+    contains({ caseSensitive: false }),
+    judge.llmScore({ name: 'answers_directly', threshold: 0.75, criteria: 'Answers the question directly.' }),
   ],
   concurrency: 2,
 })
 
-console.log(result.metrics)
+console.log(result.passed, result.results[0]?.scores.contains)
 ```
+
+`scores` and `metricSummaries` are keyed by metric `name`, whose defaults are snake_case
+(`exact_match`, `not_blank`, `contains`); pass `name` for a readable or unique key.
 
 ## Repeat, cache, and gate
 
@@ -142,18 +139,25 @@ console.log(comparison.hasRegressions)
 
 Flags are read only with `argv: true` (or an explicit array). `evalExitCode` returns `2` for a
 required invalid judgment, `1` for a required failure, and `0` otherwise; `exitCode: true` raises
-`process.exitCode` and never lowers it. Without a `scoreTolerance`, same-outcome score drift is
+`process.exitCode` and never lowers it; `failOnRegression: false` reports baseline regressions
+without raising it. Without a `scoreTolerance`, same-outcome score drift is
 `unchanged`, and optional-metric regressions do not gate unless `includeOptionalMetrics` is set.
 
 Agent trajectories have their own metrics: `toolCalled`, `toolNotCalled`, `toolCallOrder`,
 `maxTurns`, `maxTokens`, and `maxDurationMs`. `createJudgeMetrics({ model })` shares one judge
-model across the judge metrics.
+model and defaults across the judge metrics.
+
+Since `@anvia/core` 1.24.1, judges omit `temperature` unless set; `temperature` is opt-in on
+`llmJudge`, `llmScore`, the task-specific judges, and `createJudgeMetrics`. Anthropic models declare
+`temperature: false` and reject it with `CompletionCapabilityError`, so leave it unset for them.
 
 Start with deterministic checks. Add semantic similarity, judge, score, RAG, or conversation metrics
 only when each one represents a named product requirement. Judge metrics add cost and variance.
 
-Each case can pass, fail, or be invalid. Invalid means the metric could not make a valid judgment;
-never silently count it as passing. Include negative controls that must fail so a broken evaluator
+Each case can pass, fail, or be invalid. Invalid means the target or metric could not make a valid
+judgment; never silently count it as passing. An invalid outcome's `kind` is `target`, `metric`,
+`configuration`, `provider`, or `timeout`; `EvalOutcome.fromError()` infers it from the error chain
+(provider SDK errors and HTTP 4xx/5xx are `provider`) and appends the cause message to the reason. Include negative controls that must fail so a broken evaluator
 cannot make every candidate look good.
 
 ## Report suites and use managed datasets

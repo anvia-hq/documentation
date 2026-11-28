@@ -30,7 +30,7 @@ try {
 }
 ```
 
-`agent`, `cases`, and `metrics` are application-owned fixtures in this fragment. Construct the target Agent with `observability: { observers: { lens: observer }, primaryTrace: 'lens' }`. A custom registry name must match both `primaryTrace` and reporter `traceObserver` (default `lens`). The reporter can then correlate metric results with its traces; `onMissingTrace` decides whether an uncorrelated result is emitted, ignored, warned about, or rejected.
+`agent`, `cases`, and `metrics` are application-owned fixtures in this fragment. Construct the target Agent with `observability: { observers: { lens: observer }, primaryTrace: 'lens' }`. A custom registry name must match both `primaryTrace` and reporter `traceObserver` (default `lens`). The reporter can then correlate metric results with its traces. `onMissingTrace` (default `emit`) decides what happens to a result without a valid trace and observation ID: `emit` sends it uncorrelated, `ignore` drops it, `warn` drops it and logs a console warning, and `throw` raises an error. `runEvalSuite` collects reporter errors into `result.reporterErrors` by default, so pass `reporterErrorPolicy: 'throw'` when a missing trace must fail the run.
 
 ## Read a managed dataset
 
@@ -51,6 +51,6 @@ const cases = dataset.items
 await runEvalSuite({ ...suite, cases, tags: ['smoke'] })
 ```
 
-A response whose `tags` is not a string array or whose `metadata` is not a JSON object is rejected as `invalid_response` rather than coerced. `LensDatasetError.code` is `network_error`, `invalid_response`, `pagination_limit`, or the API's own error code, with a `request_failed` fallback; `status` is absent for transport and parse failures.
+A response whose `tags` is not a string array or whose `metadata` is not a JSON object is rejected as `invalid_response` rather than coerced. `LensDatasetError.code` is `network_error`, `invalid_response`, `pagination_limit`, or the API's own error code, with a `request_failed` fallback; `status` is absent only for `network_error`; invalid JSON and other `invalid_response` errors carry the HTTP status of the response that failed validation.
 
 The public client is read-only: dataset drafting, publishing, archiving, comparison, and quality-gate configuration live in Lens.

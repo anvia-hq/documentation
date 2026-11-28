@@ -84,6 +84,8 @@ If `version` is omitted, Lens returns the most recently published version. Pin a
 
 The client follows at most 100 pages, with 50 cases per request by default. This supports 5,000 cases; use `lens.datasetClient({ pageSize: 100 })` for up to 10,000. Exceeding the ceiling throws `LensDatasetError` with `code: 'pagination_limit'`, not a partial dataset. Inconsistent dataset identity/version or page counts yield `invalid_response`. It authenticates with the Lens public and secret project keys; run it on a trusted server or CI worker, never in browser code.
 
+Callers without the SDK can read the same data from `GET /api/public/datasets/:name` with HTTP Basic authentication (public key as username, secret key as password). Optional `version`, `page` (default `1`), and `limit` (default `50`, maximum `100`) query parameters select the version and page; the response contains `name`, `version`, optional `description` and `metadata`, the page's `items`, and `meta: { page, limit, totalItems, totalPages }`. Request every page up to `totalPages`, and pin `version` so pages come from the same immutable version.
+
 ## Archive instead of deleting history
 
 Archiving removes a dataset from the active list and prevents it from being fetched. It does not rewrite evaluation runs that already recorded the dataset name and version. Archive only after active suites have moved to another dataset.

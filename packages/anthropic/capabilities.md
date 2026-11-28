@@ -11,6 +11,7 @@
 | Image message content | Yes, for models that accept it |
 | Document input | Image and PDF files only |
 | Reasoning content and usage | Normalized when returned |
+| Normalized `temperature` | Rejected with a capability error (1.4.2+) |
 | Model listing | Anthropic API client only |
 | Vertex AI | Dedicated `AnthropicVertexClient` |
 | Embeddings | Not implemented |
@@ -27,6 +28,7 @@ Known Claude IDs expose model-aware context information. Custom model strings re
 
 Tools become Anthropic tool definitions and tool results return as provider content blocks. Schema validation protects the application from malformed arguments; it does not authorize the request or make the tool idempotent.
 Structured output is reachable only through tool input schemas; a request-level output schema is rejected with a capability error.
+The model also declares `temperature: false`, so a request or Agent that sets `temperature` is rejected the same way before the provider call.
 
 Provider and model restrictions still apply. Test forced tool choice, parallel calls, image content, and reasoning controls with the exact deployment target.
 

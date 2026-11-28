@@ -33,8 +33,10 @@ when the product uses different semantics.
 
 ## Make feedback durable and attributable
 
-- A valid 32-character `traceId` is required. Add the optional 16-character `observationId` to
-  target a particular span, and `responseId` when feedback applies to a model response.
+- A valid 32-character `traceId` is required. Add the 16-character `observationId` to target a
+  particular span, and `responseId` when feedback applies to a model response. Without a valid
+  `observationId` the log record carries no span context; the trace ID is kept only as the
+  `anvia.eval.target.trace_id` attribute.
 - Use a stable opaque `id` when a later vote should replace or supersede the same application
   feedback record. Omit it when every submission must remain a separate event.
 - Set `source: 'end_user'` only after authenticating and authorizing the feedback request. Lens

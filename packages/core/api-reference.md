@@ -699,18 +699,21 @@ Import these APIs from `@anvia/core/evals`:
 | `assertEvalOutcomes(result, expected)` | Check per-case metrics; unspecified required metrics default to pass. |
 | `EvalAssertionError` | Assertion failure with `mismatches: string[]`. |
 | `evalExitCode(result, expectations?)` | Compute `0`, `1`, or `2` without changing process state. |
-| `runEvalCli(options)` | Run, print, and optionally raise the process exit code. |
+| `runEvalCli(options)` | Run, print, and optionally raise the process exit code. `failOnRegression` (default `true`) lets a baseline regression raise the code to `1`. |
 | `formatEvalResult(result, options?)` / `printEvalResult(result, options?)` | Format or write pretty/JSON/quiet output with optional truncation and redaction. |
 | `agentEvalTarget({ agent, request?, interactions?, output? })` | Map inputs, resume with a bounded responder, select completed output. `request` is required only when a case input is not a string. |
 | `AgentEvalSuspensionError` | Missing responder or exhausted response limit; inspect `result`. |
 | `agentEvalTarget(agent)` | Short form for string-prompt cases; the adapter sends `{ prompt: input }`. |
-| `createJudgeMetrics({ model, ...defaults })` | Share one judge model and defaults across the judge metrics, with `model` optional per metric. |
+| `createJudgeMetrics({ model, ...defaults })` | Share one judge model and defaults (`retries`, `temperature`, `includeReason`, `strictMode`, `required`) across the judge metrics, with `model` optional per metric. |
+| `llmJudge`, `llmScore`, and task-specific judge metrics: `temperature?` | Since 1.24.1, judges omit `temperature` unless set. Models declaring `temperature: false` (Anthropic) reject it with `CompletionCapabilityError`. |
+| `EvalOutcome.fromError(error, kind?)` | Build an `invalid` outcome; without `kind`, infer `timeout`, `provider` (provider SDK errors, HTTP 4xx/5xx), `configuration` (`CompletionCapabilityError`), or `metric`, and append the direct cause message to the reason. |
+| `EvalInvalidKind` | `target`, `metric`, `configuration`, `provider`, or `timeout`. |
 | `createMemoryEvalCache()` / `createFileEvalCache(path)` / `cachedEvalTarget(target, cache)` | Reuse target outputs; a hit reports `cached: true` and restores the recorded duration. |
 | `defaultEvalCacheKey(testCase, trial)` | The default cache key: case id, trial, and serialized input. |
 | `loadEvalCases(path, { format?, autoId?, schema? })` | Load cases from JSON, `{ cases }`, or JSONL/NDJSON with optional Zod validation. |
 | `saveEvalResult(path, result, options?)` / `loadEvalResult(path)` | Persist and reload a baseline snapshot. |
 | `compareEvalResults(baseline, candidate, options?)` | Classify regressions, improvements, added/removed cases, missing metrics, and metric deltas. |
-| `compareEvalTargets({ targets, baselineTarget?, ...suite })` | Run several targets over one case set and compare each with a baseline target. |
+| `compareEvalTargets({ targets, baselineTarget?, scoreTolerance?, ...suite })` | Run several targets over one case set and compare each with a baseline target; `scoreTolerance` is forwarded to each comparison. |
 | `assertEvalPassed(result, expectations?)` | Throw `EvalAssertionError` with per-metric or per-expectation details. |
 | `parseEvalCliArgs(argv)` | Parse CLI flags into suite overrides without running a suite. |
 

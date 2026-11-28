@@ -2,9 +2,9 @@
 
 Choose the behavior you need to check, then open the metric’s page. Each page explains **when to use it, why, how to configure it, and what its result means**, with its own TypeScript example.
 
-All 22 metrics are exported from `@anvia/core/evals` and run inside `runEvalSuite()`.
+All 31 metrics are exported from `@anvia/core/evals` and run inside `runEvalSuite()`.
 
-Each case result exposes `scores`, a map keyed by metric export name. Read `scores.<metricName>` for that metric’s `outcome` (`pass`, `fail`, or `invalid`), `score`, and `comment`; the boolean or number a page calls "the score" is `scores.<metricName>.score`.
+Each case result exposes `scores`, a map keyed by each metric's `name`. The default name is the snake_case form of the metric, such as `exact_match` for `exactMatch()` or `answer_relevancy` for `answerRelevancy()`; pass `name` to choose your own. Read `scores.<name>` for that metric’s `outcome` (`pass`, `fail`, or `invalid`), `score`, and `comment`; the boolean or number a page calls "the score" is `scores.<name>.score`. `gEval` and `predicate` have no default: you always name them.
 
 ## Where to start
 
@@ -76,16 +76,53 @@ Read [Tips](/lens/evaluations/metrics/tips) for how to choose a focused set of m
 
 ## Call forms
 
-Every metric accepts a positional value, an options object, or nothing at all. Called with no expectation, a text metric falls back to `case.expected`, and the case type then requires that field:
+Text metrics that compare against an expectation (`exactMatch`, `contains`, `notContains`, `containsAll`, `containsAny`, `matches`, and `doesNotMatch`) accept a positional value, an options object, or nothing at all. Called with no expectation, they fall back to `case.expected`, and the case type then requires that field:
 
 ```ts
 metrics: [
   contains(),                    // reads case.expected
   contains('30 days'),           // positional
-  contains({ expected: /30 days/, caseSensitive: false }),
+  contains({ expected: '30 days', caseSensitive: false }),
+  contains(/30 days/i),          // a RegExp keeps its own flags
 ]
 ```
 
-Only `exactMatch` accepts `trim`; `caseSensitive` applies to string expectations, while a `RegExp` keeps its own flags. Share one judge model and its defaults with `createJudgeMetrics({ model, includeReason: 'on-fail' })`, which returns the same judge metrics with `model` optional per metric.
+Other metrics need their configuration up front:
+
+- `notBlank()` takes no expectation.
+- `maxLength(max)` and `requiredFields(fields)` take their limit or field list, positionally or as `max` and `expected`.
+- `schemaMatch(schema)` takes a Zod schema.
+- `predicate(name, check)` takes its name first.
+- Model-backed metrics take an options object with a `model` plus what they judge, such as `schema` and `passes` for `llmJudge`, or `criteria` for `llmScore`.
+- The agent metrics take the tool name, tool list, or budget positionally.
+
+Only `exactMatch` accepts `trim`; `caseSensitive` applies to string expectations and is ignored for a `RegExp`, which keeps its own flags. Share one judge model and its defaults with `createJudgeMetrics({ model, includeReason: 'on-fail' })`, which returns the same judge metrics with `model` optional per metric.
+
+## Judge model settings
+
+Model-backed metrics (`llmJudge`, `llmScore`, `gEval`, the answer quality and grounding metrics, `jsonCorrectness`, and the conversation metrics) accept two call settings. You can set both per metric or once through `createJudgeMetrics`:
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `retries` | `0` | Extra attempts for a failed judge call. |
+| `temperature` | omitted | Sampling temperature for judge calls. It is sent only when you set it. |
+
+Since `@anvia/core` 1.24.1, judge calls omit `temperature` unless you set it, so the provider's default applies. Earlier releases sent `temperature: 0`. Set a temperature only when the judge model accepts one. Models that declare they do not support it reject the request before any provider call. The Anthropic adapter (`@anvia/anthropic` 1.4.2 and later) is one of them. The metric then records `invalid` with kind `configuration`. To reduce judge variance, use narrow criteria, reviewed thresholds, and [trials](/sdk/evaluations/trials-and-caching) instead of relying on temperature.
+
+`semanticSimilarity` calls an embedding model, not a judge, so these settings do not apply to it.
+
+## Invalid results
+
+`invalid` means the metric could not make a judgment, which is different from a failed check. An invalid outcome always carries a `reason`. When it comes from a thrown error, it also carries a `kind`:
+
+| Kind | Typical cause |
+| --- | --- |
+| `target` | The target threw, so no output reached the metrics. |
+| `metric` | The metric itself threw, such as a selector failure or unusable judge output. |
+| `provider` | The judge or embedding provider returned an API error, including HTTP 4xx and 5xx responses. |
+| `configuration` | The request asked for something the model does not support, such as `temperature` on a model that rejects it. |
+| `timeout` | The case exceeded its `timeout`. |
+
+When a metric throws, the runner infers the kind from the error and its causes, and includes the underlying cause message in `reason`. A custom metric can do the same with `EvalOutcome.fromError(error)`. A metric that returns `EvalOutcome.invalid(reason)` on its own, such as `llmScore` with an out-of-range score, carries a reason but no kind. Inspect invalid results separately from failures: a provider outage or a configuration mistake is not evidence about answer quality.
 
 Continue with [What to evaluate](/lens/evaluations/what-to-evaluate) to design cases or [Run evaluations](/lens/evaluations/run-evaluations) to execute a suite.

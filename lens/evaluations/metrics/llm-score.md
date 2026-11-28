@@ -38,7 +38,7 @@ const result = await runEvalSuite({
   ],
 })
 
-console.log(result.results[0]?.scores.llmScore)
+console.log(result.results[0]?.scores.llm_score)
 ```
 
 ## Read the result
@@ -51,11 +51,13 @@ Requires a completion `model`, `criteria`, and a 0–1 `threshold`. Returns `{ s
 
 ## Keep in mind
 
-Scores must be between 0 and 1. Use narrow criteria and calibrate the threshold with reviewed examples. If you supply custom `instructions`, include your criteria there because those instructions replace the generated scoring instructions.
+Scores must be between 0 and 1: a judge score outside that range makes the outcome `invalid`, not failed, with the out-of-range score kept for inspection. Use narrow criteria and calibrate the threshold with reviewed examples. If you supply custom `instructions`, include your criteria there because those instructions replace the generated scoring instructions.
 
 Use the optional `prompt` selector when the judge needs evidence beyond the default case input, expected value, and output.
 
-An `invalid` result means the metric could not make a valid judgment, for example because required input was missing or a model call failed. Inspect it separately from a failed check.
+Judge calls accept `retries` and an opt-in `temperature`, which is omitted unless you set it. Leave `temperature` unset for models that reject it, such as Anthropic models. See [Judge model settings](/lens/evaluations/metrics#judge-model-settings).
+
+An `invalid` result means the metric could not make a valid judgment, for example because required input was missing or a model call failed. Inspect it separately from a failed check; its `reason` and `kind` say why. See [Invalid results](/lens/evaluations/metrics#invalid-results).
 
 ## Related metrics
 

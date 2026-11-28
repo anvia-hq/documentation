@@ -24,6 +24,8 @@ await langfuse.flush()
 await langfuse.close()
 ```
 
+`evalReporter()` options are `onMissingTrace` (default `'ignore'`), `publishInvalid` (default `false`), `traceObserver` (default `'langfuse'`), `truncateInputAt` (default `2048`), `includeMessages` (default `true`), and `includeContext` (default `false`). `score()` requires a non-empty `traceId` and configured `publicKey` and `secretKey`; it throws otherwise.
+
 Client options include credentials, base URL, environment, release, service name, timeout, and score-queue settings. Capture mode and PII redaction belong to `observer()` options.
 
 ## Prompts
