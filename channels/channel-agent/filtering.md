@@ -4,19 +4,22 @@ The bridge decides which events reach the agent and which conversation history e
 
 ## Filter incoming events
 
-The default filter (`defaultShouldHandleChannelEvent`) handles non-bot messages that arrive as direct messages or mention the bot. Bot-authored events and lifecycle events such as edits and reactions never start agent runs. Action events never start *new* runs — they resume a paused approval or question via `agent.resume()` (see [Approvals and interactions](/channels/channel-agent/interactions)).
+The default filter (`defaultShouldHandleChannelEvent`) handles non-bot messages that arrive as direct messages or mention the bot. Lifecycle events such as edits, deletions, and reactions never start agent runs. Action events never start *new* runs — they resume a paused approval or question via `agent.resume()` (see [Approvals and interactions](/channels/channel-agent/interactions)). Bot-authored actions and commands are always dropped by the bridge.
 
-Override `shouldHandle` for product-specific routing:
+`shouldHandle` runs for `message` events only; commands use `commands.shouldHandle` instead (see [Slash commands](/channels/channel-agent/commands)). Override it for product-specific routing:
 
 ```ts
 const service = createChannelAgent({
   channel,
   agent,
   shouldHandle(event) {
+    if (event.sender.bot) return false
     return event.conversation.kind === 'direct' || event.text.startsWith('/ask ')
   },
 })
 ```
+
+Only the default filter excludes bot-authored messages. A custom `shouldHandle` replaces it entirely, so check `event.sender.bot` yourself unless you intend bots to start runs (and guard against two bots answering each other).
 
 Errors thrown by the filter are reported with the `filter` stage and the message is skipped.
 

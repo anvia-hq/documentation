@@ -18,7 +18,7 @@ Splitting behavior:
 - Boundaries prefer readability: the last newline before the limit, then the last space, then a hard cut.
 - `maximumLength` must be a positive safe integer (`TypeError` otherwise); a `maximumLength` too small to hold one Unicode character throws a `RangeError`.
 - Empty text throws a `TypeError`; a media-only message (`text: ''` plus attachments) becomes a single part.
-- `replyToMessageId` is copied to every part.
+- `replyToMessageId` is attached to the first part only, so a long reply is one reply followed by continuations. An adapter's `splitMessage()` may override this: Slack keeps `replyToMessageId` on every part so continuations stay in the reply thread.
 - `actions` and `attachments` are placed only on the final part.
 
 ## Runtime validation
@@ -41,7 +41,7 @@ The validators throw a `TypeError` for malformed values and a `RangeError` for l
 
 - At most 5 actions per message (`MAX_CHANNEL_ACTIONS`).
 - Action labels contain between 1 and 80 characters (`MAX_CHANNEL_ACTION_LABEL_LENGTH`).
-- Action IDs are non-empty and unique within a message (`TypeError` when empty or duplicated) and at most 64 UTF-8 bytes (`RangeError` when overlong; `isChannelActionId()` checks the shape).
+- Action IDs are non-empty and unique within a message (`TypeError` when empty or duplicated) and at most 64 UTF-8 bytes (`MAX_CHANNEL_ACTION_ID_BYTES`; `RangeError` when overlong; `isChannelActionId()` checks the shape).
 - Action `style` is `'default'`, `'primary'`, or `'danger'` (default when omitted); anything else throws a `TypeError`.
 - At most 10 outbound attachments per logical message (`MAX_CHANNEL_ATTACHMENTS`).
 - Attachment `url` sources must use HTTPS; `data` sources must be valid base64. `mediaType` must be non-empty, `filename` non-empty when present, and `size` a non-negative safe integer when present.

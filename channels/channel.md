@@ -19,9 +19,11 @@ Install it from npm with `pnpm add @anvia/channel`. It requires Node.js 24 or la
 | Validate portable buttons              | `validateChannelActions()`               |
 | Validate portable outbound files       | `validateChannelAttachments()`           |
 | Check whether an action ID is portable | `isChannelActionId()`                    |
+| Pace outbound calls                    | `createRateLimitedChannel()`             |
 | Implement a new adapter                | `Channel<RawEvent>`                      |
+| Share adapter plumbing                 | `@anvia/channel/adapter` utilities       |
 
-For a normal Discord, Slack, or Telegram application, create the channel with the platform factory ([Discord](/channels/discord), [Slack](/channels/slack), [Telegram](/channels/telegram)) and use only the shared types plus `sendChannelMessage()` from this package.
+For a normal Discord, Slack, or Telegram application, create the channel with the platform factory ([Discord](/channels/discord), [Slack](/channels/slack), [Telegram](/channels/telegram)) and use only the shared types plus `sendChannelMessage()` from this package. The `@anvia/channel/adapter` subpath is for adapter authors; see [Build a custom adapter](/channels/channel/custom-adapter#adapter-utilities).
 
 ## Addresses
 

@@ -509,7 +509,7 @@ no exporter errors before it exited.
 | --- | --- |
 | Startup fails listing missing variables | Fill every value in `.env`; blank counts as missing. |
 | Bot is online but never answers | Message Content Intent must be enabled; the default filter handles direct messages and messages that mention the bot. |
-| Replies go to the wrong place | `DISCORD_CHANNEL_ID` is the numeric channel id; a thread or DM reports a different conversation id. |
+| Replies go to the wrong place | `DISCORD_CHANNEL_ID` is the numeric channel id; a DM reports its own channel id, and a thread reports its parent channel id with the thread id in `conversation.threadId`. |
 | `lookup_order` is never called | The instruction and tool description must make the tool worth calling; check the model, not the bridge. |
 | No trace in Lens | Origin must be the Lens browser origin, keys must match the project, and short-lived processes must reach `lens.close()`/`flush()`. |
 | Trace exists but payloads are empty | That is `captureMode: 'safe'`. Full capture is an explicit, reviewed change. |

@@ -44,13 +44,14 @@ Both functions return a `ChannelAgentService`, and both must be stopped.
 | --- | --- |
 | `channel` | The adapter whose lifecycle the service owns |
 | `agent` | Executor with `generate()`, `stream()`, and optional `resume()`; an Anvia `Agent` satisfies it |
-| `shouldHandle` | Message filter; defaults to direct messages and mentions |
-| `createPrompt` | Prompt builder; defaults to `channelMessagePrompt()` under the `multimodal` policy |
+| `shouldHandle` | Message filter; defaults to non-bot direct messages and mentions. Applies to `message` events only, not to commands or actions |
+| `createPrompt` | Prompt builder; defaults to `channelMessagePrompt()` under the `multimodal` policy (a custom builder owns its own attachment limits) |
 | `createSession` | Memory scope factory; defaults to sender-isolated sessions |
 | `renderOutcome` | Final response renderer; returns a string or `ChannelMessage` |
 | `streaming` | `enabled`, `placeholder`, `editIntervalMs` |
-| `acknowledge` | Acceptance/completion reactions: a reaction string, full options, or `false` |
-| `commands` | Slash-command handling: `true`, per-name options, or `false` (default) |
+| `acknowledge` | Acceptance/completion reactions: a reaction string, full options, or `false` (default) |
+| `commands` | Slash-command handling: `true` (every command, from anyone), options with your own `shouldHandle` and per-name handlers, or `false` (default) |
+| `runTimeoutMs` | Per-run execution bound for `generate`, `stream`, and `resume`; default five minutes, `Infinity` disables it, maximum `2147483647` |
 | `multimodal` | Attachment limits, or `false` to reject file input |
 | `interactions` | Store, rendering, parsing, timeout, and cancel behavior, or `false` to disable |
 | `errorMessage` | Failure reply shown to users, or `false` to send nothing |

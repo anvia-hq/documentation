@@ -23,11 +23,11 @@ The client exposes `getMe`, `getUpdates`, `sendMessage`, `sendAttachment`, `edit
 
 - `baseUrl` targets a custom (usually self-hosted) Bot API server; any HTTPS URL is accepted, while plain HTTP works only for `localhost`, `127.0.0.1`, or `::1`.
 - `fetch` replaces the Fetch implementation for proxies and test doubles.
-- `maximumAttachmentBytes` caps upload and download sizes (20 MiB by default).
+- `maximumAttachmentBytes` caps upload and download sizes (20 MiB by default). An outbound attachment whose declared or decoded size exceeds it, or an inbound file whose reported size exceeds it, throws a `RangeError`.
 
 Failures surface as `TelegramApiError` carrying `method`, the Bot API `errorCode` when present, and `retryAfterSeconds` for rate limits. Request failures never embed the request URL, so the token cannot leak into error messages.
 
-Five calls retry on HTTP 429 (up to three attempts, honoring Telegram's `retry_after` hint, abort-aware): `sendMessage`, URL-based `sendAttachment`, `editMessageText`, `deleteMessage`, and `setMessageReaction`. `answerCallbackQuery`, `sendChatAction`, `getMe`, `getUpdates`, downloads, and multipart (base64) uploads never retry. For steadier pacing on top of retries, wrap the adapter with [`createRateLimitedChannel()`](/channels/channel/capabilities).
+Six request paths retry on HTTP 429 (up to three attempts, honoring Telegram's `retry_after` hint, abort-aware, including a signal that is already aborted when the wait starts): `sendMessage`, URL-based `sendAttachment`, multipart (base64) `sendAttachment` uploads, `editMessageText`, `deleteMessage`, and `setMessageReaction`. A multipart retry rebuilds the upload form for each attempt. `answerCallbackQuery`, `sendChatAction`, `getMe`, `getUpdates`, and downloads never retry. For steadier pacing on top of retries, wrap the adapter with [`createRateLimitedChannel()`](/channels/channel/capabilities).
 
 ## Integrate a custom receive transport
 
@@ -48,7 +48,7 @@ const events = normalizeTelegramUpdate(parsed, bot)
 await channel.stop()
 ```
 
-Polling shutdown aborts an in-flight `getUpdates` and drains the loop; webhook shutdown rejects new deliveries and waits for active ones.
+Polling shutdown aborts an in-flight `getUpdates` and drains the loop. Webhook shutdown aborts delivery and waits for active handlers; a `receiveWebhook()` call made while shutdown is draining resolves without running the handler, and calls after `stop()` returns reject because the channel is no longer running.
 
 ## Continue with
 

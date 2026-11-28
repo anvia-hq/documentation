@@ -26,6 +26,9 @@ The low-level exports are extension points. A normal bot should not call a norma
 3. Install the bot with `VIEW_CHANNEL`, `SEND_MESSAGES`, and `READ_MESSAGE_HISTORY`.
 4. Add `SEND_MESSAGES_IN_THREADS` for thread replies, `ATTACH_FILES` for outbound files, and `ADD_REACTIONS` when using `channel.react()`.
 5. Grant access only to the servers and channels the application should process.
+6. Register the application's slash commands yourself, through the Discord API or a deployment script. The adapter receives and acknowledges command interactions but never registers commands.
+
+The built-in gateway subscribes to the `Guilds`, `GuildMessages`, `DirectMessages`, `GuildMessageReactions`, and `DirectMessageReactions` intents, plus the privileged `MessageContent` intent unless `messageContentIntent` is `false`. Message edits, deletions, and reactions arrive through these intents; a custom gateway must provide the same coverage to deliver those events.
 
 Set `messageContentIntent: false` for a mention-only guild bot that does not have privileged intent approval. Discord still supplies message content in direct messages, messages sent by the bot, and messages that mention the bot. See Discord's [Gateway intent documentation](https://docs.discord.com/developers/events/gateway) and [permission reference](https://docs.discord.com/developers/topics/permissions) for application setup details.
 
@@ -46,7 +49,14 @@ const channel = discord({
 
 `messageContentIntent` defaults to `true` and `maximumAttachmentBytes` defaults to 25 MiB. The byte limit caps each outbound file and the combined bytes buffered for one message. URL-backed outbound files are downloaded sequentially with redirects rejected; pass a custom `fetch` that allowlists trusted hosts when attachment URLs are not controlled by your application.
 
-`onError` receives the error and a context object whose `operation` is `'gateway'` for connection problems or `'handle'` when an event handler threw; the failing gateway event is attached in the latter case. Observer failures never terminate delivery.
+`onError` receives the error and a context object whose `operation` is `'handle'` when an event handler threw (the failing gateway event is attached) or `'gateway'` for everything the built-in gateway reports itself:
+
+- connection health: shard disconnects, reconnect attempts, invalidated sessions, and client errors;
+- interaction handling: a failed `deferReply` or `deferUpdate`, unreadable command or button payloads, unsupported interaction types, and autocomplete interactions;
+- command replies: a deferred reply that could not be edited (the answer is posted to the channel instead) and a failed cleanup of an unanswered deferral;
+- delivery tasks: failures while preparing an event before the handler runs, such as fetching an uncached reaction or user.
+
+Observer failures never terminate delivery.
 
 ## Agent integration
 

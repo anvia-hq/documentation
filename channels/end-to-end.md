@@ -83,7 +83,9 @@ const service = createChannelAgent({
 await service.start()
 ```
 
-This single program already provides: default filtering, per-sender conversation memory sessions, streaming edits with a placeholder, long-message splitting, and durable resumption of paused approvals and questions.
+This single program already provides: default filtering, streaming edits with a placeholder, long-message splitting, and durable resumption of paused approvals and questions. It has no conversation memory: the agent has no memory store, so the default `createSession` passes no session and every message runs without history. Give the agent a memory store to get per-sender sessions.
+
+Slash commands and acknowledgement reactions are opt-in. Set `commands` (and authorize with `commands.shouldHandle`, because commands skip the top-level message filter) and `acknowledge` with a `completeReaction` when you want them. See [Commands](/channels/channel-agent/commands).
 
 `SqliteChannelAgentInteractionStore` persists paused continuations across restarts. It is separate from the agent's conversation-memory store; configure agent memory through `@anvia/core` when history must also survive restarts (see [Memory](/sdk/memory)).
 
@@ -101,7 +103,7 @@ const service = createChannelAgent({
 })
 ```
 
-Use `channelConversationUserSession()` to state the default explicitly, or a custom `createSession` returning `undefined` to run selected events without memory. The scope decision matters most when memory is configured; without a memory store the bridge runs without sessions.
+Use `channelConversationUserSession()` to state the default explicitly, or a custom `createSession` returning `undefined` to run selected events without memory. The scope decision matters only when memory is configured. With the default `createSession`, an agent whose `memory` is `undefined` receives no session; a custom `createSession` always runs, and whether a session it returns affects history is up to the agent's memory configuration.
 
 ## 5. Choose attachment policy
 
@@ -143,7 +145,7 @@ await channel.start(async (event) => {
 })
 ```
 
-Handle the `event.type` values you need: `message`, `action`, `message-edited`, `message-deleted`, or `reaction`. When you started an adapter directly, `channel.stop()` — not a bridge service — owns shutdown.
+Handle the `event.type` values you need: `message`, `command`, `action`, `message-edited`, `message-deleted`, or `reaction`. When you started an adapter directly, `channel.stop()` — not a bridge service — owns shutdown.
 
 ## 7. Alternative: proactive sender
 

@@ -20,11 +20,20 @@ await sendChannelMessage({
 })
 ```
 
-`sendChannelMessage` splits text longer than 2000 characters into multiple Discord messages and returns the sent parts. Actions become one row of message buttons: `style` maps `'primary'` and `'danger'` to the matching Discord button color and anything else (including an omitted style) to secondary grey. The action `id` becomes the button `custom_id` and is delivered back as the `actionId` of an action event.
+`sendChannelMessage` splits text longer than 2000 characters into multiple Discord messages and returns the sent parts. If a later part fails, it throws `PartialDeliveryError`, whose `sent` field lists the parts already delivered. Actions become one row of message buttons, with at most 5 actions per message and action IDs of at most 64 bytes: `style` maps `'primary'` and `'danger'` to the matching Discord button color and anything else (including an omitted style) to secondary grey. The action `id` becomes the button `custom_id` and is delivered back as the `actionId` of an action event.
 
 Generated text is sent with Discord mentions disabled (`allowed_mentions` parses nothing), preventing unexpected `@everyone`, role, or user notifications.
 
-Command responses land in place: a deferred chat-input command interaction stays open and the *next* send to that channel is *attempted* as an edit of the deferred reply through the interaction webhook (single-use). If that edit fails — the reply was consumed, expired, or errored — the message is posted normally instead and the failure is reported through `onError`.
+## Command replies
+
+A slash command is acknowledged with a deferred reply. While its handler runs, the first send to the command's channel is attempted as an edit of that deferred reply through the interaction webhook:
+
+- Sends inside one command handler are serialized, so a second send waits for the first reply attempt to settle and then posts as a normal channel message.
+- If the reply edit fails (the interaction token expired, the placeholder was deleted, or Discord returned an error), the failure is reported through `onError` and the message is posted to the channel instead.
+- When the handler finishes without answering, or the answer fell back to a channel post, the deferred reply is deleted.
+- A send made through the command's reply context after its handler has finished is rejected with an error rather than reusing a stale interaction.
+
+Sends to other channels during a command handler are ordinary channel posts.
 
 ## Threads and replies
 
@@ -65,7 +74,7 @@ await channel.react(sent, '👍')
 await channel.delete(sent)
 ```
 
-`edit()` rejects messages carrying `replyToMessageId` because Discord reply targets cannot be edited. `react()` accepts any non-empty emoji string and uses the "own reaction" REST endpoint. `unreact()` removes the bot's own reaction through the matching removal endpoint.
+`edit()` rejects messages carrying `replyToMessageId` because Discord reply targets cannot be edited. An edit replaces the message's attachments with the ones in the edited message, so an edit without attachments removes any existing files. `react()` accepts any non-empty emoji string and uses the "own reaction" REST endpoint. `unreact()` removes the bot's own reaction through the matching removal endpoint.
 
 The adapter capabilities reflect this: `actions`, `replies`, `typing`, `reactions`, `reactionRemovals`, `delete`, and `messageEdits` are all enabled, with outbound attachments of every kind.
 

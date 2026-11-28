@@ -20,6 +20,7 @@ If you are choosing between adapters, use the [feature matrix](/packages/feature
 | Observability | Logs, traces, and evaluation reporting | [`@anvia/otel`](/packages/otel) |
 | Evaluations and prompts | Datasets, eval runs, and versioned prompts | [`@anvia/lens`](/packages/lens) |
 | Development tools | Local inspection, isolated execution, and visible browsing | [`@anvia/studio`](/packages/studio) |
+| Channels | Discord, Slack, and Telegram adapters and the channel-agent bridge, from the separate Channels workspace | [Channels](/channels/) |
 
 ## Guides versus package reference
 

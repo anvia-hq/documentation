@@ -1,6 +1,6 @@
 # Package catalog
 
-All packages below are maintained in the Anvia monorepo. “First-party” describes ownership, not API stability; consult each package's compatibility notes and changelog before upgrading.
+All packages below are maintained in the Anvia monorepo, except the [Channels](#channels) packages, which live in the separate Anvia Channels workspace. “First-party” describes ownership, not API stability; consult each package's compatibility notes and changelog before upgrading.
 
 ## Core runtime
 
@@ -77,3 +77,15 @@ All packages below are maintained in the Anvia monorepo. “First-party” descr
 | --- | --- | --- |
 | `@anvia/studio` | Local UI and HTTP runtime for agents and pipelines | [Open](/packages/studio) |
 | `@anvia/sandbox` | Docker and remote sandboxes, terminals, tunnels, desktops, and agent tools | [Open](/packages/sandbox) |
+
+## Channels
+
+Pre-1.0 packages from the separate Anvia Channels workspace. They require Node.js 24 or later and are documented under [Channels](/channels/).
+
+| Package | Purpose | Reference |
+| --- | --- | --- |
+| `@anvia/channel` | Platform-neutral addresses, events, messages, splitting, validation, and outbound pacing | [Open](/channels/channel) |
+| `@anvia/channel-agent` | Run an Anvia agent behind any channel adapter (peer: `@anvia/core` `^1.21.0`) | [Open](/channels/channel-agent) |
+| `@anvia/discord` | Discord Gateway input and REST delivery | [Open](/channels/discord) |
+| `@anvia/slack` | Slack Socket Mode input and Web API delivery | [Open](/channels/slack) |
+| `@anvia/telegram` | Telegram long polling, webhooks, and Bot API delivery | [Open](/channels/telegram) |

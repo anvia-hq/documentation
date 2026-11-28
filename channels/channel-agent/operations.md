@@ -4,9 +4,21 @@ The bridge observes every failure through `onError` without interrupting deliver
 
 ## Errors
 
-`onError(error, context)` observes every failure with a `context.stage` of `filter`, `prepare`, `acknowledge`, `interaction`, `agent`, or `delivery`. Observed errors never interrupt delivery: the user receives `errorMessage` (default `Sorry, I couldn't process that message.`, disable with `errorMessage: false`). An outcome with no text and no attachments is answered with `emptyResponseMessage` (default `I couldn't produce a response.`).
+`onError(error, context)` observes failures with a `context.stage` of `filter`, `prepare`, `acknowledge`, `interaction`, `agent`, or `delivery`. Observed errors never interrupt delivery: the user receives `errorMessage` (default `Sorry, I couldn't process that message.`, disable with `errorMessage: false`). An outcome with no text and no attachments is answered with `emptyResponseMessage` (default `I couldn't produce a response.`).
 
-No failure reply is sent when the run's signal was already aborted, or when even the placeholder message could not be delivered — those failures are only observed through `onError`.
+When the service's signal is already aborted (during `service.stop()`), a failing run is not reported and gets no failure reply; the bridge only cleans up its placeholder. When the placeholder message itself cannot be delivered, the failure is reported with the `delivery` stage and no further reply is attempted.
+
+## Run timeouts
+
+`runTimeoutMs` bounds each `generate`, `stream`, and `resume` call. The default is five minutes; pass `Infinity` to disable the bound, and values above `2147483647` (the timer maximum) are rejected when the service is created. A run that exceeds it has its signal aborted and is reported with the `agent` stage, then the user receives `errorMessage`, so a hung model call cannot block the conversation queue or `service.stop()`.
+
+```ts
+const service = createChannelAgent({
+  channel,
+  agent,
+  runTimeoutMs: 2 * 60_000,
+})
+```
 
 ## Graceful shutdown
 
