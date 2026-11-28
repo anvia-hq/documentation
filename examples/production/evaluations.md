@@ -51,9 +51,10 @@ const supportAgent = new Agent({
 });
 
 // A smaller model grades subjective quality. Leave `temperature` unset: Anthropic models reject it.
+// `llmScore` returns its own `feedback` as the outcome comment; `includeReason` only affects the
+// task-specific judges (such as `answerRelevancy`) and `gEval`.
 const judge = createJudgeMetrics({
   model: anthropic.completionModel({ modelId: "claude-haiku-5-5" }),
-  includeReason: "on-fail",
 });
 
 const result = await runEvalSuite({

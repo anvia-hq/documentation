@@ -1,6 +1,7 @@
 # Anvia Agents, Tools, and MCP
 
-> Current stable v1 implementation context for coding agents. Updated 2026-08-27.
+> Current stable v1 implementation context for coding agents. Updated 2026-11-28; reviewed against
+> Anvia SDK `dd0dec5` (`@anvia/core` 1.24.1).
 
 Anvia is a provider-neutral TypeScript runtime. The host application owns authentication,
 authorization, tenant scope, business services, persistence policy, deployment, and the response
@@ -9,7 +10,7 @@ shown to users.
 ## Install and create an agent
 
 ```sh
-pnpm add @anvia/core @anvia/openai
+pnpm add @anvia/core @anvia/openai zod
 ```
 
 ```ts
@@ -31,8 +32,20 @@ if (result.type === 'response') console.log(result.output)
 ```
 
 The v1 API uses `new Agent({...})` and direct `generate()` or `stream()` calls. `generate()` returns
-an explicit `response | interaction | blocked` outcome. `AgentBuilder`, `prompt().send()`, and other
-builder-era APIs are not part of the v1 public surface.
+an explicit `response | interaction | blocked` outcome; `blocked` means a guardrail rejected the input
+or output and carries `stage: 'input' | 'output'` and a `reason`. `maxTurns` defaults to 20, and a run
+that exceeds it throws `MaxTurnsError`. `AgentBuilder`, `prompt().send()`, and other builder-era APIs
+are not part of the v1 public surface.
+
+## Models
+
+Create models from a provider client with `client.completionModel({ modelId, ... })`. Factories accept
+`contextLimits` (`{ contextWindow, maxInputTokens, maxOutputTokens }`) to override the built-in limits
+table, which custom or newly released model IDs need for context accounting. Reasoning-capable models
+advertise typed controls on `model.controls`; pass values per call, for example
+`controls: { reasoningEffort: 'high' }` on `generateCompletion()` or an agent run. Invalid control
+names or values are rejected before the provider call. Anthropic models reject `temperature` with
+`CompletionCapabilityError` since `@anvia/anthropic` 1.4.2.
 
 ## Typed tools
 
@@ -49,7 +62,7 @@ const refundOrder = createTool({
 })
 ```
 
-Schemas validate data shape, not caller authority. Authenticate and authorize in application code
+`billing` is an application-owned service. Schemas validate data shape, not caller authority. Authenticate and authorize in application code
 and recheck current permissions inside side-effecting handlers.
 
 When approval is required, the run returns an interaction before execution:
@@ -67,7 +80,8 @@ if (result.type === 'interaction' && result.interaction.type === 'tool-approval'
 
 Continuations are trusted server-side runtime state, not browser authorization tokens. Persist them
 with actor, tenant, interaction, expiry, and claim state, and atomically claim a pending interaction
-before continuing it.
+before continuing it. For structured human answers instead of approval, build a tool with
+`createQuestionTool()` from `@anvia/core/tool`; it pauses with a `tool-question` interaction.
 
 ## MCP SDK v2
 
@@ -92,6 +106,7 @@ const filesystem = new McpClient({
 })
 
 const group = await McpClientGroup.connect({ clients: [filesystem] })
+// `model` is the application's completion model.
 const operator = new Agent({ id: 'operator', model, mcpServers: group.servers })
 
 try {
@@ -101,38 +116,56 @@ try {
 }
 ```
 
-The package implements MCP SDK v2 with protocol `2026-07-28`. It does not negotiate down to legacy
-protocols. Construction performs no I/O; `connect()` owns initialization and paginated discovery,
+The package implements MCP SDK v2. By default a client pins protocol `2026-07-28` without fallback;
+set `versionNegotiation: { mode: 'auto' }` to allow fallback or `{ mode: 'legacy' }` for 2025-era
+servers. `tools.prefix` namespaces tool names and `tools.discoveryLimits` bounds discovered tools.
+Construction performs no I/O; `connect()` owns initialization and paginated discovery,
 and `close()` owns cleanup. Treat remote MCP servers as privileged integrations: constrain targets,
 headers, redirects, tool exposure, and lifecycle in server-owned configuration.
 
-## Pipelines, skills, and multi-agent work
+## Pipelines, durable workflows, skills, and multi-agent work
 
 - Construct `Pipeline` directly; there is no `PipelineBuilder` or `.build()` phase in v1.
+- A `Pipeline` is an in-process runtime composition: it does not survive a restart. Use
+  `@anvia/durable` when runs must persist, resume after restarts, or wait on approvals across
+  processes.
 - Use deterministic pipeline steps for authorization, data access, branching, and side effects.
 - Configure named Pipeline observers in the constructor. Give Pipeline and Agent observers the same
   `primaryTrace` name when their spans should form one trace; use the per-run `observer` separately
   for operational stage events.
-- Use agents only where model reasoning adds value, and bound every loop with turn limits.
-- Load skills from trusted roots and validate their manifests and referenced assets.
-- Expose specialist agents as narrow tools when delegation is clearer than one large agent.
+- Use agents only where model reasoning adds value, and bound every loop with `maxTurns`.
+- Load skills with `loadSkills(skill.local('skills'))` from `@anvia/core/skills` and pass the result as
+  the Agent `skills` option. Load only trusted roots; invalid manifests throw `SkillValidationError`.
+- Expose a specialist as a narrow tool with `agent.asTool({ name, suspension: 'reject' })` when the
+  delegation order is fixed.
+- Use `AgentTeam` (from `@anvia/core/agent`) when a coordinator should spawn members dynamically;
+  `limits` bound the team, and exceeding them raises `AgentTeamLimitError`.
 - Use `@anvia/sandbox` for isolated execution, while still enforcing command, network, resource,
-  secret, and cleanup policy. `DockerSandboxClient` runs locally; `RemoteSandboxHub` with
-  the `@anvia/sandbox` daemon runs workloads elsewhere and adds terminals, loopback tunnels, and a
-  desktop. The retired `@anvia/browser` semantic tools have no direct replacement; use
-  `createDesktopTools()` against a sandbox desktop.
+  secret, and cleanup policy. `DockerSandboxClient` runs locally, and `createSandboxTools()` or
+  `createDockerSandboxTools()` expose a sandbox as policy-constrained tools. `RemoteSandboxHub` from
+  `@anvia/sandbox/remote` accepts outbound connections from the daemon (`@anvia/sandbox/daemon`)
+  running inside each sandbox, and adds terminals, loopback tunnels, and a desktop. The retired
+  `@anvia/browser` semantic tools have no direct replacement; use `createDesktopTools()` against a
+  sandbox desktop.
 
 ## Streaming and production boundaries
 
-`agent.stream()` returns a one-consumer handle. Iterate it for normalized lifecycle, tool, text,
-usage, and error events followed by a direct terminal outcome; use `textStream`, `text`, or `result`
-when only that projection is needed. Before sending anything to a browser, project it through
+`agent.stream()` returns a one-consumer handle. Iterate it for normalized lifecycle, tool, and text
+events followed by a direct terminal outcome; use `textStream`, `text`, or `result` when only that
+projection is needed. Usage arrives on each `turn_end` response, on the outcome, and on the terminal
+`error` event, which carries cumulative usage. `stream.steer(input)` queues input for the next turn
+boundary, and `stream.cancel(reason)` aborts generation and in-flight tools. Before sending anything to a browser, project it through
 `@anvia/client` and `@anvia/server`; do not expose raw reasoning, provider payloads, private errors,
 tool arguments, tool results, or secrets.
 
-Memory compaction uses token budgets: `trigger.afterTokens` and `retention.recentTokens`. The
-default estimator can be replaced with a model-specific async token counter. Call
-`agent.compactMemory({ session })` to compact an eligible older prefix manually; automatic
+Session memory is opt-in through the Agent `memory` option. `InMemoryMemoryStore` suits tests and
+single processes; `@anvia/memory-postgres`, `@anvia/memory-sqlite`, `@anvia/memory-drizzle`, and
+`@anvia/memory-prisma` persist history in the application's database. Configure compaction under
+`memory: { store, compaction: { trigger: { afterTokens }, retention, compactor } }`. `compactor` is
+required, for example `createSummaryMemoryCompactor({ model })`. `retention.recentTurns` keeps that
+many complete user-led turns (default 1) and `recentToolTurns` keeps completed tool rounds;
+`recentTokens` is deprecated. `tokenCounter` may be sync or async and replaces the default estimator.
+Call `agent.compactMemory({ session })` to compact an eligible older prefix manually; automatic
 compaction emits `memory_compaction` with message counts, token counts, attempts, and usage.
 
 Keep agent IDs and tool names stable. Make sensitive tools idempotent and auditable. Test handlers
@@ -141,16 +174,24 @@ token use, and latency.
 
 ## Canonical documentation
 
+- Models: https://docs.anvia.dev/sdk/models
+- Model boundary and limits: https://docs.anvia.dev/sdk/providers/model-boundary
 - Agents: https://docs.anvia.dev/sdk/agents
+- Guardrails: https://docs.anvia.dev/sdk/guardrails
 - Tools: https://docs.anvia.dev/sdk/tools
 - Interactions: https://docs.anvia.dev/sdk/agents/interactions
-- MCP: https://docs.anvia.dev/packages/mcp/
+- MCP: https://docs.anvia.dev/packages/mcp
 - MCP integration guide: https://docs.anvia.dev/sdk/advanced/mcp
 - Pipelines: https://docs.anvia.dev/sdk/pipelines
 - Pipeline runs and observability: https://docs.anvia.dev/sdk/pipelines/runs-and-errors
 - Multi-agent systems: https://docs.anvia.dev/sdk/advanced/multi-agent
+- Agent teams: https://docs.anvia.dev/sdk/advanced/multi-agent/agent-teams
+- Agent as a tool: https://docs.anvia.dev/sdk/advanced/multi-agent/agent-as-tool
+- Durable execution: https://docs.anvia.dev/sdk/advanced/durable-execution
 - Skills: https://docs.anvia.dev/sdk/advanced/skills
 - Streaming: https://docs.anvia.dev/sdk/streaming
+- Stream errors and cancellation: https://docs.anvia.dev/sdk/streaming/errors-and-cancellation
+- Memory: https://docs.anvia.dev/sdk/memory
 - Memory compaction: https://docs.anvia.dev/sdk/memory/compaction
 - Versioned memory writes: https://docs.anvia.dev/sdk/memory/versioned-writes
 - Context token breakdown: https://docs.anvia.dev/sdk/agents/context
