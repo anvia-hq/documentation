@@ -37,6 +37,6 @@ The CLI supports curated runtimes and features plus explicit apt, npm, and uv pa
 
 ## Boundaries
 
-The package does not provide a hosted control plane, a token issuer, a scheduler, an artifact registry, a secret manager, automatic image pulling, or a complete hostile-code guarantee. The hub authorizes and routes daemon connections; Docker, the VM, the host, and the daemon user remain part of the isolation boundary. A desktop runs inside the sandbox and is not a separate security boundary.
+The package does not provide a hosted control plane, a token issuer, a scheduler, an artifact registry, a secret manager, or a complete hostile-code guarantee. Images are pulled only when `createSandbox()` receives `pull: 'if-missing'` or `pull: 'always'`, or when you call `pullImage()` or `ensureImage()`. The hub authorizes and routes daemon connections; Docker, the VM, the host, and the daemon user remain part of the isolation boundary. A desktop runs inside the sandbox and is not a separate security boundary.
 
 See [remote sandboxes](/sdk/advanced/sandbox/remote), [desktop](/sdk/advanced/sandbox/desktop), [terminals](/sdk/advanced/sandbox/terminals), [tunnels](/sdk/advanced/sandbox/tunnels), [lifecycle](/packages/sandbox/lifecycle), [security](/packages/sandbox/security), and the [API reference](/packages/sandbox/api-reference).

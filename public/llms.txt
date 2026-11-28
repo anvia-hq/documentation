@@ -64,6 +64,7 @@ See [Compatibility and versioning](https://docs.anvia.dev/packages/compatibility
 - [Agents](https://docs.anvia.dev/sdk/agents): Agent construction, instructions, context, lifecycle, and limits.
 - [Messages](https://docs.anvia.dev/sdk/messages): Message roles and content types.
 - [Tools](https://docs.anvia.dev/sdk/tools): Typed tools, validation, execution, middleware, and security.
+- [Toolkits](https://docs.anvia.dev/sdk/tools/toolkits): Group tools with shared instructions and per-agent selection, prefixes, approval, and timeouts.
 - [Memory](https://docs.anvia.dev/sdk/memory): Sessions, persistence policies, compaction, and store adapters.
 - [Versioned memory writes](https://docs.anvia.dev/sdk/memory/versioned-writes): Idempotency keys, optimistic versions, conflicts, and durable recorded memory.
 - [Knowledge](https://docs.anvia.dev/sdk/knowledges): Document loading, embeddings, vector stores, retrieval, and search tools.
@@ -136,8 +137,9 @@ See [Compatibility and versioning](https://docs.anvia.dev/packages/compatibility
 - [Durable compaction](https://docs.anvia.dev/packages/durable/compaction): Registration-level summaries and recoverable active-loop projections without deleting canonical history.
 - [Durable steering](https://docs.anvia.dev/packages/durable/steering): Persisted user input and deduplicated receipts at safe execution boundaries.
 - [Durable tracing](https://docs.anvia.dev/packages/durable/tracing): Stable run traces, application chat grouping, and OpenTelemetry ID-generator setup.
+- [`@anvia/extensions`](https://docs.anvia.dev/packages/extensions): Pre-1.0 ready-made toolkits (web search and fetch, filesystem, shell, git, HTTP, todo, scratchpad, date and time, math), tool wrappers, guardrails, middleware, and lifecycle hooks.
 - [`@anvia/mcp`](https://docs.anvia.dev/packages/mcp): MCP SDK v2 clients, transports, discovery, and lifecycle ownership.
-- [`@anvia/sandbox`](https://docs.anvia.dev/packages/sandbox): Docker-backed workspaces, remote runtime, in-sandbox daemon, virtual desktop, and sandbox tools.
+- [`@anvia/sandbox`](https://docs.anvia.dev/packages/sandbox): Docker-backed workspaces, remote runtime, in-sandbox daemon, virtual desktop, sandbox tools, and `sandboxToolkit()`/`desktopToolkit()`.
 - [`@anvia/studio`](https://docs.anvia.dev/packages/studio): Studio development UI and HTTP runtime around registered agents, pipelines, and graph explorers.
 - [`@anvia/cli`](https://docs.anvia.dev/packages/cli): Coding-agent skills and editable shadcn/Tailwind application components.
 - [CLI Agent Skills](https://docs.anvia.dev/packages/cli/agent-skills): Ten bundled manual-invocation skills (including experimental anvia-durable), Claude Code, Cursor, AGENTS.md/Codex, custom directories, and target-specific updates.

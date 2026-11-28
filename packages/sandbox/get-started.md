@@ -12,10 +12,10 @@ Create and always destroy a sandbox:
 import { DockerSandboxClient } from '@anvia/sandbox'
 
 const client = new DockerSandboxClient()
-await client.ensureImage({ image: 'node:22-bookworm' })
 
 const sandbox = await client.createSandbox({
   image: 'node:22-bookworm',
+  pull: 'if-missing', // default 'never' requires a local image
   workspace: { type: 'ephemeral' },
   network: { mode: 'none' },
   files: { 'README.md': '# Temporary workspace\n' },
@@ -40,14 +40,14 @@ try {
 
 The image, workspace, and network policy are explicit. The root filesystem is writable unless `readonlyRootfs` is enabled; the workspace remains the intended writable area.
 
-To expose a constrained tool subset to an agent, use `createDockerSandboxTools` after reviewing [security](/packages/sandbox/security). For stopping, resuming, and persistent volumes, read [lifecycle](/packages/sandbox/lifecycle).
+To expose a constrained tool subset to an agent, pass `sandboxToolkit({ sandbox, include: [...] })` in the agent's `tools` after reviewing [security](/packages/sandbox/security). The lower-level `createDockerSandboxTools` returns the same tools as a plain array. For stopping, resuming, and persistent volumes, read [lifecycle](/packages/sandbox/lifecycle).
 
 ## Run against a remote sandbox
 
 The remote runtime runs the same interface behind a daemon inside the sandbox. The daemon dials out to a `RemoteSandboxHub`, so the agent host does not need Docker or a route to the sandbox:
 
 ```ts
-import { createSandboxTools } from '@anvia/sandbox'
+import { sandboxToolkit } from '@anvia/sandbox'
 import { RemoteSandboxHub } from '@anvia/sandbox/remote'
 
 const daemonToken = process.env.ANVIA_SANDBOX_TOKEN ?? ''
@@ -58,9 +58,9 @@ const hub = new RemoteSandboxHub({
 await hub.listen({ port: 8787, path: '/daemon' })
 
 const sandbox = hub.runtime('sbx_123', { workdir: '/workspace' })
-const tools = createSandboxTools({
+const toolkit = sandboxToolkit({
   sandbox,
-  tools: ['exec_command', 'read_file', 'write_file', 'list_files'],
+  include: ['exec_command', 'read_file', 'write_file', 'list_files'],
 })
 ```
 

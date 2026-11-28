@@ -1,18 +1,18 @@
 # Can an agent use a computer or desktop?
 
-Yes, inside a remote sandbox. `@anvia/sandbox` can run a virtual desktop in a sandbox image, and `createDesktopTools()` gives an agent tools to take screenshots, move and click the mouse, drag, scroll, type, and press keys. Chromium or any other program on that desktop can be driven this way.
+Yes, inside a remote sandbox. `@anvia/sandbox` can run a virtual desktop in a sandbox image, and `desktopToolkit()` gives an agent tools to take screenshots, move and click the mouse, drag, scroll, type, and press keys. Chromium or any other program on that desktop can be driven this way.
 
 ```ts
-import { createDesktopTools } from '@anvia/sandbox'
+import { desktopToolkit } from '@anvia/sandbox'
 import { RemoteSandboxHub } from '@anvia/sandbox/remote'
 
 const hub = new RemoteSandboxHub({
   authorize: (token) => (token === 'local-dev-token' ? { sandboxId: 'sbx_123' } : null),
 })
 
-const tools = createDesktopTools({
+const desktop = desktopToolkit({
   sandbox: hub.desktop('sbx_123'),
-  tools: ['desktop_screenshot', 'desktop_click', 'desktop_type', 'desktop_key'],
+  include: ['desktop_screenshot', 'desktop_click', 'desktop_type', 'desktop_key'],
 })
 ```
 
@@ -24,7 +24,7 @@ Desktops belong to the remote runtime: a daemon inside the sandbox connects out 
 
 ## Can a person watch or take over?
 
-Yes. Studio can show a remote sandbox's live desktop. While a person holds control, the agent's input tools fail with a `desktop_locked` error.
+Yes. Studio shows a remote sandbox's live desktop for any agent that uses its desktop tools. While a person holds control, the agent's input tools fail with a `desktop_locked` error.
 
 ## Is the desktop a security boundary?
 

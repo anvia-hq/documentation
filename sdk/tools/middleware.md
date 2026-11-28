@@ -51,3 +51,7 @@ Agent-level middleware runs before run-level middleware.
 ## Keep contracts in the handler
 
 Middleware is useful for instrumentation, normalization, request shaping, large-result spillover, and output filtering. It must not bypass schema validation or replace handler authorization.
+
+## Use built-in middleware
+
+[`@anvia/extensions/middlewares`](/packages/extensions/guardrails-middlewares-hooks) provides `toolOutputLimit`, `redactToolOutput`, `redactCompletionRequest`, `sanitizeToolErrors`, and `historyWindow`. Add them to `middlewares` like your own. `@anvia/extensions` is pre-1.0.

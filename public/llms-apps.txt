@@ -1,6 +1,6 @@
 # Anvia Full-Stack Applications
 
-> Current stable v1 implementation context for server streaming, React chat, durable chat, and messaging channels. Updated 2026-11-28; reviewed against Anvia SDK source dd0dec5 and Channels source bc762e9.
+> Current stable v1 implementation context for server streaming, React chat, durable chat, and messaging channels. Updated 2026-11-28; reviewed against Anvia SDK source 386b66ba and Channels source bc762e9.
 
 Keep agents, provider credentials, tools, memory, retrieval, observers, continuations, and access
 control on the server. Send only the reviewed Client Protocol to the browser.

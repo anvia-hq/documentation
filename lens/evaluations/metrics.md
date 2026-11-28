@@ -109,6 +109,8 @@ Model-backed metrics (`llmJudge`, `llmScore`, `gEval`, the answer quality and gr
 
 Since `@anvia/core` 1.24.1, judge calls omit `temperature` unless you set it, so the provider's default applies. Earlier releases sent `temperature: 0`. Set a temperature only when the judge model accepts one. Models that declare they do not support it reject the request before any provider call. The Anthropic adapter (`@anvia/anthropic` 1.4.2 and later) is one of them. The metric then records `invalid` with kind `configuration`. To reduce judge variance, use narrow criteria, reviewed thresholds, and [trials](/sdk/evaluations/trials-and-caching) instead of relying on temperature.
 
+Judges return structured verdicts through `extract()`. Since `@anvia/core` 1.25.0, a judge model that declares `capabilities.forcedToolChoice: false`, such as `claude-haiku-5-5` or `claude-sonnet-5-5`, receives `toolChoice: 'auto'` instead of a forced submit call. A reply without the submit call is retried within `extract()` and, if it still fails, the metric records `invalid`.
+
 `semanticSimilarity` calls an embedding model, not a judge, so these settings do not apply to it.
 
 ## Invalid results

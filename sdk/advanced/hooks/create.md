@@ -70,9 +70,22 @@ const result = await agent.generate({
 
 When both scopes are present, Anvia composes the agent lifecycle first and the run lifecycle second. Each callback receives an isolated snapshot.
 
+Since `@anvia/core` 1.25.0, both `lifecycle` options also accept an array. Handlers for each event run in array order, one at a time, and their return values are ignored:
+
+```ts
+const agent = new Agent({
+    id: 'support',
+    model,
+    instructions: 'Answer support questions clearly.',
+    lifecycle: [auditLifecycle, metricsLifecycle],
+})
+```
+
+`auditLifecycle` and `metricsLifecycle` are application-owned `AgentLifecycle` objects, or ready-made hooks such as `usageHook()` and `auditHook()` from [`@anvia/extensions/hooks`](/packages/extensions/guardrails-middlewares-hooks). Use `composeAgentLifecycle(...)` or `normalizeAgentLifecycle(...)` from `@anvia/core` when you need the composed object yourself.
+
 ## 4. Know the failure behavior
 
-Lifecycle callbacks are awaited. If one throws, the agent run fails and proceeds through error cleanup. Use this when recording the lifecycle event is required for correctness.
+Lifecycle callbacks are awaited. If one throws, the agent run fails and proceeds through error cleanup, and later handlers in a lifecycle array do not run for that event. Use this when recording the lifecycle event is required for correctness.
 
 Use an observer with non-failing behavior for best-effort telemetry that should not stop the run. The [agent runtime lifecycle](/sdk/agents/runtime-lifecycle) explains the distinction.
 

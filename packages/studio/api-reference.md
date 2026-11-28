@@ -55,6 +55,7 @@ type StudioOptions = {
   ui?: boolean | StudioUiOptions
   models?: StudioModelConfig
   sandboxes?: readonly StudioSandboxRegistration[]
+  autoDiscoverSandboxes?: boolean // default true
   graphs?: readonly StudioGraphRegistration[]
   maxBodyBytes?: number // default 10 MiB
 }
@@ -65,6 +66,8 @@ full transcripts and inline images; raise it when an application sends larger pr
 must be a positive safe integer. A larger body is rejected with HTTP `413` and error code `payload_too_large`,
 before the request reaches a target. `StudioServeOptions` accepts the same option and applies it when Studio
 starts, so a constructor value and a `serve()` value use the same ceiling; the serving option wins.
+
+`autoDiscoverSandboxes` makes Studio find sandboxes attached to registered agents' tools; set it to `false` to inspect only `sandboxes`. A `StudioSandboxRegistration` has an `inspector`, optional `agentIds`, `toolNames`, and `views`, and an optional `dispose: () => Promise<void> | void`. Studio runs each `dispose` once during `shutdown()`, after active runs drain; `close()` does not run it. An explicit registration with the same provider and ID as a discovered sandbox overrides the discovered `agentIds`, `toolNames`, `views`, and `dispose` it sets. See [Sandboxes](/studio/sandboxes).
 
 `StudioUiOptions` configures `path`, `rootRoutes`, `title`, `redirectRoot`, `clientScript`, and `protectShell`. `StudioStores` independently selects session, trace, pipeline-log, and pipeline-run stores; session and pipeline stores may be disabled with `false` where the type permits it.
 

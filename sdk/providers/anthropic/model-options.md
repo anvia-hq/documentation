@@ -54,7 +54,7 @@ const result = await generateCompletion({
 })
 ```
 
-`maxTokens`, tools, and tool choice are mapped to Anthropic request fields by the adapter. Since `@anvia/anthropic` 1.4.2 the model declares `capabilities.temperature: false`: a completion request or Agent that sets `temperature` fails with `CompletionCapabilityError` before the provider call, and the adapter never serializes the normalized field. Claude Sonnet 5 and Claude Opus 5 use adaptive thinking and reject manual sampling changes, so also avoid `top_p` and `top_k`.
+`maxTokens`, tools, and tool choice are mapped to Anthropic request fields by the adapter. Since `@anvia/anthropic` 1.4.3, `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-haiku-5-5`, `claude-fable-5-1`, `claude-fable-5-2`, `claude-mythos-5-1`, and `claude-mythos-5-2` declare `capabilities.forcedToolChoice: false`: a request or Agent that sets `toolChoice: 'required'` or a named tool fails with `CompletionCapabilityError` before the provider call. `'auto'` and `'none'` still work, and `extract()` and evaluation judges fall back to `'auto'` automatically. Since `@anvia/anthropic` 1.4.2 the model declares `capabilities.temperature: false`: a completion request or Agent that sets `temperature` fails with `CompletionCapabilityError` before the provider call, and the adapter never serializes the normalized field. Claude Sonnet 5 and Claude Opus 5 use adaptive thinking and reject manual sampling changes, so also avoid `top_p` and `top_k`.
 
 Reasoning-capable Anthropic models also advertise a typed `reasoningEffort` control. Inspect `model.controls` for the allowed values, then pass `controls: { reasoningEffort: 'high' }` on the completion or Agent run. Invalid values are rejected before the provider call.
 

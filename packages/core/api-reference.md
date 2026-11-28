@@ -221,7 +221,18 @@ const index = await createToolIndex({
 });
 ```
 
-Pass the returned `ToolIndex` directly in `Agent.tools`. `embedTools(...)` returns embedded tool documents without constructing an index. `isToolIndex(...)` identifies the public catalog type.
+Pass the returned `ToolIndex` directly in `Agent.tools`. `embedTools(...)` returns embedded tool documents without constructing an index. `isToolIndex(...)` identifies the public catalog type. Both `createToolIndex` and `embedTools` also accept toolkits in `tools`; they are flattened, and their instructions are ignored.
+
+Group tools with `createToolkit(definition, options?)` (1.25.0+):
+
+```ts
+const billing = createToolkit(
+  { name: 'billing', tools: [getInvoice, voidInvoice], instructions: 'Use for invoice questions.' },
+  { include: ['get_invoice'], prefix: 'billing_', timeoutMs: 10_000 },
+)
+```
+
+`createToolkit` returns a frozen `Toolkit` (`{ kind: 'toolkit', name, tools, instructions? }`); `ToolkitDefinition` is the first argument and `ToolkitOptions` the second (`include`, `exclude`, `prefix`, `requiresApproval`, `timeoutMs`, `instructions`). `isToolkit(value)` identifies one. A toolkit is accepted in `Agent.tools`; its instructions are appended after the agent instructions, and its `requiresApproval` option replaces the selected tools' own setting. See [Toolkits](/sdk/tools/toolkits).
 
 `createMiddleware(...)` preserves middleware callbacks for completion requests, completion responses, tool input, and tool output. `createThinkTool(...)` creates a model-visible scratch tool.
 
@@ -266,6 +277,8 @@ const lifecycle = {
   onError(event) {},
 }
 ```
+
+`Agent.lifecycle` and the run-level `lifecycle` accept an `AgentLifecycleInput`: one `AgentLifecycle` or, since 1.25.0, a readonly array of them. Array handlers run in order for each event, each awaited with its own snapshot; a throw stops the remaining handlers for that event and fails the run. `normalizeAgentLifecycle(input)` returns one composed lifecycle (or `undefined` for an empty input), and `composeAgentLifecycle(first, second)` composes two, first then second.
 
 Lifecycle callbacks observe stable run boundaries. They are not an authorization substitute and do not replace `requiresApproval`.
 
@@ -657,7 +670,7 @@ cover email addresses, validated payment cards, IPv4 addresses, standalone phone
 common API-key prefixes, bearer tokens, complete and truncated PEM private keys, and context-labelled AWS
 secret access keys. An arbitrary bare 40-character string is not treated as an AWS secret: the pattern needs a
 `secret_access_key`-style label. This is pattern matching, not a guarantee that every secret is found. Traversal marks circular references and values deeper
-than 16 levels instead of exporting them unchanged.
+than 16 levels instead of exporting them unchanged. The `data` string of an object whose `type` is `base64`, `data` (1.25.0+), `encrypted`, `image`, or `redacted` is treated as encoded content and passed through unredacted, so do not place readable sensitive text in such fields.
 
 Provider adapters also validate a provider-executed tool's normalized shape with
 `assertProviderToolShape(tool)`, which throws on a definition the durable or streaming paths cannot persist.

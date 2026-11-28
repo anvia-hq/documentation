@@ -56,7 +56,7 @@ Studio reads the registered configuration and enables relevant surfaces automati
 | Pipelines | Graph, runs, logs, history, and replay. |
 | Registered graph explorers | Bounded graph overview, filtering, details, and expansion. |
 | Agent memory or Studio sessions | Memory and session inspection. |
-| Explicit sandbox inspectors | Read-only files, ports, and process inspection. |
+| Sandbox tools or registered sandbox inspectors | Read-only files, ports, and process inspection. |
 | Registered sandbox views | Authorized browser desktops and human-control leases. |
 
 Studio keeps every navigation item accessible so developers can discover the available inspection

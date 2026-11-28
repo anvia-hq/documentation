@@ -67,11 +67,9 @@ promise does not resolve until active-run cancellation observers and asynchronou
 finish. Close observability providers in `onShutdown`, after Studio has finalized root observations
 as `cancelled`. Cleanup also runs if server startup fails, such as when the port is already in use.
 
-## Clean up sandbox sessions explicitly
+## Clean up sandboxes
 
-Studio inspects only sandbox inspectors supplied explicitly through `StudioOptions.sandboxes`. It does not own or destroy the underlying sessions.
-
-Keep creation and cleanup in the same entry point:
+Studio inspects sandboxes registered through `StudioOptions.sandboxes` and those it discovers from agent sandbox tools. By default it does not destroy either kind. Keep creation and cleanup in the same entry point:
 
 ```ts
 import { DockerSandboxClient } from '@anvia/sandbox'
@@ -103,6 +101,8 @@ try {
 }
 ```
 
-The `catch` covers failures that happen outside the normal serving lifecycle. Apply the same ownership pattern to MCP clients, worker processes, temporary directories, and any resource created for the Studio process.
+The `catch` covers failures that happen outside the normal serving lifecycle.
+
+Alternatively, opt in to Studio-owned cleanup for a local Docker sandbox with `studioSandbox(sandbox, { disposeOnShutdown: true })` or the sandbox toolkit's `studio: { disposeOnShutdown: true }`. Studio then destroys it during `shutdown()`, after active runs drain and before `onShutdown`. `close()` does not run that cleanup. Apply the same ownership pattern to MCP clients, worker processes, temporary directories, and any resource created for the Studio process.
 
 See [Sandboxes](/studio/sandboxes) for the inspection surface and [Storage and persistence](/studio/configure/storage-and-persistence) for state that should survive a restart.

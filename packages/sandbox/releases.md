@@ -1,6 +1,15 @@
 # Releases
 
-The reviewed source release is `@anvia/sandbox` **1.4.0**. The entries below preserve notable v0 history.
+The reviewed source release is `@anvia/sandbox` **1.5.0**. The entries below preserve notable v0 history.
+
+## Changes in 1.5.0
+
+Reviewed `1.4.0` → `1.5.0` against SDK source on 2026-11-28. The published peer range is `@anvia/core` `^1.25.1`, which provides `Toolkit`.
+
+- `sandboxToolkit` and `desktopToolkit` return `@anvia/core` toolkits with `include`, `exclude`, `prefix`, `requiresApproval`, `timeoutMs`, and `instructions`.
+- Sandbox and desktop tools carry metadata that lets `@anvia/studio` 1.6.0 discover them; the `studio` option narrows it or disables it with `false`.
+- `DockerSandboxClient.createSandbox` accepts `pull: 'never' | 'if-missing' | 'always'` (`DockerImagePullPolicy`, default `'never'`).
+- `studioSandbox(sandbox, options?)` also accepts a local `DockerSandbox` or `SandboxRuntime`, with `disposeOnShutdown` for Docker handles. `studioSandbox` and `studioDesktopView` are now exported from the package root as well as `@anvia/sandbox/remote`.
 
 ## Changes in 1.4.0
 
@@ -26,6 +35,7 @@ See the [source changelog](https://github.com/anvia-hq/anvia/blob/7815383f045fa4
 
 | Version | Summary |
 | --- | --- |
+| `1.5.0` | Added `sandboxToolkit` and `desktopToolkit`, Studio discovery metadata with the `studio` option, the `pull` image policy, and local `studioSandbox` registrations with opt-in `disposeOnShutdown`. |
 | `1.4.0` | Added `SandboxError`/`isSandboxError`, Docker image and sandbox management (`hasImage`, `ensureImage`, `listSandboxes`, `destroySandbox`), `execText`, `sandboxToolRecovery`, handle-accepting tool factories with default tools, hub connection events, `waitForConnection`, `attach`, `createRelayTicketStore`, `anvia-sandbox --from`/`--version`, and stricter daemon CLI flags with tunnel environment options. |
 | `1.3.2` | Added `anvia-sandbox-daemon --check` and `--require`, desktop configuration from `ANVIA_SANDBOX_DESKTOP*` environment variables, `create-image --feature desktop`, and `studioSandbox`/`studioDesktopView` for Studio. Updated upstream runtime dependencies and the `zod` peer range. |
 | `1.3.1` | Fixed the browser tunnel and desktop relays on runtimes whose WebSocket cannot pause, such as Bun; a browser more than 4 MiB ahead of the service is closed with code 1008 instead of growing memory. |
