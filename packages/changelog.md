@@ -8,6 +8,7 @@ changelogs for exact fixes, additions, breaking changes, and migration notes.
 - [`@anvia/core`](https://github.com/anvia-hq/anvia/blob/main/packages/core/CHANGELOG.md)
 - [`@anvia/client`](https://github.com/anvia-hq/anvia/blob/main/packages/client/CHANGELOG.md)
 - [`@anvia/durable`](/packages/durable/releases)
+- [`@anvia/extensions`](/packages/extensions/releases)
 - [`@anvia/mcp`](/packages/mcp/releases)
 - [`@anvia/server`](https://github.com/anvia-hq/anvia/blob/main/packages/server/CHANGELOG.md)
 - [`@anvia/react`](https://github.com/anvia-hq/anvia/blob/main/packages/react/CHANGELOG.md)
