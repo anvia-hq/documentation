@@ -41,7 +41,7 @@ Callback data outside the portable limit never becomes an event. Send actions th
 
 ## Attachments
 
-Incoming events expose file IDs as normalized metadata: photos arrive as the largest available size, voice messages map to the `audio` type, and documents with an image MIME type map to `image`. `channel.loadAttachment()` resolves that metadata to bytes:
+Incoming events expose file IDs as normalized metadata: photos arrive as the largest available size, voice messages map to the `audio` type, and documents are classified by their MIME type: `image/*` documents map to `image`, `audio/*` to `audio`, `video/*` to `video`, and anything else to `file`. `channel.loadAttachment()` resolves that metadata to bytes:
 
 ```ts
 const attachment = event.attachments[0]
@@ -69,7 +69,7 @@ await channel.edit(sent, { text: 'Release candidate is live.' })
 await channel.delete(sent)
 ```
 
-`sent` is a `SentChannelMessage` from `channel.send()` or an element of the array returned by `sendChannelMessage()`. Editing is text-only: a message with attachments or a reply target cannot be edited, and editing a message without actions clears its inline keyboard. `react()` sets a single emoji reaction, replacing the bot's previous reaction on that message. `unreact()` takes the same arguments but ignores the emoji value — it always clears the bot's reaction. `showTyping()` sends the `typing` chat action and honors the address `threadId`.
+`sent` is a `SentChannelMessage` from `channel.send()` or an element of the array returned by `sendChannelMessage()`. Editing is text-only: a message with attachments or a reply target cannot be edited, and editing a message without actions clears its inline keyboard. `react()` sets a single emoji reaction, replacing the bot's previous reaction on that message. `unreact()` clears the bot's reaction only when the emoji matches the reaction this channel instance last set on that message; otherwise it makes no API call. Tracking is in memory per instance, so a reaction set by another process or before a restart is left untouched. Reaction writes to one message are serialized. `showTyping()` sends the `typing` chat action and honors the address `threadId`.
 
 ## Continue with
 

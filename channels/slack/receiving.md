@@ -20,7 +20,11 @@ await channel.start(async (event) => {
 
 Lifecycle events arrive too: `message-edited` carries the new text and attachments, `message-deleted` carries only the message ID, and `reaction` carries the emoji and a `removed` flag.
 
-Socket envelopes are acknowledged before handler execution, so Slack does not re-deliver while the handler runs. Duplicate deliveries are suppressed with a bounded in-memory set of event IDs, and bot-authored events are filtered before the application handler runs. Handler failures are reported through `onError` without disconnecting.
+Socket envelopes are acknowledged before handler execution, so Slack does not re-deliver while the handler runs. Bot-authored events are filtered before the application handler runs.
+
+Duplicate deliveries are suppressed in memory. Every event is keyed by its envelope type and event ID, and `message` and `app_mention` events also share a `message:<teamId>:<channelId>:<timestamp>` key, so a mention that Slack delivers through both subscriptions starts one run, not two. A key is recorded as handled only after the transport handler resolves, and an event whose key is still in flight is skipped. Each set remembers the most recent 1,000 keys, so deduplication does not survive a restart.
+
+With `slack()`, the channel catches application handler errors and reports them through `onError` (`operation: 'handle'`) without disconnecting. Because the error does not reach the transport, the event is still marked handled and is not retried. Only a handler passed directly to `SlackSocketTransport.start()` that throws leaves its keys unrecorded, so a redelivery or the paired envelope can run it again; see [Custom Slack transport](/channels/slack/transport).
 
 On start, the adapter calls `auth.test` to resolve the team and bot user identity before accepting events. Direct messages and app-home conversations normalize with conversation kind `'direct'`, multi-party direct messages with `'group'`, and channels with `'channel'`. A message is flagged `mentionedBot` for `app_mention` events or when its text contains the bot user mention.
 

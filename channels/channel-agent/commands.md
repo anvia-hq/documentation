@@ -4,7 +4,7 @@ The bridge opts into platform slash commands on request and reacts to the incomi
 
 ## Slash commands
 
-The Discord, Slack, and Telegram adapters emit a shared `ChannelCommandEvent` for platform slash-command invocations (`/ask …`), carrying the command `name` without the slash and the argument `text`. The service ignores them by default; opt in with `commands: true`:
+The Discord, Slack, and Telegram adapters emit a shared `ChannelCommandEvent` for platform slash-command invocations (`/ask …`), carrying the command `name` without the slash and the argument `text`. The service ignores them by default; opt in with `commands: true` to accept every command:
 
 ```ts
 const service = createChannelAgent({
@@ -14,7 +14,13 @@ const service = createChannelAgent({
 })
 ```
 
-An accepted command runs the agent with the prompt `/<name> <text>`; bot-authored commands are always ignored. For per-name control, pass options instead of `true`:
+An accepted command runs the agent with the prompt `/<name> <text>`; bot-authored commands are always ignored.
+
+::: warning Commands bypass the message filter
+The top-level `shouldHandle` applies to `message` events only and is never called for commands. With `commands: true`, the command filter defaults to `() => true`, so any user can run any command the platform delivers, in any conversation the bot can see. Put authorization and routing in `commands.shouldHandle` (and per-command `shouldHandle`) before enabling commands in shared workspaces.
+:::
+
+For per-name control, pass options instead of `true`:
 
 ```ts
 const service = createChannelAgent({
@@ -32,7 +38,7 @@ const service = createChannelAgent({
 })
 ```
 
-Every field of a per-command handler is optional: anything omitted falls back to the shared `createPrompt`, `createSession`, and `renderOutcome` behavior, and `shouldHandle` adds an extra filter for that name on top of the shared one.
+Every field of a per-command handler (`ChannelAgentCommandHandler`) is optional: anything omitted falls back to the shared `createPrompt`, `createSession`, and `renderOutcome` behavior, and `shouldHandle` adds an extra filter for that name on top of `commands.shouldHandle`. Commands with no entry under `commands` still run when `commands.shouldHandle` accepts them. Filter errors are reported with the `filter` stage and the command is skipped.
 
 ## Register the command on each platform
 
@@ -42,11 +48,11 @@ The bridge only handles invocations the platform delivers — register the comma
 - **Discord**: register the application command (through the developer portal or a registration script). The gateway handles chat-input interactions; command replies are delivered through the interaction webhook, including subsequent edits and follow-ups. The adapter preserves that reply routing through asynchronous handling; do not replace it with an unrelated channel send.
 - **Telegram**: commands (`/ask@botname`, `/ask`) are messages with a `bot_command` entity; the adapter emits a `command` event for those addressed to this bot. Publish the command list through BotFather or `setMyCommands`.
 
-Bot-authored commands are always ignored, and commands run through the same pipeline as messages: filtering, acknowledgement reactions, sessions, streaming, and interactions all apply.
+Bot-authored commands are always ignored. A command accepted by `commands.shouldHandle` then runs through the same pipeline as a message: acknowledgement reactions, sessions, streaming, and interactions all apply. Only the filtering step differs, as described above.
 
 ## Acknowledgement reactions
 
-React to the incoming message while the agent works on it. A string is shorthand for the acceptance reaction; `false` disables acknowledgements:
+Acknowledgements are off by default. Set `acknowledge` to react to the incoming message while the agent works on it. A string is shorthand for the acceptance reaction; `false` disables acknowledgements:
 
 ```ts
 const service = createChannelAgent({
@@ -56,7 +62,7 @@ const service = createChannelAgent({
 })
 ```
 
-Both reactions require `channel.capabilities.reactions` and `channel.react`. For the full lifecycle, pass options: `completeReaction` is added once a final response is delivered, and `clearOnCompletion` (default `true` when a completion reaction is configured) removes the acceptance reaction again wherever the adapter supports removals:
+Both reactions require `channel.capabilities.reactions` and `channel.react`. The string shorthand only adds the acceptance reaction; nothing is cleaned up afterwards. For the full lifecycle, pass options: `completeReaction` is added once a final response is delivered, and `clearOnCompletion` (default `true` when a completion reaction is configured) removes the acceptance reaction again wherever the adapter supports removals. Without `completeReaction`, no completion cleanup runs:
 
 ```ts
 const service = createChannelAgent({
@@ -70,7 +76,7 @@ const service = createChannelAgent({
 })
 ```
 
-Behaviour and limits: only events that pass `shouldHandle` are acknowledged (filtered, bot-authored, and lifecycle events never get reactions); all three standard adapters support reactions; a failed acknowledgement is reported through `onError` with the `acknowledge` stage and never interrupts the run; `false` (or omitting the option) disables acknowledgements.
+Behaviour and limits: only messages that pass `shouldHandle` and commands that pass `commands.shouldHandle` are acknowledged (filtered, bot-authored, button-action, and lifecycle events never get reactions); all three standard adapters support reactions; a failed acknowledgement is reported through `onError` with the `acknowledge` stage and never interrupts the run; `false` (or omitting the option) disables acknowledgements.
 
 ## Continue with
 

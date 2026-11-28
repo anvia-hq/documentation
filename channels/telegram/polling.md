@@ -29,13 +29,17 @@ const channel = telegram({
 await channel.start(handler)
 ```
 
-`start()` validates the token with `getMe`, then runs the background polling loop. The polling defaults are `timeoutSeconds: 30`, `retryDelayMs: 1_000`, and `limit: 100` (the limit must stay within Telegram's 1–100 range). The loop subscribes with `allowed_updates: ["message", "edited_message", "message_reaction", "callback_query"]` — other update kinds are never delivered (see [Receive scope](/channels/telegram/events)). Successfully handled updates advance the offset; handler failures are reported through `onError` and the update is retried.
+`start()` validates the token with `getMe`, then runs the background polling loop. The polling defaults are `timeoutSeconds: 30`, `retryDelayMs: 1_000`, and `limit: 100` (the limit must stay within Telegram's 1–100 range). The loop subscribes with `allowed_updates: ["message", "edited_message", "message_reaction", "callback_query"]` — other update kinds are never delivered (see [Receive scope](/channels/telegram/events)). Successfully handled updates advance the offset. When a handler fails, the failure is reported through `onError`, the rest of the batch waits, and the same update is retried after an exponentially growing delay that starts at `retryDelayMs`.
 
-Poll failures retry with exponential backoff: `retryDelayMs`, doubling per consecutive failure up to 30 seconds, resetting after a successful poll. Rate-limit responses (`429`) wait exactly the `retry_after` seconds the API returns instead. `onError` receives `context.operation` (`'poll'` or `'handle'`) and `context.errorCode` for Bot API errors, so applications can treat fatal codes such as `401` differently from transient ones.
+Poll failures retry with exponential backoff: `retryDelayMs`, doubling per consecutive failure up to 30 seconds, resetting after a successful poll. Rate-limit responses (`429`) wait exactly the `retry_after` seconds the API returns instead. Use `context.errorCode` to treat fatal codes such as `401` differently from transient ones.
+
+Handler retries are bounded by `maxHandlerAttempts` (default `10`, a positive integer set on the `telegram()` options). After that many failures the update is reported through `onError` with `poisoned: true` and skipped, so one bad update cannot stall delivery. Set `onError` to observe these drops; without it, skipped updates are discarded silently. The webhook transport applies the same bound per `update_id`.
+
+The `onError` context contains `operation` (`'poll'` or `'handle'`), `update` (the Telegram update for handler and callback-query failures), `errorCode` (for Bot API poll errors), and `poisoned` (when an update was skipped).
 
 Unparseable updates never stop the loop: each one is reported through `onError` and skipped, and the offset advances past it when an `update_id` can be extracted.
 
-Polling shutdown aborts an in-flight `getUpdates` and drains the loop; webhook shutdown rejects new deliveries and waits for active ones.
+Polling shutdown aborts an in-flight `getUpdates` and drains the loop. Webhook shutdown waits for active handlers; see [Telegram client and transport](/channels/telegram/client#shutdown).
 
 ## Continue with
 

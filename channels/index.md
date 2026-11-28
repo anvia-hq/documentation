@@ -4,10 +4,10 @@ Anvia Channels is a set of platform adapters that connect Discord, Slack, and Te
 
 Channels are a separate workspace from the [Anvia SDK](/sdk/). The SDK owns the model and agent runtime; Channels own platform input and delivery. Your application keeps owning credentials, persistence, and deployment.
 
-The five libraries are published on npm and require Node.js 24 or later. Install the channel contract and the adapters your application uses:
+The five libraries are published on npm and require Node.js 24 or later. Install the channel contract and the adapters your application uses. `@anvia/channel-agent` declares `@anvia/core` `^1.21.0` as a peer dependency, so install Core alongside it:
 
 ```sh
-pnpm add @anvia/channel @anvia/channel-agent @anvia/discord @anvia/slack @anvia/telegram
+pnpm add @anvia/core @anvia/channel @anvia/channel-agent @anvia/discord @anvia/slack @anvia/telegram
 ```
 
 ## Packages
@@ -52,7 +52,15 @@ process.once('SIGTERM', () => {
 })
 ```
 
-The bridge handles default message filtering, stable conversation sessions, multimodal prompts, streaming edits, long-message splitting, native actions, and paused approval or question flows. It also handles platform slash commands (opt-in per command), acknowledgement reactions while the agent works, and reaction cleanup on completion. See [Channel-agent bridge](/channels/channel-agent).
+The bridge handles default message filtering, stable conversation sessions, multimodal prompts, streaming edits, long-message splitting, native actions, and paused approval or question flows.
+
+Three behaviors are off until you configure them:
+
+- **Slash commands:** set `commands`. `commands: true` accepts every command name, and commands skip the top-level `shouldHandle` message filter, so authorize them with `commands.shouldHandle` or a per-command `shouldHandle`.
+- **Acknowledgement reactions:** set `acknowledge` to a reaction (or an options object) to react while the agent works.
+- **Reaction cleanup:** set `acknowledge.completeReaction`. Only then does the bridge remove the acknowledgement reaction (unless `clearOnCompletion: false`) and add the completion reaction.
+
+See [Channel-agent bridge](/channels/channel-agent).
 
 ## Send proactively
 

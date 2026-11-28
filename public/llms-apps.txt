@@ -1,6 +1,6 @@
 # Anvia Full-Stack Applications
 
-> Current stable v1 implementation context for server streaming and React chat. Updated 2026-11-04.
+> Current stable v1 implementation context for server streaming, React chat, and messaging channels. Updated 2026-11-28.
 
 Keep agents, provider credentials, tools, memory, retrieval, observers, continuations, and access
 control on the server. Send only the reviewed Client Protocol to the browser.
@@ -178,6 +178,35 @@ retried with a truncated history. The handler's `maxBodyBytes` is the binding ce
 returns the chat plus the durable run identity, status, and controls (`steer`, `cancel`, `retry`,
 `resolveTool`, `resolveMemoryWrite`). `chat.stop()` detaches the stream; `run.cancel()` cancels execution.
 
+## Messaging channels
+
+Anvia Channels (`@anvia/channel`, `@anvia/channel-agent`, `@anvia/discord`, `@anvia/slack`,
+`@anvia/telegram`) is a separate pre-1.0 workspace for Node.js 24+. `@anvia/channel-agent` declares
+`@anvia/core` `^1.21.0` as a peer.
+
+```ts
+import { createChannelAgent } from '@anvia/channel-agent'
+import { telegram } from '@anvia/telegram'
+
+// `agent` is the application's existing @anvia/core Agent.
+const service = createChannelAgent({
+  channel: telegram({ token: process.env.TELEGRAM_BOT_TOKEN! }),
+  agent,
+  streaming: { placeholder: 'Thinking…' },
+})
+
+await service.start()
+process.once('SIGTERM', () => void service.stop())
+```
+
+- Default filtering accepts direct messages and mentions from non-bot senders.
+- Per-sender sessions apply only when the agent has a memory store.
+- Slash commands (`commands`) and acknowledgement reactions (`acknowledge`) are opt-in. Commands skip
+  the top-level `shouldHandle`; authorize them with `commands.shouldHandle`.
+- Use `sendChannelMessage()` for proactive sends; it splits text at the platform limit and puts actions
+  and attachments on the final part. Wrap an adapter with `createRateLimitedChannel()` for pacing.
+- The application owns bot credentials, user authorization, interaction persistence, and deployment.
+
 ## Canonical documentation
 
 - Client protocol: https://docs.anvia.dev/packages/client/
@@ -190,3 +219,5 @@ returns the chat plus the durable run identity, status, and controls (`steer`, `
 - Secure streaming example: https://docs.anvia.dev/examples/applications/streaming-react-chat
 - Resumable streams: https://docs.anvia.dev/sdk/streaming/resumable-streams
 - Agent interactions: https://docs.anvia.dev/sdk/agents/interactions
+- Channels: https://docs.anvia.dev/channels/
+- Channels end-to-end: https://docs.anvia.dev/channels/end-to-end

@@ -25,14 +25,20 @@ await channel.start(async (event) => {
 ```
 
 - Events whose sender is any bot account are filtered out before delivery.
-- `mentionedBot` is true when a message mentions the bot via `@<botusername>` (or an inline text mention), addresses a command to it with its username suffix, or replies to one of its messages. A bare `/start` in a group still arrives as a `command` event, but with `mentionedBot === false`.
+- `mentionedBot` is true when a message mentions the bot via `@<botusername>` (or an inline text mention), contains a command entity addressed to it with its username suffix, or replies to one of its messages. `command` events carry no `mentionedBot` field; command targeting is described below.
 - The chat type maps to `conversation.kind`: `private` becomes `direct`, groups and supergroups become `group`, and channels become `channel`.
 - Ordinary emoji reactions are preserved. Custom emoji become `telegram:custom_emoji:<id>` and paid reactions become `telegram:paid`; anonymous reactions use the acting chat as the normalized sender.
 - Message edits arrive as `message-edited` events carrying the new text and attachments.
 
 ## Command targeting
 
-A message whose first entity is a `bot_command` at offset 0 becomes a `command` event: the name is lowercased with any `@target` stripped, and the remaining text is trimmed into `text`. A command addressed to a different bot (`/ask@otherbot`) is ignored; a command with no target passes through.
+A message whose first entity is a `bot_command` at offset 0 becomes a `command` event: the name is lowercased with any `@target` stripped, and the remaining text is trimmed into `text`. Whether the command reaches the handler depends on the chat:
+
+- **Private chats:** a command with no target (`/ask`) or targeting this bot (`/ask@yourbot`) becomes a `command` event.
+- **Groups and supergroups:** the command must target this bot (`/ask@yourbot`, matched case-insensitively). A bare `/ask` is dropped unless you construct the adapter with `allowBareGroupCommands: true`.
+- **Any chat:** a command addressed to a different bot (`/ask@otherbot`) is dropped.
+
+Dropped commands are not forwarded as ordinary messages, so they cannot start agent runs through message filters.
 
 ## Receive scope
 

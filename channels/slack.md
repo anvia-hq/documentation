@@ -25,7 +25,7 @@ Normal applications need only `slack()` and `sendChannelMessage()`. The parsing 
 2. Create an app-level token with `connections:write`; pass it as `appToken`.
 3. Install the app with a bot token containing `chat:write`.
 4. Add `app_mentions:read` plus the history scopes matching received conversations. A minimal direct-message setup uses `im:history`; broader subscriptions use `channels:history`, `groups:history`, or `mpim:history` as applicable.
-5. Add `files:read` for incoming attachment downloads, `files:write` for outbound attachments, and `reactions:write` for `channel.react()`. To receive reaction lifecycle events, also add `reactions:read` and subscribe to `reaction_added` and `reaction_removed`.
+5. Add `files:read` for incoming attachment downloads, `files:write` plus `files:read` for outbound attachments (the adapter reads the uploaded file to resolve the posted message timestamp, so a missing `files:read` fails after the upload), and `reactions:write` for `channel.react()`. To receive reaction lifecycle events, also add `reactions:read` and subscribe to `reaction_added` and `reaction_removed`.
 6. Subscribe to `app_mention` and `message.im` for mention-driven channels and direct messages.
 7. Enable **Interactivity & Shortcuts** for portable action buttons.
 8. Reinstall the app after changing scopes or subscriptions, and invite it to channels where it should receive mentions.
@@ -47,9 +47,11 @@ const channel = slack({
 })
 ```
 
-The app token should begin with `xapp-`; the installed bot token should begin with `xoxb-`. Never log either token. `maximumAttachmentBytes` defaults to 20 MiB and caps outbound attachment downloads as well as inbound attachment fetches.
+Use an app-level token (`xapp-…`) for `appToken` and the installed bot token (`xoxb-…`) for `botToken`. The adapter only checks that both are non-empty strings, so a swapped or wrong token surfaces as a Slack API error at `start()`. Never log either token. `maximumAttachmentBytes` defaults to 20 MiB, must be a positive safe integer (`TypeError` otherwise), and caps outbound attachment downloads as well as inbound attachment fetches.
 
-`onError` receives the error and a context object whose `operation` is `'socket'` for connection problems or `'handle'` when an event handler threw; the failing socket event is attached in the latter case. Socket Mode reconnects and disconnects are reported through the same callback. Observer failures never terminate delivery.
+`fetch` replaces `globalThis.fetch` for downloading attachments and uploading outbound files. Pass a restricted implementation when attachment URLs can come from users or models: enforce an origin allowlist and block private-network destinations.
+
+`onError` receives the error and a context object whose `operation` is `'socket'` for connection problems or `'handle'` when an event handler threw; the failing socket event is attached in the latter case. A handler failure is reported, not retried: the event is still recorded as handled, so Slack does not redeliver it to `slack()`. Socket Mode reconnects and disconnects are reported through the same callback. Observer failures never terminate delivery.
 
 ## Agent integration
 

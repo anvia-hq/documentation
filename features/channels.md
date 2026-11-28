@@ -44,7 +44,7 @@ await service.start()
 process.once('SIGTERM', () => void service.stop())
 ```
 
-By default the bridge handles direct messages and mentions, gives each sender its own memory session scope, serializes runs within a conversation, streams text through message edits, and splits long final output. Filtering, prompt building, slash commands, acknowledgement reactions, and interaction rendering are all configurable.
+By default the bridge handles direct messages and mentions, serializes runs within a conversation, streams text through message edits, and splits long final output. When the agent has a memory store, each sender also gets its own memory session scope; without one, runs have no conversation history. Filtering, prompt building, and interaction rendering are configurable; slash commands and acknowledgement reactions are opt-in.
 
 To send without receiving, use `sendChannelMessage()` from `@anvia/channel` with just an adapter. See [Sending](/channels/channel/sending).
 

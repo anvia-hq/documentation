@@ -24,11 +24,13 @@ await sendChannelMessage({
 })
 ```
 
-Text is posted first with `chat.postMessage` (link previews disabled), then files are uploaded sequentially with `files.uploadV2`. A multi-file delivery may be partially visible if a later upload fails; use idempotent application retries. `sendChannelMessage` splits text longer than 4000 characters into multiple messages and returns the sent parts. Direct `channel.send()` does not split: text over 4000 characters throws a `RangeError`, as does an empty message with no attachments.
+A message without attachments is posted with `chat.postMessage` (link previews disabled). A message with attachments is published as one file message: each file is uploaded through `files.getUploadURLExternal`, then a single `files.completeUploadExternal` call shares them all with the text (or the action blocks) as the message body. If any step fails, the adapter deletes the uploaded files and any shared message, then rethrows. When that cleanup also fails it throws `SlackFileDeliveryError`, an `AggregateError` whose `errors` hold the delivery and cleanup failures and whose `retryCleanup()` retries the deletion.
+
+`sendChannelMessage` splits text longer than 4000 characters into multiple messages and returns the sent parts. The Slack adapter keeps `replyToMessageId` on every split part, so continuations stay in the reply thread. Direct `channel.send()` does not split: text over 4000 characters throws a `RangeError`, and an empty message with no attachments throws a `TypeError`.
 
 Actions become Slack `actions` blocks with one button per action; the action `id` is returned as the `actionId` of an action event, and `style: 'primary' | 'danger'` maps to the matching Slack button color.
 
-Model-generated text is protected against unintended notifications: token mentions such as `<@U123>`, `<!channel>`, and `<#channel>` are HTML-escaped in outbound text, and `link_names` is disabled on every post.
+Model-generated text is protected against unintended notifications: token mentions such as `<@U123>`, `<!channel>`, and `<#channel>` are HTML-escaped in outbound text, and `link_names` is disabled on `chat.postMessage` and `chat.update` calls.
 
 ## Threads and replies
 
@@ -53,7 +55,9 @@ Message IDs and thread IDs are Slack timestamps such as `1712345678.123456`, not
 
 Incoming file URLs are token-bearing and private, so they are retained only inside the validated raw event. `channel.loadAttachment()` performs an authenticated, size-capped download with the bot token and returns base64 data; the token-bearing URL never reaches the agent prompt. Download URLs are restricted to Slack-controlled HTTPS domains.
 
-Outbound attachments accept HTTPS URLs or base64 data. Each file is downloaded or decoded, size-checked against `maximumAttachmentBytes`, and uploaded with `files.uploadV2` (into the thread when the target is threaded). A files-only message uses a zero-width-space text fallback because Slack requires one.
+Outbound attachments accept HTTPS URLs or base64 data. Each file is downloaded or decoded, size-checked against `maximumAttachmentBytes`, and uploaded as described in [Send messages](#send-messages); the completed file message is posted with `thread_ts` when the target is threaded. The adapter then calls `files.info` to resolve the posted message timestamp, which is why outbound files need `files:read`. A files-only message uses a zero-width-space text fallback because Slack requires one.
+
+The sent-message `id` of a file message is an opaque handle, `<timestamp>:<fileId>…` (for example `1712345678.123456:F0123ABCD`), rather than a bare timestamp. Persist the whole handle: `channel.delete()` uses the file IDs to remove the files as well as the message, and a bare timestamp would leave the files behind.
 
 ## Edits, deletes, and reactions
 
@@ -64,6 +68,8 @@ await channel.edit(sent, { text: 'The import is under review.' })
 await channel.react(sent, 'eyes')
 await channel.delete(sent)
 ```
+
+`message` and `address` are application values; `sent` is the first part returned by `sendChannelMessage()`.
 
 `edit()` accepts text-only changes; attachments and reply targets cannot be edited and throw a `TypeError`. `react()` strips surrounding colons from the emoji name before calling `reactions.add`. `unreact()` removes the bot's own reaction through `reactions.remove`, stripping colons the same way.
 

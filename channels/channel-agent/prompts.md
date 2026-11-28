@@ -21,7 +21,7 @@ const service = createChannelAgent({
 })
 ```
 
-Use `channelMessagePrompt()` inside a custom `createPrompt` so custom instructions do not silently discard attachments:
+The `multimodal` policy applies only to the default `createPrompt`. A custom `createPrompt` owns its attachment policy: the service-level limits and `multimodal: false` are not applied to it. Use `channelMessagePrompt()` inside a custom builder so custom instructions do not silently discard attachments, and pass the limits you want explicitly:
 
 ```ts
 import { channelMessagePrompt } from '@anvia/channel-agent'
@@ -40,7 +40,7 @@ const service = createChannelAgent({
 })
 ```
 
-Set `multimodal: false` to reject attachment-bearing input before the model runs.
+Set `multimodal: false` to make the default prompt builder reject attachment-bearing input before the model runs; the rejection is reported with the `prepare` stage.
 
 ## Continue with
 
