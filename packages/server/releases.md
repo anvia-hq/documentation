@@ -14,7 +14,7 @@ See the [source changelog](https://github.com/anvia-hq/anvia/blob/2322fcd9b00e4c
 
 | Version | Summary |
 | --- | --- |
-| `1.3.6` | Payload-limit admission now ends a durable run in terminal `failed`, and the handler returns 413 with `payload_too_large` or 429 with `capacity_exceeded` as `{ error, code, field? }`. Body-too-large 413 includes the `maxBodyBytes` limit, and retry recomputes inherited history without truncating it. `DurableHttpError` exposes `status`, `code`, `field`, and the server message. |
+| `1.3.6` | A run whose inherited history or input exceeds the payload limit when it starts now ends in terminal `failed` (an oversized prompt is still rejected at submission), and the handler returns 413 with `payload_too_large` or 429 with `capacity_exceeded` as `{ error, code, field? }`. Body-too-large 413 includes the `maxBodyBytes` limit, and retry recomputes inherited history without truncating it. `DurableHttpError` exposes `status`, `code`, `field`, and the server message. |
 | `1.3.5` | Validated resumable `after` cursors as nonnegative safe integers and returned a typed 400 `invalid_resumable_after` response. Evicted closed in-memory streams by TTL and count, oldest first, while never evicting running streams. Reopening a running stream now fails without disturbing its history instead of silently discarding it. |
 | `1.1.4` | Kept `code`, `retryable`, and JSON-safe `details` on JSONL/SSE error events (including prototype-defined fields `JSON.stringify` drops), degraded non-JSON-safe throws to `{ message }`, and exported `errorEvent`. |
 | `1.0.11` | Updated the Client dependency to `1.0.11`. |

@@ -55,10 +55,10 @@ For agents that fetch documentation instead of reading local files, start from t
 choose the narrowest topic guide:
 
 - [llms.txt](/llms.txt): Index of the documentation, stable v1 boundaries, and topic guides.
-- [Agents, tools, and MCP](/llms-agents.txt): Models, agents, tools, MCP, skills, multi-agent coordination, pipelines, sandboxing, and streaming.
-- [Full-stack applications](/llms-apps.txt): Server streaming, React client state, headless UI, authentication, cancellation, and resumption.
-- [Evaluations and observability](/llms-evals.txt): Tracing, Lens, runtime scoring, evaluation suites, datasets, and quality gates.
-- [RAG and retrieval](/llms-rag.txt): Ingestion, embeddings, vector stores, GraphRAG, metadata filters, and permission-aware retrieval.
+- [Agents, tools, and MCP](/llms-agents.txt): Models, agents, tools, MCP, skills, memory, agent teams, pipelines versus durable workflows, sandboxing, and streaming.
+- [Full-stack applications](/llms-apps.txt): Server streaming, React client state, headless UI, interactions, resumption, durable chat, authentication, cancellation, and Discord/Slack/Telegram channels.
+- [Evaluations and observability](/llms-evals.txt): Tracing, Lens setup, runtime scoring, evaluation suites, datasets, release comparison, and quality gates.
+- [RAG and retrieval](/llms-rag.txt): Vector indexes, vector stores, embeddings, metadata filters, GraphRAG, dynamic context, and permission-aware retrieval.
 
 ## Go deeper
 

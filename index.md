@@ -50,6 +50,17 @@ if (response.type === 'response') console.log(response.output)
 - [Security and Auth](/features/security): Keep authorization, secrets, and limits on the server.
 - [Observability](/features/observability) and [Evaluations](/features/evaluations): Trace, score, and compare releases.
 
+## LLM-ready docs
+
+Point a coding agent or LLM at plain-text guides instead of HTML pages. Start with the index, then
+load only the topic guide the task needs.
+
+- [llms.txt](/llms.txt): Index of the documentation, stable v1 boundaries, and topic guides.
+- [Agents, tools, and MCP](/llms-agents.txt): Models, agents, tools, MCP, skills, memory, agent teams, pipelines versus durable workflows, sandboxing, and streaming.
+- [Full-stack applications](/llms-apps.txt): Server streaming, React client state, headless UI, interactions, resumption, durable chat, authentication, cancellation, and Discord/Slack/Telegram channels.
+- [Evaluations and observability](/llms-evals.txt): Tracing, Lens setup, runtime scoring, evaluation suites, datasets, release comparison, and quality gates.
+- [RAG and retrieval](/llms-rag.txt): Vector indexes, vector stores, embeddings, metadata filters, GraphRAG, dynamic context, and permission-aware retrieval.
+
 ## What's new
 
 Anvia packages release independently. Read the [changelog](/packages/changelog) for recent

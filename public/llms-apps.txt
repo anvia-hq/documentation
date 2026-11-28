@@ -1,6 +1,6 @@
 # Anvia Full-Stack Applications
 
-> Current stable v1 implementation context for server streaming, React chat, and messaging channels. Updated 2026-11-28.
+> Current stable v1 implementation context for server streaming, React chat, durable chat, and messaging channels. Updated 2026-11-28; reviewed against Anvia SDK source dd0dec5 and Channels source bc762e9.
 
 Keep agents, provider credentials, tools, memory, retrieval, observers, continuations, and access
 control on the server. Send only the reviewed Client Protocol to the browser.
@@ -24,15 +24,20 @@ pnpm add @anvia/react react react-dom
 ```
 
 - `@anvia/client` defines browser-safe request, event, message, and transport contracts.
-- `@anvia/server` frames client events as a Fetch `Response` using JSONL or SSE.
+  Subpaths: `@anvia/client/durable` (`DurableClient`, `DurableHttpError`) and
+  `@anvia/client/durable-chat` (`createDurableChatTransport`, `DurableBusyError`).
+- `@anvia/server` frames client events as a Fetch `Response` using JSONL or SSE;
+  `@anvia/server/durable` exports `createDurableHandler()`.
 - `@anvia/react` owns chat and completion controllers, cancellation, resumption, and interactions.
-- `@anvia/react` also provides strictly headless primitives, and the package ships no CSS.
+- `@anvia/react` primitives are headless and the package ships no CSS. The one exception is the
+  sandbox terminal: import `@xterm/xterm/css/xterm.css` once when you render it.
 - `@anvia/cli` can copy editable shadcn/Tailwind components into the application.
 
 ## Server route
 
 The route is framework-independent because it uses standard `Request`, `Response`, and Web Streams.
-Authenticate, rate-limit, and authorize before starting model work.
+Authenticate, rate-limit, and authorize before starting model work. `supportAgent` is the
+application's server-side `Agent`.
 
 ```ts
 import { agentToClientStream, parseClientStreamRequest } from '@anvia/client'
@@ -59,6 +64,10 @@ Do not serialize raw runtime events directly. Projection is the security and com
 where private errors, reasoning, provider payloads, tool inputs, and tool outputs are omitted or
 mapped to intentional public events.
 
+Return the stream with `createClientStreamResponse()`. `createHttpClientTransport()` rejects any
+response without the `x-anvia-stream-protocol: anvia.client.v3` header, so a hand-rolled response
+fails on the client.
+
 ## React controller
 
 ```tsx
@@ -71,6 +80,7 @@ const transport = createHttpClientTransport({ endpoint: '/api/chat', format: 'js
 export function Chat() {
   const chat = useChat({ transport })
   const [input, setInput] = useState('')
+  const busy = chat.status === 'submitted' || chat.status === 'streaming' || chat.status === 'waiting'
 
   return (
     <form onSubmit={(event) => {
@@ -84,24 +94,29 @@ export function Chat() {
         </div>
       ))}
       <input value={input} onChange={(event) => setInput(event.target.value)} />
-      <button disabled={chat.status === 'submitted' || chat.status === 'streaming'}>Send</button>
+      <button disabled={busy}>Send</button>
       <button type="button" onClick={chat.stop}>Stop</button>
     </form>
   )
 }
 ```
 
-The same `format` must be configured at both ends. JSONL is the default; use SSE when existing
-infrastructure requires it. Test proxy buffering, idle timeouts, disconnect cancellation, and
-maximum request duration in the deployed environment.
+`chat.status` is `ready`, `submitted`, `streaming`, `waiting`, or `error`. `waiting` means the stream
+ended suspended on a pending approval or question: answer it with `respondToInteraction()` instead
+of sending a new message.
+
+The server defaults to JSONL. The client transport defaults to `auto` and infers the format from the
+response `content-type`; set the same explicit `format` at both ends when a proxy may rewrite
+headers. Use SSE when existing infrastructure requires it. Test proxy buffering, idle timeouts,
+disconnect cancellation, and maximum request duration in the deployed environment.
 
 ## Headless UI or editable components
 
 Use the CLI when the application wants an editable starting point:
 
 ```sh
-pnpm dlx @anvia/cli init
-pnpm dlx @anvia/cli add chat
+pnpm dlx @anvia/cli ui init
+pnpm dlx @anvia/cli ui add chat
 ```
 
 Or compose headless primitives directly:
@@ -140,28 +155,85 @@ There is no package stylesheet and no `data-anvia-*` styling contract. Use appli
 `asChild`, ARIA, `data-state`, and `data-role`. CLI output belongs to the application and can be
 edited freely; the `@anvia/react` primitives remain the behavior and accessibility foundation.
 
-## Interactions and resumability
+## Interactions
 
 Client Protocol v3 represents approval and question responses as `interaction_response` requests.
-The browser may hold the public interaction ID, but the server must map it to a protected
-continuation and verify actor, tenant, expiry, response type, and claim state. Side-effecting tools
-must remain idempotent because retries and reconnects cannot create an exactly-once guarantee.
+In React, read `chat.interactions.pending` (each entry carries the full request under `request`) and
+answer with:
 
-For resumable streams, use durable shared storage across replicas, authorize both thread and stream
-ownership, and apply retention/deletion policy separately to messages, uploads, stream envelopes,
-memory, and telemetry.
+```ts
+await chat.respondToInteraction({
+  interactionId,
+  response: { type: 'tool-approval', approved: true },
+})
+// Questions: { type: 'tool-question', answers: [{ questionId, value }] }
+```
 
-When the backend is a `@anvia/durable` endpoint, create one
-`createDurableChatTransport({ client, agentId, sessionId })` per chat session and pass it to
-`useChat`. The adapter submits only the last user message, maps durable journal events to Client
-Protocol frames, routes interactions to the active run, and uses the durable run ID and sequence as
-the resume cursor. `stop()` detaches the subscription; it does not cancel the run. Use
-`transport.controller.cancel()`, `retry()`, or `reattach()` explicitly. A busy session (HTTP 409)
-surfaces as `DurableBusyError` with the active run to reattach to.
+`HumanInputPrimitive` renders pending interactions; `useApproval()` and `useQuestion()` read its
+item context and must be used inside `HumanInputPrimitive.Approval` or `.Question`. These buttons do
+not decide who may answer. The server must map the public interaction ID to a protected continuation
+and verify actor, tenant, expiry, response type, and claim state. Side-effecting tools must remain
+idempotent because retries and reconnects cannot create an exactly-once guarantee.
 
-Durable payload limits are terminal for admission: a prompt, input, or inherited history over
-`maxPayloadBytes` ends the run as `failed`, returns HTTP 413 through the handler, and is never
-retried with a truncated history. The handler's `maxBodyBytes` is the binding ceiling for uploads.
+## Resumption
+
+```ts
+const chat = useChat({
+  transport,
+  resume: { key: 'support-chat', storage: 'sessionStorage', auto: true },
+})
+```
+
+The hook stores the stream ID, latest event ID, messages, interactions, and last request, and clears
+them when the stream ends. Resuming needs a matching server route: pass
+`resumable: { streamId, store }` to `createClientStreamResponse()`, and when the request carries
+`body.resume`, authorize it and replay with `resumeClientStreamResponse({ streamId, after, store })`.
+`createMemoryResumableStreamStore()` is process-local and loses records on restart.
+Use durable shared storage across replicas, authorize both thread and stream ownership, and apply
+retention/deletion policy separately to messages, uploads, stream envelopes, memory, and telemetry.
+
+## Cancellation
+
+`chat.stop()` aborts the request. For a normal `createClientStreamResponse()` route, cancelling the
+response body calls `return()` on the event iterator, and closing an active `AgentStream` cancels its
+run; server code can also call `stream.cancel(reason)`. A resumable stream deliberately keeps
+draining and storing the run after the reader disconnects. Cancellation never undoes completed tool
+calls or external writes. Platforms and proxies may still terminate work after a disconnect.
+
+## Authentication
+
+Authenticate and authorize in the route before any model or tool call, and make authentication
+failures cost zero provider calls. Browser history is untrusted content, not identity. For durable
+backends, `createDurableHandler({ runtime, authorize })` calls `authorize(request, resource)` for
+every operation, including reads; return `false` to deny. Trace context comes only from the server's
+`trace(request, resource)` hook. `DurableClient` sends application credentials through its
+`headers` (static or async function) and `credentials` options.
+
+## Durable chat
+
+When the backend is a `@anvia/durable` endpoint served by `createDurableHandler()`, create a
+`DurableClient({ endpoint })` and one
+`createDurableChatTransport({ client, agentId, sessionId })` per chat session, then pass the
+transport to `useChat`, or use `useDurableChat()` to get the chat plus run identity, status, and
+controls (`steer`, `cancel`, `retry`, `resolveTool`, `resolveMemoryWrite`).
+
+The adapter submits only the last user message, maps durable journal events to Client Protocol
+frames, routes interactions to the active run, and uses the durable run ID and sequence as the
+resume cursor. `chat.stop()` detaches the subscription; it does not cancel the run. Use
+`transport.controller.cancel()`, `retry()`, or `reattach()` explicitly.
+
+A busy session (HTTP 409) surfaces as `DurableBusyError`. Its `runId` is the unfinished run when it
+could be read back and `undefined` otherwise; reattach to it instead of submitting again.
+
+Payload limits (`maxPayloadBytes`) apply at two points:
+
+- A prompt over the limit is rejected at submission: the handler returns 413 with
+  `code: 'payload_too_large'` and `field: 'run.prompt'`, and no run is created.
+- Inherited session history or input that exceeds the limit when the run starts ends that run in
+  terminal `failed`; it never parks in `needs_attention` and is never retried with truncated history.
+
+The handler's `maxBodyBytes` (default 64 KiB) is the binding ceiling for request bodies and uploads;
+capacity limits return 429 with `Retry-After`.
 
 ## Production checklist
 
@@ -171,12 +243,6 @@ retried with a truncated history. The handler's `maxBodyBytes` is the binding ce
 - Ensure authentication failures cause zero provider and tool calls.
 - Sanitize public errors and keep credentials and observability payloads server-side.
 - Test aborts, reconnects, duplicate interaction decisions, cross-tenant IDs, and proxy buffering.
-
-## Durable chat
-
-`createDurableChatTransport()` adapts durable runs to the chat transport contract. In React, `useDurableChat()`
-returns the chat plus the durable run identity, status, and controls (`steer`, `cancel`, `retry`,
-`resolveTool`, `resolveMemoryWrite`). `chat.stop()` detaches the stream; `run.cancel()` cancels execution.
 
 ## Messaging channels
 
@@ -203,21 +269,26 @@ process.once('SIGTERM', () => void service.stop())
 - Per-sender sessions apply only when the agent has a memory store.
 - Slash commands (`commands`) and acknowledgement reactions (`acknowledge`) are opt-in. Commands skip
   the top-level `shouldHandle`; authorize them with `commands.shouldHandle`.
-- Use `sendChannelMessage()` for proactive sends; it splits text at the platform limit and puts actions
-  and attachments on the final part. Wrap an adapter with `createRateLimitedChannel()` for pacing.
+- For proactive sends, `sendChannelMessage()` from `@anvia/channel` splits text at the platform limit
+  and puts actions and attachments on the final part. Wrap an adapter with
+  `createRateLimitedChannel()` (also `@anvia/channel`) for pacing.
 - The application owns bot credentials, user authorization, interaction persistence, and deployment.
 
 ## Canonical documentation
 
-- Client protocol: https://docs.anvia.dev/packages/client/
+- Client protocol: https://docs.anvia.dev/packages/client
 - Durable chat transport: https://docs.anvia.dev/packages/client/durable-chat
-- Server: https://docs.anvia.dev/packages/server/
+- Server: https://docs.anvia.dev/packages/server
+- Durable HTTP handler: https://docs.anvia.dev/packages/durable/http
 - Durable execution: https://docs.anvia.dev/sdk/advanced/durable-execution
-- React controllers: https://docs.anvia.dev/packages/react/
+- React controllers: https://docs.anvia.dev/packages/react
+- React state, streaming, and resume: https://docs.anvia.dev/packages/react/state-and-streaming
 - React primitives: https://docs.anvia.dev/packages/react/capabilities
-- CLI: https://docs.anvia.dev/packages/cli/
+- CLI: https://docs.anvia.dev/packages/cli
 - Secure streaming example: https://docs.anvia.dev/examples/applications/streaming-react-chat
 - Resumable streams: https://docs.anvia.dev/sdk/streaming/resumable-streams
+- Errors and cancellation: https://docs.anvia.dev/sdk/streaming/errors-and-cancellation
 - Agent interactions: https://docs.anvia.dev/sdk/agents/interactions
-- Channels: https://docs.anvia.dev/channels/
+- Security and auth: https://docs.anvia.dev/features/security
+- Channels: https://docs.anvia.dev/channels
 - Channels end-to-end: https://docs.anvia.dev/channels/end-to-end

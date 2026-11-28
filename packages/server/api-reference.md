@@ -87,8 +87,10 @@ leaves the existing stream and its history untouched; opening a closed ID starts
 `createDurableHandler()` is exported from `@anvia/server/durable`. Payload and capacity rejections return a
 JSON body of `{ error, code, field? }`: `payload_too_large` maps to HTTP 413 and `capacity_exceeded` maps to
 HTTP 429. A request body over `maxBodyBytes` returns 413 with code `payload_too_large`, field `request.body`,
-and the configured `limit`. `maxBodyBytes` is the binding ceiling for uploads and defaults to 64 KiB. A run
-that fails payload admission is terminal `failed`; it does not wait in `needs_attention`. See
+and the configured `limit`. `maxBodyBytes` is the binding ceiling for uploads and defaults to 64 KiB. A prompt
+over `maxPayloadBytes` is rejected at submission with 413 (`field: 'run.prompt'`) and no run is created. A run
+whose inherited history or input exceeds the limit when it starts ends in terminal `failed`; it does not wait
+in `needs_attention`. See
 [HTTP server and client](/packages/durable/http#routes) for routes and authorization.
 
 ## Client event compatibility

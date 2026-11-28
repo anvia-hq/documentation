@@ -43,7 +43,7 @@ public behavior did not change.
 
 ## Lens server versus SDK
 
-Lens server documentation has its own [source/release review](/lens/#reviewed-baselines) dated 2026-11-23, with deployment/startup guidance checked against v0.20.1. The SDK inventory is reviewed at `aa39d29b` with `@anvia/lens` source 1.3.1; npm’s 1.2.5 artifact was independently checked for prompt APIs, and later source releases add OpenTelemetry 3.x alignment. Server and adapter versions are not synchronized. Use release-matched Compose assets and verify declared SDK ranges rather than refreshing coverage snapshots solely for a newer server.
+Lens server documentation has its own [source/release review](/lens/#reviewed-baselines) dated 2026-11-23, with deployment/startup guidance checked against v0.20.1. Evaluation guidance was rechecked on 2026-11-28 against Lens v0.22.1, which stores per-trial evaluation results (trial number, trial count, and cache status). The SDK inventory is reviewed at `dd0dec5c` with `@anvia/lens` source 1.3.2; npm’s 1.2.5 artifact was independently checked for prompt APIs, and later source releases add OpenTelemetry 3.x alignment. Server and adapter versions are not synchronized. Use release-matched Compose assets and verify declared SDK ranges rather than refreshing coverage snapshots solely for a newer server.
 
 ## Runtime compatibility
 

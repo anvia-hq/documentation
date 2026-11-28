@@ -8,18 +8,21 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 
 ## Topic Guides
 
-- [Agents, tools, and MCP](https://docs.anvia.dev/llms-agents.txt): Models, agents, tools, MCP, skills, multi-agent coordination, pipelines, sandboxing, and streaming.
-- [Full-stack applications](https://docs.anvia.dev/llms-apps.txt): Hono routes, `@anvia/server` streaming, `@anvia/react` client state and headless primitives, authentication, cancellation, resumption, and Discord/Slack/Telegram channels.
-- [Evaluations and observability](https://docs.anvia.dev/llms-evals.txt): Tracing, Lens, runtime scoring, evaluation suites, datasets, release comparison, quality gates, alerts, cost, and testing.
-- [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt): Raw-text ingestion, embeddings, vector stores, portable Neo4j/Memgraph GraphRAG, metadata filters, dynamic context, permission-aware retrieval, and memory boundaries.
+- [Agents, tools, and MCP](https://docs.anvia.dev/llms-agents.txt): Models, agents, tools, MCP, skills, memory, agent teams, pipelines versus durable workflows, sandboxing, and streaming.
+- [Full-stack applications](https://docs.anvia.dev/llms-apps.txt): `@anvia/server` streaming, `@anvia/react` client state, headless UI, interactions, resumption, durable chat, authentication, cancellation, and Discord/Slack/Telegram channels.
+- [Evaluations and observability](https://docs.anvia.dev/llms-evals.txt): Tracing, Lens setup, runtime scoring, evaluation suites, datasets, release comparison, and quality gates, with links to alerts, cost, and testing.
+- [RAG, knowledge, and retrieval](https://docs.anvia.dev/llms-rag.txt): Vector indexes, vector stores, embeddings, metadata filters, Neo4j/Memgraph GraphRAG, dynamic context, permission-aware retrieval, and memory boundaries.
 
 ## Stable v1 boundaries
+
+See [Compatibility and versioning](https://docs.anvia.dev/packages/compatibility-and-versioning) for supported versions, reviewed baselines, and the v0 to v1 migration boundary.
 
 - Construct agents, pipelines, and extractors directly; builder-era APIs are migration context only.
 - Use `@anvia/mcp` for MCP SDK v2 clients and transports. Core retains lightweight registration contracts.
 - Use Client Protocol v3 across `@anvia/client`, `@anvia/server`, and `@anvia/react`.
-- Treat the `@anvia/react` primitives as strictly headless. Use the CLI component guide (`anvia ui add chat`) for editable
-  application-owned UI. The CLI also installs coding-agent skills.
+- Treat the `@anvia/react` primitives as strictly headless. Use the CLI component guide (`pnpm dlx @anvia/cli ui add chat`) for
+  editable application-owned UI. The CLI also installs coding-agent skills; the bundled `anvia-*` skills are
+  manual-invocation only (for example `/anvia-agent` or `$anvia-agent`).
 - Parse files or run OCR in application code, then pass normalized text to Core document helpers.
   Provider adapters may separately support PDF attachments for model input.
 - Treat Anvia package versions independently and verify declared dependency ranges instead of
@@ -65,11 +68,14 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Versioned memory writes](https://docs.anvia.dev/sdk/memory/versioned-writes): Idempotency keys, optimistic versions, conflicts, and durable recorded memory.
 - [Knowledge](https://docs.anvia.dev/sdk/knowledges): Document loading, embeddings, vector stores, retrieval, and search tools.
 - [Structured output](https://docs.anvia.dev/sdk/structured-output): Schema-driven completion and agent output.
+- [Typed decisions](https://docs.anvia.dev/sdk/decisions): Bounded classification, routing, scoring, and verification questions with typed answers.
+- [Guardrails](https://docs.anvia.dev/sdk/guardrails): Allow, block, or rewrite model-facing input and output; separate from tool authorization.
 - [Pipelines](https://docs.anvia.dev/sdk/pipelines): Typed multi-step workflows, composition, parallelism, and production workers.
 - [Pipeline decisions and routing](https://docs.anvia.dev/sdk/pipelines/decisions-and-routing): Typed decision stages and choice-based routing to one branch pipeline.
 - [Pipeline runs and observability](https://docs.anvia.dev/sdk/pipelines/runs-and-errors): Named run and stage tracing, Agent trace nesting, operational events, and failure policy.
 - [Streaming](https://docs.anvia.dev/sdk/streaming): Completion and agent streams, event types, transports, cancellation, and resumption.
-- [Providers](https://docs.anvia.dev/sdk/providers): Provider adapters, supported capabilities, and provider selection.
+- [Providers](https://docs.anvia.dev/sdk/providers): OpenAI, Anthropic, Gemini, Mistral, Grok, and compatible provider APIs; capabilities and selection.
+- [Observability](https://docs.anvia.dev/sdk/observability): Agent observers, trace identity, lifecycle callbacks, and observer failure policy.
 - [Evaluations](https://docs.anvia.dev/sdk/evaluations): Offline suites, agent targets, metrics, and regression gates.
 - [Evaluation results](https://docs.anvia.dev/sdk/evaluations/results): Suite totals, `passed`, metric summaries, and per-case records.
 - [Trials and caching](https://docs.anvia.dev/sdk/evaluations/trials-and-caching): Repeated sampling, tag filters, and target caches.
@@ -80,6 +86,8 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Dynamic context](https://docs.anvia.dev/sdk/advanced/dynamic-context): Attach stable or request-specific context with permissions and filters.
 - [Hooks and run control](https://docs.anvia.dev/sdk/advanced/hooks): Observe and control runtime lifecycle points.
 - [Multi-agent systems](https://docs.anvia.dev/sdk/advanced/multi-agent): Agent composition, coordination, boundaries, and failure handling.
+- [Agent teams](https://docs.anvia.dev/sdk/advanced/multi-agent/agent-teams): `AgentTeam` coordinators, spawned member agents, and in-flight messaging between members.
+- [Durable execution](https://docs.anvia.dev/sdk/advanced/durable-execution): Durable workflows that survive restarts, as distinct from in-process runtime pipelines.
 - [MCP](https://docs.anvia.dev/sdk/advanced/mcp): Connect MCP servers, map results, and define trust boundaries.
 - [Agent skills](https://docs.anvia.dev/sdk/advanced/skills): Skill directories, `SKILL.md`, assets, loading, tools, and validation.
 - [Dynamic tools](https://docs.anvia.dev/sdk/advanced/dynamic-tools): Large tool catalogs, indexing, embedding, and safety.
@@ -99,40 +107,53 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Lens](https://docs.anvia.dev/lens/): Production observability and evaluation.
 - [Install and set up Lens](https://docs.anvia.dev/lens/install-and-setup): Connect an application to Lens.
 - [Your first trace](https://docs.anvia.dev/lens/your-first-trace): Capture and inspect runtime telemetry.
+- [Configure Lens tracing](https://docs.anvia.dev/lens/connect/anvia/configure-tracing): Create one Lens tracing instance at startup from environment variables or explicit options.
+- [Lens evaluations](https://docs.anvia.dev/lens/evaluations): Runs, results, datasets, comparison, and quality gates.
+- [Evaluation metrics](https://docs.anvia.dev/lens/evaluations/metrics): Every `@anvia/core/evals` metric, score keys, judge settings, and invalid results.
+- [Lens evidence policies](https://docs.anvia.dev/lens/evaluations/quality-gates/configure#require-valid-evidence-per-metric): Per-metric valid-case minimums and invalid/unknown budgets.
 - [Lens observability](https://docs.anvia.dev/lens/observability): Traces, sessions, users, costs, and alerts.
 - [Lens self-hosting](https://docs.anvia.dev/lens/self-hosting/architecture): Self-hosted architecture and operational guidance.
 - [Lens prompt management](https://docs.anvia.dev/lens/prompts): Immutable prompt versions and mutable deployment labels.
-- [Lens notification channels](https://docs.anvia.dev/lens/observability/alerts/channels): Slack, Discord, Telegram, and webhooks for new incidents.
 - [Lens workspace](https://docs.anvia.dev/lens/workspace): Workspace-wide member access; projects are not human-access isolation boundaries.
 - [Lens OIDC and SSO](https://docs.anvia.dev/lens/workspace/oidc): Provider configuration, invitations, provisioning, and recovery.
-- [Lens MCP access](https://docs.anvia.dev/lens/workspace/mcp-access): Workspace-wide read-only assistant diagnostics and payload permission.
-- [Lens System Health](https://docs.anvia.dev/lens/self-hosting/system-health): Host capacity, ingestion, dependencies, workers, and queues.
 - [Channels](https://docs.anvia.dev/channels/): Discord, Slack, and Telegram adapters that connect platforms to agents and support proactive delivery.
 - [Channels end-to-end guide](https://docs.anvia.dev/channels/end-to-end): `createChannelAgent()` with `discord()`, `slack()`, or `telegram()`; durable interactions with `SqliteChannelAgentInteractionStore`; proactive `sendChannelMessage()`.
+- [Discord](https://docs.anvia.dev/channels/discord), [Slack](https://docs.anvia.dev/channels/slack), and [Telegram](https://docs.anvia.dev/channels/telegram): Platform adapter setup, scopes or intents, receiving, and messaging.
 - [Channel core](https://docs.anvia.dev/channels/channel): `sendChannelMessage()`, `splitChannelMessage()`, `createRateLimitedChannel()`, and `PartialDeliveryError`.
 - [Channel-agent commands](https://docs.anvia.dev/channels/channel-agent/commands): Opt-in slash commands; commands skip the message filter, so authorize them with `commands.shouldHandle`.
 
 ## Packages
 
 - [Package catalog](https://docs.anvia.dev/packages/): Published packages and their roles.
-- [`@anvia/core`](https://docs.anvia.dev/packages/core/): Core runtime APIs for models, agents, tools, messages, and pipelines.
-- [`@anvia/server`](https://docs.anvia.dev/packages/server/): Server transports and streaming integration.
-- [`@anvia/react`](https://docs.anvia.dev/packages/react/): React state and hooks for Anvia streams.
-- [`@anvia/mcp`](https://docs.anvia.dev/packages/mcp/): MCP SDK v2 clients, transports, discovery, and lifecycle ownership.
+- [Compatibility and versioning](https://docs.anvia.dev/packages/compatibility-and-versioning): Independent package versions, reviewed baselines, and the v0 to v1 migration boundary.
+- [`@anvia/core`](https://docs.anvia.dev/packages/core): Core runtime APIs for models, agents, tools, messages, and pipelines.
+- [`@anvia/client`](https://docs.anvia.dev/packages/client): Framework-neutral Client Protocol v3 types, transports, and client-state reduction.
+- [`@anvia/server`](https://docs.anvia.dev/packages/server): Server transports and streaming integration.
+- [`@anvia/react`](https://docs.anvia.dev/packages/react): React state and hooks for Anvia streams.
 - [React primitives](https://docs.anvia.dev/packages/react/capabilities): Strictly headless React interface primitives that ship with `@anvia/react`.
-- [`@anvia/cli`](https://docs.anvia.dev/packages/cli/): Coding-agent skills and editable shadcn/Tailwind application components.
-- [CLI Agent Skills](https://docs.anvia.dev/packages/cli/agent-skills): Ten bundled skills (including experimental anvia-durable), Claude Code, Cursor, AGENTS.md/Codex, custom directories, and target-specific updates.
+- [`@anvia/durable`](https://docs.anvia.dev/packages/durable): Persisted model and tool checkpoints, submission, observation, and recovery after restarts.
+- [Durable goals](https://docs.anvia.dev/packages/durable/goals): Verified objectives across bounded sessions, continuing rounds, budgets, and pause/edit/message signals.
+- [Durable compaction](https://docs.anvia.dev/packages/durable/compaction): Registration-level summaries and recoverable active-loop projections without deleting canonical history.
+- [Durable steering](https://docs.anvia.dev/packages/durable/steering): Persisted user input and deduplicated receipts at safe execution boundaries.
+- [Durable tracing](https://docs.anvia.dev/packages/durable/tracing): Stable run traces, application chat grouping, and OpenTelemetry ID-generator setup.
+- [`@anvia/mcp`](https://docs.anvia.dev/packages/mcp): MCP SDK v2 clients, transports, discovery, and lifecycle ownership.
+- [`@anvia/sandbox`](https://docs.anvia.dev/packages/sandbox): Docker-backed workspaces, remote runtime, in-sandbox daemon, virtual desktop, and sandbox tools.
+- [`@anvia/studio`](https://docs.anvia.dev/packages/studio): Studio development UI and HTTP runtime around registered agents, pipelines, and graph explorers.
+- [`@anvia/cli`](https://docs.anvia.dev/packages/cli): Coding-agent skills and editable shadcn/Tailwind application components.
+- [CLI Agent Skills](https://docs.anvia.dev/packages/cli/agent-skills): Ten bundled manual-invocation skills (including experimental anvia-durable), Claude Code, Cursor, AGENTS.md/Codex, custom directories, and target-specific updates.
 - [CLI editable components](https://docs.anvia.dev/packages/cli/components): Registry items, optional explicit `@anvia/react` version pinning, controller wiring, and shared-file updates.
-- [CLI troubleshooting](https://docs.anvia.dev/packages/cli/troubleshooting): Pre-1.4.0 CLI limitations, aliases, and configuration.
-- [Model providers](https://docs.anvia.dev/sdk/providers): OpenAI, Anthropic, Gemini, Mistral, Grok, and compatible provider APIs.
+- [OpenAI decisions](https://docs.anvia.dev/packages/openai/decisions): Choice, score, check, multi-label mappings, request limits, and typed refusals.
 - [Memory adapters](https://docs.anvia.dev/sdk/memory/store-adapters): SQLite, PostgreSQL, Drizzle, and Prisma-backed memory.
 - [Vector stores](https://docs.anvia.dev/sdk/knowledges/vector-stores): Qdrant, Pinecone, pgvector, Redis, Chroma, LanceDB, Milvus, and Weaviate.
 - [Knowledge graphs](https://docs.anvia.dev/packages/graph): Portable graph contracts plus Neo4j and Memgraph adapters.
 - [Observability integrations](https://docs.anvia.dev/packages/): Logger, OpenTelemetry, Lens, and Langfuse packages.
 
+CLI guides document CLI 1.5.8: the `ui` and `skills` command groups, read-only update previews with `--apply` (introduced in 1.4.0), and manual-invocation bundled skills (1.5.8). Root `init`, `add`, and `update` remain aliases.
+
 ## Examples
 
 - [Examples index](https://docs.anvia.dev/examples/): Runnable patterns organized by use case.
+- [Golden path tutorial](https://docs.anvia.dev/examples/golden-path): One production-shaped app: a Discord agent with typed tools, durable memory, Lens traces, and a proactive report.
 - [Essentials](https://docs.anvia.dev/examples/essentials/first-agent): First agents, completions, memory, tools, streaming, and structured output.
 - [Agents and tools](https://docs.anvia.dev/examples/agents-and-tools/tool-calling): Tool calling, approvals, permissions, middleware, cancellation, and multi-agent composition.
 - [Knowledge and data](https://docs.anvia.dev/examples/knowledge-and-data/basic-rag): Retrieval, document ingestion, metadata filters, memory, and vector-store adapters.
@@ -147,14 +168,3 @@ Choose the narrowest topic guide that covers the task. These guides contain cura
 - [Comparisons](https://docs.anvia.dev/faqs/comparisons/): Anvia compared with adjacent SDKs and direct provider APIs.
 - [API references](https://docs.anvia.dev/references/): Reference entry points for public APIs.
 - [GitHub repository](https://github.com/anvia-hq/anvia): Anvia source code; exported package surfaces are authoritative when documentation and implementation differ.
-
-CLI guides document CLI 1.5.0: the ui/skills command groups and read-only update previews with --apply (introduced in 1.4.0). Root init/add/update remain aliases.
-
-## Updated runtime contracts
-
-- [Durable goals](https://docs.anvia.dev/packages/durable/goals): Verified objectives across bounded sessions, continuing rounds, budgets, and pause/edit/message signals.
-- [Durable compaction](https://docs.anvia.dev/packages/durable/compaction): Registration-level summaries and recoverable active-loop projections without deleting canonical history.
-- [Durable steering](https://docs.anvia.dev/packages/durable/steering): Persisted user input and deduplicated receipts at safe execution boundaries.
-- [Durable tracing](https://docs.anvia.dev/packages/durable/tracing): Stable run traces, application chat grouping, and OpenTelemetry ID-generator setup.
-- [OpenAI decisions](https://docs.anvia.dev/packages/openai/decisions): Choice, score, check, multi-label mappings, request limits, and typed refusals.
-- [Lens evidence policies](https://docs.anvia.dev/lens/evaluations/quality-gates/configure#require-valid-evidence-per-metric): Per-metric valid-case minimums and invalid/unknown budgets.
